@@ -1,0 +1,3 @@
+int integer webtrekk_sampling 0x7f020000
+int string webtrekk_track_domain 0x7f030000
+int string webtrekk_track_id 0x7f030001

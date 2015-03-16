@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="webtrekk_track_domain">myapp.q3.webtrekk.net</string>
+    <string name="webtrekk_track_id">12345678999</string>
+    <integer name="webtrekk_sampling">0</integer>
+</resources>

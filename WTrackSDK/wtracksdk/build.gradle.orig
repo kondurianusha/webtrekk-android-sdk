@@ -1,0 +1,41 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+/**
+ * JAR
+ */
+
+task clearJar(type: Delete) {
+    delete 'jar/wtracksdk.jar'
+}
+
+task makeJar(type: Copy) {
+    from('build/intermediates/bundles/release/')
+    into('jar/')
+    //include('classes.jar')
+    include('*')
+    rename ('classes.jar', 'wtracksdk.jar')
+}
+
+makeJar.dependsOn(clearJar, build)

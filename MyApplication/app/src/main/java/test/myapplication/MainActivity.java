@@ -1,11 +1,14 @@
 package test.myapplication;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import wtrack.tracking.WTrackApplication;
-import wtrack.tracking.Tracker;
+import android.view.View;
+
+import com.webtrekk.android.tracking.Tracker;
+import com.webtrekk.android.tracking.WTrackApplication;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -15,7 +18,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Tracker t = ((WTrackApplication) getApplication()).getTracker("test");
-        t.track("test test test hi");
+        t.track("test");
     }
 
 
@@ -39,5 +42,21 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /** Called when the user clicks the Page Example Activity Button button */
+    public void showPageExampleActivity(View view) {
+        Intent intent = new Intent(this, PageExampleActivity.class);
+        startActivity(intent);
+    }
+
+    public void showShopExampleActivity(View view) {
+        Intent intent = new Intent(this, ShopExampleActivity.class);
+        startActivity(intent);
+    }
+
+    public void showMediaExampleActivity(View view) {
+        Intent intent = new Intent(this, MediaExampleActivity.class);
+        startActivity(intent);
     }
 }

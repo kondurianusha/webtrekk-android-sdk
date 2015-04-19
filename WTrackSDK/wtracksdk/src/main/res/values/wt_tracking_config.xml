@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="version">0.1</string>
+    <string name="version">4.0</string>
     <string name="webtrekk_track_domain">q3.webtrekk.net</string>
     <string name="webtrekk_track_id">111111111111111</string>
     <integer name="webtrekk_sampling">0</integer>
@@ -8,16 +8,8 @@
     <bool name="json_tracking">false</bool>
     <!-- The following auto_track variables allow the customer to specify which automatic collected
      fields will be send with each request -->
-    <bool name="auto_track_resolution">true</bool>
-    <bool name="auto_track_depth">true</bool>
-    <bool name="auto_track_language">true</bool>
-    <bool name="auto_track_timezone">true</bool>
-    <bool name="auto_track_osname">true</bool>
-    <bool name="auto_track_osversion">true</bool>
+    <bool name="auto_track_language">false</bool>
     <bool name="auto_track_apilevel">true</bool>
-    <bool name="auto_track_device">true</bool>
-    <bool name="auto_track_trackinglib_version">false</bool>
-    <bool name="auto_track_app_language">true</bool>
     <bool name="auto_track_playstoreusername">false</bool>
     <bool name="auto_track_playstoremail">false</bool>
     <bool name="auto_track_appversion_name">true</bool>

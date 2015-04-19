@@ -1,9 +1,10 @@
 package test.myapplication;
 
+import com.webtrekk.android.tracking.WTrackApplication;
+
 /**
  * Created by user on 11/03/15.
  */
-import wtrack.tracking.WTrackApplication;
 
 public class MyApplication extends WTrackApplication {
 }

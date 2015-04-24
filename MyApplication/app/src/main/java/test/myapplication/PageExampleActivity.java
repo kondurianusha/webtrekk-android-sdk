@@ -55,9 +55,9 @@ public class PageExampleActivity extends ActionBarActivity {
 
     public void onCheckboxActionClicked(View view) {
         TrackingParams tp = new TrackingParams();
-        tp.add(Params.PAGE_CAT, 1, "Herren")
-                .add(Params.ACTION, 2, "Schuhe")
-                .add(Params.ACTION, 3, "Sportschuhe");
+        tp.add(Params.PAGE_CAT, "1", "Herren")
+                .add(Params.ACTION, "2", "Schuhe")
+                .add(Params.ACTION, "3", "Sportschuhe");
         t.track(tp);
     }
 
@@ -65,14 +65,14 @@ public class PageExampleActivity extends ActionBarActivity {
         TrackingParams tp = new TrackingParams();
         tp.add(Params.ACTION, "Action Button clicked")
                 .add(Params.ACTIVITY_NAME, this.getClass().getName())
-                .add(Params.ACTION, 1, "grey")
-                .add(Params.ACTION, 2, "pos3");
+                .add(Params.ACTION,"1", "grey")
+                .add(Params.ACTION,"2", "pos3");
         t.track(tp);
 
         TrackingParams tp_pageparams = new TrackingParams();
-        tp_pageparams.add(Params.PAGE, 1, "green")
-                .add(Params.PAGE, 2, "4")
-                .add(Params.PAGE, 3, "234");
+        tp_pageparams.add(Params.PAGE, "1", "green")
+                .add(Params.PAGE, "2", "4")
+                .add(Params.PAGE, "3", "234");
         t.track(tp_pageparams);
     }
 }

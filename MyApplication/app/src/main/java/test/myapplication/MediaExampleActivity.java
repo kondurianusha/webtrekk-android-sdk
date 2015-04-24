@@ -1,6 +1,7 @@
 package test.myapplication;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
@@ -11,48 +12,52 @@ import android.view.MenuItem;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.webtrekk.android.tracking.Tracker;
+import com.webtrekk.android.tracking.TrackingParams;
+import com.webtrekk.android.tracking.WTrackApplication;
 
 public class MediaExampleActivity extends ActionBarActivity {
-    private VideoView myVideoView;
+    private TrackedVideoView myVideoView;
     private int position = 0;
     private MediaController mediaControls;
+    private Tracker t;
+    TrackingParams tp;
+
+    private MediaPlayer mp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
-        if (mediaControls == null) {
-            mediaControls = new MediaController(MediaExampleActivity.this);
-        }
+        mediaControls = new MediaController(this);
+        t = ((WTrackApplication) getApplication()).getTracker("test");
 
-        // Find your VideoView in your video_main.xml layout
-        myVideoView = (VideoView) findViewById(R.id.videoView);
-
+        myVideoView = (TrackedVideoView) findViewById(R.id.videoView);
+        myVideoView.setT(t);
 
         try {
             myVideoView.setMediaController(mediaControls);
-            myVideoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.kitkat));
+            mediaControls.setAnchorView(myVideoView);
+            myVideoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.marv3));
 
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
             e.printStackTrace();
         }
-        //mediaControls.show();
-        mediaControls.setAnchorView(myVideoView);
-        mediaControls.setAlwaysDrawnWithCacheEnabled(true);
+
         myVideoView.requestFocus();
         myVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            // Close the progress bar and play the video
             public void onPrepared(MediaPlayer mp) {
+                mediaControls.show();
                 myVideoView.seekTo(position);
                 if (position == 0) {
-                    myVideoView.start();
-
+                    mp.start();
                 } else {
-                    myVideoView.pause();
+                    mp.pause();
                 }
             }
         });
+
     }
 
 
@@ -91,4 +96,5 @@ public class MediaExampleActivity extends ActionBarActivity {
         position = savedInstanceState.getInt("Position");
         myVideoView.seekTo(position);
     }
+
 }

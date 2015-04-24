@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="webtrekk_track_domain">atracktest.nglab.org</string>
-    <string name="webtrekk_track_id">12345678999</string>
+    <string name="webtrekk_track_domain">itberatungthomasdahlmann01.wt-eu02.net</string>
+    <string name="webtrekk_track_id">206091227398578</string>
     <integer name="webtrekk_sampling">0</integer>
 </resources>

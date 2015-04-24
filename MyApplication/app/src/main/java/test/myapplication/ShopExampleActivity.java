@@ -25,9 +25,9 @@ public class ShopExampleActivity extends ActionBarActivity {
         t.track();
         tp = new TrackingParams();
         tp.add(Params.PRODUCT, "Brauner Herrenschuh Leder: Mike")
-                .add(Params.PRODUCT_CAT, 1, "Herren")
-                .add(Params.PRODUCT_CAT, 2, "Schuhe")
-                .add(Params.PRODUCT_CAT, 3, "Leder")
+                .add(Params.PRODUCT_CAT, "1", "Herren")
+                .add(Params.PRODUCT_CAT, "2", "Schuhe")
+                .add(Params.PRODUCT_CAT, "3", "Leder")
                 .add(Params.PRODUCT_COUNT, "1")
                 .add(Params.PRODUCT_COST, "99,95")
                 .add(Params.PRODUCT_STATUS, "view")

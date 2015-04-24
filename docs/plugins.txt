@@ -1,0 +1,70 @@
+Doku Plugin erste Version
+
+
+Es gibt eine abstrakte Basis Klasse die Alle Plugins implementieren müssen:
+
+public abstract class Plugin {
+    WTrack wtrack;
+
+    public Plugin(WTrack wtrack) {
+        this.wtrack = wtrack;
+    }
+
+    // this function is called by the tracker for all requests before the request is made
+    public abstract void before_request(TrackingRequest request);
+
+    // this function is called by the tracker for all requests and all plugins after the requst is made
+    public abstract void after_request(TrackingRequest request);
+
+
+}
+
+Um jetzt ein einfaches Beispiel Plugin zu schreiben müssen nur die beiden Funktionen before und after_request überschrieben werden:
+
+public class HelloWorldPlugin extends Plugin {
+
+    public HelloWorldPlugin(WTrack wtrack) {
+        super(wtrack);
+    }
+
+
+    @Override
+    public void before_request(TrackingRequest request) {
+        Log.d(WTrack.LOGTAG, "plugin hello world: before_request");
+    }
+
+    @Override
+    public void after_request(TrackingRequest request) {
+        Log.d(WTrack.LOGTAG, "plugin hello world: after_request");
+    }
+
+}
+
+
+Die track() Methode der Tracker Klasse führt dann immer bevor ein Request zur Versandwarteschlange hinzugefügt wird die before_request Funktion aus. 
+Analog dazu wird nach versenden des Requests die after_request Funktion aufgerufen. 
+
+Die Methode erhalten jeweils ein TrackingRequest Objekt als Parameter. 
+
+Dieses enthält die TrackingParams, also alle von der TrackingLibrary und dem App Entwickler erfassten Werte. Zusätzlich enthält die TrackingParams 
+Klasse eine HashMap <String, Object> plugin_params, in welcher Parameter zur Übergabe an die Plugins gespeichert werden können. Diese werden für den Zusammenbau 
+des Requests bzw. der Request URL nicht weiter berücksichtigt und dienen lediglich zur Konfiguration der Plugins. 
+
+Ein Beispiel für die Parameterübergabe ist das ExampleScrollBottomPlugin, dieses fügt einen Page Parameter den aktuellen Tracking Parametern hinzu, wenn eine Listview
+bis zum Ende gescrollt wurde. 
+Dazu benötigt Das Plugin Zugriff auf die Listview. 
+
+Beim erzeugen der TrackingParams für den Request muss desshalb dieser Parameter übergeben werden:
+
+TrackingParams tp = new TrackingParams();
+
+// Funktionsheader in der Trackingparams Klasse public TrackingParams add(String key, Object value) {...}
+der konkrete Aufurf für die Listview sieht dann so aus:
+tp.add("Listview", this.findViewById("R.exampleListView");
+
+Und in dem Plugin kann dann wie folgt auf den Parameter zugegriffen werden:
+
+ListView lv = (ListView)request.getParams().getPlugin_params().get("ListView");
+
+Wichtig ist zunächst zu prüfen ob der entsprechende Parameter übergeben wurde, um NullPointerExceptions zu vermeiden.
+

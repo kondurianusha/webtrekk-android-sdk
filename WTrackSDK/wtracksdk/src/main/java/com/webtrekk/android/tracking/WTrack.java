@@ -10,11 +10,9 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 
 import com.webtrekk.android.trackingplugin.Plugin;
-import com.webtrekk.android.trackingplugin.ExampleDiscountAdNotificationPlugin;
 import com.webtrekk.android.trackingplugin.HelloWorldPlugin;
 import wtrack.wtracksdk.R;
 
@@ -49,18 +47,17 @@ public class WTrack {
 
     Resources res;
 
-    private String webtrekk_track_domain;
-    private String webtrekk_track_id;
+    private String webtrekkTrackDomain;
+    private String webtrekkTrackId;
     // TODO: sampling implementation behavior still unclear
     private int sampling;
     private boolean isSampling;
-    private boolean json_tracking;
-    private boolean optout;
+    private boolean isOptout;
     // TODO: in die xml config
     private long initialSendDelay = 0;
     private long sendDelay = 0;
 
-    private HashMap<TrackingParams.Params, String> auto_tracked_values;
+    private HashMap<TrackingParams.Params, String> autoTrackedValues;
     private HashMap<String, String> activityState;
 
     /* synchronized queue for all tracking requests, automatically runs in background threads, handled
@@ -84,7 +81,7 @@ public class WTrack {
         //this.requestQueue = new RequestQueue(cache, network);
         this.requestQueue = new RequestQueue(initialSendDelay, sendDelay);
         requestQueue.setContext(context);
-        auto_tracked_values = new HashMap<>();
+        autoTrackedValues = new HashMap<>();
         //this.res = app.getResources();
         this.res = context.getResources();
         this.context = context;
@@ -118,10 +115,9 @@ public class WTrack {
      * this inits the basic webtrekk tracking configuration, the xml values will be overwritten by the application
      */
     private void initFromXML() {
-        webtrekk_track_domain = res.getString(R.string.webtrekk_track_domain);
-        webtrekk_track_id = res.getString(R.string.webtrekk_track_id);
+        webtrekkTrackDomain = res.getString(R.string.webtrekk_track_domain);
+        webtrekkTrackId = res.getString(R.string.webtrekk_track_id);
         sampling = res.getInteger(R.integer.webtrekk_sampling);
-        json_tracking = res.getBoolean(R.bool.json_tracking);
         initialSendDelay = res.getInteger(R.integer.initial_send_delay);
         sendDelay = res.getInteger(R.integer.send_delay);
 
@@ -141,9 +137,8 @@ public class WTrack {
 
     public void setupOptedOut() {
         SharedPreferences preferences = this.context.getSharedPreferences(PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-        this.optout = preferences.getBoolean(PREFERENCE_KEY_OPTED_OUT, false);
-
-        L.log("optedOut = " + this.optout);
+        this.isOptout = preferences.getBoolean(PREFERENCE_KEY_OPTED_OUT, false);
+        L.log("optedOut = " + this.isOptout);
     }
 
     public void setupSampling() {
@@ -170,8 +165,12 @@ public class WTrack {
         if(!this.started) {
             setContext(activity);
         }
-        if(this.webtrekk_track_id == null) {
-            L.log("activityStart: trackid was not set");
+        if (this.webtrekkTrackDomain == null) {
+            L.log("activityStart: 'track_domain' was not set.");
+            return;
+        }
+        if(this.webtrekkTrackId == null) {
+            L.log("activityStart: track_id was not set");
             return;
         }
         if(this.currentActivity != null) {
@@ -186,6 +185,10 @@ public class WTrack {
             this.setupSampling();
             this.getEverId();
             this.started = true;
+            //TODO ? prüfen
+            // this.trackReferrer();
+            //TODO: auch prüfen, doof im prinzip wenn der code überall verteilt ist, die neue version ist da besser
+            // this.trackUpdate();
             L.log(("activityStart: Started tracking"));
 
         }
@@ -194,6 +197,9 @@ public class WTrack {
     public void activityStop(Activity activity) {
         if(activity == null) {
             L.log("activityStop: activity must not be null");
+            return;
+        }
+        if (this.currentActivity == null || this.currentActivity.get() != activity) {
             return;
         }
 
@@ -227,47 +233,47 @@ public class WTrack {
 
     /**
      * collecting all static data which remains the same for all trackers and requests
-     * this functions inserts all data into the auto_tracked_values HashMap for which tracking is enabled in the xml
+     * this functions inserts all data into the autoTrackedValues HashMap for which tracking is enabled in the xml
      * this data always stays the same for a device for all trackers if configured once
      * all trackers will append this values to their tracking requests as url/json params
      * customers can decide on their own based on their xml tracking config, which values they are interested in
      */
     private void collectAutomaticData() {
-        auto_tracked_values.put(TrackingParams.Params.SCREEN_RESOLUTION, HelperFunctions.getResolution(context));
-        auto_tracked_values.put(TrackingParams.Params.SCREEN_DEPTH, HelperFunctions.getDepth(context));
-        auto_tracked_values.put(TrackingParams.Params.TIMEZONE, HelperFunctions.getTimezone());
+        autoTrackedValues.put(TrackingParams.Params.SCREEN_RESOLUTION, HelperFunctions.getResolution(context));
+        autoTrackedValues.put(TrackingParams.Params.SCREEN_DEPTH, HelperFunctions.getDepth(context));
+        autoTrackedValues.put(TrackingParams.Params.TIMEZONE, HelperFunctions.getTimezone());
         String useragent = getUserAgent();
-        auto_tracked_values.put(TrackingParams.Params.USERAGENT, useragent);
-        auto_tracked_values.put(TrackingParams.Params.DEV_LANG, HelperFunctions.getLanguage());
+        autoTrackedValues.put(TrackingParams.Params.USERAGENT, useragent);
+        autoTrackedValues.put(TrackingParams.Params.DEV_LANG, HelperFunctions.getLanguage());
 
         if(res.getBoolean(R.bool.auto_track_apilevel)) {
-            auto_tracked_values.put(TrackingParams.Params.API_LEVEL, HelperFunctions.getAPILevel());
+            autoTrackedValues.put(TrackingParams.Params.API_LEVEL, HelperFunctions.getAPILevel());
 
         }
 
 
         if(res.getBoolean(R.bool.auto_track_playstoreusername)) {
             HashMap<String, String> playstoreprofile = HelperFunctions.getUserProfile(app);
-            auto_tracked_values.put(TrackingParams.Params.PLAYSTORE_SNAME, playstoreprofile.get("sname"));
-            auto_tracked_values.put(TrackingParams.Params.PLAYSTORE_GNAME, playstoreprofile.get("gname"));
+            autoTrackedValues.put(TrackingParams.Params.PLAYSTORE_SNAME, playstoreprofile.get("sname"));
+            autoTrackedValues.put(TrackingParams.Params.PLAYSTORE_GNAME, playstoreprofile.get("gname"));
 
         }
 
         if(res.getBoolean(R.bool.auto_track_playstoremail)) {
             HashMap<String, String> playstoreprofile = HelperFunctions.getUserProfile(app);
-            auto_tracked_values.put(TrackingParams.Params.PLAYSTORE_MAIL, playstoreprofile.get("email"));
+            autoTrackedValues.put(TrackingParams.Params.PLAYSTORE_MAIL, playstoreprofile.get("email"));
 
         }
         if(res.getBoolean(R.bool.auto_track_appversion_name)) {
-            auto_tracked_values.put(TrackingParams.Params.APP_VERSION_NAME, HelperFunctions.getAppVersionName(context));
+            autoTrackedValues.put(TrackingParams.Params.APP_VERSION_NAME, HelperFunctions.getAppVersionName(context));
 
         }
         if(res.getBoolean(R.bool.auto_track_appversion_code)) {
-            auto_tracked_values.put(TrackingParams.Params.APP_VERSION_CODE, String.valueOf(HelperFunctions.getAppVersionCode(context)));
+            autoTrackedValues.put(TrackingParams.Params.APP_VERSION_CODE, String.valueOf(HelperFunctions.getAppVersionCode(context)));
 
         }
         if(res.getBoolean(R.bool.auto_track_preinstalled)) {
-            auto_tracked_values.put(TrackingParams.Params.APP_PREINSTALLED, String.valueOf(HelperFunctions.isAppPreinstalled(context)));
+            autoTrackedValues.put(TrackingParams.Params.APP_PREINSTALLED, String.valueOf(HelperFunctions.isAppPreinstalled(context)));
 
         }
         if(res.getBoolean(R.bool.auto_track_advertiserid)) {
@@ -276,21 +282,21 @@ public class WTrack {
 
         // if the app is started for the first time, the param "one" is 1 otherwise its always 0
         if(HelperFunctions.firstStart(context)) {
-            auto_tracked_values.put(TrackingParams.Params.APP_FIRST_START, "1");
+            autoTrackedValues.put(TrackingParams.Params.APP_FIRST_START, "1");
             // the old version sets this sharedpreference key, so we do it here as well for compatibility
             SharedPreferences.Editor sharedPreferences = this.context.getSharedPreferences(PREFERENCE_FILE_NAME, Context.MODE_PRIVATE).edit();
             // if the ever id is null so we set the installation flag = new  for further usage
             sharedPreferences.putString(PREFERENCE_KEY_INSTALLATION_FLAG, "1");
             sharedPreferences.commit();
         } else {
-            auto_tracked_values.put(TrackingParams.Params.APP_FIRST_START, "0");
+            autoTrackedValues.put(TrackingParams.Params.APP_FIRST_START, "0");
         }
 
         // for comatilility reasons always add the sampling rate param to the url
-        auto_tracked_values.put(TrackingParams.Params.SAMPLING, String.valueOf(sampling));
+        autoTrackedValues.put(TrackingParams.Params.SAMPLING, String.valueOf(sampling));
 
         // always track the wt everid
-        auto_tracked_values.put(TrackingParams.Params.EVERID, getEverId());
+        autoTrackedValues.put(TrackingParams.Params.EVERID, getEverId());
 
         // if the app was updated, send out the update request once
         // TODO: nochmal klären hier wann und wie das mitgesendet wird
@@ -307,23 +313,23 @@ public class WTrack {
         return "Tracking Library " + TRACKING_LIBRARY_VERSION + "(" + HelperFunctions.getOSName() + ";" + HelperFunctions.getOSVersion() + ";" + HelperFunctions.getDevice() + ";" + Locale.getDefault() + ")";
     }
 
-    public String getWebtrekk_track_domain() {
-        return webtrekk_track_domain;
+    public String getWebtrekkTrackDomain() {
+        return webtrekkTrackDomain;
     }
 
-    public void setWebtrekk_track_domain(String webtrekk_track_domain) {
+    public void setWebtrekkTrackDomain(String webtrekkTrackDomain) {
         // TODO: if this.started so if tracking has already started the trackdomain can not be adjusted anymore
-        this.webtrekk_track_domain = webtrekk_track_domain;
+        this.webtrekkTrackDomain = webtrekkTrackDomain;
     }
 
-    public String getWebtrekk_track_id() {
-        return webtrekk_track_id;
+    public String getWebtrekkTrackId() {
+        return webtrekkTrackId;
     }
 
-    public void setWebtrekk_track_id(String webtrekk_track_id) {
+    public void setWebtrekkTrackId(String webtrekkTrackId) {
         // TODO: if this.started so if tracking has already started the trackid can not be adjusted anymore
 
-        this.webtrekk_track_id = webtrekk_track_id;
+        this.webtrekkTrackId = webtrekkTrackId;
     }
 
     public int getSampling() {
@@ -339,21 +345,14 @@ public class WTrack {
         this.sampling = sampling;
     }
 
-    public HashMap<TrackingParams.Params, String> getAuto_tracked_values() {
-        return auto_tracked_values;
+    public HashMap<TrackingParams.Params, String> getAutoTrackedValues() {
+        return autoTrackedValues;
     }
 
-    public void setAuto_tracked_values(HashMap<TrackingParams.Params, String> auto_tracked_values) {
-        this.auto_tracked_values = auto_tracked_values;
+    public void setAutoTrackedValues(HashMap<TrackingParams.Params, String> autoTrackedValues) {
+        this.autoTrackedValues = autoTrackedValues;
     }
 
-    public boolean isJson_tracking() {
-        return json_tracking;
-    }
-
-    public void setJson_tracking(boolean json_tracking) {
-        this.json_tracking = json_tracking;
-    }
 
     public RequestQueue getRequestQueue() {
         return requestQueue;
@@ -364,20 +363,20 @@ public class WTrack {
     }
 
     public boolean isOptout() {
-        return optout;
+        return isOptout;
     }
 
     public void setOptout(boolean oo) {
-        if (this.optout == oo) {
+        if (this.isOptout == oo) {
             return;
         }
 
-        this.optout = oo;
+        this.isOptout = oo;
 
         SharedPreferences preferences = this.context.getSharedPreferences(PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-        preferences.edit().putBoolean(PREFERENCE_KEY_OPTED_OUT, optout).commit();
+        preferences.edit().putBoolean(PREFERENCE_KEY_OPTED_OUT, isOptout).commit();
 
-        if (optout) {
+        if (isOptout) {
             this.requestQueue.clear();
         }
     }
@@ -444,5 +443,23 @@ public class WTrack {
         this.requestQueue.setSendDelay(sendDelay);
     }
 
+    public String getCurrentActivityName() {
+        return this.currentActivity.getClass().getName();
+    }
 
+    public boolean isStarted() {
+        return started;
+    }
+
+    public void setStarted(boolean started) {
+        this.started = started;
+    }
+
+    public boolean isSampling() {
+        return isSampling;
+    }
+
+    public void setIsSampling(boolean isSampling) {
+        this.isSampling = isSampling;
+    }
 }

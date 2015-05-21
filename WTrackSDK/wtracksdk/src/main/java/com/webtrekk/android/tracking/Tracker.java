@@ -1,7 +1,5 @@
 package com.webtrekk.android.tracking;
 
-import android.util.Log;
-
 import com.webtrekk.android.trackingplugin.Plugin;
 
 /**
@@ -28,7 +26,7 @@ public class Tracker {
         // don't track anything if the user opted out
         if(wtrack.isOptout()) return;
 
-        L.log("logging message: " + message + " to: " + wtrack.getWebtrekk_track_domain() + " with trackdid: " + wtrack.getWebtrekk_track_id());
+        L.log("logging message: " + message + " to: " + wtrack.getWebtrekkTrackDomain() + " with trackdid: " + wtrack.getWebtrekkTrackId());
 
     }
 
@@ -60,26 +58,18 @@ public class Tracker {
             String activity_name = new Throwable().getStackTrace()[2].getClassName();
             tp.add(TrackingParams.Params.ACTIVITY_NAME, activity_name);
         }
-        tp.add(wtrack.getAuto_tracked_values());
+        tp.add(wtrack.getAutoTrackedValues());
         tp.add(TrackingParams.Params.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
         TrackingRequest request;
-        if(wtrack.isJson_tracking()) {
-            request = new TrackingRequestJSON(tp, wtrack);
-        } else {
-            request = new TrackingRequestUrl(tp, wtrack);
-        }
+
+        request = new TrackingRequestUrl(tp, wtrack);
 
         // execute the before plugin functions
         for(Plugin p: wtrack.getPlugins()){
             p.before_request(request);
         }
 
-        // put the request on the send queue
-        if(wtrack.isJson_tracking()) {
-            // maybe later
-        } else {
-            wtrack.getRequestQueue().addUrl(((TrackingRequestUrl)request).getURLString());
-        }
+        wtrack.getRequestQueue().addUrl(((TrackingRequestUrl)request).getUrlString());
 
 
         // execute the after_request plugin functions

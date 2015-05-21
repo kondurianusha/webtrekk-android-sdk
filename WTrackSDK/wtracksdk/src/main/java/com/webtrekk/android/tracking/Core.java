@@ -3,22 +3,13 @@ package com.webtrekk.android.tracking;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Build;
-import android.util.Log;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * @deprecated  Use the new Tracker Interface instead
@@ -98,67 +89,11 @@ class Core {
     }
 
     public void activityStart(Activity activity) {
-        if (activity == null) {
-            this.log("activityStart: 'activity' must not be null.");
-            return;
-        }
-
-        if (!this.started) {
-            this.setContext(activity);
-        }
-
-        if (this.serverUrl == null) {
-            this.log("activityStart: 'serverUrl' was not set.");
-            return;
-        }
-        if (this.trackId == null) {
-            this.log("activityStart: 'trackId' was not set.");
-            return;
-        }
-
-        if (this.currentActivity != null) {
-            Activity currentActivity = this.currentActivity.get();
-            if (currentActivity == activity) {
-                return;
-            }
-        }
-
-        this.currentActivity = new WeakReference<Activity>(activity);
-
-        if (!this.started) {
-            this.setupSampling();
-            this.getEverId();
-
-            this.started = true;
-            this.log("activityStart: Started tracking.");
-
-            this.trackReferrer();
-
-            if(this.appVersionParameter != null) {
-                this.trackUpdate();
-            }
-        }
+       wtrack.activityStart(activity);
     }
 
     public void activityStop(Activity activity) {
-        if (activity == null) {
-            this.log("activityStop: 'activity' must not be null.");
-            return;
-        }
-
-        if (this.currentActivity == null
-                || this.currentActivity.get() != activity) {
-            return;
-        }
-
-        wtrack.getRequestQueue().saveBackup();
-
-        this.currentActivity = null;
-        this.isSampling = false;
-
-        this.started = false;
-
-        this.log("activityStop: Stopped tracking.");
+        wtrack.activityStop(activity);
     }
 
     public Context getContext() {
@@ -350,7 +285,7 @@ class Core {
      *    on how to use the new Tracking Interface.
      */
     public String getServerUrl() {
-        return wtrack.getWebtrekk_track_domain();
+        return wtrack.getWebtrekkTrackDomain();
     }
 
     /**
@@ -360,7 +295,7 @@ class Core {
      *    on how to use the new Tracking Interface.
      */
     public String getTrackId() {
-        return wtrack.getWebtrekk_track_id();
+        return wtrack.getWebtrekkTrackId();
     }
 
     /**
@@ -491,7 +426,7 @@ class Core {
      */
     @Deprecated
     public void setServerUrl(String serverUrl) {
-        wtrack.setWebtrekk_track_domain(serverUrl);
+        wtrack.setWebtrekkTrackDomain(serverUrl);
     }
 
     /**
@@ -502,7 +437,7 @@ class Core {
      */
     @Deprecated
     public void setTrackId(String trackId) {
-        wtrack.setWebtrekk_track_id(trackId);
+        wtrack.setWebtrekkTrackId(trackId);
     }
 
     public void setAppVersionParameter(String appVersionParameter){
@@ -586,12 +521,12 @@ class Core {
      */
     @Deprecated
     public void trackEvent(Map<String, String> data) {
-        if (!this.started) {
+        if (!wtrack.isStarted()) {
             this.log("trackEvent: Cannot track event as tracking is not started. Did you forget to call activityStart()?");
             return;
         }
 
-        if (this.optedOut || !this.isSampling) {
+        if (wtrack.isOptout() || !wtrack.isSampling()) {
             return;
         }
 
@@ -623,8 +558,10 @@ class Core {
         boolean appendedParameters = false;
 
         StringBuilder url = new StringBuilder();
-        url.append(this.serverUrl);
-        if (!this.serverUrl.endsWith("/")) {
+        //TODO: not really clever to do this check every time for a mistake which happens just once
+        // define the url ending in the documentation
+        url.append(wtrack.getWebtrekkTrackDomain());
+        if (!wtrack.getWebtrekkTrackDomain().endsWith("/")) {
             url.append('/');
         }
         url.append(this.trackId);

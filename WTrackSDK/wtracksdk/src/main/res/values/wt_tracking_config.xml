@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="webtrekk_track_domain">q3.webtrekk.net</string>
-    <string name="webtrekk_track_id">111111111111111</string>
+    <string name="webtrekkTrackDomain">http://q3.webtrekk.net</string>
+    <string name="webtrekkTrackId">111111111111111</string>
     <integer name="webtrekk_sampling">0</integer>
     <integer name="initial_send_delay">0</integer>
     <integer name="send_delay">0</integer>

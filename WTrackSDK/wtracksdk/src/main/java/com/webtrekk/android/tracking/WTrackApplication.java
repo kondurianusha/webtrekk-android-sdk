@@ -8,7 +8,7 @@ import java.util.HashMap;
 /**
  * Created by user on 01/03/15.
  *
- * This is the abstract base class which handles the creation of the WTrack Singleton class, and the initiatilation
+ * This is the abstract base class which handles the creation of the WTrack Singleton class, and the initialisation
  * of the tracker, every application which wants to use tracking functions needs to extend this class
  */
 public abstract class WTrackApplication extends Application {

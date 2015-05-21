@@ -17,7 +17,7 @@ public class MyApplication extends Application {
         Webtrekk.setOptedOut(false);
         Webtrekk.setSamplingRate(0);
         Webtrekk.setSendDelay(10000);
-        Webtrekk.setServerUrl("atracktest.nglab.org");
+        Webtrekk.setServerUrl("http://atracktest.nglab.org");
         Webtrekk.setTrackId("206091227999999");
 
         // Webtrekk.setAppVersionParameter("cs5");

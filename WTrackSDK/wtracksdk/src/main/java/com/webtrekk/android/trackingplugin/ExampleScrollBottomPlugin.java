@@ -1,9 +1,6 @@
 package com.webtrekk.android.trackingplugin;
 
-import android.util.Log;
 import android.widget.ListView;
-
-import java.util.HashMap;
 
 import com.webtrekk.android.tracking.L;
 import com.webtrekk.android.tracking.TrackingParams;
@@ -27,7 +24,7 @@ public class ExampleScrollBottomPlugin extends Plugin {
     @Override
     public void before_request(TrackingRequest request) {
         // make shure the neccesary plugin params are passed
-        ListView lv = (ListView)request.getParams().getPlugin_params().get("ListView");
+        ListView lv = (ListView)request.getParams().getPluginParams().get("ListView");
         if(lv == null) {
             L.log("missing Pluginparameter: ListView");
             return;

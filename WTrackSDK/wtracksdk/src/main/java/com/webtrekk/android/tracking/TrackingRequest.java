@@ -18,8 +18,8 @@ public abstract class TrackingRequest {
 
     protected TrackingRequest(WTrack wtrack) {
         if(wtrack != null) {
-            this.webtrekk_track_domain = wtrack.getWebtrekk_track_domain();
-            this.webtrekk_track_id = wtrack.getWebtrekk_track_id();
+            this.webtrekk_track_domain = wtrack.getWebtrekkTrackDomain();
+            this.webtrekk_track_id = wtrack.getWebtrekkTrackId();
         }
     }
 

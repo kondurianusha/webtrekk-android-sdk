@@ -39,6 +39,6 @@ public class TestApplication extends AndroidTestCase {
         assertEquals(HelperFunctions.getCountry(), "germany");
         assertEquals(HelperFunctions.getOSVersion(), "Lollipop");
         HelperFunctions.getAdvertiserID(app);
-        assertEquals(app.getWTRack().getAuto_tracked_values().get(TrackingParams.Params.ADVERTISER_ID), "asdf");
+        assertEquals(app.getWTRack().getAutoTrackedValues().get(TrackingParams.Params.ADVERTISER_ID), "asdf");
     }
 }

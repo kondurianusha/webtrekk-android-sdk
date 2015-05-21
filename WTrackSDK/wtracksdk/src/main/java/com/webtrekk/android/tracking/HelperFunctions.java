@@ -1,6 +1,5 @@
 package com.webtrekk.android.tracking;
 
-import android.app.Application;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -328,8 +327,8 @@ public class HelperFunctions {
                     Info adInfo = null;
                     try {
                         adInfo = AdvertisingIdClient.getAdvertisingIdInfo(app);
-                        app.getWTRack().getAuto_tracked_values().put(TrackingParams.Params.ADVERTISER_ID, adInfo.getId());
-                        app.getWTRack().getAuto_tracked_values().put(TrackingParams.Params.ADVERTISER_OPTOUT, String.valueOf(adInfo.isLimitAdTrackingEnabled()));
+                        app.getWTRack().getAutoTrackedValues().put(TrackingParams.Params.ADVERTISER_ID, adInfo.getId());
+                        app.getWTRack().getAutoTrackedValues().put(TrackingParams.Params.ADVERTISER_OPTOUT, String.valueOf(adInfo.isLimitAdTrackingEnabled()));
 
                     } catch (IOException e) {
                         // Unrecoverable error connecting to Google Play services (e.g.,

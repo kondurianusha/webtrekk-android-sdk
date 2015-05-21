@@ -1,7 +1,5 @@
 package com.webtrekk.android.tracking;
 
-import android.util.Log;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,29 +16,29 @@ public class TrackingParams {
     // general tracking params
     private TreeMap<Params, String> tparams;
     // customer trackingparams, defined by the app
-    private TreeMap<String, String> page_params;
-    private TreeMap<String, String> session_params;
-    private TreeMap<String, String> ecom_params;
-    private TreeMap<String, String> user_categories;
-    private TreeMap<String, String> page_categories;
-    private TreeMap<String, String> ad_params;
-    private TreeMap<String, String> action_params;
-    private TreeMap<String, String> product_categories;
-    private TreeMap<String, String> media_categories;
-    private HashMap<String, Object> plugin_params;
+    private TreeMap<String, String> pageParams;
+    private TreeMap<String, String> sessionParams;
+    private TreeMap<String, String> ecomParams;
+    private TreeMap<String, String> userCategories;
+    private TreeMap<String, String> pageCategories;
+    private TreeMap<String, String> adParams;
+    private TreeMap<String, String> actionParams;
+    private TreeMap<String, String> productCategories;
+    private TreeMap<String, String> mediaCategories;
+    private HashMap<String, Object> pluginParams;
 
 
     public TrackingParams() {
         this.tparams = new TreeMap<>();
-        this.page_params = new TreeMap<>();
-        this.session_params = new TreeMap<>();
-        this.ecom_params = new TreeMap<>();
-        this.user_categories = new TreeMap<>();
-        this.page_categories = new TreeMap<>();
-        this.ad_params = new TreeMap<>();
-        this.action_params = new TreeMap<>();
-        this.product_categories = new TreeMap<>();
-        this.media_categories = new TreeMap<>();
+        this.pageParams = new TreeMap<>();
+        this.sessionParams = new TreeMap<>();
+        this.ecomParams = new TreeMap<>();
+        this.userCategories = new TreeMap<>();
+        this.pageCategories = new TreeMap<>();
+        this.adParams = new TreeMap<>();
+        this.actionParams = new TreeMap<>();
+        this.productCategories = new TreeMap<>();
+        this.mediaCategories = new TreeMap<>();
     }
 
     /*
@@ -60,7 +58,7 @@ public class TrackingParams {
      * @return this
      */
     public TrackingParams add(String key, Object value) {
-        this.plugin_params.put(key, value);
+        this.pluginParams.put(key, value);
         return this;
     }
 
@@ -70,31 +68,31 @@ public class TrackingParams {
     public TrackingParams add(Params key, String index, String value) {
         switch(key) {
             case ACTION:
-                this.action_params.put(index, value);
+                this.actionParams.put(index, value);
                 break;
             case PAGE:
-                this.page_params.put(index, value);
+                this.pageParams.put(index, value);
                 break;
             case SESSION:
-                this.session_params.put(index, value);
+                this.sessionParams.put(index, value);
                 break;
             case ECOM:
-                this.ecom_params.put(index, value);
+                this.ecomParams.put(index, value);
                 break;
             case AD:
-                this.ad_params.put(index, value);
+                this.adParams.put(index, value);
                 break;
             case USER_CAT:
-                this.user_categories.put(index, value);
+                this.userCategories.put(index, value);
                 break;
             case PAGE_CAT:
-                this.page_categories.put(index, value);
+                this.pageCategories.put(index, value);
                 break;
             case PRODUCT_CAT:
-                this.product_categories.put(index, value);
+                this.productCategories.put(index, value);
                 break;
             case MEDIA_CAT:
-                this.media_categories.put(index, value);
+                this.mediaCategories.put(index, value);
                 break;
             default:
                 L.log( "invalid trackingparam type");
@@ -120,48 +118,48 @@ public class TrackingParams {
         return tparams;
     }
 
-    public TreeMap<String, String> getPage_params() {
-        return page_params;
+    public TreeMap<String, String> getPageParams() {
+        return pageParams;
     }
 
-    public TreeMap<String, String> getSession_params() {
-        return session_params;
+    public TreeMap<String, String> getSessionParams() {
+        return sessionParams;
     }
 
-    public TreeMap<String, String> getEcom_params() {
-        return ecom_params;
+    public TreeMap<String, String> getEcomParams() {
+        return ecomParams;
     }
 
-    public TreeMap<String, String> getUser_categories() {
-        return user_categories;
+    public TreeMap<String, String> getUserCategories() {
+        return userCategories;
     }
 
-    public TreeMap<String, String> getPage_categories() {
-        return page_categories;
+    public TreeMap<String, String> getPageCategories() {
+        return pageCategories;
     }
 
-    public TreeMap<String, String> getAd_params() {
-        return ad_params;
+    public TreeMap<String, String> getAdParams() {
+        return adParams;
     }
 
-    public TreeMap<String, String> getAction_params() {
-        return action_params;
+    public TreeMap<String, String> getActionParams() {
+        return actionParams;
     }
 
-    public TreeMap<String, String> getProduct_categories() {
-        return product_categories;
+    public TreeMap<String, String> getProductCategories() {
+        return productCategories;
     }
 
     public void setTparams(TreeMap<Params, String> tparams) {
         this.tparams = tparams;
     }
 
-    public TreeMap<String, String> getMedia_categories() {
-        return media_categories;
+    public TreeMap<String, String> getMediaCategories() {
+        return mediaCategories;
     }
 
-    public HashMap<String, Object> getPlugin_params() {
-        return plugin_params;
+    public HashMap<String, Object> getPluginParams() {
+        return pluginParams;
     }
 
     public enum Params {

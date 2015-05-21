@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="version">4.0</string>
     <string name="webtrekk_track_domain">q3.webtrekk.net</string>
     <string name="webtrekk_track_id">111111111111111</string>
     <integer name="webtrekk_sampling">0</integer>
+    <integer name="initial_send_delay">0</integer>
+    <integer name="send_delay">0</integer>
     <string name="application_version">1</string>
     <bool name="json_tracking">false</bool>
+    <bool name="ssl_only">false</bool>
     <!-- The following auto_track variables allow the customer to specify which automatic collected
      fields will be send with each request -->
     <bool name="auto_track_language">false</bool>
-    <bool name="auto_track_apilevel">true</bool>
+    <bool name="auto_track_apilevel">false</bool>
     <bool name="auto_track_playstoreusername">false</bool>
     <bool name="auto_track_playstoremail">false</bool>
-    <bool name="auto_track_appversion_name">true</bool>
-    <bool name="auto_track_appversion_code">true</bool>
+    <bool name="auto_track_appversion_name">false</bool>
+    <bool name="auto_track_appversion_code">false</bool>
     <bool name="auto_track_preinstalled">false</bool>
-    <bool name="auto_track_firststart">true</bool>
-    <bool name="auto_track_updated">true</bool>
+    <bool name="auto_track_updated">false</bool>
     <bool name="auto_track_advertiserid">false</bool>
     <bool name="auto_track_advertising_optout">false</bool>
+    <bool name="enable_plugin_hello_world">true</bool>
 </resources>

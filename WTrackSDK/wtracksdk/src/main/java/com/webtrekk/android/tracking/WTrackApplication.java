@@ -13,22 +13,15 @@ import java.util.HashMap;
  */
 public abstract class WTrackApplication extends Application {
     // a tracked application can have one ore more trackers identified bei their name
-    HashMap<String, Tracker> trackers = new HashMap<String, Tracker>();
-    WTrack wtrack;
+    private WTrack wtrack;
 
     public WTrack getWTRack() {
         Context context = getApplicationContext();
-        wtrack =  WTrack.getInstance(this, context);
+        wtrack =  WTrack.getInstance(context);
         return wtrack;
     }
 
     public Tracker getTracker(String name) {
-
-        if(trackers.containsKey(name)) {
-            return trackers.get(name);
-        }
-        Tracker t = new Tracker(name, getWTRack());
-        trackers.put(name, t);
-        return t;
+        return wtrack.getTracker();
     }
 }

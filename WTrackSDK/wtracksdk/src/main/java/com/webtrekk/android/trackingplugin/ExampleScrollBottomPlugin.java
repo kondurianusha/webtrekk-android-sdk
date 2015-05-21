@@ -5,6 +5,7 @@ import android.widget.ListView;
 
 import java.util.HashMap;
 
+import com.webtrekk.android.tracking.L;
 import com.webtrekk.android.tracking.TrackingParams;
 import com.webtrekk.android.tracking.TrackingRequest;
 import com.webtrekk.android.tracking.WTrack;
@@ -28,7 +29,7 @@ public class ExampleScrollBottomPlugin extends Plugin {
         // make shure the neccesary plugin params are passed
         ListView lv = (ListView)request.getParams().getPlugin_params().get("ListView");
         if(lv == null) {
-            Log.d(WTrack.LOGTAG, "missing Pluginparameter: ListView");
+            L.log("missing Pluginparameter: ListView");
             return;
         }
         if(lv.getLastVisiblePosition() == lv.getAdapter().getCount() -1 && lv.getChildAt(lv.getChildCount() - 1).getBottom() <= lv.getHeight()) {

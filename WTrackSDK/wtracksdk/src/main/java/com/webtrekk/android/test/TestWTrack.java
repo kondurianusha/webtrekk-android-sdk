@@ -29,7 +29,7 @@ public class TestWTrack extends AndroidTestCase {
 
 
     public void testInit() {
-        wtrack = WTrack.getInstance(null, null);
+        wtrack = WTrack.getInstance(null);
         assertEquals(1,1);
     }
 

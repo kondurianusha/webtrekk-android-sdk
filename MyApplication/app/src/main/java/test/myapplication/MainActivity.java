@@ -56,7 +56,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void showMediaExampleActivity(View view) {
-        Intent intent = new Intent(this, MediaExampleActivity.class);
+        //Intent intent = new Intent(this, MediaExampleActivity.class);
+        Intent intent = new Intent(this, MediaActivity.class);
+
         startActivity(intent);
     }
 }

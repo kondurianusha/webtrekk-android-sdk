@@ -8,17 +8,14 @@ import com.webtrekk.android.trackingplugin.Plugin;
  * Created by user on 01/03/15.
  */
 public class Tracker {
-    protected final String name;
     private WTrack wtrack;
 
 
     /**
      * creates a Tracker object
-     * @param name
      * @param wtrack
      */
-    public Tracker(String name, WTrack wtrack) {
-        this.name = name;
+    public Tracker(WTrack wtrack) {
         this.wtrack = wtrack;
     }
 
@@ -31,7 +28,7 @@ public class Tracker {
         // don't track anything if the user opted out
         if(wtrack.isOptout()) return;
 
-        Log.i(WTrack.LOGTAG, "logging message: " + message + " to: " + wtrack.getWebtrekk_track_domain() + " with trackdid: " + wtrack.getWebtrekk_track_id());
+        L.log("logging message: " + message + " to: " + wtrack.getWebtrekk_track_domain() + " with trackdid: " + wtrack.getWebtrekk_track_id());
 
     }
 
@@ -89,6 +86,67 @@ public class Tracker {
         for(Plugin p: wtrack.getPlugins()){
             p.after_request(request);
         }
+    }
+
+    public void trackReferrer() {
+        String campaign = "";
+        String content = "";
+        String medium = "";
+        String source = "";
+        String term = "";
+
+        String referrer = ReferrerReceiver.getStoredReferrer(wtrack.getContext());
+        if (referrer == null || referrer.length() == 0) {
+            return;
+        }
+
+        String[] components = referrer.split("&");
+        for (String component : components) {
+            String parameter[] = component.split("=", 2);
+            if (parameter.length < 2) {
+                continue;
+            }
+
+            String key = HelperFunctions.urlDecode(parameter[0]);
+            String value = HelperFunctions.urlDecode(parameter[1]);
+
+            if ("utm_campaign".equals(key)) {
+                campaign = value;
+            } else if ("utm_content".equals(key)) {
+                content = value;
+            } else if ("utm_medium".equals(key)) {
+                medium = value;
+            } else if ("utm_source".equals(key)) {
+                source = value;
+            } else if ("utm_term".equals(key)) {
+                term = value;
+            }
+        }
+        TrackingParams tp = new TrackingParams();
+
+        String campaignId = HelperFunctions.urlEncode(source + "." + medium + "." + content + "." + campaign);
+        if(!term.isEmpty())
+        {
+            campaignId += ";wt_kw%3D" + HelperFunctions.urlEncode(term);
+        }
+
+        tp.add(TrackingParams.Params.INSTALL_REFERRER_PARAMS_MC, campaignId);
+        tp.add(TrackingParams.Params.ACTIVITY_NAME, "app-installation");
+
+        track(tp);
+    }
+
+    public void trackUpdate() {
+        if(HelperFunctions.updated(wtrack.getContext())) {
+            L.log("is update");
+            TrackingParams tp = new TrackingParams();
+            tp.add(TrackingParams.Params.ACTIVITY_NAME, "update");
+            //tp.add(TrackingParams.Params.APP_UPDATE, "1");
+            track(tp);
+
+        }
+
+
     }
 
 

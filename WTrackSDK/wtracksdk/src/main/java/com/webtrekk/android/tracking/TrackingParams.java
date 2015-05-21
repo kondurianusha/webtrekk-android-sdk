@@ -97,7 +97,7 @@ public class TrackingParams {
                 this.media_categories.put(index, value);
                 break;
             default:
-                Log.d(WTrack.LOGTAG, "invalid trackingparam type");
+                L.log( "invalid trackingparam type");
         }
         return this;
     }
@@ -244,6 +244,9 @@ public class TrackingParams {
         PAGE_CAT(""),
         PRODUCT_CAT(""),
         MEDIA_CAT(""),
+        INSTALL_REFERRER_PARAMS_MC("wt_mc"), // for the referrer tracking
+        INSTALL_REFERRER_KEYWORD("wt_kw"), // for the referrer tracking
+        SAMPLING("ps"), // to submit the sampling value with each request which is an integer like 10
         // this are string/value pairs which are just used to pass objects/references and values to the plugins, they are not used by the tracking lib,
         PLUGIN_PARAM("");
 

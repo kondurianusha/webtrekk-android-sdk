@@ -37,13 +37,6 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ad &amp; Campaign Example"
-            android:id="@+id/button_adcampaign"
-            android:layout_gravity="center_horizontal" />
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:text="Media Example"
             android:id="@+id/button_media"
             android:layout_gravity="center_horizontal"

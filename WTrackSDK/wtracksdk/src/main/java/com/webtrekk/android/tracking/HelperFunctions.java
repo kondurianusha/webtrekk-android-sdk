@@ -14,6 +14,9 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,14 +39,14 @@ public class HelperFunctions {
 
     /**
      * returns a string of the display resolution, like 400x300
-     * @param app
+     * @param context
      * @return
      */
-    public static String getResolution(Application app) {
+    public static String getResolution(Context context) {
         String resolution = "";
         try {
             DisplayMetrics dm = new DisplayMetrics();
-            WindowManager wm = (WindowManager) app.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+            WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
             wm.getDefaultDisplay().getMetrics(dm);
 
             resolution = String.format("%sx%s", dm.widthPixels, dm.heightPixels);
@@ -55,10 +58,10 @@ public class HelperFunctions {
 
     /**
      * gets the screendepth, as its 32 default, return this value
-     * @param app
+     * @param context
      * @return
      */
-    public static String getDepth(Application app) {
+    public static String getDepth(Context context) {
         // since android 2.3
         return "32";
         //WindowManager wm = (WindowManager) app.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
@@ -92,11 +95,11 @@ public class HelperFunctions {
     }
 
     /**
-     * returns the timezone of the device
+     * returns the UTC Offset of the current timezone at the current time, in hours
      * @return
      */
     public static String getTimezone() {
-        return TimeZone.getDefault().getID();
+        return "" + (TimeZone.getDefault().getRawOffset()/1000/60/60);
     }
 
     /**
@@ -264,6 +267,7 @@ public class HelperFunctions {
      * @return
      */
     public static boolean updated(Context context) {
+        // this also automaticly handles the case when there is an update between the tracking lib
         int current_version = getAppVersionCode(context);
         int stored_version = context.getSharedPreferences(WTrack.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE).getInt(WTrack.PREFERENCE_APP_VERSIONCODE, -1);
         if(!firstStart(context) && current_version > stored_version ) {
@@ -298,6 +302,13 @@ public class HelperFunctions {
             }
         }
         return false;
+    }
+
+    public static boolean isNewInstallation(Context context) {
+            SharedPreferences preferences = context.getSharedPreferences(WTrack.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+            String installationFlag = preferences.getString(WTrack.PREFERENCE_KEY_INSTALLATION_FLAG, null);
+            return (installationFlag != null && installationFlag.equals("1"));
+
     }
 
     /**
@@ -335,6 +346,36 @@ public class HelperFunctions {
             }).start();
 
 
+        }
+    }
+
+    /**
+     * url encodes the given string as utf8
+     * replaces special strings like " " with %20
+     * @param string
+     * @return
+     */
+    public static String urlEncode(String string) {
+        if (string == null || string.length() == 0) {
+            return string;
+        }
+
+        try {
+            return URLEncoder.encode(string, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String urlDecode(String string) {
+        if (string == null || string.length() == 0) {
+            return string;
+        }
+
+        try {
+            return URLDecoder.decode(string, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
     }
 

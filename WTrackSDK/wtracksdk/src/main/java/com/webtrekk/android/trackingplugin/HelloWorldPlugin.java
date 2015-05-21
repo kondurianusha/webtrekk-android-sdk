@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.HashMap;
 
+import com.webtrekk.android.tracking.L;
 import com.webtrekk.android.tracking.TrackingParams;
 import com.webtrekk.android.tracking.TrackingRequest;
 import com.webtrekk.android.tracking.WTrack;
@@ -20,12 +21,12 @@ public class HelloWorldPlugin extends Plugin {
 
     @Override
     public void before_request(TrackingRequest request) {
-        Log.d(WTrack.LOGTAG, "plugin hello world: before_request");
+        L.log("plugin hello world: before_request");
     }
 
     @Override
     public void after_request(TrackingRequest request) {
-        Log.d(WTrack.LOGTAG, "plugin hello world: after_request");
+        L.log("plugin hello world: after_request");
     }
 
 }

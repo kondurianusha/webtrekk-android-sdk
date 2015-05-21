@@ -6,15 +6,21 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,45 +44,31 @@ public class RequestQueue {
 
     private File                    backupFile;
     private Context                 context;
-    private final AndroidHttpClient httpClient;
     private final long              initialSendDelay;
     private long                    sendDelay;
     private Thread                  sendRequestsThread;
     private int                     successfullSends;
     private final List<String>      urls;
     private boolean isLoggingEnabled;
+    private HttpURLConnection urlConnection;
 
 
 
 
     public RequestQueue(long initialSendDelay, long sendDelay) {
-        //TODO: httpconnection is deprecated and no longer supported, replace with urlconnection
-        HttpParams httpParameters = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParameters, NETWORK_CONNECTION_TIMEOUT);
-        HttpConnectionParams.setSoTimeout(httpParameters, NETWORK_CONNECTION_TIMEOUT);
 
-        this.httpClient       = AndroidHttpClient.newInstance(WTrack.getUserAgent());
         this.initialSendDelay = initialSendDelay;
         this.sendDelay        = sendDelay;
         this.urls             = new ArrayList<String>();
     }
 
-    public void log(String message) {
-        if (WTrack.isLoggingEnabled) {
-            Log.d(WTrack.LOGTAG, message);
-        }
-    }
-    public void log(String message, Throwable t) {
-        if (WTrack.isLoggingEnabled) {
-            Log.e(WTrack.LOGTAG, message, t);
-        }
-    }
+
 
     public synchronized void addUrl(String url) {
         if (this.urls.size() >= MAXIMUM_URL_COUNT) {
             this.urls.remove(0);
         }
-        log("adding url: " + url);
+        L.log("adding url: " + url);
 
         this.urls.add(url);
 
@@ -92,7 +84,9 @@ public class RequestQueue {
 
     @Override
     public void finalize() {
-        this.httpClient.close();
+        if(this.urlConnection != null) {
+            this.urlConnection.disconnect();
+        }
     }
 
 
@@ -123,7 +117,7 @@ public class RequestQueue {
                 this.urls.addAll(0, urls);
             }
         } catch (Exception e) {
-            this.log("loadBackup: Cannot load backup file '" + this.backupFile.getAbsolutePath() + "'", e);
+            L.log("loadBackup: Cannot load backup file '" + this.backupFile.getAbsolutePath() + "'", e);
         }
     }
 
@@ -134,7 +128,7 @@ public class RequestQueue {
         }
 
         if (!this.urls.isEmpty()) {
-            this.log("saveBackup: Saving backup of " + this.urls.size() + " URLs.");
+            L.log("saveBackup: Saving backup of " + this.urls.size() + " URLs.");
 
             try {
                 PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.backupFile), "UTF-8"), 2048));
@@ -148,14 +142,14 @@ public class RequestQueue {
                 }
             }
             catch (FileNotFoundException e) {
-                this.log("saveBackup: Cannot save backup of URLs.", e);
+                L.log("saveBackup: Cannot save backup of URLs.", e);
             }
             catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
         }
         else {
-            this.log("saveBackup: Deleting backup - queue is clear.");
+            L.log("saveBackup: Deleting backup - queue is clear.");
 
             if (this.backupFile.exists()) {
                 this.backupFile.delete();
@@ -189,12 +183,12 @@ public class RequestQueue {
         // this method must run in a separate worker thread!
 
         for (;;) {
-            HttpGet httpGet;
+            URL httpGet;
             String url;
 
             synchronized (this) {
                 if (this.urls.isEmpty()) {
-                    this.log("sendRequestsThreadLoop: Nothing to do.");
+                    L.log("sendRequestsThreadLoop: Nothing to do.");
 
                     this.sendRequestsThread = null;
                     return;
@@ -203,10 +197,16 @@ public class RequestQueue {
                 url = this.urls.get(0);
 
                 try {
-                    httpGet = new HttpGet(url);
+                    httpGet = new URL(url);
                 }
-                catch (IllegalArgumentException e) {
-                    this.log("sendRequestsThreadLoop: Removing invalid URL '" + url + "' from queue.");
+                catch (MalformedURLException e) {
+                    L.log("sendRequestsThreadLoop: Removing invalid URL '" + url + "' from queue.");
+
+                    this.urls.remove(0);
+                    continue;
+                }
+                catch (Exception e) {
+                    L.log("sendRequestsThreadLoop: Removing URL from queue because exception cannot be handled.", e);
 
                     this.urls.remove(0);
                     continue;
@@ -216,23 +216,28 @@ public class RequestQueue {
             boolean success = false;
             boolean retry = false;
 
-            this.log("sendRequestsThreadLoop: Opening connection to '" + url + "'.");
+            L.log("sendRequestsThreadLoop: Opening connection to '" + url + "'.");
 
             try {
-                HttpResponse response = this.httpClient.execute(httpGet);
+                this.urlConnection = (HttpURLConnection) httpGet.openConnection();
+                this.urlConnection.setRequestMethod("GET");
+                this.urlConnection.setConnectTimeout(NETWORK_CONNECTION_TIMEOUT);
+                this.urlConnection.setReadTimeout(NETWORK_CONNECTION_TIMEOUT);
+                this.urlConnection.setRequestProperty("User-Agent", WTrack.getUserAgent());
+                this.urlConnection.connect();
                 try {
-                    int statusCode = response.getStatusLine().getStatusCode();
+                    int statusCode = urlConnection.getResponseCode();
                     if (statusCode >= 200 && statusCode <= 299) {
-                        this.log("sendRequestsThreadLoop: Completed request to '" + url + "'.");
+                        L.log("sendRequestsThreadLoop: Completed request to '" + url + "'.");
 
                         success = true;
                     }
                     else {
-                        this.log("sendRequestsThreadLoop: Received status " + statusCode + " for '" + url + "'.");
+                        L.log("sendRequestsThreadLoop: Received status " + statusCode + " for '" + url + "'.");
 
                         if (statusCode <= 499 || statusCode >= 600) {
                             // client-side error. we cannot handle that.
-                            this.log("sendRequestsThreadLoop: Removing URL from queue because status code cannot be handled.");
+                            L.log("sendRequestsThreadLoop: Removing URL from queue because status code cannot be handled.");
                         }
                         else {
                             // server-side error. we can wait.
@@ -240,26 +245,32 @@ public class RequestQueue {
                         }
                     }
                 }
-                finally {
-                    if (response.getEntity() != null) {
-                        response.getEntity().consumeContent();
-                    }
+                catch (Exception e) {
+                    L.log("unknown exception: " , e);
                 }
             }
+            catch (EOFException e) {
+                L.log("sendRequestsThreadLoop: EOF > Will retry later.", e);
+                retry = true;
+            }
+            catch (SocketTimeoutException e) {
+                L.log("sendRequestsThreadLoop: SocketTimeout > Will retry later.", e);
+                retry = true;
+            }
             catch (ConnectTimeoutException e) {
-                this.log("sendRequestsThreadLoop: User is too deep in the jungle. Will retry later.", e);
+                L.log("sendRequestsThreadLoop: ConnectTimeout > Will retry later.", e);
                 retry = true;
             }
             catch (NoHttpResponseException e) {
-                this.log("sendRequestsThreadLoop: Server is nuts! Will retry later.", e);
+                L.log("sendRequestsThreadLoop: NoHttpResponse > Will retry later.", e);
                 retry = true;
             }
             catch (HttpHostConnectException e) {
-                this.log("sendRequestsThreadLoop: Uhm, server down? Will retry later.", e);
+                L.log("sendRequestsThreadLoop: HttpHostConnect > Will retry later.", e);
                 retry = true;
             }
             catch (UnknownHostException e) {
-                this.log("sendRequestsThreadLoop: User is too deep in the jungle. Will retry later.", e);
+                L.log("sendRequestsThreadLoop: UnknownHost > Will retry later.", e);
                 retry = true;
             }
             catch (InterruptedIOException e) {
@@ -268,9 +279,15 @@ public class RequestQueue {
                 this.sendRequestsThread = null;
                 return;
             }
+            catch(IOException e) {
+                L.log("io exception: can not connect to host", e);
+                L.log("sendRequestsThreadLoop: IO > Removing URL from queue because exception cannot be handled.", e);
+            }
             catch (Exception e) {
                 // we don't know how to resolve these - cannot retry
-                this.log("sendRequestsThreadLoop: Removing URL from queue because exception cannot be handled.", e);
+                L.log("sendRequestsThreadLoop: Removing URL from queue because exception cannot be handled.", e);
+                // IllegalStateException by setrequestproperty in case the connectin is already established
+                // NPE
             }
 
             synchronized (this) {
@@ -296,7 +313,7 @@ public class RequestQueue {
                 }
 
                 if (this.urls.isEmpty()) {
-                    this.log("sendRequestsThreadLoop: All done!");
+                    L.log("sendRequestsThreadLoop: All done!");
 
                     this.saveBackup();
 
@@ -313,7 +330,7 @@ public class RequestQueue {
             try {
                 long sendDelay = this.successfullSends > 0 ? this.sendDelay : this.initialSendDelay;
 
-                this.log("sendRequests: Will process next URL in " + sendDelay + " ms.");
+                L.log("sendRequests: Will process next URL in " + sendDelay + " ms.");
                 Thread.sleep(sendDelay);
             }
             catch (InterruptedException e) {
@@ -338,7 +355,7 @@ public class RequestQueue {
                 this.loadBackup();
 
                 if (!this.urls.isEmpty()) {
-                    this.log("setContext: Sending " + this.urls.size() + " backupped requests now.");
+                    L.log("setContext: Sending " + this.urls.size() + " backupped requests now.");
 
                     this.sendRequests(true);
                 }

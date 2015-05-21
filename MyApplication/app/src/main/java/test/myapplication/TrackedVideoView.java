@@ -30,7 +30,7 @@ public class TrackedVideoView extends VideoView {
         tp = new TrackingParams();
         tp.add(TrackingParams.Params.MEDIA_FILE, getResources().getResourceEntryName(R.raw.marv3));
         tp.add(TrackingParams.Params.MEDIA_LENGTH, String.valueOf(getDuration()));
-
+        tp.add(TrackingParams.Params.MEDIA_POS, String.valueOf(getCurrentPosition()));
         tp.add(TrackingParams.Params.MEDIA_CAT, "1", "mp3");
         tp.add(TrackingParams.Params.MEDIA_CAT, "1", "example");
     }
@@ -46,7 +46,7 @@ public class TrackedVideoView extends VideoView {
     @Override
     public void start() {
         super.start();
-        tp.add(TrackingParams.Params.MEDIA_ACTION, "pause");
+        tp.add(TrackingParams.Params.MEDIA_ACTION, "start");
         tp.add(TrackingParams.Params.MEDIA_POS, String.valueOf(getCurrentPosition()));
         t.track(tp);
     }
@@ -62,6 +62,7 @@ public class TrackedVideoView extends VideoView {
     @Override
     public void stopPlayback() {
         super.stopPlayback();
+        tp.add(TrackingParams.Params.MEDIA_POS, String.valueOf(getCurrentPosition()));
         tp.add(TrackingParams.Params.MEDIA_ACTION, "stop");
         t.track(tp);
     }

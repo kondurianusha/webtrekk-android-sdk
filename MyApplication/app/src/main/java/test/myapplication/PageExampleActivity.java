@@ -6,21 +6,35 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.webtrekk.android.tracking.Tracker;
-import com.webtrekk.android.tracking.TrackingParams;
-import com.webtrekk.android.tracking.WTrackApplication;
-import com.webtrekk.android.tracking.TrackingParams.Params;
+import com.webtrekk.webbtrekksdk.TrackingParameter;
+import com.webtrekk.webbtrekksdk.Webtrekk;
+import com.webtrekk.webbtrekksdk.WebtrekkApplication;
+import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
 
 
 public class PageExampleActivity extends ActionBarActivity {
-    private Tracker t;
+    private Webtrekk webtrekk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_page_example_activity);
-        t = ((WTrackApplication) getApplication()).getTracker("test");
-        t.track();
+        webtrekk = Webtrekk.getInstance();
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        webtrekk.startActivity("PageExampleActivity");
+        webtrekk.track();
+    }
+
+    @Override
+    public void onStop()
+    {
+        webtrekk.stopActivity();
+        super.onStop();
     }
 
 
@@ -47,32 +61,32 @@ public class PageExampleActivity extends ActionBarActivity {
     }
 
     public void onButtonActionClicked(View view) {
-        TrackingParams tp = new TrackingParams();
-        tp.add(Params.ACTION_NAME, "Action Button clicked")
-        .add(Params.ACTIVITY_NAME, this.getClass().getName());
-        t.track(tp);
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ACTION_NAME, "Action Button clicked")
+        .add(Parameter.ACTIVITY_NAME, this.getClass().getName());
+        webtrekk.track(tp);
     }
 
     public void onCheckboxActionClicked(View view) {
-        TrackingParams tp = new TrackingParams();
-        tp.add(Params.PAGE_CAT, "1", "Herren")
-                .add(Params.ACTION, "2", "Schuhe")
-                .add(Params.ACTION, "3", "Sportschuhe");
-        t.track(tp);
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.PAGE_CAT, "1", "Herren")
+                .add(Parameter.ACTION, "2", "Schuhe")
+                .add(Parameter.ACTION, "3", "Sportschuhe");
+        webtrekk.track(tp);
     }
 
     public void onButtonActionParamsClicked(View view) {
-        TrackingParams tp = new TrackingParams();
-        tp.add(Params.ACTION, "Action Button clicked")
-                .add(Params.ACTIVITY_NAME, this.getClass().getName())
-                .add(Params.ACTION,"1", "grey")
-                .add(Params.ACTION,"2", "pos3");
-        t.track(tp);
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ACTION, "Action Button clicked")
+                .add(Parameter.ACTIVITY_NAME, this.getClass().getName())
+                .add(Parameter.ACTION,"1", "grey")
+                .add(Parameter.ACTION,"2", "pos3");
+        webtrekk.track(tp);
 
-        TrackingParams tp_pageparams = new TrackingParams();
-        tp_pageparams.add(Params.PAGE, "1", "green")
-                .add(Params.PAGE, "2", "4")
-                .add(Params.PAGE, "3", "234");
-        t.track(tp_pageparams);
+        TrackingParameter tp_pageparams = new TrackingParameter();
+        tp_pageparams.add(Parameter.PAGE, "1", "green")
+                .add(Parameter.PAGE, "2", "4")
+                .add(Parameter.PAGE, "3", "234");
+        webtrekk.track(tp_pageparams);
     }
 }

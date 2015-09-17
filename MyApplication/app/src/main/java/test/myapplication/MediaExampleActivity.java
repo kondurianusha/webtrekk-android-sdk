@@ -1,7 +1,5 @@
 package test.myapplication;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
@@ -10,17 +8,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.MediaController;
-import android.widget.VideoView;
 
-import com.webtrekk.android.tracking.Tracker;
-import com.webtrekk.android.tracking.TrackingParams;
-import com.webtrekk.android.tracking.WTrackApplication;
+import com.webtrekk.webbtrekksdk.TrackingParams;
+import com.webtrekk.webbtrekksdk.Webtrekk;
+import com.webtrekk.webbtrekksdk.WebtrekkApplication;
 
 public class MediaExampleActivity extends ActionBarActivity {
     private TrackedVideoView myVideoView;
     private int position = 0;
     private MediaController mediaControls;
-    private Tracker t;
+    private Webtrekk webtrekk;
     TrackingParams tp;
 
     private MediaPlayer mp;
@@ -30,10 +27,10 @@ public class MediaExampleActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
         mediaControls = new MediaController(this);
-        t = ((WTrackApplication) getApplication()).getTracker("test");
+        webtrekk = Webtrekk.getInstance();
 
         myVideoView = (TrackedVideoView) findViewById(R.id.videoView);
-        myVideoView.setT(t);
+        myVideoView.setWebtrekk(webtrekk);
 
         try {
             myVideoView.setMediaController(mediaControls);
@@ -60,6 +57,20 @@ public class MediaExampleActivity extends ActionBarActivity {
 
     }
 
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        webtrekk.startActivity("MediaExampleActivity");
+        webtrekk.track();
+    }
+
+    @Override
+    public void onStop()
+    {
+        webtrekk.stopActivity();
+        super.onStop();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

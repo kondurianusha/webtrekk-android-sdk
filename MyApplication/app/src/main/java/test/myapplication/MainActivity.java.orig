@@ -15,8 +15,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Tracker t = ((WTrackApplication) getApplication()).getTracker("test");
-        t.track("test test test hi");
+        Tracker webtrekk = ((WTrackApplication) getApplication()).getTracker("test");
+        webtrekk.track("test test test hi");
     }
 
 

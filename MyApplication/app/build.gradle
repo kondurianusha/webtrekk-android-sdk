@@ -23,7 +23,7 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.0.0'
     //compile(name:'volley-release', ext: 'aar')
-    compile(name:'wtracksdk-release', ext:'aar')
+    compile(name:'WebtrekkSDK-release', ext:'aar')
     //compile files('libs/wtracksdk.jar')
 }
 

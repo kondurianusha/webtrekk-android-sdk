@@ -7,18 +7,35 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.webtrekk.android.tracking.Tracker;
-import com.webtrekk.android.tracking.WTrackApplication;
+import com.webtrekk.webbtrekksdk.Webtrekk;
+import com.webtrekk.webbtrekksdk.WebtrekkApplication;
 
 
 public class MainActivity extends ActionBarActivity {
+    private Webtrekk webtrekk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Tracker t = ((WTrackApplication) getApplication()).getTracker("test");
-        t.track("test");
+        webtrekk = Webtrekk.getInstance();
+        webtrekk.initWebtrekk(this);
+
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        webtrekk.startActivity("MainActivity");
+        webtrekk.track();
+    }
+
+    @Override
+    public void onStop()
+    {
+        webtrekk.stopActivity();
+        super.onStop();
     }
 
 

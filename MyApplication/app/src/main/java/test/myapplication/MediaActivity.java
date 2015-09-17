@@ -11,9 +11,15 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.webtrekk.android.tracking.Tracker;
-import com.webtrekk.android.tracking.TrackingParams;
-import com.webtrekk.android.tracking.WTrackApplication;
+import com.webtrekk.webbtrekksdk.TrackingParameter;
+import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
+
+import com.webtrekk.webbtrekksdk.Webtrekk;
+import com.webtrekk.webbtrekksdk.WebtrekkApplication;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class MediaActivity extends ActionBarActivity {
@@ -21,9 +27,10 @@ public class MediaActivity extends ActionBarActivity {
 
     SeekBar playProgressBar;
     TextView currentMediaPositionField;
-    private Tracker t;
-    TrackingParams tp;
+    private Webtrekk webtrekk;
+    TrackingParameter tp;
     private String currentState = ""; // this variable stores the current state (play/pause/stop)
+    private ScheduledExecutorService timerService;
 
     int getCurrentPlayProgress() {
         return (int) (MEDIA_LENGTH * (this.playProgressBar.getProgress() / 100.0) * 1000);
@@ -31,19 +38,21 @@ public class MediaActivity extends ActionBarActivity {
 
     public void initMediaTracking() {
         // Tracker initialisieren
-        t = ((WTrackApplication) getApplication()).getTracker("test");
+
         int progress = MediaActivity.this.getCurrentPlayProgress();
 
         if (MediaActivity.this.tp == null) {
-            MediaActivity.this.tp = new TrackingParams();
-            MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_FILE, "android-demo-media"); // Name des Videos
-            MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_LENGTH, String.valueOf(MEDIA_LENGTH)); // Dauer des Videos in Millisekunden
-            MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_POS, String.valueOf(progress)); // Startposition des Videos in Millisekunden
-            MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_CAT, "1", "demo-category-1"); // optional - Mediakategorien
-            MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_CAT, "2", "demo-category-2");
-            MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_CAT, "2", "demo-category-2");
-            MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_ACTION, "init");
-            MediaActivity.this.t.track(tp);
+            MediaActivity.this.tp = new TrackingParameter();
+            MediaActivity.this.tp.add(Parameter.MEDIA_FILE, "android-demo-media"); // Name des Videos
+            MediaActivity.this.tp.add(Parameter.MEDIA_LENGTH, String.valueOf(MEDIA_LENGTH)); // Dauer des Videos in Millisekunden
+            MediaActivity.this.tp.add(Parameter.MEDIA_POS, String.valueOf(progress)); // Startposition des Videos in Millisekunden
+            MediaActivity.this.tp.add(Parameter.MEDIA_CAT, "1", "demo-category-1"); // optional - Mediakategorien
+            MediaActivity.this.tp.add(Parameter.MEDIA_CAT, "2", "demo-category-2");
+            MediaActivity.this.tp.add(Parameter.MEDIA_CAT, "2", "demo-category-2");
+            MediaActivity.this.tp.add(Parameter.MEDIA_ACTION, "init");
+            MediaActivity.this.webtrekk.track(tp);
+
+
         }
     }
 
@@ -51,6 +60,7 @@ public class MediaActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        webtrekk = Webtrekk.getInstance();
         setContentView(R.layout.activity_media2);
 
         this.playProgressBar = (SeekBar) this.findViewById(R.id.media_current_psoition_progressbar);
@@ -63,11 +73,15 @@ public class MediaActivity extends ActionBarActivity {
                 initMediaTracking();
                 int progress = MediaActivity.this.getCurrentPlayProgress();
                 currentState = "play";
-                MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_ACTION, "play");
-                MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_POS, String.valueOf(progress));
-                MediaActivity.this.t.track(tp);
+                MediaActivity.this.tp.add(Parameter.MEDIA_ACTION, "play");
+                MediaActivity.this.tp.add(Parameter.MEDIA_POS, String.valueOf(progress));
+                MediaActivity.this.webtrekk.track(tp);
+                startTimerService();
+
             }
         });
+
+
 
         final Button pauseButton = (Button) this.findViewById(R.id.button_media_pause);
         pauseButton.setOnClickListener(new View.OnClickListener() {
@@ -75,9 +89,10 @@ public class MediaActivity extends ActionBarActivity {
             public void onClick(View v) {
                 int progress = MediaActivity.this.getCurrentPlayProgress();
                 currentState = "pause";
-                MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_ACTION, "pause");
-                MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_POS, String.valueOf(progress));
-                MediaActivity.this.t.track(tp);
+                MediaActivity.this.tp.add(Parameter.MEDIA_ACTION, "pause");
+                MediaActivity.this.tp.add(Parameter.MEDIA_POS, String.valueOf(progress));
+                MediaActivity.this.webtrekk.track(tp);
+                timerService.shutdown();
             }
         });
 
@@ -87,11 +102,12 @@ public class MediaActivity extends ActionBarActivity {
             public void onClick(View v) {
                 int progress = MediaActivity.this.getCurrentPlayProgress();
                 currentState = "stop";
-                tp.add(TrackingParams.Params.MEDIA_ACTION, "stop");
-                tp.add(TrackingParams.Params.MEDIA_POS, String.valueOf(progress));
-                t.track(tp);
+                tp.add(Parameter.MEDIA_ACTION, "stop");
+                tp.add(Parameter.MEDIA_POS, String.valueOf(progress));
+                webtrekk.track(tp);
                 // reset tracking params to null after stop
                 //tp = null;
+                timerService.shutdown();
             }
         });
 
@@ -101,22 +117,23 @@ public class MediaActivity extends ActionBarActivity {
                 int progress = MediaActivity.this.getCurrentPlayProgress();
                 // replace the current tracked action of seekend with the state before seek began
                 // so if it was play before set it to play, otherwise set it to pause
-                Log.d("MyApplication", "action: "+ MediaActivity.this.tp.getTparams().get(TrackingParams.Params.MEDIA_ACTION));
+                Log.d("MyApplication", "action: "+ MediaActivity.this.tp.getTparams().get(Parameter.MEDIA_ACTION));
                 if(!currentState.equals("play")) {
-                    MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_ACTION, "pause");
+                    MediaActivity.this.tp.add(Parameter.MEDIA_ACTION, "pause");
                 } else {
-                    MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_ACTION, "play");
+                    MediaActivity.this.tp.add(Parameter.MEDIA_ACTION, "play");
+                    startTimerService();
                 }
-                MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_POS, String.valueOf(progress));
-                MediaActivity.this.t.track(tp);
+                MediaActivity.this.tp.add(Parameter.MEDIA_POS, String.valueOf(progress));
+                MediaActivity.this.webtrekk.track(tp);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 int progress = MediaActivity.this.getCurrentPlayProgress();
-                MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_ACTION, "seek");
-                MediaActivity.this.tp.add(TrackingParams.Params.MEDIA_POS, String.valueOf(progress));
-                MediaActivity.this.t.track(tp);
+                MediaActivity.this.tp.add(Parameter.MEDIA_ACTION, "seek");
+                MediaActivity.this.tp.add(Parameter.MEDIA_POS, String.valueOf(progress));
+                MediaActivity.this.webtrekk.track(tp);
             }
 
             @Override
@@ -124,6 +141,31 @@ public class MediaActivity extends ActionBarActivity {
                 //not interesting for us
             }
         });
+    }
+
+    public void startTimerService(){
+        // start the timer service
+        timerService = Executors.newSingleThreadScheduledExecutor();
+        timerService.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                onPlayIntervalOver();
+            }
+        }, 30, 30, TimeUnit.SECONDS);
+    }
+
+    /**
+     * this method gets called every 30 seconds, when in play state, it sends the current position
+     * TODO: discuss if this should really be in the SDK, if so, the mediaactions need an if/else block
+     *
+     */
+    void onPlayIntervalOver() {
+        if(currentState.equals("play")) {
+            int progress = MediaActivity.this.getCurrentPlayProgress();
+            MediaActivity.this.tp.add(Parameter.MEDIA_ACTION, "play");
+            MediaActivity.this.tp.add(Parameter.MEDIA_POS, String.valueOf(progress));
+            MediaActivity.this.webtrekk.track(tp);
+        }
     }
 
     @Override
@@ -153,16 +195,19 @@ public class MediaActivity extends ActionBarActivity {
     protected void onStart () {
         super.onStart();
         initMediaTracking();
+        webtrekk.startActivity("MediaActivity");
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        t.track();
+        webtrekk.track();
     }
 
     @Override
     protected void onStop() {
+        webtrekk.stopActivity();
         super.onStop();
     }
 }

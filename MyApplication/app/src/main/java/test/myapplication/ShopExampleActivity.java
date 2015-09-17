@@ -6,35 +6,47 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.webtrekk.android.tracking.Tracker;
-import com.webtrekk.android.tracking.WTrackApplication;
-import com.webtrekk.android.tracking.TrackingParams;
-import com.webtrekk.android.tracking.TrackingParams.Params;
-
+import com.webtrekk.webbtrekksdk.TrackingParameter;
+import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webbtrekksdk.Webtrekk;
+import com.webtrekk.webbtrekksdk.WebtrekkApplication;
 
 
 public class ShopExampleActivity extends ActionBarActivity {
-    private Tracker t;
-    TrackingParams tp;
+    private Webtrekk webtrekk;
+    TrackingParameter tp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop_example);
-        t = ((WTrackApplication) getApplication()).getTracker("test");
-        t.track();
-        tp = new TrackingParams();
-        tp.add(Params.PRODUCT, "Brauner Herrenschuh Leder: Mike")
-                .add(Params.PRODUCT_CAT, "1", "Herren")
-                .add(Params.PRODUCT_CAT, "2", "Schuhe")
-                .add(Params.PRODUCT_CAT, "3", "Leder")
-                .add(Params.PRODUCT_COUNT, "1")
-                .add(Params.PRODUCT_COST, "99,95")
-                .add(Params.PRODUCT_STATUS, "view")
-                .add(Params.CURRENCY, "EUR");
-        t.track(tp);
+        webtrekk = Webtrekk.getInstance();
+        webtrekk.track();
+        tp = new TrackingParameter();
+        tp.add(Parameter.PRODUCT, "Brauner Herrenschuh Leder: Mike")
+                .add(Parameter.PRODUCT_CAT, "1", "Herren")
+                .add(Parameter.PRODUCT_CAT, "2", "Schuhe")
+                .add(Parameter.PRODUCT_CAT, "3", "Leder")
+                .add(Parameter.PRODUCT_COUNT, "1")
+                .add(Parameter.PRODUCT_COST, "99,95")
+                .add(Parameter.PRODUCT_STATUS, "view")
+                .add(Parameter.CURRENCY, "EUR");
+        webtrekk.track(tp);
+    }
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        webtrekk.startActivity("ShopActivity");
+        webtrekk.track();
     }
 
+    @Override
+    public void onStop()
+    {
+        webtrekk.stopActivity();
+        super.onStop();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -59,8 +71,8 @@ public class ShopExampleActivity extends ActionBarActivity {
     }
 
     public void onButtonOrderClicked(View view) {
-        tp.add(Params.PRODUCT_STATUS, "add")
-        .add(Params.ACTION_NAME, "orderButton");
-        t.track(tp);
+        tp.add(Parameter.PRODUCT_STATUS, "add")
+        .add(Parameter.ACTION_NAME, "orderButton");
+        webtrekk.track(tp);
     }
 }

@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * this class acts as a local storage for the url strings before the are send
@@ -75,7 +76,7 @@ public class RequestUrlStore {
     /**
      * loads the requests from the cache file if present
      */
-    void loadRequestsFromFile() {
+    public void loadRequestsFromFile() {
         if (requestStoreFile == null || !requestStoreFile.exists()) {
             return;
         }
@@ -134,16 +135,23 @@ public class RequestUrlStore {
      */
     void deleteRequestsFile() {
         WebtrekkLogging.log("deleting old backupfile");
-        if (requestStoreFile.exists()) {
-            requestStoreFile.delete();
+        if (requestStoreFile == null || !requestStoreFile.exists()) {
+            return;
         }
+        boolean success = requestStoreFile.delete();
+        if(success) {
+            WebtrekkLogging.log("old backup file deleted");
+        } else {
+            WebtrekkLogging.log("error deleting old backup file");
+        }
+
     }
 
     /**
      * for unit testing only
      * @return
      */
-    ArrayList<String> getRequestList() {
+    List<String> getRequestList() {
         return requestList;
     }
     /**

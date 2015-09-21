@@ -18,6 +18,15 @@ android {
     }
 }
 
+task checkstyle(type: Checkstyle) {
+    configFile file("${project.rootDir}/config/quality/checkstyle/checkstyle.xml") // Where my checkstyle config is...
+    configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/config/quality/checkstyle/suppressions.xml").absolutePath // Where is my suppressions file for checkstyle is...
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    classpath = files()
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.1.1'

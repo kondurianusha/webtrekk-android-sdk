@@ -1,5 +1,7 @@
 package com.webtrekk.webbtrekksdk;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 import static org.mockito.Mockito.*;
 
@@ -175,5 +177,43 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.onSendIntervalOver();
         assertNotNull(webtrekk.getExecutorService());
         assertNotNull(webtrekk.getRequestProcessorFuture());
+    }
+
+    public void testSetOptOut() {
+        webtrekk.initWebtrekk(getContext());
+        SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+
+        webtrekk.setOptout(true);
+        assertTrue(webtrekk.isOptout());
+        assertTrue(preferences.getBoolean(Webtrekk.PREFERENCE_KEY_OPTED_OUT, false));
+
+        webtrekk.setOptout(false);
+        assertFalse(preferences.getBoolean(Webtrekk.PREFERENCE_KEY_OPTED_OUT, true));
+        assertFalse(webtrekk.isOptout());
+
+    }
+
+    public void testInitSamplingNull() {
+        webtrekk.initWebtrekk(getContext());
+        SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+
+        webtrekk.getTrackingConfiguration().setSampling(0);
+        webtrekk.initSampling();
+        assertFalse(webtrekk.isSampling());
+        assertFalse(preferences.getBoolean(Webtrekk.PREFERENCE_KEY_IS_SAMPLING, true));
+        assertEquals(0, preferences.getInt(Webtrekk.PREFERENCE_KEY_SAMPLING, -1));
+    }
+
+    public void testInitSamplingNotNull() {
+        webtrekk.initWebtrekk(getContext());
+        SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+
+        webtrekk.getTrackingConfiguration().setSampling(10);
+        webtrekk.initSampling();
+        assertEquals(10, preferences.getInt(Webtrekk.PREFERENCE_KEY_SAMPLING, -1));
+        // also make sure the value is reinitalized after change
+        webtrekk.getTrackingConfiguration().setSampling(20);
+        webtrekk.initSampling();
+        assertEquals(20, preferences.getInt(Webtrekk.PREFERENCE_KEY_SAMPLING, -1));
     }
 }

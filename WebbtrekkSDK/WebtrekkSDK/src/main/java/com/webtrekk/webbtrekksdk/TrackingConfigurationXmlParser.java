@@ -15,7 +15,6 @@ import java.util.List;
  */
 class TrackingConfigurationXmlParser {
     private static final String ns = null;
-    private String xmlTrackingConfigurationString;
 
     /**
      * parses the TrackingConfiguration from XML String
@@ -26,7 +25,6 @@ class TrackingConfigurationXmlParser {
      * @throws IOException
      */
     public TrackingConfiguration parse(String in) throws XmlPullParserException, IOException {
-            xmlTrackingConfigurationString = in;
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(new StringReader(in));
@@ -44,8 +42,6 @@ class TrackingConfigurationXmlParser {
      */
     private TrackingConfiguration readConfig(XmlPullParser parser) throws XmlPullParserException, IOException {
         TrackingConfiguration config = new TrackingConfiguration();
-        List entries = new ArrayList();
-
         parser.require(XmlPullParser.START_TAG, ns, "webtrekkConfiguration");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -369,6 +365,8 @@ class TrackingConfigurationXmlParser {
                     break;
                 case XmlPullParser.START_TAG:
                     depth++;
+                    break;
+                default:
                     break;
             }
         }

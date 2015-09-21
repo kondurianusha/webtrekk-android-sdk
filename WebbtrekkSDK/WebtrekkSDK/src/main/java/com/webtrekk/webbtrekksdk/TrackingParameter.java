@@ -2,6 +2,7 @@ package com.webtrekk.webbtrekksdk;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
@@ -14,7 +15,7 @@ import java.util.TreeMap;
  */
 public class TrackingParameter {
     // general tracking trackingParameter
-    private TreeMap<Parameter, String> tparams;
+    private SortedMap<Parameter, String> tparams;
     // customer trackingparams, defined by the app
     private TreeMap<String, String> pageParams;
     private TreeMap<String, String> sessionParams;
@@ -134,58 +135,58 @@ public class TrackingParameter {
      * @return
      *
      */
-    public TrackingParameter add(HashMap<Parameter, String> auto_tracked_values) {
+    public TrackingParameter add(Map<Parameter, String> auto_tracked_values) {
         for(Map.Entry<Parameter, String> entry : auto_tracked_values.entrySet()) {
             tparams.put(entry.getKey(), entry.getValue());
         }
         return this;
     }
 
-    public TreeMap<Parameter, String> getTparams() {
+    public SortedMap<Parameter, String> getTparams() {
         return tparams;
     }
 
-    public TreeMap<String, String> getPageParams() {
+    public SortedMap<String, String> getPageParams() {
         return pageParams;
     }
 
-    public TreeMap<String, String> getSessionParams() {
+    public SortedMap<String, String> getSessionParams() {
         return sessionParams;
     }
 
-    public TreeMap<String, String> getEcomParams() {
+    public SortedMap<String, String> getEcomParams() {
         return ecomParams;
     }
 
-    public TreeMap<String, String> getUserCategories() {
+    public SortedMap<String, String> getUserCategories() {
         return userCategories;
     }
 
-    public TreeMap<String, String> getPageCategories() {
+    public SortedMap<String, String> getPageCategories() {
         return pageCategories;
     }
 
-    public TreeMap<String, String> getAdParams() {
+    public SortedMap<String, String> getAdParams() {
         return adParams;
     }
 
-    public TreeMap<String, String> getActionParams() {
+    public SortedMap<String, String> getActionParams() {
         return actionParams;
     }
 
-    public TreeMap<String, String> getProductCategories() {
+    public SortedMap<String, String> getProductCategories() {
         return productCategories;
     }
 
-    public void setTparams(TreeMap<Parameter, String> tparams) {
+    public void setTparams(SortedMap<Parameter, String> tparams) {
         this.tparams = tparams;
     }
 
-    public TreeMap<String, String> getMediaCategories() {
+    public SortedMap<String, String> getMediaCategories() {
         return mediaCategories;
     }
 
-    public HashMap<String, Object> getPluginParams() {
+    public Map<String, Object> getPluginParams() {
         return pluginParams;
     }
 
@@ -288,7 +289,8 @@ public class TrackingParameter {
         // this are string/value pairs which are just used to pass objects/references and values to the plugins, they are not used by the tracking lib,
         PLUGIN_PARAM(""),
         SCREEN_ORIENTATION("s_o"),
-        CONNECTION_TYPE("c_t");
+        CONNECTION_TYPE("c_t"),
+        ADVERTISEMENT_OPT_OUT("aoo");
 
         private final String value;
 

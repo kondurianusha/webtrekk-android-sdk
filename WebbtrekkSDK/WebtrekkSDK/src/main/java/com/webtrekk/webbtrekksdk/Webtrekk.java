@@ -25,7 +25,8 @@ public class Webtrekk {
     public static final String PREFERENCE_KEY_EVER_ID = "everId";
     public static final String PREFERENCE_APP_VERSIONCODE = "appVersion";
     public static final String PREFERENCE_KEY_OPTED_OUT = "optedOut";
-    public static final String PREFERENCE_KEY_IS_SAMPLING = "sampling";
+    public static final String PREFERENCE_KEY_IS_SAMPLING = "issampling";
+    public static final String PREFERENCE_KEY_SAMPLING = "sampling";
     public static final String PREFERENCE_KEY_INSTALLATION_FLAG = "InstallationFlag";
     public static final String PREFERENCE_KEY_CONFIGURATION = "webtrekkTrackingConfiguration";
     public static final String TRACKING_LIBRARY_VERSION = "400";
@@ -53,6 +54,8 @@ public class Webtrekk {
     private Future<?> requestProcessorFuture;
 
     private Context context;
+    // this tracking params allows to add parameters globally to all tracking requests in the configured app
+    private TrackingParameter globalTrackingParameter;
 
     /**
      * non public constructor to create a Webtrekk Instance as
@@ -227,19 +230,20 @@ public class Webtrekk {
      * it can be reset with changing the xml config
      */
     void initSampling() {
-        //TODO: make shure this needs to be done every time? it could also just run once when the app starts a first time, but that way sampling could not be configured via xml
-        //first check if sampling is configured
-
         if(trackingConfiguration.getSampling() > 0) {
             SharedPreferences preferences = this.context.getSharedPreferences(PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-            if(preferences.contains(PREFERENCE_KEY_IS_SAMPLING)) {
+            if(preferences.contains(PREFERENCE_KEY_IS_SAMPLING) && preferences.getInt(PREFERENCE_KEY_SAMPLING, -1) == trackingConfiguration.getSampling()) {
                 isSampling = preferences.getBoolean(PREFERENCE_KEY_IS_SAMPLING, false);
-            } else {
-                this.isSampling = new Random().nextInt(trackingConfiguration.getSampling()) == 0;
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putBoolean(PREFERENCE_KEY_IS_SAMPLING, this.isSampling);
-                editor.commit();
+                //nothing more to do here already intialized
+                return;
             }
+
+            this.isSampling = new Random().nextInt(trackingConfiguration.getSampling()) == 0;
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean(PREFERENCE_KEY_IS_SAMPLING, this.isSampling);
+            editor.putInt(PREFERENCE_KEY_SAMPLING, trackingConfiguration.getSampling());
+            editor.commit();
+
 
         }
         WebtrekkLogging.log("isSampling = " + this.isSampling + ", samplingRate = " + this.sampling);
@@ -358,24 +362,8 @@ public class Webtrekk {
     }
 
 
-    public TrackingConfiguration getTrackingConfiguration() {
-        return trackingConfiguration;
-    }
-
-
     public Context getContext() {
         return context;
-    }
-
-
-    /**
-     * sets the trackingConfiguration
-     * TODO: check if this needs to be public, would give the customer the possibility to write custom tracking configuration parsers
-     * for example custom json loader
-     * @param trackingConfiguration
-     */
-    public void setTrackingConfiguration(TrackingConfiguration trackingConfiguration) {
-        this.trackingConfiguration = trackingConfiguration;
     }
 
     public String getCurrentActivityName() {
@@ -401,7 +389,7 @@ public class Webtrekk {
      */
     public void autoTrackActivity(String name) {
         //TODO: check call start/stopActivity here as well
-        if(!getTrackingConfiguration().getActivityConfigurations().containsKey(name)) {
+        if(!trackingConfiguration.getActivityConfigurations().containsKey(name)) {
             // this activity is not configured
             //TODO: this basicly makes autoTrack obsolete
             return;
@@ -451,6 +439,8 @@ public class Webtrekk {
         tp.add(staticAutomaticData);
         //TODO: this values need to be in a custom customer defined parameter as webtrekk has none for it?
         tp.add(initDynamicAutomaticData());
+        // add the global tracking parameter, this overrides any custom values which may be set
+        tp.add(globalTrackingParameter);
         tp.add(TrackingParameter.Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
         TrackingRequest request;
 
@@ -613,6 +603,18 @@ public class Webtrekk {
     }
 
     /**
+     * allows to set global tracking parameter which will be added to all requests
+     * @return
+     */
+    public TrackingParameter getGlobalTrackingParameter() {
+        return globalTrackingParameter;
+    }
+
+    public void setGlobalTrackingParameter(TrackingParameter globalTrackingParameter) {
+        this.globalTrackingParameter = globalTrackingParameter;
+    }
+
+    /**
      * for unit testing only
      * @param requestUrlStore
      */
@@ -661,5 +663,21 @@ public class Webtrekk {
      */
     ArrayList<Plugin> getPlugins() {
         return plugins;
+    }
+
+    /**
+     * for unittesting only
+     * @return
+     */
+    TrackingConfiguration getTrackingConfiguration() {
+        return trackingConfiguration;
+    }
+
+    /**
+     * for unit testing only
+     * @param trackingConfiguration
+     */
+    void setTrackingConfiguration(TrackingConfiguration trackingConfiguration) {
+        this.trackingConfiguration = trackingConfiguration;
     }
 }

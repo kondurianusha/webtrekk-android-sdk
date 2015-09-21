@@ -39,6 +39,7 @@ public class TrackingParameter {
         this.actionParams = new TreeMap<>();
         this.productCategories = new TreeMap<>();
         this.mediaCategories = new TreeMap<>();
+        this.pluginParams = new HashMap<>();
     }
 
     /*
@@ -47,6 +48,26 @@ public class TrackingParameter {
      */
     public TrackingParameter add(Parameter key, String value) {
         tparams.put(key, value);
+        return this;
+    }
+
+    /**
+     * this method allows to merge two trackingparameter objects in single objects
+     * @param tp
+     * @return
+     */
+    public TrackingParameter add(TrackingParameter tp) {
+        this.tparams.putAll(tp.getTparams());
+        this.pageParams.putAll(tp.getPageParams());
+        this.sessionParams.putAll(tp.getSessionParams());
+        this.ecomParams.putAll(tp.getEcomParams());
+        this.userCategories.putAll(tp.getUserCategories());
+        this.pageCategories.putAll(tp.getPageCategories());
+        this.adParams.putAll(tp.getAdParams());
+        this.actionParams.putAll(tp.getActionParams());
+        this.productCategories.putAll(tp.getProductCategories());
+        this.mediaCategories.putAll(tp.getMediaCategories());
+        this.pluginParams.putAll(tp.getPluginParams());
         return this;
     }
     /**

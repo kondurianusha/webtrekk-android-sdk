@@ -23,7 +23,6 @@ import java.net.UnknownHostException;
 import javax.net.ssl.HttpsURLConnection;
 
 /**
- * Created by user on 10.09.15.
  * this class sends the requests to the server
  * it handles just the networking tasks
  */
@@ -41,7 +40,6 @@ public class RequestProcessor implements Runnable{
 
     @Override
     public void run() {
-
         while(true) {
             if(requestUrlStore.size() == 0) {
                 // no request urls in the store, return
@@ -49,8 +47,6 @@ public class RequestProcessor implements Runnable{
             }
             URL url = null;
             String urlString = null;
-            boolean success = false;
-            boolean retry = false;
 
             try {
                 urlString = requestUrlStore.get(0);
@@ -83,14 +79,7 @@ public class RequestProcessor implements Runnable{
                             WebtrekkLogging.log("removing URL from queue because status code cannot be handled.");
                             this.requestUrlStore.remove(0);
                         } else {
-                            // server-side error. we can wait.
-                            retry = true;
-                            // move URL to end to prevent failing with the same URL
-                            // over and over again
-                            //TODO: discuss this point again, spezifikation 5 widerspricht sicht hier mit der Reihenfolge und dem alten SDK
-                            this.requestUrlStore.remove(0);
-                            this.requestUrlStore.add(urlString);
-                            //break here to give the server time to recover
+                            // server-side error. will try to resend after next send delay
                             break;
                         }
                     }
@@ -101,22 +90,16 @@ public class RequestProcessor implements Runnable{
 
             } catch (EOFException e) {
                 WebtrekkLogging.log("sendRequestsThreadLoop: EOF > Will retry later.", e);
-                retry = true;
             } catch (SocketTimeoutException e) {
                 WebtrekkLogging.log("sendRequestsThreadLoop: SocketTimeout > Will retry later.", e);
-                retry = true;
             } catch (ConnectTimeoutException e) {
                 WebtrekkLogging.log("sendRequestsThreadLoop: ConnectTimeout > Will retry later.", e);
-                retry = true;
             } catch (NoHttpResponseException e) {
                 WebtrekkLogging.log("sendRequestsThreadLoop: NoHttpResponse > Will retry later.", e);
-                retry = true;
             } catch (HttpHostConnectException e) {
                 WebtrekkLogging.log("sendRequestsThreadLoop: HttpHostConnect > Will retry later.", e);
-                retry = true;
             } catch (UnknownHostException e) {
                 WebtrekkLogging.log("sendRequestsThreadLoop: UnknownHost > Will retry later.", e);
-                retry = true;
             } catch (IOException e) {
                 WebtrekkLogging.log("io exception: can not connect to host", e);
                 WebtrekkLogging.log("sendRequestsThreadLoop: IO > Removing URL from queue because exception cannot be handled.", e);

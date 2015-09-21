@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 
@@ -47,7 +48,14 @@ import java.util.TimeZone;
  * this class contains various static helper functions to get device details
  * TODO: discus if it should be available to the customer or not
  */
-class HelperFunctions {
+final class HelperFunctions {
+
+    /**
+     * private constructor as this is a utility class
+     */
+    private HelperFunctions() {
+
+    }
 
     /**
      * returns a string of the display resolution, like 400x300
@@ -79,23 +87,6 @@ class HelperFunctions {
         //WindowManager wm = (WindowManager) app.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         //int depth = wm.getDefaultDisplay().getPixelFormat();
         //return String.format("%s", depth);
-    }
-
-    /**
-     * returns the current timestamp in ms as String
-     * @return
-     */
-    public static String getTimestamp() {
-        Long ts = System.currentTimeMillis()/1000;
-        return ts.toString();
-    }
-
-    /**
-     * returns the current formatted date and time
-     * @return
-     */
-    public static String getCurrentDateTime() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ").format(new Date());
     }
 
     /**
@@ -168,7 +159,7 @@ class HelperFunctions {
      * @param context
      * @return
      */
-    public static HashMap<String, String> getUserProfile(Context context) {
+    public static Map<String, String> getUserProfile(Context context) {
         // TODO: this method needs special permissions, so i would at least add an opt out possibility here
         // this method only works on android > 4.0, for lower versions use accountmanager
 
@@ -439,44 +430,6 @@ class HelperFunctions {
     }
 
     /**
-     * reads the advertiser id and advertiser opt out values for the user,
-     * needs the appropiate permissions and playstore lib linked, at least the ad parts
-     * works by passing in a reference as it runs in a seperate thread to avoid lags in the main thread,
-     *
-     * @param context
-     */
-    public static synchronized void getAdvertiserID(final Context context) {
-        // check if playservice sdk is available on that device, TODO: define alternative handling here
-        // TODO: define default handling when this values can not be read, maybe cache them in Shared preferences if that is allowed due to opt out
-        if( GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == 0) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Info adInfo = null;
-                    try {
-                        adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
-                        //app.getTracker()..getAutoTrackedValues().put(TrackingParams.Params.ADVERTISER_ID, adInfo.getId());
-                        //app.getWTRack().getAutoTrackedValues().put(TrackingParams.Params.ADVERTISER_OPTOUT, String.valueOf(adInfo.isLimitAdTrackingEnabled()));
-
-                    } catch (IOException e) {
-                        // Unrecoverable error connecting to Google Play services (e.g.,
-                        // the old version of the service doesn't support getting AdvertisingId).
-
-                    } catch (GooglePlayServicesNotAvailableException e) {
-                        // Google Play services is not available entirely.
-                    } catch (GooglePlayServicesRepairableException e) {
-                        // maybe will work with another try, recheck
-                    } catch (NullPointerException e) {
-                        // adinfo was null or could not get the id/optout setting
-                    }
-                }
-            }).start();
-
-
-        }
-    }
-
-    /**
      * url encodes the given string as utf8
      * replaces special strings like " " with %20
      * @param string
@@ -534,7 +487,7 @@ class HelperFunctions {
         return builder.toString();
     }
 
-    public String getXmlFromUrl(String url) throws IOException {
+    public static String getXmlFromUrl(String url) throws IOException {
         String xml = null;
             // defaultHttpClient
             HttpURLConnection urlConnection;

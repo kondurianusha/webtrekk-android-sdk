@@ -1,12 +1,13 @@
 package com.webtrekk.webbtrekksdk;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * a global configuration class which gets its values from the xml config parser
  * all plugins, activity and other tracking details are configured here
  */
-public class TrackingConfiguration {
+class TrackingConfiguration {
 
     // the current version of the configuration, used to check if a new one is available
     private int version;
@@ -35,8 +36,11 @@ public class TrackingConfiguration {
     // enabled plugins
     boolean isHelloWorldPluginEnabed;
 
+    // activitylifycycle callbacks for automated activity tracking
+    boolean isAutoTracking;
 
-    private HashMap<String, ActivityConfiguration> activityConfigurations;
+
+    private Map<String, ActivityConfiguration> activityConfigurations;
 
     public TrackingConfiguration() {
         activityConfigurations = new HashMap<>();
@@ -214,11 +218,11 @@ public class TrackingConfiguration {
         this.isAutoTrackAdvertisingOptOut = isAutoTrackAdvertisingOptOut;
     }
 
-    public HashMap<String, ActivityConfiguration> getActivityConfigurations() {
+    public Map<String, ActivityConfiguration> getActivityConfigurations() {
         return activityConfigurations;
     }
 
-    public void setActivityConfigurations(HashMap<String, ActivityConfiguration> activityConfigurations) {
+    public void setActivityConfigurations(Map<String, ActivityConfiguration> activityConfigurations) {
         this.activityConfigurations = activityConfigurations;
     }
 
@@ -238,5 +242,11 @@ public class TrackingConfiguration {
         this.trackingConfigurationUrl = trackingConfigurationUrl;
     }
 
+    public boolean isAutoTracking() {
+        return isAutoTracking;
+    }
 
+    public void setIsAutoTracking(boolean isAutoTracking) {
+        this.isAutoTracking = isAutoTracking;
+    }
 }

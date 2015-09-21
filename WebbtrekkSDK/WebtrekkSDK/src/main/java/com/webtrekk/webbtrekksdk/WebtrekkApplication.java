@@ -13,14 +13,14 @@ public class WebtrekkApplication extends Application {
 
     synchronized public Webtrekk getWebtrekk() {
 
-        if(callbacks == null) {
-            callbacks = new TrackedActivityLifecycleCallbacks(this);
-            registerActivityLifecycleCallbacks(callbacks);
-        }
-
         if(webtrekk == null) {
             webtrekk = Webtrekk.getInstance();
             webtrekk.initWebtrekk(this);
+        }
+
+        if(callbacks == null && webtrekk.getTrackingConfiguration().isAutoTracking()) {
+            callbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+            registerActivityLifecycleCallbacks(callbacks);
         }
         return webtrekk;
     }

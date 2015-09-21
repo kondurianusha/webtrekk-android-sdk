@@ -82,6 +82,19 @@ public class TrackingRequestTests extends AndroidTestCase {
 
     }
 
+    public void testGlobalTrackingParameter() {
+        tp_activity_start = new TrackingParameter();
+        tp_activity_start.add(auto_tracked_values);
+        tr_astart = new TrackingRequest(tp_activity_start, trackingConfiguration);
+        TrackingParameter globalTrackingParameter = new TrackingParameter();
+        globalTrackingParameter.add(Parameter.ECOM, "1", "GLOBALTEST");
+        tp_activity_start.add(globalTrackingParameter);
+
+        String url = tr_astart.getUrlString();
+        assertEquals("http://q3.webtrekk.net/1111111111/wt?p=400,StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&mts=1231233243245&dev=Google+Nexus+4&eid=12345678901234&cb1=GLOBALTEST&eor=1", url);
+
+    }
+
     //TODO: media tracking tests
 
     //TODO: test more url variants and trackingParameter after the missing requirements are clear

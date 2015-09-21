@@ -10,32 +10,32 @@ import android.os.Bundle;
  */
 class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
-    private WebtrekkApplication app;
+    private Webtrekk webtrekk;
 
-    public TrackedActivityLifecycleCallbacks(WebtrekkApplication app) {
-        this.app = app;
+    public TrackedActivityLifecycleCallbacks(Webtrekk webtrekk) {
+        this.webtrekk = webtrekk;
     }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         WebtrekkLogging.log("Tracking Activity Created: " + activity.getLocalClassName());
-        app.getWebtrekk().autoTrackActivity(activity.getLocalClassName());
+        webtrekk.autoTrackActivity(activity.getLocalClassName());
     }
 
     @Override
     public void onActivityDestroyed(Activity activity) {
         WebtrekkLogging.log("Tracking Activity Destroyed: " + activity.getLocalClassName());
-        app.getWebtrekk().autoTrackActivity(activity.getLocalClassName());
+        webtrekk.autoTrackActivity(activity.getLocalClassName());
     }
     @Override
     public void onActivityPaused(Activity activity) {
         WebtrekkLogging.log("Tracking Activity Paused: " + activity.getLocalClassName());
-        app.getWebtrekk().autoTrackActivity(activity.getLocalClassName());
+        webtrekk.autoTrackActivity(activity.getLocalClassName());
     }
     @Override
     public void onActivityResumed(Activity activity) {
         WebtrekkLogging.log("Tracking Activity Resumed: " + activity.getLocalClassName());
-        app.getWebtrekk().autoTrackActivity(activity.getLocalClassName());
+        webtrekk.autoTrackActivity(activity.getLocalClassName());
     }
     @Override
     public void onActivitySaveInstanceState (Activity activity, Bundle outState) {
@@ -45,12 +45,12 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
     @Override
     public void onActivityStarted(Activity activity) {
         WebtrekkLogging.log("Tracking Activity started: " + activity.getLocalClassName());
-        app.getWebtrekk().autoTrackActivity(activity.getLocalClassName());
+        webtrekk.autoTrackActivity(activity.getLocalClassName());
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
         WebtrekkLogging.log("Tracking Activity stopped: " + activity.getLocalClassName());
-        app.getWebtrekk().autoTrackActivity(activity.getLocalClassName());
+        webtrekk.autoTrackActivity(activity.getLocalClassName());
     }
 }

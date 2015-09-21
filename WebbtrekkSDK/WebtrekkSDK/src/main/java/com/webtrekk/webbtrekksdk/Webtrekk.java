@@ -1,12 +1,22 @@
 package com.webtrekk.webbtrekksdk;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,9 +25,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The WebtrekkSDK main class, the developer/customer interacts with the SDK through this class
+ * The WebtrekkSDK main class, the developer/customer interacts with the SDK through this class.
  */
-public class Webtrekk {
+public final class Webtrekk {
 
 
     //name of the preference strings
@@ -35,7 +45,6 @@ public class Webtrekk {
     private RequestUrlStore requestUrlStore;
     private TrackingConfiguration trackingConfiguration;
 
-    private int sampling;
     private boolean isSampling;
     private boolean isOptout;
 
@@ -57,9 +66,11 @@ public class Webtrekk {
     // this tracking params allows to add parameters globally to all tracking requests in the configured app
     private TrackingParameter globalTrackingParameter;
 
+    private TrackedActivityLifecycleCallbacks callbacks;
+
     /**
      * non public constructor to create a Webtrekk Instance as
-     * makes use of the Singleton Pattern here
+     * makes use of the Singleton Pattern here.
      */
 
     Webtrekk() {
@@ -72,7 +83,7 @@ public class Webtrekk {
 
     /**
      * public method to get the singleton instance of the webtrekk object,
-     * @return
+     * @return webtrekk instance
      */
     public static Webtrekk getInstance() {
         return SingletonHolder.webtrekk;
@@ -81,17 +92,17 @@ public class Webtrekk {
     /**
      * this initializes the webtrekk tracking configuration, it has to be called only once when the
      * application starts, for example in the Application Class or the Main Activitys onCreate
-     * @param context the application context / context of the main activity
+     * @param c the application context / context of the main activity
      *
      */
-    public void initWebtrekk(final Context context) {
-        if(context == null) {
+    final public void initWebtrekk(final Context c) {
+        if (c == null) {
             throw new IllegalArgumentException("no valid context");
         }
-        if(this.context != null) {
+        if (this.context != null) {
             throw new IllegalStateException("The initWebtrekk method must be called only once");
         }
-        this.context = context;
+        this.context = c;
 
         initTrackingConfiguration();
         initOptedOut();
@@ -106,7 +117,7 @@ public class Webtrekk {
 
     }
 
-    void initTrackingConfiguration() {
+    final void initTrackingConfiguration() {
         initTrackingConfiguration(null);
     }
 
@@ -117,12 +128,12 @@ public class Webtrekk {
      *
      * @param configurationString for unit testing only
      */
-    void initTrackingConfiguration(String configurationString) {
+    final void initTrackingConfiguration(final String configurationString) {
 
             // always parse the local raw config version first, this is fallback, default and also the way to fix broken online configs
             //TODO: this could me more elegant by only parsing it when its a new app version which needs to be set anyway
             String trackingConfigurationString;
-            if(configurationString == null) {
+            if (configurationString == null) {
                 try {
                     trackingConfigurationString = HelperFunctions.stringFromStream(context.getResources().openRawResource(R.raw.webtrekk_config));
                 } catch (IOException e) {
@@ -148,15 +159,17 @@ public class Webtrekk {
             TrackingConfiguration sharedPreferencetrackingConfiguration = null;
             try {
                 sharedPreferencetrackingConfiguration = new TrackingConfigurationXmlParser().parse(trackingConfigurationString);
-            } catch (Exception e) {
-                //throw new IllegalStateException("invalid sharedPreference configuration string, invalid state");
-                WebtrekkLogging.log("invalid sharedPreference configuration string, invalid state");
+                if(sharedPreferencetrackingConfiguration.getVersion() > trackingConfiguration.getVersion()) {
+                    // in this case there is a newer, so replace th old one
+                    trackingConfiguration = sharedPreferencetrackingConfiguration;
+                }
+            } catch (IOException e) {
+                WebtrekkLogging.log("ioexception parsing the configuration string", e);
+            } catch(XmlPullParserException e) {
+                WebtrekkLogging.log("exception parsing the configuration string", e);
             }
 
-            if(sharedPreferencetrackingConfiguration.getVersion() > trackingConfiguration.getVersion()) {
-                // in this case there is a newer, so replace th old one
-                trackingConfiguration = sharedPreferencetrackingConfiguration;
-            }
+
         }
         // third check online for newer versions
         //TODO: maybe store just the version number locally in preferences might reduce some parsing
@@ -230,23 +243,29 @@ public class Webtrekk {
      * it can be reset with changing the xml config
      */
     void initSampling() {
-        if(trackingConfiguration.getSampling() > 0) {
-            SharedPreferences preferences = this.context.getSharedPreferences(PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-            if(preferences.contains(PREFERENCE_KEY_IS_SAMPLING) && preferences.getInt(PREFERENCE_KEY_SAMPLING, -1) == trackingConfiguration.getSampling()) {
-                isSampling = preferences.getBoolean(PREFERENCE_KEY_IS_SAMPLING, false);
-                //nothing more to do here already intialized
+        SharedPreferences preferences = context.getSharedPreferences(PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+
+        if(preferences.contains(PREFERENCE_KEY_IS_SAMPLING)) {
+            // key exists so set sampling value and return
+            isSampling = preferences.getBoolean(PREFERENCE_KEY_IS_SAMPLING, false);
+            // check if the sampling value is unchanged, if so return
+            if(preferences.getInt(PREFERENCE_KEY_SAMPLING, -1) == trackingConfiguration.getSampling()) {
                 return;
             }
-
-            this.isSampling = new Random().nextInt(trackingConfiguration.getSampling()) == 0;
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putBoolean(PREFERENCE_KEY_IS_SAMPLING, this.isSampling);
-            editor.putInt(PREFERENCE_KEY_SAMPLING, trackingConfiguration.getSampling());
-            editor.commit();
-
-
         }
-        WebtrekkLogging.log("isSampling = " + this.isSampling + ", samplingRate = " + this.sampling);
+        // from here on they sampling either changed or is missing, so reinitialize it
+        SharedPreferences.Editor editor = preferences.edit();
+        // calculate if the device is sampling
+        if(trackingConfiguration.getSampling()>0) {
+            isSampling = new Random().nextInt(trackingConfiguration.getSampling()) == 0;
+        } else {
+            isSampling = false;
+        }
+        // store the preference keys if the device is sampling and the sampling value
+        editor.putBoolean(PREFERENCE_KEY_IS_SAMPLING, isSampling);
+        editor.putInt(PREFERENCE_KEY_SAMPLING, trackingConfiguration.getSampling());
+        editor.commit();
+        WebtrekkLogging.log("isSampling = " + this.isSampling + ", samplingRate = " + trackingConfiguration.getSampling());
     }
 
     /**
@@ -272,14 +291,14 @@ public class Webtrekk {
         }
 
         if(trackingConfiguration.isAutoTrackPlaystoreUsername()) {
-            HashMap<String, String> playstoreprofile = HelperFunctions.getUserProfile(context);
+            Map<String, String> playstoreprofile = HelperFunctions.getUserProfile(context);
             staticAutomaticData.put(TrackingParameter.Parameter.PLAYSTORE_SNAME, playstoreprofile.get("sname"));
             staticAutomaticData.put(TrackingParameter.Parameter.PLAYSTORE_GNAME, playstoreprofile.get("gname"));
 
         }
 
         if(trackingConfiguration.isAutoTrackPlaystoreEmail()) {
-            HashMap<String, String> playstoreprofile = HelperFunctions.getUserProfile(context);
+            Map<String, String> playstoreprofile = HelperFunctions.getUserProfile(context);
             staticAutomaticData.put(TrackingParameter.Parameter.PLAYSTORE_MAIL, playstoreprofile.get("email"));
 
         }
@@ -297,7 +316,7 @@ public class Webtrekk {
 
         }
         if(trackingConfiguration.isAutoTrackAdvertiserId()) {
-            HelperFunctions.getAdvertiserID(context);
+            initAdvertiserId();
         }
 
         // if the app is started for the first time, the param "one" is 1 otherwise its always 0
@@ -320,16 +339,72 @@ public class Webtrekk {
         WebtrekkLogging.log("collected static automatic data");
     }
 
+    /**
+     * reads the advertiser id and advertiser opt out values for the user,
+     * needs the appropiate permissions and playstore lib linked, at least the ad parts
+     * works by passing in a reference as it runs in a seperate thread to avoid lags in the main thread,
+     */
+    private synchronized void initAdvertiserId() {
+        // check if playservice sdk is available on that device, TODO: define alternative handling here
+        // TODO: define default handling when this values can not be read, maybe cache them in Shared preferences if that is allowed due to opt out
+        if( GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == 0) {
+            Thread advertiserIdThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    AdvertisingIdClient.Info adInfo = null;
+                    try {
+                        adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
+                        Webtrekk.getInstance().getStaticAutomaticData().put(TrackingParameter.Parameter.ADVERTISER_ID, adInfo.getId());
+                        Webtrekk.getInstance().getStaticAutomaticData().put(TrackingParameter.Parameter.ADVERTISEMENT_OPT_OUT, String.valueOf(adInfo.isLimitAdTrackingEnabled()));
+                        //app.getTracker()..getAutoTrackedValues().put(TrackingParams.Params.ADVERTISER_ID, adInfo.getId());
+                        //app.getWTRack().getAutoTrackedValues().put(TrackingParams.Params.ADVERTISER_OPTOUT, String.valueOf(adInfo.isLimitAdTrackingEnabled()));
+
+                    } catch (IOException e) {
+                        // Unrecoverable error connecting to Google Play services (e.g.,
+                        // the old version of the service doesn't support getting AdvertisingId).
+
+                    } catch (GooglePlayServicesNotAvailableException e) {
+                        // Google Play services is not available entirely.
+                    } catch (GooglePlayServicesRepairableException e) {
+                        // maybe will work with another try, recheck
+                    } catch (NullPointerException e) {
+                        // adinfo was null or could not get the id/optout setting
+                    }
+                }
+            });
+            try {
+                advertiserIdThread.start();
+            } catch (Exception e){
+                WebtrekkLogging.log("error getting the advertiser id");
+            }
+
+
+        }
+    }
+
 
     /**
      * this method collects the automated data which may change with every request
      * @return
      */
-    HashMap<TrackingParameter.Parameter, String> initDynamicAutomaticData() {
+    Map<TrackingParameter.Parameter, String> initDynamicAutomaticData() {
         HashMap<TrackingParameter.Parameter, String> dynamicAutomaticData = new HashMap<>();
         dynamicAutomaticData.put(TrackingParameter.Parameter.SCREEN_ORIENTATION, HelperFunctions.getOrientation(context));
         dynamicAutomaticData.put(TrackingParameter.Parameter.CONNECTION_TYPE, HelperFunctions.getConnectionString(context));
         return dynamicAutomaticData;
+    }
+
+
+
+    /**
+     * this functions enables the automatic activity tracking in case its enabled in the configuration
+     * @param app application object of the tracked app, can either be a custom one or required by getApplication()
+     */
+    void initAutoTracking(Application app){
+        if(callbacks == null && trackingConfiguration.isAutoTracking()) {
+            callbacks = new TrackedActivityLifecycleCallbacks(this);
+            app.registerActivityLifecycleCallbacks(callbacks);
+        }
     }
 
 
@@ -347,7 +422,7 @@ public class Webtrekk {
 
     /**
      * checks if logging is enabled
-     * @return
+     * @return boolean if logging is enabled
      */
     public static boolean isLoggingEnabled() {
         return WebtrekkLogging.isLogging();
@@ -355,19 +430,27 @@ public class Webtrekk {
 
     /**
      * enables the logging for all SDK log outputs
-     * @param logging
+     * @param logging enables/disables the webtrekk logging
      */
     public static void setLoggingEnabled(boolean logging) {
         WebtrekkLogging.setIsLogging(logging);
     }
 
+    public boolean isSampling() {
+        return isSampling;
+    }
 
+    /**
+     * returns the context with which the webtrekk instance was initialized, this can not be changed
+     *
+     * @return context
+     */
     public Context getContext() {
         return context;
     }
 
     public String getCurrentActivityName() {
-        return currentActivityName;
+        return this.currentActivityName;
     }
 
     public void setCurrentActivityName(String currentActivityName) {
@@ -415,7 +498,7 @@ public class Webtrekk {
      * @param tp the TrackingParams for the request
      * @throws IllegalStateException when the SDK has not benn initialized, activity was not started or the trackingParameter are invalid
      */
-    public void track(TrackingParameter tp) {
+    public void track(final TrackingParameter tp) {
         if (requestUrlStore == null || trackingConfiguration == null) {
             throw new IllegalStateException("webtrekk has not been initialized");
         }
@@ -440,12 +523,12 @@ public class Webtrekk {
         //TODO: this values need to be in a custom customer defined parameter as webtrekk has none for it?
         tp.add(initDynamicAutomaticData());
         // add the global tracking parameter, this overrides any custom values which may be set
-        tp.add(globalTrackingParameter);
+        if(globalTrackingParameter!=null) {
+            tp.add(globalTrackingParameter);
+        }
         tp.add(TrackingParameter.Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
-        TrackingRequest request;
 
-        request = new TrackingRequest(tp, trackingConfiguration);
-
+        TrackingRequest request = new TrackingRequest(tp, trackingConfiguration);
         addRequest(request);
     }
 
@@ -561,24 +644,10 @@ public class Webtrekk {
         this.context = context;
     }
 
-    HashMap<TrackingParameter.Parameter, String> getStaticAutomaticData() {
+    Map<TrackingParameter.Parameter, String> getStaticAutomaticData() {
         return staticAutomaticData;
     }
 
-
-
-    public int getSampling() {
-        return sampling;
-    }
-
-    public void setSampling(int sampling) {
-        if (sampling < 0) {
-            WebtrekkLogging.log("setSamplingRate: 'samplingRate' must not be negative.");
-            return;
-        }
-        // TODO: if this.started so if tracking has already started the sampling rate can not be adjusted anymore
-        this.sampling = sampling;
-    }
 
     public boolean isOptout() {
         return isOptout;
@@ -597,9 +666,6 @@ public class Webtrekk {
 
         SharedPreferences preferences = this.context.getSharedPreferences(PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
         preferences.edit().putBoolean(PREFERENCE_KEY_OPTED_OUT, isOptout).commit();
-
-        stopTracking();
-
     }
 
     /**
@@ -614,6 +680,10 @@ public class Webtrekk {
         this.globalTrackingParameter = globalTrackingParameter;
     }
 
+
+    public String getEverId() {
+        return HelperFunctions.getEverId(context);
+    }
     /**
      * for unit testing only
      * @param requestUrlStore
@@ -661,7 +731,7 @@ public class Webtrekk {
      * for unit testing only
      * @return
      */
-    ArrayList<Plugin> getPlugins() {
+    List<Plugin> getPlugins() {
         return plugins;
     }
 

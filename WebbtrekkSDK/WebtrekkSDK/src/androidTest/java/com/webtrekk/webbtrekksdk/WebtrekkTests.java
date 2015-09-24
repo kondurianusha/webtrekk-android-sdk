@@ -45,7 +45,7 @@ public class WebtrekkTests extends AndroidTestCase {
         assertNotNull(webtrekk.getPlugins());
         assertNotNull(webtrekk.getContext());
         assertNotNull(webtrekk.getRequestUrlStore());
-        assertNotNull(webtrekk.getStaticAutomaticData());
+        assertNotNull(webtrekk.getWebtrekkParameter());
         assertNotNull(webtrekk.getTimerService());
         assertEquals(0, webtrekk.getActivityCount());
         // make shure it fails when init is called twice
@@ -66,7 +66,7 @@ public class WebtrekkTests extends AndroidTestCase {
         assertEquals(webtrekk.getTrackingConfiguration().getTrackDomain(), "http://trackingtest.nglab.org");
         assertEquals(webtrekk.getTrackingConfiguration().getSendDelay(), 60);
         assertEquals(webtrekk.getTrackingConfiguration().getInitialSendDelay(), 0);
-        assertEquals(webtrekk.getTrackingConfiguration().getMaximumRequests(), 5000);
+        assertEquals(webtrekk.getTrackingConfiguration().getMaxRequests(), 5000);
         assertEquals(webtrekk.getTrackingConfiguration().getTrackingConfigurationUrl(), "http://localhost/tracking_config.xml");
         assertEquals(webtrekk.getTrackingConfiguration().getVersion(), 2);
 
@@ -80,19 +80,52 @@ public class WebtrekkTests extends AndroidTestCase {
         assertEquals(1, webtrekk.getPlugins().size());
     }
 
-    public void testInitStaticAutomaticData() {
+    public void testInitWebtrekkParameter() {
+        // make sure the default params have valid values
         webtrekk.setContext(getContext());
         webtrekk.initTrackingConfiguration();
-        webtrekk.initStaticAutomaticData();
-        assertEquals(8, webtrekk.getStaticAutomaticData().size());
-        assertEquals("Tracking Library 400(Android;5.1;Genymotion Google Nexus 4 - 5.1.0 - API 22 - 768x1280;en_US)", webtrekk.getStaticAutomaticData().get(TrackingParameter.Parameter.USERAGENT));
+        webtrekk.initInternalParameter();
+        webtrekk.initWebtrekkParameter();
+        assertEquals(6, webtrekk.getWebtrekkParameter().size());
+        assertEquals("Tracking Library 400(Android;5.1;Genymotion Google Nexus 4 - 5.1.0 - API 22 - 768x1280;en_US)", webtrekk.getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT));
+
     }
 
-    public void testInitDynamicAutomaticData() {
+    public void testUpdateDynamicParameter() {
+        // make sure that the values which change with every request are inserted as well
         webtrekk.setContext(getContext());
-        assertEquals(2, webtrekk.initDynamicAutomaticData().size());
-        assertEquals("portrait", webtrekk.initDynamicAutomaticData().get(TrackingParameter.Parameter.SCREEN_ORIENTATION));
-        assertEquals("WIFI", webtrekk.initDynamicAutomaticData().get(TrackingParameter.Parameter.CONNECTION_TYPE));
+        webtrekk.initTrackingConfiguration();
+        webtrekk.initInternalParameter();
+        webtrekk.initWebtrekkParameter();
+        webtrekk.initCustomParameter();
+
+        RequestUrlStore requestUrlStore = mock(RequestUrlStore.class);
+        webtrekk.setRequestUrlStore(requestUrlStore);
+        when(requestUrlStore.size()).thenReturn(55);
+
+        //set some different default values
+        webtrekk.getCustomParameter().put("screenOrientation", "stttr");
+        webtrekk.getCustomParameter().put("connectionType", "offline");
+
+        webtrekk.updateDynamicParameter();
+        assertEquals(7, webtrekk.getWebtrekkParameter().size());
+        assertEquals("portrait", webtrekk.getCustomParameter().get("screenOrientation"));
+        assertEquals("WIFI", webtrekk.getCustomParameter().get("connectionType"));
+        assertEquals("55", webtrekk.getCustomParameter().get("requestUrlStoreSize"));
+    }
+    public void testInitInternalParameter() {
+        //TODO: tests hier schreiben
+    }
+
+    public void testInitCustomParameter() {
+        // make sure that the values which change with every request are inserted as well
+        webtrekk.setContext(getContext());
+        webtrekk.initTrackingConfiguration();
+        webtrekk.initInternalParameter();
+        webtrekk.initWebtrekkParameter();
+        webtrekk.initCustomParameter();
+
+        assertEquals("22", webtrekk.getCustomParameter().get("apiLevel"));
     }
 
     public void testTrack() {

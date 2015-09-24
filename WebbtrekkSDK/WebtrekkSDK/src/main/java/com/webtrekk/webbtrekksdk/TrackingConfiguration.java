@@ -13,48 +13,65 @@ class TrackingConfiguration {
     private int version;
 
     //global tracking configuration
-    private String trackingConfigurationUrl;
+
     private String trackDomain;
     private String trackId;
     private int sampling;
     private int initialSendDelay;
     private int sendDelay;
-    private int maximumRequests;
-
-    // auto tracking configuration
-    boolean isAutoTrackLanguage;
-    boolean isAutoTrackApiLevel;
-    boolean isAutoTrackPlaystoreUsername;
-    boolean isAutoTrackPlaystoreEmail;
-    boolean isAutoTrackAppversionName;
-    boolean isAutoTrackAppversionCode;
-    boolean isAutoTrackAppPreinstalled;
-    boolean isAutoTrackAppUpdate;
-    boolean isAutoTrackAdvertiserId;
-    boolean isAutoTrackAdvertisingOptOut;
-
-    // enabled plugins
-    boolean isHelloWorldPluginEnabed;
+    private int maxRequests;
 
     // activitylifycycle callbacks for automated activity tracking
-    boolean isAutoTracking;
+    private boolean autoTracked;
 
+    // auto tracking configuration
+    private boolean autoTrackAppUpdate;
+    private boolean autoTrackAdvertiserId;
+    private boolean autoTrackAppVersionName;
+    private boolean autoTrackAppVersionCode;
+    private boolean autoTrackAppPreInstalled;
+    private boolean autoTrackPlaystoreUsername;
+    private boolean autoTrackPlaystoreMail;
+    private boolean autoTrackPlaystoreGivenName;
+    private boolean autoTrackPlaystoreFamilyName;
+    private boolean autoTrackApiLevel;
+    private boolean autoTrackScreenorientation;
+    private boolean autoTrackConnectionType;
+    private boolean autoTrackAdvertismentOptOut;
+
+    // enabled plugins
+    private boolean enablePluginHelloWorld;
+    private boolean enableRemoteConfiguration;
+    private String trackingConfigurationUrl;
+    private boolean sendRequestUrlStoreSize;
+    //intervall when autotracked start activity is send again
+    private int resendOnStartEventTime;
+
+
+    // global trackingparameter xml values
+    private TrackingParameter globalTrackingParameter;
 
     private Map<String, ActivityConfiguration> activityConfigurations;
 
+    // the customParameter map from the xml configuration
+    private Map<String, String> customParameter;
+
     public TrackingConfiguration() {
         activityConfigurations = new HashMap<>();
+
     }
 
     public static class ActivityConfiguration {
         private String className;
         private String mappingName;
         private boolean isAutoTrack;
+        private TrackingParameter activityTrackingParameter;
 
-        public ActivityConfiguration(String className, String mappingName, boolean isAutoTrack) {
+        public ActivityConfiguration(String className, String mappingName, boolean isAutoTrack, TrackingParameter tp) {
             this.className = className;
             this.mappingName = mappingName;
             this.isAutoTrack = isAutoTrack;
+            this.activityTrackingParameter = tp;
         }
 
         public String getClassName() {
@@ -80,6 +97,28 @@ class TrackingConfiguration {
         public void setIsAutoTrack(boolean isAutoTrack) {
             this.isAutoTrack = isAutoTrack;
         }
+
+        public TrackingParameter getActivityTrackingParameter() {
+            return activityTrackingParameter;
+        }
+
+        public void setActivityTrackingParameter(TrackingParameter activityTrackingParameter) {
+            this.activityTrackingParameter = activityTrackingParameter;
+        }
+    }
+
+    /**
+     * this method validates that the tracking configuration is valid
+     *
+     * @return
+     */
+    public boolean validateConfiguration() {
+        //TODO: implement validation rules
+
+        // check for mandatory values
+
+        // check for details like valid url, min max values and so on
+        return true;
     }
 
     public int getVersion() {
@@ -130,93 +169,23 @@ class TrackingConfiguration {
         this.sendDelay = sendDelay;
     }
 
-    public int getMaximumRequests() {
-        return maximumRequests;
+    public int getResendOnStartEventTime() {
+        return resendOnStartEventTime;
     }
 
-    public void setMaximumRequests(int maximumRequests) {
-        this.maximumRequests = maximumRequests;
+    public void setResendOnStartEventTime(int resendOnStartEventTime) {
+        this.resendOnStartEventTime = resendOnStartEventTime;
     }
 
-    public boolean isAutoTrackLanguage() {
-        return isAutoTrackLanguage;
+    public int getMaxRequests() {
+        return maxRequests;
     }
 
-    public void setIsAutoTrackLanguage(boolean isAutoTrackLanguage) {
-        this.isAutoTrackLanguage = isAutoTrackLanguage;
+    public void setMaxRequests(int maxRequests) {
+        this.maxRequests = maxRequests;
     }
 
-    public boolean isAutoTrackApiLevel() {
-        return isAutoTrackApiLevel;
-    }
 
-    public void setIsAutoTrackApiLevel(boolean isAutoTrackApiLevel) {
-        this.isAutoTrackApiLevel = isAutoTrackApiLevel;
-    }
-
-    public boolean isAutoTrackPlaystoreUsername() {
-        return isAutoTrackPlaystoreUsername;
-    }
-
-    public void setIsAutoTrackPlaystoreUsername(boolean isAutoTrackPlaystoreUsername) {
-        this.isAutoTrackPlaystoreUsername = isAutoTrackPlaystoreUsername;
-    }
-
-    public boolean isAutoTrackPlaystoreEmail() {
-        return isAutoTrackPlaystoreEmail;
-    }
-
-    public void setIsAutoTrackPlaystoreEmail(boolean isAutoTrackPlaystoreEmail) {
-        this.isAutoTrackPlaystoreEmail = isAutoTrackPlaystoreEmail;
-    }
-
-    public boolean isAutoTrackAppversionName() {
-        return isAutoTrackAppversionName;
-    }
-
-    public void setIsAutoTrackAppversionName(boolean isAutoTrackAppversionName) {
-        this.isAutoTrackAppversionName = isAutoTrackAppversionName;
-    }
-
-    public boolean isAutoTrackAppversionCode() {
-        return isAutoTrackAppversionCode;
-    }
-
-    public void setIsAutoTrackAppversionCode(boolean isAutoTrackAppversionCode) {
-        this.isAutoTrackAppversionCode = isAutoTrackAppversionCode;
-    }
-
-    public boolean isAutoTrackAppPreinstalled() {
-        return isAutoTrackAppPreinstalled;
-    }
-
-    public void setIsAutoTrackAppPreinstalled(boolean isAutoTrackAppPreinstalled) {
-        this.isAutoTrackAppPreinstalled = isAutoTrackAppPreinstalled;
-    }
-
-    public boolean isAutoTrackAppUpdate() {
-        return isAutoTrackAppUpdate;
-    }
-
-    public void setIsAutoTrackAppUpdate(boolean isAutoTrackAppUpdate) {
-        this.isAutoTrackAppUpdate = isAutoTrackAppUpdate;
-    }
-
-    public boolean isAutoTrackAdvertiserId() {
-        return isAutoTrackAdvertiserId;
-    }
-
-    public void setIsAutoTrackAdvertiserId(boolean isAutoTrackAdvertiserId) {
-        this.isAutoTrackAdvertiserId = isAutoTrackAdvertiserId;
-    }
-
-    public boolean isAutoTrackAdvertisingOptOut() {
-        return isAutoTrackAdvertisingOptOut;
-    }
-
-    public void setIsAutoTrackAdvertisingOptOut(boolean isAutoTrackAdvertisingOptOut) {
-        this.isAutoTrackAdvertisingOptOut = isAutoTrackAdvertisingOptOut;
-    }
 
     public Map<String, ActivityConfiguration> getActivityConfigurations() {
         return activityConfigurations;
@@ -226,13 +195,6 @@ class TrackingConfiguration {
         this.activityConfigurations = activityConfigurations;
     }
 
-    public boolean isHelloWorldPluginEnabed() {
-        return isHelloWorldPluginEnabed;
-    }
-
-    public void setIsHelloWorldPluginEnabed(boolean isHelloWorldPluginEnabed) {
-        this.isHelloWorldPluginEnabed = isHelloWorldPluginEnabed;
-    }
 
     public String getTrackingConfigurationUrl() {
         return trackingConfigurationUrl;
@@ -242,11 +204,159 @@ class TrackingConfiguration {
         this.trackingConfigurationUrl = trackingConfigurationUrl;
     }
 
-    public boolean isAutoTracking() {
-        return isAutoTracking;
+    public boolean isAutoTracked() {
+        return autoTracked;
     }
 
     public void setIsAutoTracking(boolean isAutoTracking) {
-        this.isAutoTracking = isAutoTracking;
+        this.autoTracked = isAutoTracking;
+    }
+
+    public TrackingParameter getGlobalTrackingParameter() {
+        return globalTrackingParameter;
+    }
+
+    public void setGlobalTrackingParameter(TrackingParameter globalTrackingParameter) {
+        this.globalTrackingParameter = globalTrackingParameter;
+    }
+
+    public void setAutoTracked(boolean autoTracked) {
+        this.autoTracked = autoTracked;
+    }
+
+    public boolean isAutoTrackAppUpdate() {
+        return autoTrackAppUpdate;
+    }
+
+    public void setAutoTrackAppUpdate(boolean autoTrackAppUpdate) {
+        this.autoTrackAppUpdate = autoTrackAppUpdate;
+    }
+
+    public boolean isAutoTrackAdvertiserId() {
+        return autoTrackAdvertiserId;
+    }
+
+    public void setAutoTrackAdvertiserId(boolean autoTrackAdvertiserId) {
+        this.autoTrackAdvertiserId = autoTrackAdvertiserId;
+    }
+
+    public boolean isAutoTrackAppVersionName() {
+        return autoTrackAppVersionName;
+    }
+
+    public void setAutoTrackAppVersionName(boolean autoTrackAppVersionName) {
+        this.autoTrackAppVersionName = autoTrackAppVersionName;
+    }
+
+    public boolean isAutoTrackAppVersionCode() {
+        return autoTrackAppVersionCode;
+    }
+
+    public void setAutoTrackAppVersionCode(boolean autoTrackAppVersionCode) {
+        this.autoTrackAppVersionCode = autoTrackAppVersionCode;
+    }
+
+    public boolean isAutoTrackAppPreInstalled() {
+        return autoTrackAppPreInstalled;
+    }
+
+    public void setAutoTrackAppPreInstalled(boolean autoTrackAppPreInstalled) {
+        this.autoTrackAppPreInstalled = autoTrackAppPreInstalled;
+    }
+
+    public boolean isAutoTrackPlaystoreUsername() {
+        return autoTrackPlaystoreUsername;
+    }
+
+    public void setAutoTrackPlaystoreUsername(boolean autoTrackPlaystoreUsername) {
+        this.autoTrackPlaystoreUsername = autoTrackPlaystoreUsername;
+    }
+
+    public boolean isAutoTrackPlaystoreMail() {
+        return autoTrackPlaystoreMail;
+    }
+
+    public void setAutoTrackPlaystoreMail(boolean autoTrackPlaystoreMail) {
+        this.autoTrackPlaystoreMail = autoTrackPlaystoreMail;
+    }
+
+    public boolean isAutoTrackPlaystoreGivenName() {
+        return autoTrackPlaystoreGivenName;
+    }
+
+    public void setAutoTrackPlaystoreGivenName(boolean autoTrackPlaystoreGivenName) {
+        this.autoTrackPlaystoreGivenName = autoTrackPlaystoreGivenName;
+    }
+
+    public boolean isAutoTrackPlaystoreFamilyName() {
+        return autoTrackPlaystoreFamilyName;
+    }
+
+    public void setAutoTrackPlaystoreFamilyName(boolean autoTrackPlaystoreFamilyName) {
+        this.autoTrackPlaystoreFamilyName = autoTrackPlaystoreFamilyName;
+    }
+
+    public boolean isAutoTrackApiLevel() {
+        return autoTrackApiLevel;
+    }
+
+    public void setAutoTrackApiLevel(boolean autoTrackApiLevel) {
+        this.autoTrackApiLevel = autoTrackApiLevel;
+    }
+
+    public boolean isAutoTrackScreenorientation() {
+        return autoTrackScreenorientation;
+    }
+
+    public void setAutoTrackScreenorientation(boolean autoTrackScreenorientation) {
+        this.autoTrackScreenorientation = autoTrackScreenorientation;
+    }
+
+    public boolean isAutoTrackConnectionType() {
+        return autoTrackConnectionType;
+    }
+
+    public void setAutoTrackConnectionType(boolean autoTrackConnectionType) {
+        this.autoTrackConnectionType = autoTrackConnectionType;
+    }
+
+    public boolean isAutoTrackAdvertismentOptOut() {
+        return autoTrackAdvertismentOptOut;
+    }
+
+    public void setAutoTrackAdvertismentOptOut(boolean autoTrackAdvertismentOptOut) {
+        this.autoTrackAdvertismentOptOut = autoTrackAdvertismentOptOut;
+    }
+
+    public boolean isEnablePluginHelloWorld() {
+        return enablePluginHelloWorld;
+    }
+
+    public void setEnablePluginHelloWorld(boolean enablePluginHelloWorld) {
+        this.enablePluginHelloWorld = enablePluginHelloWorld;
+    }
+
+    public boolean isEnableRemoteConfiguration() {
+        return enableRemoteConfiguration;
+    }
+
+    public void setEnableRemoteConfiguration(boolean enableRemoteConfiguration) {
+        this.enableRemoteConfiguration = enableRemoteConfiguration;
+    }
+
+    public boolean isSendRequestUrlStoreSize() {
+        return sendRequestUrlStoreSize;
+    }
+
+    public void setSendRequestUrlStoreSize(boolean sendRequestUrlStoreSize) {
+        this.sendRequestUrlStoreSize = sendRequestUrlStoreSize;
+    }
+
+    public Map<String, String> getCustomParameter() {
+        return customParameter;
+    }
+
+    public void setCustomParameter(Map<String, String> customParameter) {
+        this.customParameter = customParameter;
     }
 }

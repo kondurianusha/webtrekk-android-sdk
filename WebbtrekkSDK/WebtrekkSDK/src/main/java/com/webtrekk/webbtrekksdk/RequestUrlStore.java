@@ -101,7 +101,7 @@ public class RequestUrlStore {
      * saves the requests from the store to the request file if they could not be send
      * in case all requests are send, the old cache file gets deleted
      */
-    synchronized void saveRequestsToFile() {
+    public synchronized void saveRequestsToFile() {
         if (requestStoreFile == null) {
             // no valid filehandle
             return;

@@ -3,7 +3,6 @@ package com.webtrekk.webbtrekksdk;
 
 import java.util.Map;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
 
@@ -35,7 +34,7 @@ public class TrackingRequest {
      */
     public String getUrlString() {
         StringBuffer url = new StringBuffer();
-        SortedMap<Parameter, String> tp = trackingParameter.getTparams();
+        SortedMap<Parameter, String> tp = trackingParameter.getDefaultParameter();
         // maybe add https here if that ssl option is set in the configs
         url.append(trackingConfiguration.getTrackDomain() + "/" + trackingConfiguration.getTrackId() + "/wt?p=" + Webtrekk.TRACKING_LIBRARY_VERSION + ",");
         url.append(HelperFunctions.urlEncode(tp.get(Parameter.ACTIVITY_NAME)) + ",0,");
@@ -43,12 +42,6 @@ public class TrackingRequest {
         url.append(tp.get(Parameter.SCREEN_DEPTH) + ",0,");
         url.append(tp.get(Parameter.TIMESTAMP) + ",0,0,0");
 
-        // always add mts param for server side request ordering
-        url.append("&mts=" + trackingParameter.getTparams().get(Parameter.TIMESTAMP));
-
-        if(trackingParameter.containsKey(Parameter.DEVICE)) {
-            url.append("&" + Parameter.DEVICE.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.DEVICE)));
-        }
         if(trackingParameter.containsKey(Parameter.SAMPLING)) {
             url.append("&" + Parameter.SAMPLING.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.SAMPLING)));
         }
@@ -155,21 +148,47 @@ public class TrackingRequest {
             url.append("&" + Parameter.ADVERTISER_ID.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ADVERTISER_ID)));
         }
 
+        // media tracking
+        if(trackingParameter.containsKey(Parameter.MEDIA_FILE)) {
+            url.append("&" + Parameter.MEDIA_FILE.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_FILE)));
+        }
+        if(trackingParameter.containsKey(Parameter.MEDIA_ACTION)) {
+            url.append("&" + Parameter.MEDIA_ACTION.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_ACTION)));
+        }
+        if(trackingParameter.containsKey(Parameter.MEDIA_POS)) {
+            url.append("&" + Parameter.MEDIA_POS.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_POS)));
+        }
+        if(trackingParameter.containsKey(Parameter.MEDIA_LENGTH)) {
+            url.append("&" + Parameter.MEDIA_LENGTH.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_LENGTH)));
+        }
+        if(trackingParameter.containsKey(Parameter.MEDIA_BANDWITH)) {
+            url.append("&" + Parameter.MEDIA_BANDWITH.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_BANDWITH)));
+        }
+        if(trackingParameter.containsKey(Parameter.MEDIA_VOLUME)) {
+            url.append("&" + Parameter.MEDIA_VOLUME.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_VOLUME)));
+        }
+        if(trackingParameter.containsKey(Parameter.MEDIA_MUTED)) {
+            url.append("&" + Parameter.MEDIA_MUTED.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_MUTED)));
+        }
+        if(trackingParameter.containsKey(Parameter.MEDIA_TIMESTAMP)) {
+            url.append("&" + Parameter.MEDIA_TIMESTAMP.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_TIMESTAMP)));
+        }
+
         //if action trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getActionParams().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getActionParams().entrySet()) {
+        if (!trackingParameter.getActionParameter().isEmpty()) {
+            for (Map.Entry<String, String> entry : trackingParameter.getActionParameter().entrySet()) {
                 url.append("&ck" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
             }
         }
         //if ad trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getAdParams().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getAdParams().entrySet()) {
+        if (!trackingParameter.getAdParameter().isEmpty()) {
+            for (Map.Entry<String, String> entry : trackingParameter.getAdParameter().entrySet()) {
                 url.append("&cc" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
             }
         }
         //if ecom trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getEcomParams().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getEcomParams().entrySet()) {
+        if (!trackingParameter.getEcomParameter().isEmpty()) {
+            for (Map.Entry<String, String> entry : trackingParameter.getEcomParameter().entrySet()) {
                 url.append("&cb" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
             }
         }
@@ -186,8 +205,8 @@ public class TrackingRequest {
             }
         }
         //if session trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getSessionParams().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getSessionParams().entrySet()) {
+        if (!trackingParameter.getSessionParameter().isEmpty()) {
+            for (Map.Entry<String, String> entry : trackingParameter.getSessionParameter().entrySet()) {
                 url.append("&cs" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
             }
         }
@@ -198,8 +217,8 @@ public class TrackingRequest {
             }
         }
         //if action trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getPageParams().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getPageParams().entrySet()) {
+        if (!trackingParameter.getPageParameter().isEmpty()) {
+            for (Map.Entry<String, String> entry : trackingParameter.getPageParameter().entrySet()) {
                 url.append("&cp" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
             }
         }
@@ -207,5 +226,7 @@ public class TrackingRequest {
         url.append("&eor=1");
         return url.toString();
     }
+
+
 
 }

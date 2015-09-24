@@ -18,7 +18,7 @@ public class WebtrekkApplication extends Application {
             webtrekk.initWebtrekk(this);
         }
 
-        if(callbacks == null && webtrekk.getTrackingConfiguration().isAutoTracking()) {
+        if(callbacks == null && webtrekk.getTrackingConfiguration().isAutoTracked()) {
             callbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
             registerActivityLifecycleCallbacks(callbacks);
         }

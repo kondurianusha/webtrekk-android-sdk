@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<webtrekkConfiguration>
-<version>2</version>
-<trackDomain type="text">http://trackingtest.nglab.org</trackDomain>
-<trackId type="text">111111111111</trackId>
-<sampling type="text">0</sampling>
-<initial_send_delay type="text">0</initial_send_delay>
-<send_delay type="text">60</send_delay>
-<max_requests type="number">5000</max_requests>
-<auto_tracked type="text">false</auto_tracked>
-<enable_plugin_hello_world>true</enable_plugin_hello_world>
-<trackingConfigurationUrl>http://localhost/tracking_config.xml</trackingConfigurationUrl>
+    <webtrekkConfiguration>
+    <version>2</version>
+    <trackDomain type="text">http://trackingtest.nglab.org</trackDomain>
+    <trackId type="text">111111111111</trackId>
+    <sampling type="text">0</sampling>
+    <initial_send_delay type="text">0</initial_send_delay>
+    <send_delay type="text">60</send_delay>
+    <max_requests type="number">5000</max_requests>
+    <auto_tracked type="text">false</auto_tracked>
+    <enable_plugin_hello_world>true</enable_plugin_hello_world>
+    <trackingConfigurationUrl>http://localhost/tracking_config.xml</trackingConfigurationUrl>
+    <resendOnStartEventTime>30</resendOnStartEventTime>
 
 
     <activity>

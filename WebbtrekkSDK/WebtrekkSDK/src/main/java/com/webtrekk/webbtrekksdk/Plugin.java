@@ -7,7 +7,7 @@ package com.webtrekk.webbtrekksdk;
  */
 
 // abstract base class for all plugins, maybe switch to interface later when more information are avail
-public abstract class Plugin {
+abstract class Plugin {
     Webtrekk webtrekk;
 
     public Plugin(Webtrekk webtrekk) {

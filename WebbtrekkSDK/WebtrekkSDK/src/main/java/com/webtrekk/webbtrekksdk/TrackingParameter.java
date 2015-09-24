@@ -1,6 +1,5 @@
 package com.webtrekk.webbtrekksdk;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -15,32 +14,30 @@ import java.util.TreeMap;
  */
 public class TrackingParameter {
     // general tracking trackingParameter
-    private SortedMap<Parameter, String> tparams;
+    private SortedMap<Parameter, String> defaultParameter;
     // customer trackingparams, defined by the app
-    private TreeMap<String, String> pageParams;
-    private TreeMap<String, String> sessionParams;
-    private TreeMap<String, String> ecomParams;
-    private TreeMap<String, String> userCategories;
-    private TreeMap<String, String> pageCategories;
-    private TreeMap<String, String> adParams;
-    private TreeMap<String, String> actionParams;
-    private TreeMap<String, String> productCategories;
-    private TreeMap<String, String> mediaCategories;
-    private HashMap<String, Object> pluginParams;
+    private SortedMap<String, String> pageParameter;
+    private SortedMap<String, String> sessionParameter;
+    private SortedMap<String, String> ecomParameter;
+    private SortedMap<String, String> userCategories;
+    private SortedMap<String, String> pageCategories;
+    private SortedMap<String, String> adParameter;
+    private SortedMap<String, String> actionParameter;
+    private SortedMap<String, String> productCategories;
+    private SortedMap<String, String> mediaCategories;
 
 
     public TrackingParameter() {
-        this.tparams = new TreeMap<>();
-        this.pageParams = new TreeMap<>();
-        this.sessionParams = new TreeMap<>();
-        this.ecomParams = new TreeMap<>();
+        this.defaultParameter = new TreeMap<>();
+        this.pageParameter = new TreeMap<>();
+        this.sessionParameter = new TreeMap<>();
+        this.ecomParameter = new TreeMap<>();
         this.userCategories = new TreeMap<>();
         this.pageCategories = new TreeMap<>();
-        this.adParams = new TreeMap<>();
-        this.actionParams = new TreeMap<>();
+        this.adParameter = new TreeMap<>();
+        this.actionParameter = new TreeMap<>();
         this.productCategories = new TreeMap<>();
         this.mediaCategories = new TreeMap<>();
-        this.pluginParams = new HashMap<>();
     }
 
     /*
@@ -48,7 +45,7 @@ public class TrackingParameter {
      * if the key already exists it will be updated
      */
     public TrackingParameter add(Parameter key, String value) {
-        tparams.put(key, value);
+        defaultParameter.put(key, value);
         return this;
     }
 
@@ -58,34 +55,21 @@ public class TrackingParameter {
      * @return
      */
     public TrackingParameter add(TrackingParameter tp) {
-        this.tparams.putAll(tp.getTparams());
-        this.pageParams.putAll(tp.getPageParams());
-        this.sessionParams.putAll(tp.getSessionParams());
-        this.ecomParams.putAll(tp.getEcomParams());
+        this.defaultParameter.putAll(tp.getDefaultParameter());
+        this.pageParameter.putAll(tp.getPageParameter());
+        this.sessionParameter.putAll(tp.getSessionParameter());
+        this.ecomParameter.putAll(tp.getEcomParameter());
         this.userCategories.putAll(tp.getUserCategories());
         this.pageCategories.putAll(tp.getPageCategories());
-        this.adParams.putAll(tp.getAdParams());
-        this.actionParams.putAll(tp.getActionParams());
+        this.adParameter.putAll(tp.getAdParameter());
+        this.actionParameter.putAll(tp.getActionParameter());
         this.productCategories.putAll(tp.getProductCategories());
         this.mediaCategories.putAll(tp.getMediaCategories());
-        this.pluginParams.putAll(tp.getPluginParams());
-        return this;
-    }
-    /**
-     * this method ads new plugin trackingParameter, each plugin can check by the key if it has the neccesary information
-     * this can be used for example to pass the activity as reference for a plugin which needs to get resource access
-     *
-     * @param key
-     * @Param value
-     * @return this
-     */
-    public TrackingParameter add(String key, Object value) {
-        this.pluginParams.put(key, value);
         return this;
     }
 
     public boolean containsKey(Parameter key) {
-        return tparams.containsKey(key);
+        return defaultParameter.containsKey(key);
     }
 
     //TODO: noch mehr add Methoden für int/long/double usw, dann muss der nutzer nicht mehr manuell String.valueOf nehmen beispiel mediatracking positionen
@@ -95,19 +79,19 @@ public class TrackingParameter {
     public TrackingParameter add(Parameter key, String index, String value) {
         switch(key) {
             case ACTION:
-                this.actionParams.put(index, value);
+                this.actionParameter.put(index, value);
                 break;
             case PAGE:
-                this.pageParams.put(index, value);
+                this.pageParameter.put(index, value);
                 break;
             case SESSION:
-                this.sessionParams.put(index, value);
+                this.sessionParameter.put(index, value);
                 break;
             case ECOM:
-                this.ecomParams.put(index, value);
+                this.ecomParameter.put(index, value);
                 break;
             case AD:
-                this.adParams.put(index, value);
+                this.adParameter.put(index, value);
                 break;
             case USER_CAT:
                 this.userCategories.put(index, value);
@@ -137,25 +121,25 @@ public class TrackingParameter {
      */
     public TrackingParameter add(Map<Parameter, String> auto_tracked_values) {
         for(Map.Entry<Parameter, String> entry : auto_tracked_values.entrySet()) {
-            tparams.put(entry.getKey(), entry.getValue());
+            defaultParameter.put(entry.getKey(), entry.getValue());
         }
         return this;
     }
 
-    public SortedMap<Parameter, String> getTparams() {
-        return tparams;
+    public SortedMap<Parameter, String> getDefaultParameter() {
+        return defaultParameter;
     }
 
-    public SortedMap<String, String> getPageParams() {
-        return pageParams;
+    public SortedMap<String, String> getPageParameter() {
+        return pageParameter;
     }
 
-    public SortedMap<String, String> getSessionParams() {
-        return sessionParams;
+    public SortedMap<String, String> getSessionParameter() {
+        return sessionParameter;
     }
 
-    public SortedMap<String, String> getEcomParams() {
-        return ecomParams;
+    public SortedMap<String, String> getEcomParameter() {
+        return ecomParameter;
     }
 
     public SortedMap<String, String> getUserCategories() {
@@ -166,28 +150,60 @@ public class TrackingParameter {
         return pageCategories;
     }
 
-    public SortedMap<String, String> getAdParams() {
-        return adParams;
+    public SortedMap<String, String> getAdParameter() {
+        return adParameter;
     }
 
-    public SortedMap<String, String> getActionParams() {
-        return actionParams;
+    public SortedMap<String, String> getActionParameter() {
+        return actionParameter;
     }
 
     public SortedMap<String, String> getProductCategories() {
         return productCategories;
     }
 
-    public void setTparams(SortedMap<Parameter, String> tparams) {
-        this.tparams = tparams;
+    public void setDefaultParameter(SortedMap<Parameter, String> defaultParameter) {
+        this.defaultParameter = defaultParameter;
     }
 
     public SortedMap<String, String> getMediaCategories() {
         return mediaCategories;
     }
 
-    public Map<String, Object> getPluginParams() {
-        return pluginParams;
+    public void setPageParameter(SortedMap<String, String> pageParameter) {
+        this.pageParameter = pageParameter;
+    }
+
+    public void setSessionParameter(SortedMap<String, String> sessionParameter) {
+        this.sessionParameter = sessionParameter;
+    }
+
+    public void setEcomParameter(SortedMap<String, String> ecomParameter) {
+        this.ecomParameter = ecomParameter;
+    }
+
+    public void setUserCategories(SortedMap<String, String> userCategories) {
+        this.userCategories = userCategories;
+    }
+
+    public void setPageCategories(SortedMap<String, String> pageCategories) {
+        this.pageCategories = pageCategories;
+    }
+
+    public void setAdParameter(SortedMap<String, String> adParameter) {
+        this.adParameter = adParameter;
+    }
+
+    public void setActionParameter(SortedMap<String, String> actionParameter) {
+        this.actionParameter = actionParameter;
+    }
+
+    public void setProductCategories(SortedMap<String, String> productCategories) {
+        this.productCategories = productCategories;
+    }
+
+    public void setMediaCategories(SortedMap<String, String> mediaCategories) {
+        this.mediaCategories = mediaCategories;
     }
 
     /**
@@ -199,8 +215,6 @@ public class TrackingParameter {
          */
         SCREEN_RESOLUTION("res"),
         SCREEN_DEPTH("depth"),
-        DEVICE("dev"),
-
 
         SAMPLING("ps"), // to submit the sampling value with each request which is an integer like 10
         TIMESTAMP("ts"),
@@ -271,26 +285,10 @@ public class TrackingParameter {
         /**
          * unclear / TODO: remove and use as custom trackingParameter
          */
-        OS_NAME("osname"),
-        OS_VERSION("osversion"),
-        TRACKING_LIB_VERSION("tracklib"),
-        APP_VERSION_NAME("aversion_name"),
-        APP_VERSION_CODE("aversion_code"),
-        APP_LANGUAGE("alang"),
-        APP_UPDATE("aupdate"),
-        APP_PREINSTALLED("apreinstalled"),
-        PLAYSTORE_GNAME("ps_gname"),
-        PLAYSTORE_SNAME("ps_sname"),
-        PLAYSTORE_MAIL("ps_mail"),
         ACTIVITY_NAME("aname"),
-        API_LEVEL("api"),
         INSTALL_REFERRER_PARAMS_MC("wt_mc"), // for the referrer tracking
         INSTALL_REFERRER_KEYWORD("wt_kw"), // for the referrer tracking
-        // this are string/value pairs which are just used to pass objects/references and values to the plugins, they are not used by the tracking lib,
-        PLUGIN_PARAM(""),
-        SCREEN_ORIENTATION("s_o"),
-        CONNECTION_TYPE("c_t"),
-        ADVERTISEMENT_OPT_OUT("aoo");
+        FORCE_NEW_SESSION("fns");
 
         private final String value;
 
@@ -300,6 +298,43 @@ public class TrackingParameter {
 
         public String toString() {
             return value;
+        }
+
+        public static Parameter getParameterByName(String name) {
+            for(Parameter p: Parameter.values()) {
+                if(name.equals(p.name())) {
+                    return p;
+                }
+            }
+            return null;
+        }
+    }
+
+    /**
+     * this method maps any values from mapping values to all the stored parameters
+     * it matches by the key of the stored parameter and the mapping value, and replaces
+     * the value of the stored parameter with the value from the mappingValues map
+     *
+     * @param mappingValues
+     */
+    public void applyMapping(Map<String, String> mappingValues) {
+        applySingleMapping(actionParameter, mappingValues);
+        applySingleMapping(adParameter, mappingValues);
+        applySingleMapping(ecomParameter, mappingValues);
+        applySingleMapping(pageCategories, mappingValues);
+        applySingleMapping(productCategories, mappingValues);
+        applySingleMapping(sessionParameter, mappingValues);
+        applySingleMapping(userCategories, mappingValues);
+        applySingleMapping(pageParameter, mappingValues);
+    }
+
+    private void applySingleMapping(Map<String, String> original, Map<String, String> mappingValues) {
+        if (!original.isEmpty()) {
+            for (Map.Entry<String, String> entry : original.entrySet()) {
+                if(mappingValues.containsKey(entry.getValue())) {
+                    entry.setValue(mappingValues.get(entry.getValue()));
+                }
+            }
         }
     }
 

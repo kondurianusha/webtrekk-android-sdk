@@ -73,15 +73,13 @@ public class RequestProcessor implements Runnable{
                         this.requestUrlStore.remove(0);
                     } else {
                         WebtrekkLogging.log("received status " + statusCode);
+                        // all error codes above 400 will be removed, the 300 redirects should not occur
+                        // if there are redirects on serverside this has to be changed
+                        WebtrekkLogging.log("removing URL from queue because status code cannot be handled.");
+                        this.requestUrlStore.remove(0);
 
-                        if (statusCode <= 499 || statusCode >= 600) {
-                            // client-side error. we cannot handle that.
-                            WebtrekkLogging.log("removing URL from queue because status code cannot be handled.");
-                            this.requestUrlStore.remove(0);
-                        } else {
-                            // server-side error. will try to resend after next send delay
-                            break;
-                        }
+                        break;
+
                     }
                 } catch (Exception e) {
                     WebtrekkLogging.log("unknown exception: ", e);

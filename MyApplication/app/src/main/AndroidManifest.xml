@@ -32,10 +32,6 @@
             android:label="@string/title_activity_shop_example" >
         </activity>
         <activity
-            android:name=".MediaExampleActivity"
-            android:label="@string/title_activity_media" >
-        </activity>
-        <activity
             android:name=".MediaActivity"
             android:label="@string/title_activity_media" >
         </activity>

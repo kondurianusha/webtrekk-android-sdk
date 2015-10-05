@@ -114,6 +114,15 @@ class TrackingConfiguration {
      */
     public boolean validateConfiguration() {
         //TODO: implement validation rules
+        if(sendDelay < 10) {
+            WebtrekkLogging.log("invalid sendDelay Value");
+        }
+        if(sampling < 0) {
+            WebtrekkLogging.log("invalid sampling Value");
+        }
+        if(maxRequests < 100) {
+            WebtrekkLogging.log("invalid maxRequests Value");
+        }
 
         // check for mandatory values
 

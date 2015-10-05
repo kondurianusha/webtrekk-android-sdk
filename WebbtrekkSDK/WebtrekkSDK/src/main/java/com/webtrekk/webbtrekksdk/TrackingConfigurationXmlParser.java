@@ -118,7 +118,7 @@ class TrackingConfigurationXmlParser {
 
                 try {
                     int initialSendDelay = Integer.parseInt(initialSendDelayValue);
-                    config.setSampling(initialSendDelay);
+                    config.setInitialSendDelay(initialSendDelay);
                 }  catch (Exception ex){
                     WebtrekkLogging.log("invalid initialSendDelay value: ", ex);
                 }

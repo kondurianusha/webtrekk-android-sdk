@@ -118,7 +118,10 @@ public final class Webtrekk {
             throw new IllegalArgumentException("no valid context");
         }
         if (this.context != null) {
-            throw new IllegalStateException("The initWebtrekk method must be called only once");
+            //this can also occur on screen orientation changes
+            //TODO: recheck desired behaviour
+            return;
+            //throw new IllegalStateException("The initWebtrekk method must be called only once");
         }
         this.context = c;
 
@@ -207,12 +210,11 @@ public final class Webtrekk {
         //TODO: maybe store just the version number locally in preferences might reduce some parsing
         //new TrackingConfigurationDownloadTask(this).execute(trackingConfiguration.getTrackingConfigurationUrl());
 
-        WebtrekkLogging.log("saving trackingConfiguration to preferences");
-        sharedPrefs.edit().putString(Webtrekk.PREFERENCE_KEY_CONFIGURATION, trackingConfigurationString).commit();
+        // check if we have a valid configuration
+        if(trackingConfiguration != null && trackingConfiguration.validateConfiguration()) {
+            WebtrekkLogging.log("saving trackingConfiguration to preferences");
+            sharedPrefs.edit().putString(Webtrekk.PREFERENCE_KEY_CONFIGURATION, trackingConfigurationString).commit();
 
-
-
-        if(trackingConfiguration != null) {
             WebtrekkLogging.log("xml trackingConfiguration value: trackid - " + trackingConfiguration.getTrackId());
             WebtrekkLogging.log("xml trackingConfiguration value: trackdomain - " + trackingConfiguration.getTrackDomain());
             WebtrekkLogging.log("xml trackingConfiguration value: send_delay - " + trackingConfiguration.getSendDelay());
@@ -331,7 +333,12 @@ public final class Webtrekk {
         webtrekkParameter.put(Parameter.EVERID, HelperFunctions.generateEverid());
 
         if(trackingConfiguration.isAutoTrackAdvertiserId()) {
-            initAdvertiserId();
+            try {
+                initAdvertiserId();
+            } catch(Exception e) {
+                WebtrekkLogging.log("error initializing the advertiser id", e);
+            }
+
         }
         WebtrekkLogging.log("collected static automatic data");
     }
@@ -625,6 +632,8 @@ public final class Webtrekk {
         }
         // only track when not opted out, but always execute the plugins
         if(!isOptout && !isSampling) {
+            String urlString = request.getUrlString();
+            WebtrekkLogging.log("sending url: " + urlString);
             requestUrlStore.add(request.getUrlString());
         }
 

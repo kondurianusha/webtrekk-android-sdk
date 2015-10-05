@@ -87,7 +87,7 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initInternalParameter();
         webtrekk.initWebtrekkParameter();
         assertEquals(6, webtrekk.getWebtrekkParameter().size());
-        assertEquals("Tracking Library 400(Android;5.1;Genymotion Google Nexus 4 - 5.1.0 - API 22 - 768x1280;en_US)", webtrekk.getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT));
+        assertTrue(webtrekk.getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library 400(Android;"));
 
     }
 
@@ -125,7 +125,7 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initWebtrekkParameter();
         webtrekk.initCustomParameter();
 
-        assertEquals("22", webtrekk.getCustomParameter().get("apiLevel"));
+        assertNotNull(webtrekk.getCustomParameter().get("apiLevel"));
     }
 
     public void testTrack() {

@@ -9,7 +9,6 @@ import android.view.View;
 import com.webtrekk.webbtrekksdk.TrackingParameter;
 import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webbtrekksdk.Webtrekk;
-import com.webtrekk.webbtrekksdk.WebtrekkApplication;
 
 
 public class ShopExampleActivity extends ActionBarActivity {

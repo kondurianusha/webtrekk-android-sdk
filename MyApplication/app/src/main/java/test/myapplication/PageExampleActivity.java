@@ -8,7 +8,6 @@ import android.view.View;
 
 import com.webtrekk.webbtrekksdk.TrackingParameter;
 import com.webtrekk.webbtrekksdk.Webtrekk;
-import com.webtrekk.webbtrekksdk.WebtrekkApplication;
 import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
 
 
@@ -62,8 +61,7 @@ public class PageExampleActivity extends ActionBarActivity {
 
     public void onButtonActionClicked(View view) {
         TrackingParameter tp = new TrackingParameter();
-        tp.add(Parameter.ACTION_NAME, "Action Button clicked")
-        .add(Parameter.ACTIVITY_NAME, this.getClass().getName());
+        tp.add(Parameter.ACTION_NAME, "Action Button clicked");
         webtrekk.track(tp);
     }
 
@@ -78,7 +76,6 @@ public class PageExampleActivity extends ActionBarActivity {
     public void onButtonActionParamsClicked(View view) {
         TrackingParameter tp = new TrackingParameter();
         tp.add(Parameter.ACTION, "Action Button clicked")
-                .add(Parameter.ACTIVITY_NAME, this.getClass().getName())
                 .add(Parameter.ACTION,"1", "grey")
                 .add(Parameter.ACTION,"2", "pos3");
         webtrekk.track(tp);

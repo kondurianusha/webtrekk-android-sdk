@@ -1,5 +1,6 @@
 package test.myapplication;
 
+import android.app.Application;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -8,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.webtrekk.webbtrekksdk.Webtrekk;
-import com.webtrekk.webbtrekksdk.WebtrekkApplication;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -20,6 +20,8 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         webtrekk = Webtrekk.getInstance();
         webtrekk.initWebtrekk(this);
+        // optional für das automatische Aktivitätstracking
+        //webtrekk.initAutoTracking(getApplication());
 
     }
 

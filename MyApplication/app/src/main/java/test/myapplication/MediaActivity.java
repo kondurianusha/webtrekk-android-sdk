@@ -1,6 +1,5 @@
 package test.myapplication;
 
-import android.media.session.MediaSession;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +14,6 @@ import com.webtrekk.webbtrekksdk.TrackingParameter;
 import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
 
 import com.webtrekk.webbtrekksdk.Webtrekk;
-import com.webtrekk.webbtrekksdk.WebtrekkApplication;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -117,7 +115,7 @@ public class MediaActivity extends ActionBarActivity {
                 int progress = MediaActivity.this.getCurrentPlayProgress();
                 // replace the current tracked action of seekend with the state before seek began
                 // so if it was play before set it to play, otherwise set it to pause
-                Log.d("MyApplication", "action: "+ MediaActivity.this.tp.getTparams().get(Parameter.MEDIA_ACTION));
+                Log.d("MyApplication", "action: "+ MediaActivity.this.tp.getDefaultParameter().get(Parameter.MEDIA_ACTION));
                 if(!currentState.equals("play")) {
                     MediaActivity.this.tp.add(Parameter.MEDIA_ACTION, "pause");
                 } else {
@@ -162,7 +160,7 @@ public class MediaActivity extends ActionBarActivity {
     void onPlayIntervalOver() {
         if(currentState.equals("play")) {
             int progress = MediaActivity.this.getCurrentPlayProgress();
-            MediaActivity.this.tp.add(Parameter.MEDIA_ACTION, "play");
+            MediaActivity.this.tp.add(Parameter.MEDIA_ACTION, "pos");
             MediaActivity.this.tp.add(Parameter.MEDIA_POS, String.valueOf(progress));
             MediaActivity.this.webtrekk.track(tp);
         }

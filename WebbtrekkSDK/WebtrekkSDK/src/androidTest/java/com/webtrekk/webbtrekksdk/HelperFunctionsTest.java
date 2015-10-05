@@ -22,7 +22,8 @@ public class HelperFunctionsTest extends AndroidTestCase {
 
     public void testGetResolution() {
         String resolution = HelperFunctions.getResolution(getContext());
-        assertEquals("768x1184", resolution);
+        assertTrue(resolution.contains("x"));
+        assertTrue(resolution.length() > 5);
     }
 
     public void testGetDepth() {
@@ -45,11 +46,11 @@ public class HelperFunctionsTest extends AndroidTestCase {
     }
 
     public void testGetgetOSVersion() {
-        assertEquals("5.1", HelperFunctions.getOSVersion());
+        assertNotNull(HelperFunctions.getOSVersion());
     }
 
     public void testGetDevice() {
-        assertEquals("Genymotion Google Nexus 4 - 5.1.0 - API 22 - 768x1280", HelperFunctions.getDevice());
+        assertTrue(HelperFunctions.getDevice().contains("API"));
     }
 
     public void testGetCountry() {
@@ -57,7 +58,8 @@ public class HelperFunctionsTest extends AndroidTestCase {
     }
 
     public void testGetgetUseragent() {
-        assertEquals("Tracking Library 400(Android;5.1;Genymotion Google Nexus 4 - 5.1.0 - API 22 - 768x1280;en_US)", HelperFunctions.getUserAgent());
+        assertTrue(HelperFunctions.getUserAgent().contains("Tracking Library 400(Android"));
+        assertTrue(HelperFunctions.getUserAgent().contains("API"));
     }
 
     public void testIsSysAutorotate() {

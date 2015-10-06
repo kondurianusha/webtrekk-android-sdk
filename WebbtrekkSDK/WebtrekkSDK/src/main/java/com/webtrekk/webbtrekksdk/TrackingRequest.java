@@ -147,6 +147,9 @@ public class TrackingRequest {
         if(trackingParameter.containsKey(Parameter.ADVERTISER_ID)) {
             url.append("&" + Parameter.ADVERTISER_ID.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ADVERTISER_ID)));
         }
+        if(trackingParameter.containsKey(Parameter.FORCE_NEW_SESSION)) {
+            url.append(("&" + Parameter.FORCE_NEW_SESSION.toString() + "=" + tp.get(Parameter.FORCE_NEW_SESSION)));
+        }
 
         // media tracking
         if(trackingParameter.containsKey(Parameter.MEDIA_FILE)) {

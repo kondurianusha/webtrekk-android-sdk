@@ -153,7 +153,12 @@ public final class Webtrekk {
         }
         // first initalization of the webtrekk instance, so set fns to 1
         internalParameter.add(Parameter.FORCE_NEW_SESSION, "1");
-        internalParameter.add(Parameter.APP_FIRST_START, "0");
+        // if the app is started for the first time, the param "one" is 1 otherwise its always 0
+        if(HelperFunctions.firstStart(context)) {
+            internalParameter.add(Parameter.APP_FIRST_START, "1");
+        } else {
+            internalParameter.add(Parameter.APP_FIRST_START, "0");
+        }
     }
 
     /**
@@ -319,18 +324,13 @@ public final class Webtrekk {
         webtrekkParameter.put(Parameter.USERAGENT, HelperFunctions.getUserAgent());
         webtrekkParameter.put(Parameter.DEV_LANG, HelperFunctions.getCountry());
 
-        // if the app is started for the first time, the param "one" is 1 otherwise its always 0
-        if(HelperFunctions.firstStart(context)) {
-            internalParameter.add(Parameter.APP_FIRST_START, "1");
-        } else {
-            internalParameter.add(Parameter.APP_FIRST_START, "0");
-        }
+
 
         // for comatilility reasons always add the sampling rate param to the url
         webtrekkParameter.put(Parameter.SAMPLING, "" + trackingConfiguration.getSampling());
 
         // always track the wt everid
-        webtrekkParameter.put(Parameter.EVERID, HelperFunctions.generateEverid());
+        webtrekkParameter.put(Parameter.EVERID, HelperFunctions.getEverId(context));
 
         if(trackingConfiguration.isAutoTrackAdvertiserId()) {
             try {
@@ -846,5 +846,13 @@ public final class Webtrekk {
      */
     void setTrackingConfiguration(TrackingConfiguration trackingConfiguration) {
         this.trackingConfiguration = trackingConfiguration;
+    }
+
+    /**
+     * for unittesting only
+     * @return
+     */
+    public TrackingParameter getInternalParameter() {
+        return internalParameter;
     }
 }

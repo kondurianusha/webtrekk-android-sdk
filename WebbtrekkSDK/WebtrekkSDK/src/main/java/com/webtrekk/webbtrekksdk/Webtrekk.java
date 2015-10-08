@@ -125,6 +125,10 @@ public final class Webtrekk {
         }
         this.context = c;
 
+        if(customParameter == null) {
+            customParameter = new HashMap<>();
+        }
+
         initTrackingConfiguration();
         initOptedOut();
         initSampling();
@@ -133,6 +137,7 @@ public final class Webtrekk {
         initCustomParameter();
         initPlugins();
         initTimerService();
+        initAdvertiserId();
 
         this.requestUrlStore = new RequestUrlStore(context, trackingConfiguration.getMaxRequests());
         globalTrackingParameter = new TrackingParameter();
@@ -333,14 +338,7 @@ public final class Webtrekk {
         // always track the wt everid
         webtrekkParameter.put(Parameter.EVERID, HelperFunctions.getEverId(context));
 
-        if(trackingConfiguration.isAutoTrackAdvertiserId()) {
-            try {
-                initAdvertiserId();
-            } catch(Exception e) {
-                WebtrekkLogging.log("error initializing the advertiser id", e);
-            }
 
-        }
         WebtrekkLogging.log("collected static automatic data");
     }
 
@@ -405,30 +403,39 @@ public final class Webtrekk {
      * works by passing in a reference as it runs in a seperate thread to avoid lags in the main thread,
      */
     private synchronized void initAdvertiserId() {
+        if(!trackingConfiguration.isAutoTrackAdvertiserId()) {
+            return;
+        }
         // check if playservice sdk is available on that device, TODO: define alternative handling here
         // TODO: define default handling when this values can not be read, maybe cache them in Shared preferences if that is allowed due to opt out
         if( GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == 0) {
             Thread advertiserIdThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    WebtrekkLogging.log("starting advertiser id thread");
                     AdvertisingIdClient.Info adInfo = null;
                     try {
                         adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
-                        Webtrekk.getInstance().getCustomParameter().put("advertiserId", adInfo.getId());
-                        Webtrekk.getInstance().getCustomParameter().put("advertisingOptOut", String.valueOf(adInfo.isLimitAdTrackingEnabled()));
+
+                        WebtrekkLogging.log("advertiserId: " + adInfo.getId());
+                        Webtrekk.this.customParameter.put("advertiserId", adInfo.getId());
+                        Webtrekk.this.customParameter.put("advertisingOptOut", String.valueOf(adInfo.isLimitAdTrackingEnabled()));
                         //app.getTracker()..getAutoTrackedValues().put(TrackingParams.Params.ADVERTISER_ID, adInfo.getId());
                         //app.getWTRack().getAutoTrackedValues().put(TrackingParams.Params.ADVERTISER_OPTOUT, String.valueOf(adInfo.isLimitAdTrackingEnabled()));
 
                     } catch (IOException e) {
                         // Unrecoverable error connecting to Google Play services (e.g.,
                         // the old version of the service doesn't support getting AdvertisingId).
+                        WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
 
                     } catch (GooglePlayServicesNotAvailableException e) {
                         // Google Play services is not available entirely.
+                        WebtrekkLogging.log("GooglePlayServicesNotAvailableException", e);
                     } catch (GooglePlayServicesRepairableException e) {
                         // maybe will work with another try, recheck
                     } catch (NullPointerException e) {
                         // adinfo was null or could not get the id/optout setting
+                        WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
                     }
                 }
             });
@@ -437,6 +444,8 @@ public final class Webtrekk {
             } catch (Exception e){
                 WebtrekkLogging.log("error getting the advertiser id");
             }
+        } else {
+            WebtrekkLogging.log("google play services not available on device");
         }
     }
 
@@ -579,7 +588,7 @@ public final class Webtrekk {
         // other way was cooler, but requirements where to allow setting it always manually
 
 
-        TrackingRequest request = createTrackingRequest(tp, trackingConfiguration);
+        TrackingRequest request = createTrackingRequest(tp);
         addRequest(request);
     }
 
@@ -588,10 +597,9 @@ public final class Webtrekk {
      * this honours the hirarchy of overriding the values
      *
      * @param tp
-     * @param tc
      * @return
      */
-    private TrackingRequest createTrackingRequest(TrackingParameter tp, TrackingConfiguration tc) {
+    TrackingRequest createTrackingRequest(TrackingParameter tp) {
         // create a new trackingParameter object
         TrackingParameter trackingParameter = new TrackingParameter();
         // add the name of the current activity

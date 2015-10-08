@@ -117,7 +117,7 @@ public class RequestProcessor implements Runnable {
             String urlString = requestUrlStore.get(0);
             URL url = getUrl(urlString);
             if (url == null) {
-                WebtrekkLogging.log("Removing invalid URL '" + urlString + "' from queue.");
+                WebtrekkLogging.log("Removing invalid URL '" + urlString + "' from queue. remaining: " + requestUrlStore.size());
                 this.requestUrlStore.remove(0);
                 continue;
             }

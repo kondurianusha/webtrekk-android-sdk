@@ -205,7 +205,7 @@ public class WebtrekkTests extends AndroidTestCase {
         assertNull(webtrekk.getExecutorService());
         assertNull(webtrekk.getRequestProcessorFuture());
 
-        when(requestUrlStore.size()).thenReturn(5);
+        when(requestUrlStore.size()).thenReturn(5).thenReturn(4).thenReturn(3).thenReturn(2).thenReturn(1).thenReturn(0);
         webtrekk.onSendIntervalOver();
         assertNotNull(webtrekk.getExecutorService());
         assertNotNull(webtrekk.getRequestProcessorFuture());
@@ -289,5 +289,30 @@ public class WebtrekkTests extends AndroidTestCase {
 
         assertEquals(HelperFunctions.updated(getContext(), 5), true);
         assertEquals(preferences.getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, 0), 5);
+    }
+    // only test this on a real device or seperatly install playtore lib on the emulator device!
+    public void testInitAdvertiserId() {
+        webtrekk.initWebtrekk(getContext());
+        assertTrue(webtrekk.getTrackingConfiguration().isAutoTrackAdvertiserId());
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(webtrekk.getCustomParameter().get("advertiserId"));
+    }
+
+    public void testCreateTrackingRequest() {
+        TrackingParameter globalTp = new TrackingParameter();
+        globalTp.add(Parameter.ACTIVITY_NAME, "testtestact");
+        webtrekk.initWebtrekk(getContext());
+        TrackingParameter tp = new TrackingParameter();
+        webtrekk.setGlobalTrackingParameter(globalTp);
+        webtrekk.createTrackingRequest(tp);
+        webtrekk.startActivity("testact");
+        assertTrue(tp.containsKey(Parameter.TIMESTAMP));
+        //verify override
+        assertEquals(webtrekk.getGlobalTrackingParameter().getDefaultParameter().get(Parameter.ACTIVITY_NAME), "testtestact");
+
     }
 }

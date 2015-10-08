@@ -276,4 +276,18 @@ public class WebtrekkTests extends AndroidTestCase {
         assertTrue(webtrekk.getRequestUrlStore().get(1).contains("&one=0"));
         assertEquals(webtrekk.getInternalParameter().getDefaultParameter().get(Parameter.APP_FIRST_START), "0");
     }
+
+    public void testUpdated() {
+        webtrekk.initWebtrekk(getContext());
+        assertEquals(webtrekk.getCustomParameter().get("appUpdated"), "0");
+        SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+        assertEquals(preferences.getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, -1), 0);
+        webtrekk.startActivity("testact");
+        webtrekk.track();
+        assertEquals(HelperFunctions.getAppVersionCode(getContext()), 0);
+        assertEquals(webtrekk.getCustomParameter().get("appUpdated"), "0");
+
+        assertEquals(HelperFunctions.updated(getContext(), 5), true);
+        assertEquals(preferences.getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, 0), 5);
+    }
 }

@@ -279,11 +279,11 @@ final class HelperFunctions {
      * @param context
      * @return
      */
-    public static boolean updated(Context context) {
-        // this also automaticly handles the case when there is an update between the tracking lib
-        int current_version = getAppVersionCode(context);
+    public static boolean updated(Context context, int currentVersion) {
         int stored_version = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE).getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, -1);
-        if(!firstStart(context) && current_version > stored_version ) {
+        if(currentVersion > stored_version ) {
+            // update the stored version
+            setAppVersionCode(currentVersion, context);
             return true;
         }
         return false;

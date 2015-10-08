@@ -137,6 +137,7 @@ public final class Webtrekk {
         this.requestUrlStore = new RequestUrlStore(context, trackingConfiguration.getMaxRequests());
         globalTrackingParameter = new TrackingParameter();
 
+
         WebtrekkLogging.log("requestUrlStore created: max requests - " + trackingConfiguration.getMaxRequests());
 
         WebtrekkLogging.log("tracking initialized");
@@ -376,8 +377,20 @@ public final class Webtrekk {
 
         }
         // if the app was updated, send out the update request once
-        if(trackingConfiguration.isAutoTrackAppUpdate() && HelperFunctions.updated(context)) {
-            customParameter.put("appUpdated", "1");
+
+        if(trackingConfiguration.isAutoTrackAppUpdate()) {
+            int currentVersion = HelperFunctions.getAppVersionCode(context);
+            // store the app version code to check for updates
+            if(HelperFunctions.firstStart(context)) {
+                HelperFunctions.setAppVersionCode(currentVersion, context);
+            }
+
+            if(HelperFunctions.updated(context, currentVersion)) {
+                customParameter.put("appUpdated", "1");
+            } else  {
+                customParameter.put("appUpdated", "0");
+            }
+
         }
         if(trackingConfiguration.isAutoTrackApiLevel()) {
             customParameter.put("apiLevel", HelperFunctions.getAPILevel());

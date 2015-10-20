@@ -136,7 +136,6 @@ public class RequestProcessor implements Runnable {
                 // if there are redirects on serverside this has to be changed
                 WebtrekkLogging.log("removing URL from queue because status code cannot be handled: ");
                 this.requestUrlStore.remove(0);
-                break;
             }
         }
     }

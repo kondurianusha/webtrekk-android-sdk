@@ -229,7 +229,7 @@ final class HelperFunctions {
         if (!preferences.contains(Webtrekk.PREFERENCE_KEY_EVER_ID)) {
             preferences.edit().putString(Webtrekk.PREFERENCE_KEY_EVER_ID, HelperFunctions.generateEverid()).commit();
             // for compatibility reasons put the key here for new installation
-            preferences.edit().putString(Webtrekk.PREFERENCE_KEY_INSTALLATION_FLAG, "1");
+            //preferences.edit().putString(Webtrekk.PREFERENCE_KEY_INSTALLATION_FLAG, "1");
         }
         return preferences.getString(Webtrekk.PREFERENCE_KEY_EVER_ID, "");
     }
@@ -307,7 +307,7 @@ final class HelperFunctions {
     public static boolean firstStart(Context context) {
         // if no everid is set, this is the first start
         SharedPreferences preferences = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-        return preferences.contains(Webtrekk.PREFERENCE_KEY_EVER_ID);
+        return !preferences.contains(Webtrekk.PREFERENCE_KEY_EVER_ID);
     }
 
     /**

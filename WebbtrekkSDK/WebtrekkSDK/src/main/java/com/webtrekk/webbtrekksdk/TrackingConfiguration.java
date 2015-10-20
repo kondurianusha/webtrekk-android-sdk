@@ -1,5 +1,7 @@
 package com.webtrekk.webbtrekksdk;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,20 +116,41 @@ class TrackingConfiguration {
      */
     public boolean validateConfiguration() {
         //TODO: implement validation rules
+        boolean valid = true;
         if(sendDelay < 10) {
             WebtrekkLogging.log("invalid sendDelay Value");
+            valid = false;
         }
         if(sampling < 0) {
             WebtrekkLogging.log("invalid sampling Value");
+            valid = false;
         }
         if(maxRequests < 100) {
             WebtrekkLogging.log("invalid maxRequests Value");
+            valid = false;
         }
 
         // check for mandatory values
+        if(trackId == null || trackId.isEmpty() || trackId.length() < 5) {
+            WebtrekkLogging.log("missing value: trackId");
+            valid = false;
+        }
+        // make sure a trackdomain is configured
+        if(trackDomain == null || trackDomain.isEmpty() || trackDomain.length() < 5) {
+            WebtrekkLogging.log("missing value: trackId");
+            valid = false;
+        }
+        //try if its a valid url
+        try {
+            new URL(trackDomain);
+        } catch (MalformedURLException e) {
+            WebtrekkLogging.log("invalid trackDomain Value");
+            valid = false;
+        }
+
 
         // check for details like valid url, min max values and so on
-        return true;
+        return valid;
     }
 
     public int getVersion() {

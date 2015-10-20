@@ -1,5 +1,6 @@
 package com.webtrekk.webbtrekksdk;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -138,6 +139,9 @@ public final class Webtrekk {
         initPlugins();
         initTimerService();
         initAdvertiserId();
+        //TODO: make sure this can not break
+        Application act = (Application) context.getApplicationContext();
+        initAutoTracking(act);
 
         this.requestUrlStore = new RequestUrlStore(context, trackingConfiguration.getMaxRequests());
         globalTrackingParameter = new TrackingParameter();
@@ -269,7 +273,7 @@ public final class Webtrekk {
             public void run() {
                 onSendIntervalOver();
             }
-        }, trackingConfiguration.getInitialSendDelay(), trackingConfiguration.getSendDelay(), TimeUnit.SECONDS);
+        }, trackingConfiguration.getSendDelay(), trackingConfiguration.getSendDelay(), TimeUnit.SECONDS);
         WebtrekkLogging.log("timer service started");
     }
 
@@ -472,11 +476,11 @@ public final class Webtrekk {
      */
     void initAutoTracking(Application app){
         if(callbacks == null && trackingConfiguration.isAutoTracked()) {
+            WebtrekkLogging.log("enabling autoTracking");
             callbacks = new TrackedActivityLifecycleCallbacks(this);
             app.registerActivityLifecycleCallbacks(callbacks);
         }
     }
-
 
 
     /**
@@ -538,26 +542,26 @@ public final class Webtrekk {
 
     /**
      * this method gets called when auto tracking is enabled and one of the lifycycle methods is called
-     * @param name
      */
-    public void autoTrackActivity(String name) {
-        //TODO: check call start/stopActivity here as well
-        if(!trackingConfiguration.getActivityConfigurations().containsKey(name)) {
-            // this activity is not configured
-            //TODO: this basicly makes autoTrack obsolete
-            return;
-        }
-        TrackingConfiguration.ActivityConfiguration actConfig = trackingConfiguration.getActivityConfigurations().get(name);
-        TrackingParameter tp = new TrackingParameter();
-        tp.add(webtrekkParameter);
-        tp.add(TrackingParameter.Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
-        TrackingRequest request;
-
-        // apply mapping
-        tp.add(TrackingParameter.Parameter.ACTIVITY_NAME, actConfig.getMappingName());
-
-        request = new TrackingRequest(tp, trackingConfiguration);
-        addRequest(request);
+    public void autoTrackActivity() {
+        //TODO: basicly obsolete method, maybe do more advanced stuff later, but can be removed
+        track();
+//        TrackingParameter tp = new TrackingParameter();
+//        tp.add(webtrekkParameter);
+//        tp.add(TrackingParameter.Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
+//        tp.add(TrackingParameter.Parameter.ACTIVITY_NAME, currentActivityName);
+//        TrackingRequest request;
+//
+//        // apply mapping
+//        if(trackingConfiguration.getActivityConfigurations().containsKey(currentActivityName)) {
+//            TrackingConfiguration.ActivityConfiguration actConfig = trackingConfiguration.getActivityConfigurations().get(currentActivityName);
+//            // this activity is not configured
+//            //TODO: this basicly makes autoTrack obsolete
+//            tp.add(TrackingParameter.Parameter.ACTIVITY_NAME, actConfig.getMappingName());
+//        }
+//
+//        request = new TrackingRequest(tp, trackingConfiguration);
+//        addRequest(request);
     }
 
     /**
@@ -568,13 +572,16 @@ public final class Webtrekk {
      */
     public void track(final TrackingParameter tp) {
         if (requestUrlStore == null || trackingConfiguration == null) {
-            throw new IllegalStateException("webtrekk has not been initialized");
+            WebtrekkLogging.log("webtrekk has not been initialized");
+            return;
         }
         if (activityCount == 0) {
-            throw new IllegalStateException("no running activity, call startActivity first");
+            WebtrekkLogging.log("no running activity, call startActivity first");
+            return;
         }
         if(tp == null) {
-            throw new IllegalStateException("TrackingParams is null");
+            WebtrekkLogging.log("TrackingParams is null");
+            return;
         }
 
         // use the automatic name in case no activity name is given
@@ -676,14 +683,14 @@ public final class Webtrekk {
      * best place to call this is during the activitys onStart method, it also allows overriding the
      * current activity name, which gets tracked
      *
-     * @param ActivityName a string containing the name of the activity
+     * @param activityName a string containing the name of the activity
      */
-    public void startActivity(String ActivityName) {
+    public void startActivity(String activityName) {
         if (requestUrlStore == null || trackingConfiguration == null) {
             throw new IllegalStateException("webtrekk has not been initialized");
         }
         activityCount++;
-        this.currentActivityName = ActivityName;
+        this.currentActivityName = activityName;
         if(activityCount == 1) {
             onFirstActivityStart();
         }

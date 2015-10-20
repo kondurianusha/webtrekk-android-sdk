@@ -45,7 +45,7 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
         if(isPaused) {
             if((System.currentTimeMillis() - lastRequestTimestamp)/1000 > webtrekk.getTrackingConfiguration().getResendOnStartEventTime()) {
                 // in this case more than resendOnStartEventTime seconds have passed since the last request, so send the onStart Event again
-                webtrekk.autoTrackActivity(activity.getClass().getName());
+                webtrekk.autoTrackActivity();
             }
             isPaused = false;
         }
@@ -59,12 +59,14 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
     @Override
     public void onActivityStarted(Activity activity) {
         WebtrekkLogging.log("Tracking Activity started: " + activity.getClass().getName());
-        webtrekk.autoTrackActivity(activity.getClass().getName());
+        webtrekk.startActivity(activity.getClass().getName());
+        webtrekk.autoTrackActivity();
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
         WebtrekkLogging.log("Tracking Activity stopped: " + activity.getClass().getName());
+        webtrekk.stopActivity();
         //webtrekk.autoTrackActivity(activity.getClass().getName());
     }
 }

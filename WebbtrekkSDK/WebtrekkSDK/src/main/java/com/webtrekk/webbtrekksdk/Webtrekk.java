@@ -41,6 +41,7 @@ public final class Webtrekk {
     public static final String PREFERENCE_KEY_INSTALLATION_FLAG = "InstallationFlag";
     public static final String PREFERENCE_KEY_CONFIGURATION = "webtrekkTrackingConfiguration";
     public static final String TRACKING_LIBRARY_VERSION = "400";
+    public static final String TRACKING_LIBRARY_VERSION_UA = "4.0";
 
 
     private RequestUrlStore requestUrlStore;
@@ -146,11 +147,8 @@ public final class Webtrekk {
         this.requestUrlStore = new RequestUrlStore(context, trackingConfiguration.getMaxRequests());
         globalTrackingParameter = new TrackingParameter();
 
-
         WebtrekkLogging.log("requestUrlStore created: max requests - " + trackingConfiguration.getMaxRequests());
-
         WebtrekkLogging.log("tracking initialized");
-
     }
 
     final void initTrackingConfiguration() {
@@ -661,7 +659,7 @@ public final class Webtrekk {
         // only track when not opted out, but always execute the plugins
         if(!isOptout && !isSampling) {
             String urlString = request.getUrlString();
-            WebtrekkLogging.log("sending url: " + urlString);
+            WebtrekkLogging.log("add url: " + urlString);
             requestUrlStore.add(request.getUrlString());
         }
 

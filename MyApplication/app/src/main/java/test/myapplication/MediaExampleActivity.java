@@ -9,7 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.MediaController;
 
-import com.webtrekk.webbtrekksdk.TrackingParams;
+import com.webtrekk.webbtrekksdk.TrackingParameter;
 import com.webtrekk.webbtrekksdk.Webtrekk;
 import com.webtrekk.webbtrekksdk.WebtrekkApplication;
 
@@ -18,7 +18,7 @@ public class MediaExampleActivity extends ActionBarActivity {
     private int position = 0;
     private MediaController mediaControls;
     private Webtrekk webtrekk;
-    TrackingParams tp;
+    TrackingParameter tp;
 
     private MediaPlayer mp;
 

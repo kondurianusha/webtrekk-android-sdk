@@ -69,6 +69,7 @@ public class RequestProcessor implements Runnable {
     public int sendRequest(URL url) {
         HttpURLConnection connection = null;
         try {
+            WebtrekkLogging.log("sending request: " + url);
             connection = getUrlConnection(url);
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(NETWORK_CONNECTION_TIMEOUT);
@@ -131,10 +132,9 @@ public class RequestProcessor implements Runnable {
                 // client side networking errors, just break and try again with next onSendintervalOver
                 break;
             } else {
-                WebtrekkLogging.log("received status " + statusCode);
                 // all error codes above 400 will be removed, the 300 redirects should not occur
                 // if there are redirects on serverside this has to be changed
-                WebtrekkLogging.log("removing URL from queue because status code cannot be handled: ");
+                WebtrekkLogging.log("removing URL from queue because status code cannot be handled: " + statusCode);
                 this.requestUrlStore.remove(0);
             }
         }

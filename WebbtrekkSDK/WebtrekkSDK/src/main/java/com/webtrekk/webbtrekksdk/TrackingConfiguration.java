@@ -118,33 +118,36 @@ class TrackingConfiguration {
         //TODO: implement validation rules
         boolean valid = true;
         if(sendDelay < 10) {
-            WebtrekkLogging.log("invalid sendDelay Value");
+            //ToDo: get default sendDelay from SDK XML
+            WebtrekkLogging.log("invalid sendDelay: " + sendDelay);
             valid = false;
         }
         if(sampling < 0) {
-            WebtrekkLogging.log("invalid sampling Value");
+            //ToDo: get default sampling from SDK XML
+            WebtrekkLogging.log("invalid sampling: " + sampling);
             valid = false;
         }
         if(maxRequests < 100) {
-            WebtrekkLogging.log("invalid maxRequests Value");
+            //ToDo: get default maxRequests from SDK XML
+            WebtrekkLogging.log("invalid maxRequests: " + maxRequests);
             valid = false;
         }
 
         // check for mandatory values
-        if(trackId == null || trackId.isEmpty() || trackId.length() < 5) {
-            WebtrekkLogging.log("missing value: trackId");
+        if(trackId == null || trackId.isEmpty() || trackId.length() < 15) {
+            WebtrekkLogging.log("invalid trackId: " + trackId);
             valid = false;
         }
         // make sure a trackdomain is configured
         if(trackDomain == null || trackDomain.isEmpty() || trackDomain.length() < 5) {
-            WebtrekkLogging.log("missing value: trackId");
+            WebtrekkLogging.log("missing trackId: " + trackDomain);
             valid = false;
         }
         //try if its a valid url
         try {
             new URL(trackDomain);
         } catch (MalformedURLException e) {
-            WebtrekkLogging.log("invalid trackDomain Value");
+            WebtrekkLogging.log("invalid trackDomain Value: " + trackDomain);
             valid = false;
         }
 

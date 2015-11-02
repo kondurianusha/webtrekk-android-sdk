@@ -487,7 +487,7 @@ final class HelperFunctions {
         return builder.toString();
     }
 
-    public static String getXmlFromUrl(String url) throws IOException {
+    public String getXmlFromUrl(String url) throws IOException {
         String xml = null;
             // defaultHttpClient
             HttpURLConnection urlConnection;
@@ -509,7 +509,7 @@ final class HelperFunctions {
                 WebtrekkLogging.log("getXmlFromUrl: invalid URL", e);
                 return null;
             } catch (ProtocolException e) {
-                e.printStackTrace();
+                WebtrekkLogging.log("getXmlFromUrl: invalid URL", e);
             } catch (IOException e) {
                 WebtrekkLogging.log("getXmlFromUrl: invalid URL", e);
             } finally {
@@ -519,6 +519,20 @@ final class HelperFunctions {
             }
         // return XML
         return xml;
+    }
+
+    // Given a string representation of a URL, sets up a connection and gets
+// an input stream.
+    InputStream downloadUrl(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(10000 /* milliseconds */);
+        conn.setConnectTimeout(15000 /* milliseconds */);
+        conn.setRequestMethod("GET");
+        conn.setDoInput(true);
+        // Starts the query
+        conn.connect();
+        return conn.getInputStream();
     }
 
 }

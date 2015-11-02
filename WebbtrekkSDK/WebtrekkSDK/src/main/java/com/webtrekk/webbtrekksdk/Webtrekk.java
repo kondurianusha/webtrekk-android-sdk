@@ -28,7 +28,7 @@ import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
 /**
  * The WebtrekkSDK main class, the developer/customer interacts with the SDK through this class.
  */
-public final class Webtrekk {
+public class Webtrekk {
 
 
     //name of the preference strings
@@ -223,7 +223,7 @@ public final class Webtrekk {
         }
         // third check online for newer versions
         //TODO: maybe store just the version number locally in preferences might reduce some parsing
-        //new TrackingConfigurationDownloadTask(this).execute(trackingConfiguration.getTrackingConfigurationUrl());
+        new TrackingConfigurationDownloadTask(this, null).execute(trackingConfiguration.getTrackingConfigurationUrl());
 
         // check if we have a valid configuration
         if(trackingConfiguration != null && trackingConfiguration.validateConfiguration()) {

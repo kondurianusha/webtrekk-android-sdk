@@ -1,6 +1,5 @@
 package com.webtrekk.webbtrekksdk;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -41,7 +40,6 @@ public class Webtrekk {
     public static final String PREFERENCE_KEY_INSTALLATION_FLAG = "InstallationFlag";
     public static final String PREFERENCE_KEY_CONFIGURATION = "webtrekkTrackingConfiguration";
     public static final String TRACKING_LIBRARY_VERSION = "400";
-    public static final String TRACKING_LIBRARY_VERSION_UA = "4.0";
 
 
     private RequestUrlStore requestUrlStore;
@@ -147,8 +145,11 @@ public class Webtrekk {
         this.requestUrlStore = new RequestUrlStore(context, trackingConfiguration.getMaxRequests());
         globalTrackingParameter = new TrackingParameter();
 
+
         WebtrekkLogging.log("requestUrlStore created: max requests - " + trackingConfiguration.getMaxRequests());
+
         WebtrekkLogging.log("tracking initialized");
+
     }
 
     final void initTrackingConfiguration() {
@@ -181,18 +182,34 @@ public class Webtrekk {
             // always parse the local raw config version first, this is fallback, default and also the way to fix broken online configs
             //TODO: this could me more elegant by only parsing it when its a new app version which needs to be set anyway
             String trackingConfigurationString;
+            String defaultConfigurationString = null;
+            TrackingConfiguration defaultConfiguration = null;
             if (configurationString == null) {
                 try {
                     trackingConfigurationString = HelperFunctions.stringFromStream(context.getResources().openRawResource(R.raw.webtrekk_config));
                 } catch (IOException e) {
+                    WebtrekkLogging.log("no custom config was found, illegal state, provide a valid config in res/raw/webtrekk_config.xml");
                     throw new IllegalStateException("can not load xml configuration file, invalid state");
+                }
+                if(trackingConfigurationString.length() < 80) {
+                    // neccesary to make sure it uses the placeholder which has 66 chars length
+                    WebtrekkLogging.log("no custom config was found, illegal state, provide a valid config in res/raw/webtrekk_config.xml");
+                    throw new IllegalStateException("can not load xml configuration file, invalid state");
+                }
+                try {
+                    defaultConfigurationString = HelperFunctions.stringFromStream(context.getResources().openRawResource(R.raw.webtrekk_default));
+                } catch (IOException e) {
+                    WebtrekkLogging.log("no default config was found, illegal state");
+                    throw new IllegalStateException("can not load default xml configuration file, invalid state");
                 }
             } else {
                 trackingConfigurationString = configurationString;
             }
 
         try {
-            trackingConfiguration = new TrackingConfigurationXmlParser().parse(trackingConfigurationString);
+            // parse default configuration without default, willl throw exceptions when its not valid
+            defaultConfiguration = new TrackingConfigurationXmlParser().parse(defaultConfigurationString, null);
+            trackingConfiguration = new TrackingConfigurationXmlParser().parse(trackingConfigurationString, defaultConfiguration);
         } catch (Exception e) {
             throw new IllegalStateException("invalid xml configuration file, invalid state");
         }
@@ -206,7 +223,7 @@ public class Webtrekk {
             trackingConfigurationString = sharedPrefs.getString(Webtrekk.PREFERENCE_KEY_CONFIGURATION, null);
             TrackingConfiguration sharedPreferencetrackingConfiguration = null;
             try {
-                sharedPreferencetrackingConfiguration = new TrackingConfigurationXmlParser().parse(trackingConfigurationString);
+                sharedPreferencetrackingConfiguration = new TrackingConfigurationXmlParser().parse(trackingConfigurationString, defaultConfiguration);
                 if(sharedPreferencetrackingConfiguration.getVersion() > trackingConfiguration.getVersion()) {
                     // in this case there is a newer, so replace th old one
                     trackingConfiguration = sharedPreferencetrackingConfiguration;
@@ -221,7 +238,7 @@ public class Webtrekk {
         }
         // third check online for newer versions
         //TODO: maybe store just the version number locally in preferences might reduce some parsing
-        new TrackingConfigurationDownloadTask(this, null).execute(trackingConfiguration.getTrackingConfigurationUrl());
+        new TrackingConfigurationDownloadTask(this, defaultConfiguration, null).execute(trackingConfiguration.getTrackingConfigurationUrl());
 
         // check if we have a valid configuration
         if(trackingConfiguration != null && trackingConfiguration.validateConfiguration()) {
@@ -659,7 +676,7 @@ public class Webtrekk {
         // only track when not opted out, but always execute the plugins
         if(!isOptout && !isSampling) {
             String urlString = request.getUrlString();
-            WebtrekkLogging.log("add url: " + urlString);
+            WebtrekkLogging.log("sending url: " + urlString);
             requestUrlStore.add(request.getUrlString());
         }
 
@@ -881,4 +898,20 @@ public class Webtrekk {
     public TrackingParameter getInternalParameter() {
         return internalParameter;
     }
+
+    /**
+     * for unit testing in the application and debugging
+     */
+    public int getVersion() { return trackingConfiguration.getVersion(); }
+    public String getTrackDomain() { return trackingConfiguration.getTrackDomain(); }
+    public String getTrackId() { return trackingConfiguration.getTrackId(); }
+    public int getSampling() { return trackingConfiguration.getSampling(); }
+    public int getInitialSendDelay() { return trackingConfiguration.getInitialSendDelay(); }
+    public int getSendDelay() { return trackingConfiguration.getSendDelay(); }
+    public int getResendOnStartEventTime() { return trackingConfiguration.getResendOnStartEventTime(); }
+    public int getMaxRequests() { return trackingConfiguration.getMaxRequests(); }
+    public String getTrackingConfigurationUrl() { return trackingConfiguration.getTrackingConfigurationUrl(); }
+    public boolean isAutoTracked() { return trackingConfiguration.isAutoTracked(); }
+    public boolean isAutoTrackApiLevel() { return trackingConfiguration.isAutoTrackApiLevel(); }
+    public boolean isEnableRemoteConfiguration() { return trackingConfiguration.isEnableRemoteConfiguration(); }
 }

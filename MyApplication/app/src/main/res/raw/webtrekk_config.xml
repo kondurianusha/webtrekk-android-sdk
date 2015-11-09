@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <webtrekkConfiguration>
     <!--the version number for this configuration file -->
-    <version>2</version>
+    <version>3</version>
     <!--the webtrekk trackDomain where the requests are send -->
-    <trackDomain type="text">http://wt-test01.webtrekk.net</trackDomain>
+    <trackDomain type="text">http://trackingtest.nglab.orgO</trackDomain>
     <!--customers trackid -->
-    <trackId type="text">111111111111111</trackId>
+    <trackId type="text">1111111111112O</trackId>
     <!-- measure only a subset of the users -->
-    <sampling type="text">0</sampling>
+    <sampling type="text">333</sampling>
+    <!--delay before the first request is send -->
+    <initialSendDelay type="text">33</initialSendDelay>
     <!-- interval between the requests are send in seconds -->
-    <sendDelay type="text">60</sendDelay>
+    <sendDelay type="text">602</sendDelay>
     <!--maximum amoount of requests to store when the user is offline -->
-    <maxRequests type="number">5000</maxRequests>
+    <maxRequests type="number">4000</maxRequests>
 
     <!--optional settings -->
     <!--automaticly track activities onStart method -->
-    <autoTracked>true</autoTracked>
+    <autoTracked>false</autoTracked>
 
 
     <!--track if there was an application update -->
@@ -23,38 +25,39 @@
     <!--track the advertiser id -->
     <autoTrackAdvertiserId>true</autoTrackAdvertiserId>
     <!--track the app versions name -->
-    <autoTrackAppVersionName>false</autoTrackAppVersionName>
+    <autoTrackAppVersionName>true</autoTrackAppVersionName>
     <!--track the app versions code -->
     <autoTrackAppVersionCode>true</autoTrackAppVersionCode>
     <!--track if the app was already installed -->
     <autoTrackAppPreInstalled>true</autoTrackAppPreInstalled>
     <!--track the playstore username, requires special permissions! -->
-    <autoTrackPlaystoreUsername>false</autoTrackPlaystoreUsername>
+    <autoTrackPlaystoreUsername>true</autoTrackPlaystoreUsername>
     <!--track the playstore email, requires special permissions! -->
-    <autoTrackPlaystoreMail>false</autoTrackPlaystoreMail>
+    <autoTrackPlaystoreMail>true</autoTrackPlaystoreMail>
     <!--track the playstore given name, requires special permissions! -->
-    <autoTrackPlaystoreGivenName>false</autoTrackPlaystoreGivenName>
+    <autoTrackPlaystoreGivenName>true</autoTrackPlaystoreGivenName>
     <!--track the playstore family name, requires special permissions! -->
-    <autoTrackPlaystoreFamilyName>false</autoTrackPlaystoreFamilyName>
+    <autoTrackPlaystoreFamilyName>true</autoTrackPlaystoreFamilyName>
     <!--track the supported api level of the device, requires special permissions! -->
-    <autoTrackApiLevel>true</autoTrackApiLevel>
+    <autoTrackApiLevel>false</autoTrackApiLevel>
     <!--track the devices screen orientation -->
     <autoTrackScreenOrientation>true</autoTrackScreenOrientation>
     <!--track the current connection type -->
     <autoTrackConnectionType>true</autoTrackConnectionType>
     <!--track if the user has opted out for advertisement on google plays -->
-    <autoTrackAdvertisementOptOut>false</autoTrackAdvertisementOptOut>
+    <autoTrackAdvertisementOptOut>true</autoTrackAdvertisementOptOut>
+
 
     <!--enable the hello world plugin functions -->
-    <enablePluginHelloWorld>false</enablePluginHelloWorld>
+    <enablePluginHelloWorld>true</enablePluginHelloWorld>
     <!--enables the remote xml configuration -->
-    <enableRemoteConfiguration>true</enableRemoteConfiguration>
+    <enableRemoteConfiguration>XXX</enableRemoteConfiguration>
     <!--url of the remote configuration -->
-    <trackingConfigurationUrl>https://supportcenter.webtrekk.com/android_config.xml</trackingConfigurationUrl>
+    <trackingConfigurationUrl>http://remotehost/tracking_config.xml</trackingConfigurationUrl>
     <!--sends the size of the current locally stored urls in a custom parameter -->
     <sendRequestUrlStoreSize>true</sendRequestUrlStoreSize>
     <!--resend onStart time, this is the timeout for auto tracked sessions in case an activity was paused -->
-    <resendOnStartEventTime>30</resendOnStartEventTime>
+    <resendOnStartEventTime></resendOnStartEventTime>
 
     <!--custom parameter -->
     <customParameter>
@@ -148,6 +151,4 @@
 
         </activityTrackingParameter>
     </activity>
-
-
 </webtrekkConfiguration>

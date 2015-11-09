@@ -294,7 +294,7 @@ final class HelperFunctions {
      * @return
      */
     public static String getUserAgent() {
-        return "Tracking Library " + Webtrekk.TRACKING_LIBRARY_VERSION_UA + "(" + HelperFunctions.getOSName() + ";" + HelperFunctions.getOSVersion() + ";" + HelperFunctions.getDevice() + ";" + Locale.getDefault() + ")";
+        return "Tracking Library " + Webtrekk.TRACKING_LIBRARY_VERSION + "(" + HelperFunctions.getOSName() + ";" + HelperFunctions.getOSVersion() + ";" + HelperFunctions.getDevice() + ";" + Locale.getDefault() + ")";
     }
 
     /**

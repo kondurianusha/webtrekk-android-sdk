@@ -28,12 +28,12 @@ class TrackingConfigurationXmlParser {
      * @throws XmlPullParserException
      * @throws IOException
      */
-    public TrackingConfiguration parse(String in) throws XmlPullParserException, IOException {
+    public TrackingConfiguration parse(String in, TrackingConfiguration defaultConfiguration) throws XmlPullParserException, IOException {
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(new StringReader(in));
             parser.nextTag();
-            return readConfig(parser);
+            return readConfig(parser, defaultConfiguration);
     }
 
     /**
@@ -44,7 +44,7 @@ class TrackingConfigurationXmlParser {
      * @throws XmlPullParserException
      * @throws IOException
      */
-    private TrackingConfiguration readConfig(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private TrackingConfiguration readConfig(XmlPullParser parser, TrackingConfiguration defaultConfiguration) throws XmlPullParserException, IOException {
         TrackingConfiguration config = new TrackingConfiguration();
         parser.require(XmlPullParser.START_TAG, ns, "webtrekkConfiguration");
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -61,6 +61,8 @@ class TrackingConfigurationXmlParser {
                     config.setVersion(version);
                 }  catch (Exception ex){
                     WebtrekkLogging.log("invalid version value: ", ex);
+                    WebtrekkLogging.log("using default: " + defaultConfiguration.getVersion());
+                    config.setVersion(defaultConfiguration.getVersion());
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "version");
 
@@ -83,14 +85,14 @@ class TrackingConfigurationXmlParser {
 
             }  else if (name.equals("sampling")) {
                 parser.require(XmlPullParser.START_TAG, ns, "sampling");
-
                 String samplingValue = readText(parser);
-
                 try {
                     int sampling = Integer.parseInt(samplingValue);
                     config.setSampling(sampling);
                 }  catch (Exception ex){
                     WebtrekkLogging.log("invalid sampling value: ", ex);
+                    WebtrekkLogging.log("using default: " + defaultConfiguration.getSampling());
+                    config.setSampling(defaultConfiguration.getSampling());
                 }
 
                 parser.require(XmlPullParser.END_TAG, ns, "sampling");
@@ -106,6 +108,8 @@ class TrackingConfigurationXmlParser {
                     config.setMaxRequests(maxRequests);
                 }  catch (Exception ex){
                     WebtrekkLogging.log("invalid maxRequests value: ", ex);
+                    WebtrekkLogging.log("using default: " + defaultConfiguration.getMaxRequests());
+                    config.setMaxRequests(defaultConfiguration.getMaxRequests());
                 }
 
                 parser.require(XmlPullParser.END_TAG, ns, "maxRequests");
@@ -113,14 +117,14 @@ class TrackingConfigurationXmlParser {
 
             } else if (name.equals("initialSendDelay")) {
                 parser.require(XmlPullParser.START_TAG, ns, "initialSendDelay");
-
                 String initialSendDelayValue = readText(parser);
-
                 try {
                     int initialSendDelay = Integer.parseInt(initialSendDelayValue);
                     config.setInitialSendDelay(initialSendDelay);
                 }  catch (Exception ex){
                     WebtrekkLogging.log("invalid initialSendDelay value: ", ex);
+                    WebtrekkLogging.log("using default: " + defaultConfiguration.getInitialSendDelay());
+                    config.setInitialSendDelay(defaultConfiguration.getInitialSendDelay());
                 }
 
                 parser.require(XmlPullParser.END_TAG, ns, "initialSendDelay");
@@ -128,16 +132,15 @@ class TrackingConfigurationXmlParser {
 
             } else if (name.equals("sendDelay")) {
                 parser.require(XmlPullParser.START_TAG, ns, "sendDelay");
-
                 String sendDelayValue = readText(parser);
-
                 try {
                     int sendDelay = Integer.parseInt(sendDelayValue);
                     config.setSendDelay(sendDelay);
                 }  catch (Exception ex){
                     WebtrekkLogging.log("invalid sendDelay value: ", ex);
+                    WebtrekkLogging.log("using default: " + defaultConfiguration.getSendDelay());
+                    config.setSendDelay(defaultConfiguration.getSendDelay());
                 }
-
                 parser.require(XmlPullParser.END_TAG, ns, "sendDelay");
 
 
@@ -326,8 +329,11 @@ class TrackingConfigurationXmlParser {
                 String value = readText(parser);
                 if(value.equals("true")) {
                     config.setEnableRemoteConfiguration(true);
-                } else {
+                } else if (value.equals("false")) {
                     config.setEnableRemoteConfiguration(false);
+                } else {
+                        WebtrekkLogging.log("using default: " + defaultConfiguration.isEnableRemoteConfiguration());
+                        config.setEnableRemoteConfiguration(defaultConfiguration.isEnableRemoteConfiguration());
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "enableRemoteConfiguration");
 
@@ -353,6 +359,8 @@ class TrackingConfigurationXmlParser {
                     config.setResendOnStartEventTime(resendOnStartEventTime);
                 }  catch (Exception ex){
                     WebtrekkLogging.log("invalid resendOnStartEventTime value: ", ex);
+                    WebtrekkLogging.log("using default: " + defaultConfiguration.getResendOnStartEventTime());
+                    config.setResendOnStartEventTime(defaultConfiguration.getResendOnStartEventTime());
                 }
 
                 parser.require(XmlPullParser.END_TAG, ns, "resendOnStartEventTime");

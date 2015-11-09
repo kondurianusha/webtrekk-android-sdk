@@ -1,5 +1,7 @@
 package com.webtrekk.webbtrekksdk;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.test.InstrumentationTestCase;
 import android.util.Log;
 
@@ -42,7 +44,7 @@ public class TrackingConfigurationDownloadTaskTest extends InstrumentationTestCa
         synchronizedWaiter = new SynchronizedWaiter();
         AsyncTest asyncTest = this;
         Log.d("TEST", "task started");
-        TrackingConfigurationDownloadTask task = new TrackingConfigurationDownloadTask(webtrekk, asyncTest);
+        TrackingConfigurationDownloadTask task = new TrackingConfigurationDownloadTask(webtrekk, null, asyncTest);
         task = spy(task);
         try {
             task.execute(webtrekk.getTrackingConfiguration().getTrackingConfigurationUrl());
@@ -62,7 +64,7 @@ public class TrackingConfigurationDownloadTaskTest extends InstrumentationTestCa
         synchronizedWaiter = new SynchronizedWaiter();
         AsyncTest asyncTest = this;
         Log.d("TEST", "task started");
-        TrackingConfigurationDownloadTask task = new TrackingConfigurationDownloadTask(webtrekk, asyncTest);
+        TrackingConfigurationDownloadTask task = new TrackingConfigurationDownloadTask(webtrekk, null, asyncTest);
         task = spy(task);
         doReturn(new ByteArrayInputStream("foo".getBytes("UTF-8"))).when(task).getXmlFromUrl("http://foourl.de/config.xml");
         try {
@@ -84,7 +86,7 @@ public class TrackingConfigurationDownloadTaskTest extends InstrumentationTestCa
         synchronizedWaiter = new SynchronizedWaiter();
         AsyncTest asyncTest = this;
         Log.d("TEST", "task started");
-        TrackingConfigurationDownloadTask task = new TrackingConfigurationDownloadTask(webtrekk, asyncTest);
+        TrackingConfigurationDownloadTask task = new TrackingConfigurationDownloadTask(webtrekk, null, asyncTest);
         assertNotNull(webtrekk.getTrackingConfiguration());
         task = spy(task);
         webtrekk = spy(webtrekk);
@@ -110,18 +112,20 @@ public class TrackingConfigurationDownloadTaskTest extends InstrumentationTestCa
      * @throws Throwable
      */
     public void testTrackingConfigurationDownloadTaskNewConfigVersion() throws Throwable {
+        SharedPreferences preferences = getInstrumentation().getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+        preferences.edit().remove(Webtrekk.PREFERENCE_KEY_EVER_ID).commit();
         synchronizedWaiter = new SynchronizedWaiter();
         AsyncTest asyncTest = this;
         String config = "<webtrekkConfiguration>\n" +
                 "    <!--the version number for this configuration file -->\n" +
                 "    <version>3</version></webtrekkConfiguration>";
 
-        TrackingConfigurationDownloadTask task = spy(new TrackingConfigurationDownloadTask(webtrekk, asyncTest));
+        TrackingConfigurationDownloadTask task = spy(new TrackingConfigurationDownloadTask(webtrekk, null, asyncTest));
         doReturn("foo").when(task).getXmlFromUrl(anyString());
 //        when(task.downloadUrl("http://nglab.org/config.xml")).thenReturn(new ByteArrayInputStream(config.getBytes("UTF-8")));
                 assertNotNull(webtrekk.getTrackingConfiguration());
         // make sure it uses config version 2 before
-        assertEquals(2, webtrekk.getTrackingConfiguration().getVersion());
+       // assertEquals(2, webtrekk.getTrackingConfiguration().getVersion());
         //webtrekk = spy(webtrekk);
 
         //final HttpURLConnection mockURLConnection = mock(HttpURLConnection.class);
@@ -131,7 +135,7 @@ public class TrackingConfigurationDownloadTaskTest extends InstrumentationTestCa
 
 
         try {
-            task.execute("http://wt.nglab.org:1480/webtrekk_config3.xml");
+            task.execute("https://supportcenter.webtrekk.com/android_config.xml");
 
         } catch (Exception e) {
             fail("should never throw an exception, just use the local configuration");
@@ -139,7 +143,7 @@ public class TrackingConfigurationDownloadTaskTest extends InstrumentationTestCa
         synchronizedWaiter.doWait();
         // make sure the current tracking configuration has been set and has the new version number
         //verify(webtrekk, times(1)).setTrackingConfiguration((TrackingConfiguration)any());
-        assertEquals(3, webtrekk.getTrackingConfiguration().getVersion());
+        assertEquals(5, webtrekk.getTrackingConfiguration().getVersion());
     }
 
     @Override

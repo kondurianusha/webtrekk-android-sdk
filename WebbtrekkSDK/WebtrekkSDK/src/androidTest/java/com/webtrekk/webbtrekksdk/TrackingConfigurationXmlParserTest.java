@@ -49,8 +49,8 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
     public void testParseValidXmlGlobalSection() {
         TrackingConfiguration config = null;
         try {
-            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_config));
-            config = trackingConfigurationXmlParser.parse(trackingConfigurationString);
+            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_default));
+            config = trackingConfigurationXmlParser.parse(trackingConfigurationString, null);
         } catch (Exception e) {
             android.util.Log.d("WebtrekkSDK", "parsing error", e);
         }
@@ -89,8 +89,8 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
     public void testParseValidXmlGlobalTrackingParameter() {
         TrackingConfiguration config = null;
         try {
-            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_config));
-            config = trackingConfigurationXmlParser.parse(trackingConfigurationString);
+            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_default));
+            config = trackingConfigurationXmlParser.parse(trackingConfigurationString, null);
         } catch (Exception e) {
             android.util.Log.d("WebtrekkSDK", "parsing error", e);
         }
@@ -132,8 +132,8 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
     public void testParseValidXmlCustomParameters() {
         TrackingConfiguration config = null;
         try {
-            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_config));
-            config = trackingConfigurationXmlParser.parse(trackingConfigurationString);
+            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_default));
+            config = trackingConfigurationXmlParser.parse(trackingConfigurationString, null);
         } catch (Exception e) {
             android.util.Log.d("WebtrekkSDK", "parsing error", e);
         }
@@ -148,8 +148,8 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
     public void testParseValidXmlActivityConfiguration() {
         TrackingConfiguration config = null;
         try {
-            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_config));
-            config = trackingConfigurationXmlParser.parse(trackingConfigurationString);
+            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_default));
+            config = trackingConfigurationXmlParser.parse(trackingConfigurationString, null);
         } catch (Exception e) {
             android.util.Log.d("WebtrekkSDK", "parsing error", e);
         }
@@ -192,15 +192,15 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
     public void testParseInvalidXML() {
         TrackingConfiguration config = null;
         try {
-            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_config));
-            config = trackingConfigurationXmlParser.parse(invalidXmlConfiguration);
+            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_default));
+            config = trackingConfigurationXmlParser.parse(invalidXmlConfiguration, null);
             fail("invalid xml configuration");
         }  catch (Exception e) {
         }
 
         try {
-            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_config));
-            config = trackingConfigurationXmlParser.parse(missingTagXmlConfiguration);
+            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_default));
+            config = trackingConfigurationXmlParser.parse(missingTagXmlConfiguration, null);
             fail("invalid xml configuration");
         }  catch (Exception e) {
         }

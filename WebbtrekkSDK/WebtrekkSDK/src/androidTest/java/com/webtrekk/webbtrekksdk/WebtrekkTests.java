@@ -320,4 +320,32 @@ public class WebtrekkTests extends AndroidTestCase {
         assertEquals(webtrekk.getGlobalTrackingParameter().getDefaultParameter().get(Parameter.ACTIVITY_NAME), "testtestact");
 
     }
+
+    /**
+     * verify that when a global tracking parameter was set, that it appears in the url
+     */
+    public void testGlobalTrackingParameter() {
+        // set a global tracking param
+        TrackingParameter globalTp = new TrackingParameter();
+        globalTp.add(Parameter.ECOM, "1", "testecomparam");
+        webtrekk.initWebtrekk(getContext());
+        TrackingParameter tp = new TrackingParameter();
+        webtrekk.setGlobalTrackingParameter(globalTp);
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        assertTrue(tp.containsKey(Parameter.TIMESTAMP));
+        //assertTrue(tp.getEcomParameter().get("1").contains("testecomparam"));
+        assertTrue("url string does not contain value: " + tr.getUrlString(), tr.getUrlString().contains("&cb1=testecomparam"));
+    }
+
+
+
+
+
+    public void testAutoTrackSettings() {
+
+    }
+
+    public void testActivityNameOverride() {
+
+    }
 }

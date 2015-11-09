@@ -4,10 +4,12 @@ import android.app.Application;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.webtrekk.webbtrekksdk.TrackingParameter;
 import com.webtrekk.webbtrekksdk.Webtrekk;
 
 
@@ -19,6 +21,11 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         webtrekk = Webtrekk.getInstance();
+        try {
+            webtrekk.initWebtrekk(this);
+        } catch (Exception e) {
+            Log.d("MyApplication", "error initializing webtrekk", e);
+        }
         webtrekk.initWebtrekk(this);
         // optional für das automatische Aktivitätstracking
         //webtrekk.initAutoTracking(getApplication());
@@ -79,5 +86,9 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this, MediaActivity.class);
 
         startActivity(intent);
+    }
+
+    public Webtrekk getWebtrekk() {
+        return webtrekk;
     }
 }

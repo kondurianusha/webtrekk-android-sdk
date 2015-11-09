@@ -26,15 +26,17 @@ public class TrackingConfigurationDownloadTask extends AsyncTask<String, Void, T
     private Context context;
     private Webtrekk webtrekk;
     private TrackingConfiguration trackingConfiguration;
+    private TrackingConfiguration defaultConfiguration;
     private String trackingConfigurationString;
     // this interface is for testing asynchronous calls, only used during unit tests to notify that the task is done
     private AsyncTest asyncTest;
 
 
-    public TrackingConfigurationDownloadTask(Webtrekk webtrekk, AsyncTest asyncTest) {
+    public TrackingConfigurationDownloadTask(Webtrekk webtrekk, TrackingConfiguration defaultConfiguration, AsyncTest asyncTest) {
         this.webtrekk = webtrekk;
         this.context = webtrekk.getContext();
         this.asyncTest = asyncTest;
+        this.defaultConfiguration = defaultConfiguration;
     }
 
     /**
@@ -54,7 +56,7 @@ public class TrackingConfigurationDownloadTask extends AsyncTask<String, Void, T
             trackingConfigurationString = getXmlFromUrl(urls[0]);
             WebtrekkLogging.log("remote configuration string: " + trackingConfigurationString);
             if (trackingConfigurationString != null) {
-                trackingConfiguration = trackingConfigurationParser.parse(trackingConfigurationString);
+                trackingConfiguration = trackingConfigurationParser.parse(trackingConfigurationString, defaultConfiguration);
                 return trackingConfiguration;
             } else {
                 WebtrekkLogging.log("error getting the xml configuration string from url: " + urls[0]);

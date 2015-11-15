@@ -42,36 +42,42 @@ public class TrackingRequest {
         url.append(tp.get(Parameter.SCREEN_DEPTH) + ",0,");
         url.append(tp.get(Parameter.TIMESTAMP) + ",0,0,0");
 
-        if(trackingParameter.containsKey(Parameter.SAMPLING)) {
-            url.append("&" + Parameter.SAMPLING.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.SAMPLING)));
-        }
-        if(trackingParameter.containsKey(Parameter.CURRENT_TIME)) {
-            url.append( "&" + Parameter.CURRENT_TIME.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.CURRENT_TIME)));
-        }
-        if(trackingParameter.containsKey(Parameter.IP_ADDRESS)) {
-            url.append("&" + Parameter.IP_ADDRESS.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.IP_ADDRESS)));
-        }
-        if(trackingParameter.containsKey(Parameter.USERAGENT)) {
-            url.append("&" + Parameter.USERAGENT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.USERAGENT)));
-        }
-        if(trackingParameter.containsKey(Parameter.TIMEZONE)) {
-            url.append("&" + Parameter.TIMEZONE.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.TIMEZONE)));
-        }
-        if(trackingParameter.containsKey(Parameter.DEV_LANG)) {
-            url.append("&" + Parameter.DEV_LANG.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.DEV_LANG)));
-        }
         if(trackingParameter.containsKey(Parameter.EVERID)) {
             url.append("&" + Parameter.EVERID.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.EVERID)));
         }
+
+        if(trackingParameter.containsKey(Parameter.ADVERTISER_ID)) {
+            url.append("&" + Parameter.ADVERTISER_ID.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ADVERTISER_ID)));
+        }
+
+        if(trackingParameter.containsKey(Parameter.FORCE_NEW_SESSION)) {
+            url.append(("&" + Parameter.FORCE_NEW_SESSION.toString() + "=" + tp.get(Parameter.FORCE_NEW_SESSION)));
+        }
+
         if(trackingParameter.containsKey(Parameter.APP_FIRST_START)) {
             url.append("&" + Parameter.APP_FIRST_START.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.APP_FIRST_START)));
         }
+
+        if(trackingParameter.containsKey(Parameter.CURRENT_TIME)) {
+            url.append( "&" + Parameter.CURRENT_TIME.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.CURRENT_TIME)));
+        }
+
+        if(trackingParameter.containsKey(Parameter.TIMEZONE)) {
+            url.append("&" + Parameter.TIMEZONE.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.TIMEZONE)));
+        }
+
+        if(trackingParameter.containsKey(Parameter.DEV_LANG)) {
+            url.append("&" + Parameter.DEV_LANG.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.DEV_LANG)));
+        }
+
+        if(trackingParameter.containsKey(Parameter.CUSTOMER_ID)) {
+            url.append("&" + Parameter.CUSTOMER_ID.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.CUSTOMER_ID)));
+        }
+
         if(trackingParameter.containsKey(Parameter.ACTION_NAME)) {
             url.append("&" + Parameter.ACTION_NAME.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ACTION_NAME)));
         }
-        if(trackingParameter.containsKey(Parameter.VOUCHER_VALUE)) {
-            url.append("&" + Parameter.VOUCHER_VALUE.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.VOUCHER_VALUE)));
-        }
+
         if(trackingParameter.containsKey(Parameter.ORDER_TOTAL)) {
             url.append("&" + Parameter.ORDER_TOTAL.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ORDER_TOTAL)));
         }
@@ -81,21 +87,49 @@ public class TrackingRequest {
         if(trackingParameter.containsKey(Parameter.PRODUCT)) {
             url.append("&" + Parameter.PRODUCT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.PRODUCT)));
         }
-        if(trackingParameter.containsKey(Parameter.PRODUCT_COST)) {
-            url.append("&" + Parameter.PRODUCT_COST.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.PRODUCT_COST)));
-        }
+
         if(trackingParameter.containsKey(Parameter.CURRENCY)) {
             url.append("&" + Parameter.CURRENCY.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.CURRENCY)));
         }
+
         if(trackingParameter.containsKey(Parameter.PRODUCT_COUNT)) {
             url.append("&" + Parameter.PRODUCT_COUNT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.PRODUCT_COUNT)));
         }
         if(trackingParameter.containsKey(Parameter.PRODUCT_STATUS)) {
             url.append("&" + Parameter.PRODUCT_STATUS.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.PRODUCT_STATUS)));
         }
-        if(trackingParameter.containsKey(Parameter.CUSTOMER_ID)) {
-            url.append("&" + Parameter.CUSTOMER_ID.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.CUSTOMER_ID)));
+        if(trackingParameter.containsKey(Parameter.VOUCHER_VALUE)) {
+            url.append("&" + Parameter.VOUCHER_VALUE.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.VOUCHER_VALUE)));
         }
+
+        if(trackingParameter.containsKey(Parameter.SAMPLING)) {
+            url.append("&" + Parameter.SAMPLING.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.SAMPLING)));
+        }
+
+        if(trackingParameter.containsKey(Parameter.ADVERTISEMENT)) {
+            url.append("&" + Parameter.ADVERTISEMENT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ADVERTISEMENT)));
+        }
+        if(trackingParameter.containsKey(Parameter.ADVERTISEMENT_ACTION)) {
+            url.append("&" + Parameter.ADVERTISEMENT_ACTION.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ADVERTISEMENT_ACTION)));
+        }
+
+        if(trackingParameter.containsKey(Parameter.IP_ADDRESS)) {
+            url.append("&" + Parameter.IP_ADDRESS.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.IP_ADDRESS)));
+        }
+        if(trackingParameter.containsKey(Parameter.USERAGENT)) {
+            url.append("&" + Parameter.USERAGENT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.USERAGENT)));
+        }
+
+        if(trackingParameter.containsKey(Parameter.INTERN_SEARCH)) {
+            url.append("&" + Parameter.INTERN_SEARCH.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.INTERN_SEARCH)));
+        }
+
+
+        if(trackingParameter.containsKey(Parameter.PRODUCT_COST)) {
+            url.append("&" + Parameter.PRODUCT_COST.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.PRODUCT_COST)));
+        }
+
+
         if(trackingParameter.containsKey(Parameter.EMAIL)) {
             url.append("&" + Parameter.EMAIL.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.EMAIL)));
         }
@@ -135,21 +169,10 @@ public class TrackingRequest {
         if(trackingParameter.containsKey(Parameter.STREETNUMBER)) {
             url.append("&" + Parameter.STREETNUMBER.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.STREETNUMBER)));
         }
-        if(trackingParameter.containsKey(Parameter.INTERN_SEARCH)) {
-            url.append("&" + Parameter.INTERN_SEARCH.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.INTERN_SEARCH)));
-        }
-        if(trackingParameter.containsKey(Parameter.ADVERTISEMENT)) {
-            url.append("&" + Parameter.ADVERTISEMENT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ADVERTISEMENT)));
-        }
-        if(trackingParameter.containsKey(Parameter.ADVERTISEMENT_ACTION)) {
-            url.append("&" + Parameter.ADVERTISEMENT_ACTION.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ADVERTISEMENT_ACTION)));
-        }
-        if(trackingParameter.containsKey(Parameter.ADVERTISER_ID)) {
-            url.append("&" + Parameter.ADVERTISER_ID.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ADVERTISER_ID)));
-        }
-        if(trackingParameter.containsKey(Parameter.FORCE_NEW_SESSION)) {
-            url.append(("&" + Parameter.FORCE_NEW_SESSION.toString() + "=" + tp.get(Parameter.FORCE_NEW_SESSION)));
-        }
+
+
+
+
 
         // media tracking
         if(trackingParameter.containsKey(Parameter.MEDIA_FILE)) {

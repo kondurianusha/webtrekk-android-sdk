@@ -19,7 +19,6 @@ class TrackingConfiguration {
     private String trackDomain;
     private String trackId;
     private int sampling;
-    private int initialSendDelay;
     private int sendDelay;
     private int maxRequests;
 
@@ -45,7 +44,7 @@ class TrackingConfiguration {
     private boolean enablePluginHelloWorld;
     private boolean enableRemoteConfiguration;
     private String trackingConfigurationUrl;
-    private boolean sendRequestUrlStoreSize;
+    private boolean autoTrackRequestUrlStoreSize;
     //intervall when autotracked start activity is send again
     private int resendOnStartEventTime;
 
@@ -61,52 +60,6 @@ class TrackingConfiguration {
     public TrackingConfiguration() {
         activityConfigurations = new HashMap<>();
 
-    }
-
-    public static class ActivityConfiguration {
-        private String className;
-        private String mappingName;
-        private boolean isAutoTrack;
-        private TrackingParameter activityTrackingParameter;
-
-        public ActivityConfiguration(String className, String mappingName, boolean isAutoTrack, TrackingParameter tp) {
-            this.className = className;
-            this.mappingName = mappingName;
-            this.isAutoTrack = isAutoTrack;
-            this.activityTrackingParameter = tp;
-        }
-
-        public String getClassName() {
-            return className;
-        }
-
-        public void setClassName(String className) {
-            this.className = className;
-        }
-
-        public String getMappingName() {
-            return mappingName;
-        }
-
-        public void setMappingName(String mappingName) {
-            this.mappingName = mappingName;
-        }
-
-        public boolean isAutoTrack() {
-            return isAutoTrack;
-        }
-
-        public void setIsAutoTrack(boolean isAutoTrack) {
-            this.isAutoTrack = isAutoTrack;
-        }
-
-        public TrackingParameter getActivityTrackingParameter() {
-            return activityTrackingParameter;
-        }
-
-        public void setActivityTrackingParameter(TrackingParameter activityTrackingParameter) {
-            this.activityTrackingParameter = activityTrackingParameter;
-        }
     }
 
     /**
@@ -183,14 +136,6 @@ class TrackingConfiguration {
 
     public void setSampling(int sampling) {
         this.sampling = sampling;
-    }
-
-    public int getInitialSendDelay() {
-        return initialSendDelay;
-    }
-
-    public void setInitialSendDelay(int initialSendDelay) {
-        this.initialSendDelay = initialSendDelay;
     }
 
     public int getSendDelay() {
@@ -376,12 +321,12 @@ class TrackingConfiguration {
         this.enableRemoteConfiguration = enableRemoteConfiguration;
     }
 
-    public boolean isSendRequestUrlStoreSize() {
-        return sendRequestUrlStoreSize;
+    public boolean isAutoTrackRequestUrlStoreSize() {
+        return autoTrackRequestUrlStoreSize;
     }
 
-    public void setSendRequestUrlStoreSize(boolean sendRequestUrlStoreSize) {
-        this.sendRequestUrlStoreSize = sendRequestUrlStoreSize;
+    public void setAutoTrackRequestUrlStoreSize(boolean autoTrackRequestUrlStoreSize) {
+        this.autoTrackRequestUrlStoreSize = autoTrackRequestUrlStoreSize;
     }
 
     public Map<String, String> getCustomParameter() {

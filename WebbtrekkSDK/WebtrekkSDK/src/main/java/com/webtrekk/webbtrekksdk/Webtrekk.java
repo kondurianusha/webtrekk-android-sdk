@@ -39,7 +39,7 @@ public class Webtrekk {
     public static final String PREFERENCE_KEY_SAMPLING = "sampling";
     public static final String PREFERENCE_KEY_INSTALLATION_FLAG = "InstallationFlag";
     public static final String PREFERENCE_KEY_CONFIGURATION = "webtrekkTrackingConfiguration";
-    public static final String TRACKING_LIBRARY_VERSION = "400";
+    public static final String TRACKING_LIBRARY_VERSION = "4.0";
 
 
     private RequestUrlStore requestUrlStore;
@@ -248,9 +248,8 @@ public class Webtrekk {
             WebtrekkLogging.log("xml trackingConfiguration value: trackid - " + trackingConfiguration.getTrackId());
             WebtrekkLogging.log("xml trackingConfiguration value: trackdomain - " + trackingConfiguration.getTrackDomain());
             WebtrekkLogging.log("xml trackingConfiguration value: send_delay - " + trackingConfiguration.getSendDelay());
-            WebtrekkLogging.log("xml trackingConfiguration value: initial_send_delay - " + trackingConfiguration.getInitialSendDelay());
 
-            for(TrackingConfiguration.ActivityConfiguration cfg : trackingConfiguration.getActivityConfigurations().values()) {
+            for(ActivityConfiguration cfg : trackingConfiguration.getActivityConfigurations().values()) {
                 WebtrekkLogging.log("xml trackingConfiguration activity for: " + cfg.getClassName() + " mapped to: " + cfg.getMappingName() + " autotracked: " + cfg.isAutoTrack());
             }
         } else {
@@ -288,7 +287,7 @@ public class Webtrekk {
             public void run() {
                 onSendIntervalOver();
             }
-        }, trackingConfiguration.getSendDelay(), trackingConfiguration.getSendDelay(), TimeUnit.SECONDS);
+        }, 0, trackingConfiguration.getSendDelay(), TimeUnit.SECONDS);
         WebtrekkLogging.log("timer service started");
     }
 
@@ -385,8 +384,10 @@ public class Webtrekk {
 
         }
         if(trackingConfiguration.isAutoTrackPlaystoreMail()) {
-            Map<String, String> playstoreprofile = HelperFunctions.getUserProfile(context);
-            customParameter.put("playstoreMail", playstoreprofile.get("email"));
+            //Map<String, String> playstoreprofile = HelperFunctions.getUserProfile(context);
+            //customParameter.put("playstoreMail", playstoreprofile.get("email"));
+            customParameter.put("playstoreMail", HelperFunctions.getMailByAccountManager(context));
+
 
         }
         if (trackingConfiguration.isAutoTrackAppPreInstalled()) {
@@ -421,7 +422,7 @@ public class Webtrekk {
      * needs the appropiate permissions and playstore lib linked, at least the ad parts
      * works by passing in a reference as it runs in a seperate thread to avoid lags in the main thread,
      */
-    private synchronized void initAdvertiserId() {
+    synchronized void initAdvertiserId() {
         if(!trackingConfiguration.isAutoTrackAdvertiserId()) {
             return;
         }
@@ -477,7 +478,10 @@ public class Webtrekk {
         // put the screen orientation to into the custom parameter, will change with every request
         customParameter.put("screenOrientation", HelperFunctions.getOrientation(context));
         customParameter.put("connectionType", HelperFunctions.getConnectionString(context));
-        customParameter.put("requestUrlStoreSize", String.valueOf(requestUrlStore.size()));
+        if(requestUrlStore != null) {
+            customParameter.put("requestUrlStoreSize", String.valueOf(requestUrlStore.size()));
+        }
+
         // also update the webtrekk parameter
         webtrekkParameter.put(Parameter.SCREEN_RESOLUTION, HelperFunctions.getResolution(context));
 
@@ -490,7 +494,18 @@ public class Webtrekk {
      * @param app application object of the tracked app, can either be a custom one or required by getApplication()
      */
     void initAutoTracking(Application app){
-        if(callbacks == null && trackingConfiguration.isAutoTracked()) {
+        boolean autoTrack = false;
+        // when global autotracking is enabled, autoTrack is true
+        if(trackingConfiguration.isAutoTracked()) {
+            autoTrack = true;
+        }
+        // enable autotracking when one of the activities has autoTracking enabled
+        for(ActivityConfiguration activityConfiguration : trackingConfiguration.getActivityConfigurations().values()) {
+            if(activityConfiguration.isAutoTrack()) {
+                autoTrack = true;
+            }
+        }
+        if(callbacks == null && autoTrack) {
             WebtrekkLogging.log("enabling autoTracking");
             callbacks = new TrackedActivityLifecycleCallbacks(this);
             app.registerActivityLifecycleCallbacks(callbacks);
@@ -558,9 +573,14 @@ public class Webtrekk {
     /**
      * this method gets called when auto tracking is enabled and one of the lifycycle methods is called
      */
-    public void autoTrackActivity() {
-        //TODO: basicly obsolete method, maybe do more advanced stuff later, but can be removed
-        track();
+    void autoTrackActivity() {
+        // only track if auto tracking is enabled for that activity
+        // the default value and the activities autoTracked value is based on the global xml settings, so no
+        // need to check the global value again here
+        if(trackingConfiguration.getActivityConfigurations().get(currentActivityName).isAutoTrack()) {
+            track();
+        }
+
 //        TrackingParameter tp = new TrackingParameter();
 //        tp.add(webtrekkParameter);
 //        tp.add(TrackingParameter.Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
@@ -622,16 +642,20 @@ public class Webtrekk {
      * @return
      */
     TrackingRequest createTrackingRequest(TrackingParameter tp) {
+        // action params are a special case, no other params but the ones given as parameter in the code
+        if(tp.containsKey(Parameter.ACTION_NAME)) {
+            return new TrackingRequest(tp, trackingConfiguration);
+        }
         // create a new trackingParameter object
         TrackingParameter trackingParameter = new TrackingParameter();
         // add the name of the current activity
-        tp.add(Parameter.ACTIVITY_NAME, currentActivityName);
+        trackingParameter.add(Parameter.ACTIVITY_NAME, currentActivityName);
         // update the dynamic parameter which change with every request
         updateDynamicParameter();
         // add the default parameter
-        tp.add(webtrekkParameter);
+        trackingParameter.add(webtrekkParameter);
 
-        tp.add(Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
+        trackingParameter.add(Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
         // first add the globally configured trackingparams which are defined in the webtrekk.globalTrackingParameter, if there are any
         if(globalTrackingParameter != null) {
             trackingParameter.add(globalTrackingParameter);
@@ -645,16 +669,17 @@ public class Webtrekk {
         trackingParameter.add(tp);
         //forth add the local ones which each activity has defined in its xml configuration, they will override the ones above
         //TODO: make this better code, basicly check that the activity has params configured
-        if(trackingConfiguration.getActivityConfigurations()!= null
-                && trackingConfiguration.getActivityConfigurations().containsKey(currentActivityName)
-                && trackingConfiguration.getActivityConfigurations().get(currentActivityName).getActivityTrackingParameter() != null) {
-            trackingParameter.add(trackingConfiguration.getActivityConfigurations().get(currentActivityName).getActivityTrackingParameter());
+        if(trackingConfiguration.getActivityConfigurations()!= null && trackingConfiguration.getActivityConfigurations().containsKey(currentActivityName)){
+            ActivityConfiguration activityConfiguration = trackingConfiguration.getActivityConfigurations().get(currentActivityName);
+            if(activityConfiguration != null) {
+                trackingParameter.add(activityConfiguration.getActivityTrackingParameter());
+            }
         }
 
         //last step add the internal parameter
         trackingParameter.add(internalParameter);
         //now map the string values from the xml/code tracking parameters to the custom values defined by webtrekk or the customer
-        tp.applyMapping(customParameter);
+        trackingParameter.applyMapping(customParameter);
 
         return new TrackingRequest(trackingParameter, trackingConfiguration);
 
@@ -906,7 +931,6 @@ public class Webtrekk {
     public String getTrackDomain() { return trackingConfiguration.getTrackDomain(); }
     public String getTrackId() { return trackingConfiguration.getTrackId(); }
     public int getSampling() { return trackingConfiguration.getSampling(); }
-    public int getInitialSendDelay() { return trackingConfiguration.getInitialSendDelay(); }
     public int getSendDelay() { return trackingConfiguration.getSendDelay(); }
     public int getResendOnStartEventTime() { return trackingConfiguration.getResendOnStartEventTime(); }
     public int getMaxRequests() { return trackingConfiguration.getMaxRequests(); }

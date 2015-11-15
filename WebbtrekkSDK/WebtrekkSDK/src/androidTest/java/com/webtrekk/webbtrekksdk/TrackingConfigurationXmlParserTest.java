@@ -3,6 +3,9 @@ package com.webtrekk.webbtrekksdk;
 import android.test.AndroidTestCase;
 import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 
 
 public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
@@ -46,10 +49,114 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
         super.tearDown();
     }
 
-    public void testParseValidXmlGlobalSection() {
+    /**
+     * test that the default value is used when an invalid sampling value is provided in the config
+     */
+    public void testSamplingOneUseDefault(){
+        TrackingConfiguration defaultConfig = null;
         TrackingConfiguration config = null;
         try {
             String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_default));
+            defaultConfig = trackingConfigurationXmlParser.parse(trackingConfigurationString, null);
+            assertNotNull(defaultConfig);
+        } catch (Exception e) {
+            android.util.Log.d("WebtrekkSDK", "parsing error", e);
+        }
+        String configString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><webtrekkConfiguration><sampling type=\"text\">1</sampling></webtrekkConfiguration>";
+        try {
+            config = trackingConfigurationXmlParser.parse(configString, defaultConfig);
+            assertNotNull(config);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertEquals("error: config= " + config + " defaultconfig= " + defaultConfig, defaultConfig.getSampling(), config.getSampling());
+    }
+
+    /**
+     * test that the default value is used when an invalid send delay value is provided in the config
+     */
+    public void testSendDelayUseDefault(){
+        TrackingConfiguration defaultConfig = null;
+        TrackingConfiguration config = null;
+        try {
+            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_default));
+            defaultConfig = trackingConfigurationXmlParser.parse(trackingConfigurationString, null);
+            assertNotNull(defaultConfig);
+        } catch (Exception e) {
+            android.util.Log.d("WebtrekkSDK", "parsing error", e);
+        }
+        String configString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><webtrekkConfiguration><sendDelay type=\"text\">1</sendDelay></webtrekkConfiguration>";
+        try {
+            config = trackingConfigurationXmlParser.parse(configString, defaultConfig);
+            assertNotNull(config);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertEquals("error: config= " + config + " defaultconfig= " + defaultConfig, defaultConfig.getSendDelay(), config.getSendDelay());
+    }
+
+    /**
+     * test that the default value is used when an invalid send delay value is provided in the config
+     */
+    public void testMaxRequestUseDefault(){
+        TrackingConfiguration defaultConfig = null;
+        TrackingConfiguration config = null;
+        try {
+            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_default));
+            defaultConfig = trackingConfigurationXmlParser.parse(trackingConfigurationString, null);
+            assertNotNull(defaultConfig);
+        } catch (Exception e) {
+            android.util.Log.d("WebtrekkSDK", "parsing error", e);
+        }
+        String configString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><webtrekkConfiguration><maxRequests type=\"text\">16</maxRequests></webtrekkConfiguration>";
+        try {
+            config = trackingConfigurationXmlParser.parse(configString, defaultConfig);
+            assertNotNull(config);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertEquals("error: config= " + config + " defaultconfig= " + defaultConfig, defaultConfig.getMaxRequests(), config.getMaxRequests());
+    }
+
+    /**
+     * test remove trailing slash from trackdomain
+     */
+
+    public void testTrailingSlash(){
+        TrackingConfiguration defaultConfig = null;
+        TrackingConfiguration config = null;
+        try {
+            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_default));
+            defaultConfig = trackingConfigurationXmlParser.parse(trackingConfigurationString, null);
+            assertNotNull(defaultConfig);
+        } catch (Exception e) {
+            android.util.Log.d("WebtrekkSDK", "parsing error", e);
+        }
+        String configString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><webtrekkConfiguration><trackDomain type=\"text\">http://test.de/</trackDomain></webtrekkConfiguration>";
+        try {
+            config = trackingConfigurationXmlParser.parse(configString, defaultConfig);
+            assertNotNull(config);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.print("error: config= " + config + " defaultconfig= " + defaultConfig);
+        assertEquals("error: config= " + config + " defaultconfig= " + defaultConfig, "http://test.de", config.getTrackDomain());
+    }
+
+
+
+    public void testParseValidXmlGlobalSection() {
+        TrackingConfiguration config = null;
+        try {
+            String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_config));
             config = trackingConfigurationXmlParser.parse(trackingConfigurationString, null);
         } catch (Exception e) {
             android.util.Log.d("WebtrekkSDK", "parsing error", e);
@@ -58,7 +165,6 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
         assertEquals("http://trackingtest.nglab.org", config.getTrackDomain());
         assertEquals("1111111111112", config.getTrackId());
         assertEquals(22, config.getSampling());
-        assertEquals(33, config.getInitialSendDelay());
         assertEquals(60, config.getSendDelay());
         assertEquals(5000, config.getMaxRequests());
 
@@ -81,7 +187,7 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
 
         assertEquals(true, config.isEnableRemoteConfiguration());
         assertEquals("http://localhost/tracking_config.xml", config.getTrackingConfigurationUrl());
-        assertEquals(true, config.isSendRequestUrlStoreSize());
+        assertEquals(true, config.isAutoTrackRequestUrlStoreSize());
         assertEquals(30, config.getResendOnStartEventTime());
 
     }
@@ -156,7 +262,7 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
         assertNotNull(config.getActivityConfigurations());
         assertEquals(1, config.getActivityConfigurations().size());
         assertTrue(config.getActivityConfigurations().containsKey("MainActivity"));
-        TrackingConfiguration.ActivityConfiguration act = config.getActivityConfigurations().get("MainActivity");
+        ActivityConfiguration act = config.getActivityConfigurations().get("MainActivity");
         assertNotNull(act);
         assertEquals(act.getMappingName(), "Startseite");
         assertEquals(act.isAutoTrack(), true);

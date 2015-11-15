@@ -1,5 +1,7 @@
 package com.webtrekk.webbtrekksdk;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +17,7 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.WindowManager;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
@@ -41,6 +44,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 
 /**
@@ -206,6 +210,18 @@ final class HelperFunctions {
         return result;
     }
 
+    public static String getMailByAccountManager(Context context) {
+        AccountManager accManager = AccountManager.get(context);
+        Pattern gmailPattern = Patterns.EMAIL_ADDRESS;
+        Account acc[] = accManager.getAccountsByType("com.google");
+        for (Account account : acc) {
+            if (gmailPattern.matcher(account.name).matches()) {
+                return account.name;
+            }
+        }
+        return acc[0].name;
+    }
+
     /**
      * generates the everid, a unique identifier for the tracking
      * @return
@@ -353,14 +369,20 @@ final class HelperFunctions {
      * this function returns the current device orientation ignoring the rotation as string
      */
     public static String getOrientation(Context context) {
-        int orientation = context.getResources().getConfiguration().orientation;
-        if(orientation == 2) {
-            return "landscape";
-        } else if (orientation == 1){
-            return "portrait";
-        } else {
-            return "undefined";
+        String orientationString = "undefined";
+        try {
+            int orientation = context.getResources().getConfiguration().orientation;
+            if (orientation == 2) {
+                orientationString = "landscape";
+            } else if (orientation == 1) {
+                orientationString = "portrait";
+            } else {
+                orientationString = "undefined";
+            }
+        } catch(Exception e) {
+            WebtrekkLogging.log("error getting orientation settings", e);
         }
+        return orientationString;
     }
 
     /**

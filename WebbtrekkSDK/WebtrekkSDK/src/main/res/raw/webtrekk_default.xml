@@ -55,7 +55,7 @@
     <!--url of the remote configuration -->
     <trackingConfigurationUrl>http://localhost/tracking_config.xml</trackingConfigurationUrl>
     <!--sends the size of the current locally stored urls in a custom parameter -->
-    <sendRequestUrlStoreSize>true</sendRequestUrlStoreSize>
+    <autoTrackRequestUrlStoreSize>true</autoTrackRequestUrlStoreSize>
     <!--resend onStart time, this is the timeout for auto tracked sessions in case an activity was paused -->
     <resendOnStartEventTime>30</resendOnStartEventTime>
 

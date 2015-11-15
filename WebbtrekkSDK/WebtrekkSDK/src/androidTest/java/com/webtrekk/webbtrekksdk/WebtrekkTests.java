@@ -68,7 +68,6 @@ public class WebtrekkTests extends AndroidTestCase {
         assertEquals(webtrekk.getTrackingConfiguration().getTrackId(), "1111111111112");
         assertEquals(webtrekk.getTrackingConfiguration().getTrackDomain(), "http://trackingtest.nglab.org");
         assertEquals(webtrekk.getTrackingConfiguration().getSendDelay(), 60);
-        assertEquals(webtrekk.getTrackingConfiguration().getInitialSendDelay(), 33);
         assertEquals(webtrekk.getTrackingConfiguration().getMaxRequests(), 5000);
         assertEquals(webtrekk.getTrackingConfiguration().getTrackingConfigurationUrl(), "http://localhost/tracking_config.xml");
         assertEquals(webtrekk.getTrackingConfiguration().getVersion(), 2);
@@ -336,9 +335,6 @@ public class WebtrekkTests extends AndroidTestCase {
         //assertTrue(tp.getEcomParameter().get("1").contains("testecomparam"));
         assertTrue("url string does not contain value: " + tr.getUrlString(), tr.getUrlString().contains("&cb1=testecomparam"));
     }
-
-
-
 
 
     public void testAutoTrackSettings() {

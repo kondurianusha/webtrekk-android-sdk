@@ -16,6 +16,7 @@ public class TrackingRequestTests extends AndroidTestCase {
     private HashMap<Parameter, String> auto_tracked_values;
     TrackingConfiguration trackingConfiguration;
     private TrackingParameter tpMedia;
+    private Webtrekk webtrekk;
 
     @Override
     protected void setUp() throws Exception {
@@ -23,9 +24,21 @@ public class TrackingRequestTests extends AndroidTestCase {
         // android bug workaround: 308
         System.setProperty("dexmaker.dexcache", getContext().getCacheDir().toString());
 
+        webtrekk = new Webtrekk();
+
         trackingConfiguration = new TrackingConfiguration();
         trackingConfiguration.setTrackId("1111111111");
         trackingConfiguration.setTrackDomain("http://q3.webtrekk.net");
+
+        webtrekk.setTrackingConfiguration(trackingConfiguration);
+        webtrekk.setCurrentActivityName("test");
+        webtrekk.setContext(getContext());
+        webtrekk.initWebtrekkParameter();
+        webtrekk.initInternalParameter();
+
+        // for all tests just start with an tmpy list of parameters
+        webtrekk.setCustomParameter(new HashMap<String, String>());
+
 
         auto_tracked_values = new HashMap<>();
         //auto_tracked_values.put(Parameter.DEVICE, "Google Nexus 4");
@@ -143,6 +156,153 @@ public class TrackingRequestTests extends AndroidTestCase {
 
     }
 
+    public void testAutoTrackAppUpdate() {
+        webtrekk.getCustomParameter().put("appUpdated", "0");
+        trackingConfiguration.setAutoTrackAppUpdate(true);
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ECOM, "100", "appUpdated");
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        String url = tr.getUrlString();
+        assertTrue(url, url.contains("cb100=0"));
 
-    //TODO: test more url variants and trackingParameter after the missing requirements are clear
+        webtrekk.getCustomParameter().put("appUpdated", "1");
+        TrackingParameter tp2 = new TrackingParameter();
+        tp2.add(Parameter.ECOM, "100", "appUpdated");
+        TrackingRequest tr2 = webtrekk.createTrackingRequest(tp2);
+        String url2 = tr2.getUrlString();
+        assertTrue(url2, url2.contains("cb100=1"));
+    }
+
+    public void testAutoAdvertiserId() {
+        trackingConfiguration.setAutoTrackAdvertiserId(true);
+        assertTrue(webtrekk.getTrackingConfiguration().isAutoTrackAdvertiserId());
+        webtrekk.initAdvertiserId();
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ECOM, "100", "advertiserId");
+        tp.add(Parameter.ECOM, "200", "advertisingOptOut");
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        String url = tr.getUrlString();
+        assertTrue(url, url.contains("cb100="));
+        assertTrue(webtrekk.getCustomParameter().get("advertiserId").length() > 10);
+        assertTrue(url, url.contains("cb200=false"));
+    }
+
+    public void testAutoTrackAppVersion() {
+        webtrekk.getCustomParameter().put("appVersion", "10");
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ECOM, "100", "appVersion");
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        String url = tr.getUrlString();
+        assertTrue(url, url.contains("cb100=10"));
+
+        webtrekk.getCustomParameter().put("appVersion", "11");
+        TrackingParameter tp2 = new TrackingParameter();
+        tp2.add(Parameter.ECOM, "100", "appVersion");
+        TrackingRequest tr2 = webtrekk.createTrackingRequest(tp2);
+        String url2 = tr2.getUrlString();
+        assertTrue(url2, url2.contains("cb100=11"));
+    }
+
+    public void testAutoTrackAppVersionCode() {
+        webtrekk.getCustomParameter().put("appVersionCode", "10");
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ECOM, "100", "appVersionCode");
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        String url = tr.getUrlString();
+        assertTrue(url, url.contains("cb100=10"));
+    }
+
+    public void testAutoTrackAppPreinstalled() {
+        webtrekk.getCustomParameter().put("appPreinstalled", "1");
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ECOM, "100", "appPreinstalled");
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        String url = tr.getUrlString();
+        assertTrue(url, url.contains("cb100=1"));
+    }
+
+    public void testAutoTrackApiLevel() {
+        webtrekk.getCustomParameter().put("apiLevel", "19");
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ECOM, "100", "apiLevel");
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        String url = tr.getUrlString();
+        assertTrue(url, url.contains("cb100=19"));
+    }
+
+
+    public void testAutoTrackScreenOrientation() {
+        //webtrekk.getCustomParameter().put("screenOrientation", "landscape");
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ECOM, "100", "screenOrientation");
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        String url = tr.getUrlString();
+        assertTrue(url, url.contains("cb100=portrait"));
+    }
+
+    public void testAutoTrackConnectionType() {
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ECOM, "100", "connectionType");
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        String url = tr.getUrlString();
+        assertTrue(url, url.contains("cb100=WIFI"));
+    }
+
+    public void testAutoTrackPlaystoreUsername() {
+        //webtrekk.getCustomParameter().put("screenOrientation", "landscape");
+        trackingConfiguration.setAutoTrackPlaystoreUsername(true);
+        webtrekk.initCustomParameter();
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ECOM, "100", "playstoreFamilyname");
+        tp.add(Parameter.ECOM, "200", "playstoreGivenname");
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        String url = tr.getUrlString();
+        assertNotNull(webtrekk.getCustomParameter().get("playstoreFamilyname"));
+        assertNotNull(webtrekk.getCustomParameter().get("playstoreGivenname"));
+        assertTrue(url, url.contains("cb100="));
+        assertTrue(url, url.contains("cb200="));
+    }
+
+    public void testAutoTrackPlaystoreMail() {
+        //webtrekk.getCustomParameter().put("screenOrientation", "landscape");
+        trackingConfiguration.setAutoTrackPlaystoreMail(true);
+        assertTrue(trackingConfiguration.isAutoTrackPlaystoreMail());
+        webtrekk.initCustomParameter();
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ECOM, "100", "playstoreMail");
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        String url = tr.getUrlString();
+        assertNotNull(webtrekk.getCustomParameter().get("playstoreMail"));
+        assertTrue(url, url.contains("cb100="));
+    }
+
+    public void testActionParameter() {
+        // replaces init function
+        webtrekk.setGlobalTrackingParameter(new TrackingParameter());
+        webtrekk.getGlobalTrackingParameter().add(Parameter.ECOM, "1", "test1");
+        //trackingConfiguration.getActivityConfigurations().get("")
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ECOM, "2", "test2");
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        String url = tr.getUrlString();
+        assertTrue(url, url.contains("cb1=test1"));
+        assertTrue(url, url.contains("cb2=test2"));
+        // now an action parameter where the global ones are ignored
+        tp.add(Parameter.ACTION_NAME, "OrderButton");
+        tr = webtrekk.createTrackingRequest(tp);
+        url = tr.getUrlString();
+        assertFalse(url, url.contains("cb1=test1"));
+        assertTrue(url, url.contains("cb2=test2"));
+        assertTrue(url, url.contains("OrderButton"));
+
+    }
+
+
+
+
 }

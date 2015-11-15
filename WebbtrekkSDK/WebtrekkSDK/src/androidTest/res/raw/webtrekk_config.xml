@@ -8,8 +8,6 @@
     <trackId type="text">1111111111112</trackId>
     <!-- measure only a subset of the users -->
     <sampling type="text">22</sampling>
-    <!--delay before the first request is send -->
-    <initialSendDelay type="text">33</initialSendDelay>
     <!-- interval between the requests are send in seconds -->
     <sendDelay type="text">60</sendDelay>
     <!--maximum amoount of requests to store when the user is offline -->
@@ -55,16 +53,10 @@
     <!--url of the remote configuration -->
     <trackingConfigurationUrl>http://localhost/tracking_config.xml</trackingConfigurationUrl>
     <!--sends the size of the current locally stored urls in a custom parameter -->
-    <sendRequestUrlStoreSize>true</sendRequestUrlStoreSize>
+    <autoTrackRequestUrlStoreSize>true</autoTrackRequestUrlStoreSize>
     <!--resend onStart time, this is the timeout for auto tracked sessions in case an activity was paused -->
     <resendOnStartEventTime>30</resendOnStartEventTime>
 
-    <!--custom parameter -->
-    <customParameter>
-        <parameter key="test_customer_parameter_key1" value="value1"></parameter>
-        <parameter key="test_customer_parameter_key2" value="value2"></parameter>
-        <parameter key="test_customer_parameter_key3" value="value3"></parameter>
-    </customParameter>
 
     <!--global tracking parameter -->
     <globalTrackingParameter>
@@ -111,7 +103,7 @@
     <activity>
         <classname type="text">MainActivity</classname>
         <mappingname type="text">Startseite</mappingname>
-        <autotrack type="text">true</autotrack>
+        <autoTracked>true</autoTracked>
         <!--activity tracking parameter -->
         <activityTrackingParameter>
             <!--define global tracking parameter which are send with every request, the key has to match a valid parameter name!

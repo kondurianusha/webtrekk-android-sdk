@@ -7,8 +7,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -29,11 +27,11 @@ class TrackingConfigurationXmlParser {
      * @throws IOException
      */
     public TrackingConfiguration parse(String in, TrackingConfiguration defaultConfiguration) throws XmlPullParserException, IOException {
-            XmlPullParser parser = Xml.newPullParser();
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            parser.setInput(new StringReader(in));
-            parser.nextTag();
-            return readConfig(parser, defaultConfiguration);
+        XmlPullParser parser = Xml.newPullParser();
+        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+        parser.setInput(new StringReader(in));
+        parser.nextTag();
+        return readConfig(parser, defaultConfiguration);
     }
 
     /**
@@ -59,7 +57,7 @@ class TrackingConfigurationXmlParser {
                 try {
                     int version = Integer.parseInt(versionValue);
                     config.setVersion(version);
-                }  catch (Exception ex){
+                } catch (Exception ex) {
                     WebtrekkLogging.log("invalid version value: ", ex);
                     WebtrekkLogging.log("using default: " + defaultConfiguration.getVersion());
                     config.setVersion(defaultConfiguration.getVersion());
@@ -69,27 +67,35 @@ class TrackingConfigurationXmlParser {
 
             } else if (name.equals("trackDomain")) {
                 parser.require(XmlPullParser.START_TAG, ns, "trackDomain");
-                    String trackDomain = readText(parser);
-                    config.setTrackDomain(trackDomain);
+                String trackDomain = readText(parser);
+                if (trackDomain.endsWith("/")) {
+                    trackDomain = trackDomain.substring(0, trackDomain.length() - 1);
+                }
+                config.setTrackDomain(trackDomain);
                 parser.require(XmlPullParser.END_TAG, ns, "trackDomain");
 
 
             } else if (name.equals("trackId")) {
                 parser.require(XmlPullParser.START_TAG, ns, "trackId");
 
-                    String trackId = readText(parser);
-                    config.setTrackId(trackId);
+                String trackId = readText(parser);
+                config.setTrackId(trackId);
 
                 parser.require(XmlPullParser.END_TAG, ns, "trackId");
 
 
-            }  else if (name.equals("sampling")) {
+            } else if (name.equals("sampling")) {
                 parser.require(XmlPullParser.START_TAG, ns, "sampling");
                 String samplingValue = readText(parser);
                 try {
                     int sampling = Integer.parseInt(samplingValue);
-                    config.setSampling(sampling);
-                }  catch (Exception ex){
+                    if (sampling != 1 && sampling >= 0) {
+                        config.setSampling(sampling);
+                    } else {
+                        config.setSampling(defaultConfiguration.getSampling());
+                    }
+
+                } catch (Exception ex) {
                     WebtrekkLogging.log("invalid sampling value: ", ex);
                     WebtrekkLogging.log("using default: " + defaultConfiguration.getSampling());
                     config.setSampling(defaultConfiguration.getSampling());
@@ -105,8 +111,13 @@ class TrackingConfigurationXmlParser {
 
                 try {
                     int maxRequests = Integer.parseInt(maxRequestsValue);
-                    config.setMaxRequests(maxRequests);
-                }  catch (Exception ex){
+                    if(maxRequests > 99) {
+                        config.setMaxRequests(maxRequests);
+                    } else {
+                        config.setMaxRequests(defaultConfiguration.getMaxRequests());
+                    }
+
+                } catch (Exception ex) {
                     WebtrekkLogging.log("invalid maxRequests value: ", ex);
                     WebtrekkLogging.log("using default: " + defaultConfiguration.getMaxRequests());
                     config.setMaxRequests(defaultConfiguration.getMaxRequests());
@@ -115,28 +126,18 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.END_TAG, ns, "maxRequests");
 
 
-            } else if (name.equals("initialSendDelay")) {
-                parser.require(XmlPullParser.START_TAG, ns, "initialSendDelay");
-                String initialSendDelayValue = readText(parser);
-                try {
-                    int initialSendDelay = Integer.parseInt(initialSendDelayValue);
-                    config.setInitialSendDelay(initialSendDelay);
-                }  catch (Exception ex){
-                    WebtrekkLogging.log("invalid initialSendDelay value: ", ex);
-                    WebtrekkLogging.log("using default: " + defaultConfiguration.getInitialSendDelay());
-                    config.setInitialSendDelay(defaultConfiguration.getInitialSendDelay());
-                }
-
-                parser.require(XmlPullParser.END_TAG, ns, "initialSendDelay");
-
-
             } else if (name.equals("sendDelay")) {
                 parser.require(XmlPullParser.START_TAG, ns, "sendDelay");
                 String sendDelayValue = readText(parser);
                 try {
                     int sendDelay = Integer.parseInt(sendDelayValue);
-                    config.setSendDelay(sendDelay);
-                }  catch (Exception ex){
+                    if(sendDelay > 9) {
+                        config.setSendDelay(sendDelay);
+                    } else {
+                        config.setSendDelay(defaultConfiguration.getSendDelay());
+                    }
+
+                } catch (Exception ex) {
                     WebtrekkLogging.log("invalid sendDelay value: ", ex);
                     WebtrekkLogging.log("using default: " + defaultConfiguration.getSendDelay());
                     config.setSendDelay(defaultConfiguration.getSendDelay());
@@ -144,11 +145,11 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.END_TAG, ns, "sendDelay");
 
 
-            }  else if (name.equals("autoTracked")) {
+            } else if (name.equals("autoTracked")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTracked");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTracked(true);
                 } else {
                     config.setAutoTracked(false);
@@ -160,7 +161,7 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackAppUpdate");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackAppUpdate(true);
                 } else {
                     config.setAutoTrackAppUpdate(false);
@@ -172,7 +173,7 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackAdvertiserId");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackAdvertiserId(true);
                 } else {
                     config.setAutoTrackAdvertiserId(false);
@@ -184,7 +185,7 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackAppVersionName");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackAppVersionName(true);
                 } else {
                     config.setAutoTrackAppVersionName(false);
@@ -195,73 +196,73 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackAppVersionCode");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackAppVersionCode(true);
                 } else {
                     config.setAutoTrackAppVersionCode(false);
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "autoTrackAppVersionCode");
 
-            }  else if (name.equals("autoTrackAppPreInstalled")) {
+            } else if (name.equals("autoTrackAppPreInstalled")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackAppPreInstalled");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackAppPreInstalled(true);
                 } else {
                     config.setAutoTrackAppPreInstalled(false);
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "autoTrackAppPreInstalled");
 
-            }   else if (name.equals("autoTrackPlaystoreUsername")) {
+            } else if (name.equals("autoTrackPlaystoreUsername")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackPlaystoreUsername");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackPlaystoreUsername(true);
                 } else {
                     config.setAutoTrackPlaystoreUsername(false);
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "autoTrackPlaystoreUsername");
 
-            }   else if (name.equals("autoTrackPlaystoreMail")) {
+            } else if (name.equals("autoTrackPlaystoreMail")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackPlaystoreMail");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackPlaystoreMail(true);
                 } else {
                     config.setAutoTrackPlaystoreMail(false);
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "autoTrackPlaystoreMail");
 
-            }   else if (name.equals("autoTrackPlaystoreGivenName")) {
+            } else if (name.equals("autoTrackPlaystoreGivenName")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackPlaystoreGivenName");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackPlaystoreGivenName(true);
                 } else {
                     config.setAutoTrackPlaystoreGivenName(false);
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "autoTrackPlaystoreGivenName");
 
-            }   else if (name.equals("autoTrackPlaystoreFamilyName")) {
+            } else if (name.equals("autoTrackPlaystoreFamilyName")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackPlaystoreFamilyName");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackPlaystoreFamilyName(true);
                 } else {
                     config.setAutoTrackPlaystoreFamilyName(false);
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "autoTrackPlaystoreFamilyName");
 
-            }   else if (name.equals("autoTrackApiLevel")) {
+            } else if (name.equals("autoTrackApiLevel")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackApiLevel");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackApiLevel(true);
                 } else {
                     config.setAutoTrackApiLevel(false);
@@ -272,18 +273,18 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackScreenOrientation");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackScreenorientation(true);
                 } else {
-                config.setAutoTrackScreenorientation(false);
+                    config.setAutoTrackScreenorientation(false);
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "autoTrackScreenOrientation");
 
-            }  else if (name.equals("autoTrackConnectionType")) {
+            } else if (name.equals("autoTrackConnectionType")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackConnectionType");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackConnectionType(true);
                 } else {
                     config.setAutoTrackConnectionType(false);
@@ -294,7 +295,7 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackAdvertisementOptOut");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setAutoTrackAdvertismentOptOut(true);
                 } else {
                     config.setAutoTrackAdvertismentOptOut(false);
@@ -316,7 +317,7 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.START_TAG, ns, "enablePluginHelloWorld");
 
                 String isPluginHelloWorldEnabled = readText(parser);
-                if(isPluginHelloWorldEnabled.equals("true")) {
+                if (isPluginHelloWorldEnabled.equals("true")) {
                     config.setEnablePluginHelloWorld(true);
                 } else {
                     config.setEnablePluginHelloWorld(false);
@@ -327,27 +328,26 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.START_TAG, ns, "enableRemoteConfiguration");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
+                if (value.equals("true")) {
                     config.setEnableRemoteConfiguration(true);
                 } else if (value.equals("false")) {
                     config.setEnableRemoteConfiguration(false);
                 } else {
-                        WebtrekkLogging.log("using default: " + defaultConfiguration.isEnableRemoteConfiguration());
-                        config.setEnableRemoteConfiguration(defaultConfiguration.isEnableRemoteConfiguration());
+                    WebtrekkLogging.log("using default: " + defaultConfiguration.isEnableRemoteConfiguration());
+                    config.setEnableRemoteConfiguration(defaultConfiguration.isEnableRemoteConfiguration());
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "enableRemoteConfiguration");
 
-            }
-            else if (name.equals("sendRequestUrlStoreSize")) {
-                parser.require(XmlPullParser.START_TAG, ns, "sendRequestUrlStoreSize");
+            } else if (name.equals("autoTrackRequestUrlStoreSize")) {
+                parser.require(XmlPullParser.START_TAG, ns, "autoTrackRequestUrlStoreSize");
 
                 String value = readText(parser);
-                if(value.equals("true")) {
-                    config.setSendRequestUrlStoreSize(true);
+                if (value.equals("true")) {
+                    config.setAutoTrackRequestUrlStoreSize(true);
                 } else {
-                    config.setSendRequestUrlStoreSize(false);
+                    config.setAutoTrackRequestUrlStoreSize(false);
                 }
-                parser.require(XmlPullParser.END_TAG, ns, "sendRequestUrlStoreSize");
+                parser.require(XmlPullParser.END_TAG, ns, "autoTrackRequestUrlStoreSize");
 
             } else if (name.equals("resendOnStartEventTime")) {
                 parser.require(XmlPullParser.START_TAG, ns, "resendOnStartEventTime");
@@ -357,7 +357,7 @@ class TrackingConfigurationXmlParser {
                 try {
                     int resendOnStartEventTime = Integer.parseInt(sendDelayValue);
                     config.setResendOnStartEventTime(resendOnStartEventTime);
-                }  catch (Exception ex){
+                } catch (Exception ex) {
                     WebtrekkLogging.log("invalid resendOnStartEventTime value: ", ex);
                     WebtrekkLogging.log("using default: " + defaultConfiguration.getResendOnStartEventTime());
                     config.setResendOnStartEventTime(defaultConfiguration.getResendOnStartEventTime());
@@ -366,14 +366,14 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.END_TAG, ns, "resendOnStartEventTime");
 
 
-            }  else if (name.equals("customParameter")) {
+            } else if (name.equals("customParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "customParameter");
                 config.setCustomParameter(readParameterConfiguration(parser));
             } else if (name.equals("globalTrackingParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "globalTrackingParameter");
                 config.setGlobalTrackingParameter(readTrackingParameterConfiguration(parser));
             } else if (name.equals("activity")) {
-                TrackingConfiguration.ActivityConfiguration act = readActivityConfiguration(parser);
+                ActivityConfiguration act = readActivityConfiguration(parser, config.isAutoTracked());
                 config.getActivityConfigurations().put(act.getClassName(), act);
             } else {
                 skip(parser);
@@ -390,11 +390,11 @@ class TrackingConfigurationXmlParser {
      * @throws XmlPullParserException
      * @throws IOException
      */
-    private TrackingConfiguration.ActivityConfiguration readActivityConfiguration(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private ActivityConfiguration readActivityConfiguration(XmlPullParser parser, boolean globalAutoTracked) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "activity");
         String className = null;
         String mappingName = null;
-        boolean isAutoTrack = false;
+        boolean isAutoTrack = globalAutoTracked;
         TrackingParameter trackingParameter = null;
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -407,18 +407,25 @@ class TrackingConfigurationXmlParser {
             } else if (name.equals("mappingname")) {
                 parser.require(XmlPullParser.START_TAG, ns, "mappingname");
                 mappingName = readText(parser);
-            } else if (name.equals("autotrack")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autotrack");
-                String autotrack = readText(parser);
-                if (autotrack.equals("true")) {
+            } else if (name.equals("autoTracked")) {
+                parser.require(XmlPullParser.START_TAG, ns, "autoTracked");
+                String autoTracked = readText(parser);
+                // the default value for the activities is based on the global setting
+                // when global autotracking is enabled, all activities have true by default
+                // when its disabled globally, all activities have false by default
+                // each activity can override this value with its own
+                if (autoTracked.equals("true")) {
                     isAutoTrack = true;
+                }
+                if (autoTracked.equals("false")) {
+                    isAutoTrack = false;
                 }
             } else if (name.equals("activityTrackingParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "activityTrackingParameter");
                 trackingParameter = readTrackingParameterConfiguration(parser);
             }
         }
-        return new TrackingConfiguration.ActivityConfiguration(className, mappingName, isAutoTrack, trackingParameter);
+        return new ActivityConfiguration(className, mappingName, isAutoTrack, trackingParameter);
     }
 
     /**
@@ -443,7 +450,7 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.START_TAG, ns, "parameter");
                 String key = parser.getAttributeValue(ns, "key");
                 String value = parser.getAttributeValue(ns, "value");
-                if(key != null && value != null) {
+                if (key != null && value != null) {
                     tp.add(Parameter.getParameterByName(key), value);
                 } else {
                     WebtrekkLogging.log("invalid parameter configuration while reading customParameter, missing key or value");
@@ -496,7 +503,7 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.START_TAG, ns, "parameter");
                 String key = parser.getAttributeValue(ns, "key");
                 String value = parser.getAttributeValue(ns, "value");
-                if(key != null && value != null) {
+                if (key != null && value != null) {
                     customParameter.put(key, value);
                 } else {
                     WebtrekkLogging.log("invalid parameter configuration while reading customParameter, missing key or value");
@@ -509,6 +516,7 @@ class TrackingConfigurationXmlParser {
 
     /**
      * reads a String value from xml tag
+     *
      * @param parser
      * @return
      * @throws IOException

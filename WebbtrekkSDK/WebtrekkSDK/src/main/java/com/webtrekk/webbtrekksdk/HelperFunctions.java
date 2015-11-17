@@ -180,7 +180,7 @@ final class HelperFunctions {
                 Uri.withAppendedPath(
                         ContactsContract.Profile.CONTENT_URI,
                         ContactsContract.Contacts.Data.CONTENT_DIRECTORY),
-                        profilequery,
+                profilequery,
 
                 // Selects only email addresses or names
                 ContactsContract.Contacts.Data.MIMETYPE + "=? OR "
@@ -219,7 +219,8 @@ final class HelperFunctions {
                 return account.name;
             }
         }
-        return acc[0].name;
+        WebtrekkLogging.log("could not get valid Account Email, check Permissions");
+        return "";
     }
 
     /**

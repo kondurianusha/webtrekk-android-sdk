@@ -55,6 +55,10 @@ public class TrackingParameter {
      * @return
      */
     public TrackingParameter add(TrackingParameter tp) {
+        if(tp == null) {
+            WebtrekkLogging.log("Error: TrackingParameter object passed to add method is null");
+            return this;
+        }
         this.defaultParameter.putAll(tp.getDefaultParameter());
         this.pageParameter.putAll(tp.getPageParameter());
         this.sessionParameter.putAll(tp.getSessionParameter());

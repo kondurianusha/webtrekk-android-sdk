@@ -575,9 +575,12 @@ public class Webtrekk {
      */
     void autoTrackActivity() {
         // only track if auto tracking is enabled for that activity
-        // the default value and the activities autoTracked value is based on the global xml settings, so no
-        // need to check the global value again here
-        if(trackingConfiguration.getActivityConfigurations().get(currentActivityName).isAutoTrack()) {
+        // the default value and the activities autoTracked value is based on the global xml settings
+        boolean autoTrack = trackingConfiguration.isAutoTracked();
+        if(trackingConfiguration.getActivityConfigurations()!= null && trackingConfiguration.getActivityConfigurations().containsKey(currentActivityName)) {
+            autoTrack = trackingConfiguration.getActivityConfigurations().get(currentActivityName).isAutoTrack();
+        }
+        if(autoTrack) {
             track();
         }
 

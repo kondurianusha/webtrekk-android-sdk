@@ -9,8 +9,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.webtrekk.webbtrekksdk.TrackingParameter;
-import com.webtrekk.webbtrekksdk.Webtrekk;
+import com.webtrekk.webtrekksdk.TrackingParameter;
+import com.webtrekk.webtrekksdk.Webtrekk;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -28,7 +28,7 @@ public class MainActivity extends ActionBarActivity {
         }
         webtrekk.initWebtrekk(this);
         // optional für das automatische Aktivitätstracking
-        //webtrekk.initAutoTracking(getApplication());
+        webtrekk.initAutoTracking(getApplication());
 
     }
 
@@ -36,7 +36,7 @@ public class MainActivity extends ActionBarActivity {
     public void onStart()
     {
         super.onStart();
-        webtrekk.startActivity("MainActivity");
+        webtrekk.startActivity("test.myapplication.MainActivity");
         webtrekk.track();
     }
 

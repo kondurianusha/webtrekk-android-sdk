@@ -6,9 +6,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.webtrekk.webbtrekksdk.TrackingParameter;
-import com.webtrekk.webbtrekksdk.Webtrekk;
-import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.TrackingParameter;
+import com.webtrekk.webtrekksdk.Webtrekk;
+import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 
 
 public class PageExampleActivity extends ActionBarActivity {
@@ -26,7 +26,6 @@ public class PageExampleActivity extends ActionBarActivity {
     {
         super.onStart();
         //webtrekk.startActivity("PageExampleActivity");
-        //webtrekk.track();
     }
 
     @Override

@@ -6,9 +6,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.webtrekk.webbtrekksdk.TrackingParameter;
-import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
-import com.webtrekk.webbtrekksdk.Webtrekk;
+import com.webtrekk.webtrekksdk.TrackingParameter;
+import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Webtrekk;
 
 
 public class ShopExampleActivity extends ActionBarActivity {
@@ -70,8 +70,9 @@ public class ShopExampleActivity extends ActionBarActivity {
     }
 
     public void onButtonOrderClicked(View view) {
-        tp.add(Parameter.PRODUCT_STATUS, "add")
+        TrackingParameter buttonParameter = new TrackingParameter();
+        buttonParameter.add(Parameter.PRODUCT_STATUS, "add")
         .add(Parameter.ACTION_NAME, "orderButton");
-        webtrekk.track(tp);
+        webtrekk.track(buttonParameter);
     }
 }

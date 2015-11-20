@@ -1,6 +1,6 @@
 package test.myapplication;
 
-import com.webtrekk.webbtrekksdk.WebtrekkApplication;
+import com.webtrekk.webtrekksdk.WebtrekkApplication;
 
 /**
  * Created by user on 11/03/15.

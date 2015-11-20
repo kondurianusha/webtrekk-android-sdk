@@ -1,7 +1,7 @@
 package test.myapplication;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.webtrekk.webbtrekksdk.Webtrekk;
+import com.webtrekk.webtrekksdk.Webtrekk;
 
 import test.myapplication.MainActivity;
 
@@ -47,7 +47,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertEquals(wt.getVersion(), 3);
         assertEquals(wt.getTrackId(), "1111111111112O");
         assertEquals(wt.getSampling(), 333);
-        assertEquals(wt.getInitialSendDelay(), 33);
         assertEquals(wt.getSendDelay(), 602);
         //assertEquals(wt.getResendOnStartEventTime(), 303);
         assertEquals(wt.getMaxRequests(), 4000);

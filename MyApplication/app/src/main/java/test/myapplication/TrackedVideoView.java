@@ -4,8 +4,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.VideoView;
 
-import com.webtrekk.webbtrekksdk.TrackingParameter;
-import com.webtrekk.webbtrekksdk.Webtrekk;
+import com.webtrekk.webtrekksdk.TrackingParameter;
+import com.webtrekk.webtrekksdk.Webtrekk;
 
 public class TrackedVideoView extends VideoView {
     private Webtrekk webtrekk;

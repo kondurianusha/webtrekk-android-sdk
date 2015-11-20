@@ -10,10 +10,10 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.webtrekk.webbtrekksdk.TrackingParameter;
-import com.webtrekk.webbtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.TrackingParameter;
+import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 
-import com.webtrekk.webbtrekksdk.Webtrekk;
+import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

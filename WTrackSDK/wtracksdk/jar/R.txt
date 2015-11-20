@@ -1,3 +1,0 @@
-int integer webtrekk_sampling 0x7f020000
-int string webtrekkTrackDomain 0x7f030000
-int string webtrekkTrackId 0x7f030001

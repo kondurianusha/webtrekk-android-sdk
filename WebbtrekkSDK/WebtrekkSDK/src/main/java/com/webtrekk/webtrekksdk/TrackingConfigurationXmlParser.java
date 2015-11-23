@@ -124,7 +124,7 @@ class TrackingConfigurationXmlParser {
                 String sendDelayValue = readText(parser);
                 try {
                     int sendDelay = Integer.parseInt(sendDelayValue);
-                    if (sendDelay > 9) {
+                    if (sendDelay > 1) {
                         config.setSendDelay(sendDelay);
                     } else {
                         WebtrekkLogging.log("invalid sendDelay value, using default");

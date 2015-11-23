@@ -99,7 +99,7 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initTrackingConfiguration();
         webtrekk.initInternalParameter();
         webtrekk.initWebtrekkParameter();
-        webtrekk.initCustomParameter();
+        webtrekk.initAutoCustomParameter();
 
         RequestUrlStore requestUrlStore = mock(RequestUrlStore.class);
         webtrekk.setRequestUrlStore(requestUrlStore);
@@ -123,7 +123,7 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initTrackingConfiguration();
         webtrekk.initInternalParameter();
         webtrekk.initWebtrekkParameter();
-        webtrekk.initCustomParameter();
+        webtrekk.initAutoCustomParameter();
 
         assertNotNull(webtrekk.getCustomParameter().get("apiLevel"));
     }

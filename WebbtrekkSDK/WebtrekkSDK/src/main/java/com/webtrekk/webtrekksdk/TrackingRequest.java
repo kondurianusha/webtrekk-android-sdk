@@ -246,14 +246,13 @@ public class TrackingRequest {
             url.append("&" + Parameter.SAMPLING.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.SAMPLING)));
         }
 
-        if(trackingParameter.containsKey(Parameter.USERAGENT)) {
-            url.append("&" + Parameter.USERAGENT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.USERAGENT)));
-        }
-
         if(trackingParameter.containsKey(Parameter.IP_ADDRESS)) {
             url.append("&" + Parameter.IP_ADDRESS.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.IP_ADDRESS)));
         }
 
+        if(trackingParameter.containsKey(Parameter.USERAGENT)) {
+            url.append("&" + Parameter.USERAGENT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.USERAGENT)));
+        }
         // append eor to make shure the request is valid
         url.append("&eor=1");
         return url.toString();

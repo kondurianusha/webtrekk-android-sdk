@@ -42,6 +42,7 @@ public class Webtrekk {
     public static final String PREFERENCE_KEY_INSTALLATION_FLAG = "InstallationFlag";
     public static final String PREFERENCE_KEY_CONFIGURATION = "webtrekkTrackingConfiguration";
     public static final String TRACKING_LIBRARY_VERSION = "400";
+    public static final String TRACKING_LIBRARY_VERSION_UA = "4.0";
 
 
     private RequestUrlStore requestUrlStore;
@@ -73,7 +74,9 @@ public class Webtrekk {
     //local tracking params, and override them, so for example key = orientation, value = horizontal
     //in the xml configuraton then is the trackingparameter requests defined with ecomerce_parameter "1" and the key orientation
     // before the request url is generated this keys will be replaced with values from this map
+    // the customParameter are set by the user and are only valid for the current activity
     private Map<String, String> customParameter;
+    private Map<String, String> autoCustomParameter;
 
     // this hashmap contains all the default parameter which are defined by webtrekk and have an url mapping
     private HashMap<Parameter, String> webtrekkParameter;
@@ -112,11 +115,11 @@ public class Webtrekk {
     /**
      * this initializes the webtrekk tracking configuration, it has to be called only once when the
      * application starts, for example in the Application Class or the Main Activitys onCreate
-     * @param c the application context / context of the main activity
+     * @param app the application context / context of the main activity
      *
      */
-    final public void initWebtrekk(final Context c) {
-        if (c == null) {
+    final public void initWebtrekk(final Application app) {
+        if (app == null) {
             throw new IllegalArgumentException("no valid context");
         }
         if (this.context != null) {
@@ -125,7 +128,7 @@ public class Webtrekk {
             return;
             //throw new IllegalStateException("The initWebtrekk method must be called only once");
         }
-        this.context = c;
+        this.context = app;
 
         if(customParameter == null) {
             customParameter = new HashMap<>();
@@ -136,13 +139,13 @@ public class Webtrekk {
         initSampling();
         initInternalParameter();
         initWebtrekkParameter();
-        initCustomParameter();
+        initAutoCustomParameter();
         initPlugins();
         initTimerService();
         initAdvertiserId();
         //TODO: make sure this can not break
-        Application act = (Application) context.getApplicationContext();
-        initAutoTracking(act);
+        //Application act = (Application) context.getApplicationContext();
+        initAutoTracking(app);
 
         this.requestUrlStore = new RequestUrlStore(context, trackingConfiguration.getMaxRequests());
         globalTrackingParameter = new TrackingParameter();
@@ -357,34 +360,37 @@ public class Webtrekk {
      * this method initializes the custom parameter values which are predefined by webtrekk
      * the customer can also add new ones as he likes, unknown entries will be ingored by the server
      */
-    public void initCustomParameter() {
+    public void initAutoCustomParameter() {
+        if(autoCustomParameter == null) {
+            autoCustomParameter = new HashMap<>();
+        }
         if(customParameter == null) {
             customParameter = new HashMap<>();
         }
 
         if(trackingConfiguration.isAutoTrackAppVersionName()) {
-            customParameter.put("appVersion", HelperFunctions.getAppVersionName(context));
+            autoCustomParameter.put("appVersion", HelperFunctions.getAppVersionName(context));
 
         }
         if(trackingConfiguration.isAutoTrackAppVersionCode()) {
-            customParameter.put("appVersionCode", String.valueOf(HelperFunctions.getAppVersionCode(context)));
+            autoCustomParameter.put("appVersionCode", String.valueOf(HelperFunctions.getAppVersionCode(context)));
 
         }
         if(trackingConfiguration.isAutoTrackPlaystoreUsername()) {
             Map<String, String> playstoreprofile = HelperFunctions.getUserProfile(context);
-            customParameter.put("playstoreFamilyname", playstoreprofile.get("sname"));
-            customParameter.put("playstoreGivenname", playstoreprofile.get("gname"));
+            autoCustomParameter.put("playstoreFamilyname", playstoreprofile.get("sname"));
+            autoCustomParameter.put("playstoreGivenname", playstoreprofile.get("gname"));
 
         }
         if(trackingConfiguration.isAutoTrackPlaystoreMail()) {
             //Map<String, String> playstoreprofile = HelperFunctions.getUserProfile(context);
             //customParameter.put("playstoreMail", playstoreprofile.get("email"));
-            customParameter.put("playstoreMail", HelperFunctions.getMailByAccountManager(context));
+            autoCustomParameter.put("playstoreMail", HelperFunctions.getMailByAccountManager(context));
 
 
         }
         if (trackingConfiguration.isAutoTrackAppPreInstalled()) {
-            customParameter.put("appPreinstalled", String.valueOf(HelperFunctions.isAppPreinstalled(context)));
+            autoCustomParameter.put("appPreinstalled", String.valueOf(HelperFunctions.isAppPreinstalled(context)));
 
         }
         // if the app was updated, send out the update request once
@@ -397,14 +403,14 @@ public class Webtrekk {
             }
 
             if(HelperFunctions.updated(context, currentVersion)) {
-                customParameter.put("appUpdated", "1");
+                autoCustomParameter.put("appUpdated", "1");
             } else  {
-                customParameter.put("appUpdated", "0");
+                autoCustomParameter.put("appUpdated", "0");
             }
 
         }
         if(trackingConfiguration.isAutoTrackApiLevel()) {
-            customParameter.put("apiLevel", HelperFunctions.getAPILevel());
+            autoCustomParameter.put("apiLevel", HelperFunctions.getAPILevel());
 
         }
 
@@ -431,8 +437,8 @@ public class Webtrekk {
                         adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
 
                         WebtrekkLogging.log("advertiserId: " + adInfo.getId());
-                        Webtrekk.this.customParameter.put("advertiserId", adInfo.getId());
-                        Webtrekk.this.customParameter.put("advertisingOptOut", String.valueOf(adInfo.isLimitAdTrackingEnabled()));
+                        Webtrekk.this.autoCustomParameter.put("advertiserId", adInfo.getId());
+                        Webtrekk.this.autoCustomParameter.put("advertisingOptOut", String.valueOf(adInfo.isLimitAdTrackingEnabled()));
                         //app.getTracker()..getAutoTrackedValues().put(TrackingParams.Params.ADVERTISER_ID, adInfo.getId());
                         //app.getWTRack().getAutoTrackedValues().put(TrackingParams.Params.ADVERTISER_OPTOUT, String.valueOf(adInfo.isLimitAdTrackingEnabled()));
 
@@ -469,10 +475,10 @@ public class Webtrekk {
      */
     void updateDynamicParameter() {
         // put the screen orientation to into the custom parameter, will change with every request
-        customParameter.put("screenOrientation", HelperFunctions.getOrientation(context));
-        customParameter.put("connectionType", HelperFunctions.getConnectionString(context));
+        autoCustomParameter.put("screenOrientation", HelperFunctions.getOrientation(context));
+        autoCustomParameter.put("connectionType", HelperFunctions.getConnectionString(context));
         if(requestUrlStore != null) {
-            customParameter.put("requestUrlStoreSize", String.valueOf(requestUrlStore.size()));
+            autoCustomParameter.put("requestUrlStoreSize", String.valueOf(requestUrlStore.size()));
         }
 
         // also update the webtrekk parameter
@@ -487,19 +493,19 @@ public class Webtrekk {
      * @param app application object of the tracked app, can either be a custom one or required by getApplication()
      */
     public void initAutoTracking(Application app){
-        boolean autoTrack = false;
-        // when global autotracking is enabled, autoTrack is true
-        if(trackingConfiguration.isAutoTracked()) {
-            autoTrack = true;
-        }
-        // enable autotracking when one of the activities has autoTracking enabled
-        for(ActivityConfiguration activityConfiguration : trackingConfiguration.getActivityConfigurations().values()) {
-            if(activityConfiguration.isAutoTrack()) {
-                autoTrack = true;
-            }
-        }
-        if(callbacks == null && autoTrack) {
-            WebtrekkLogging.log("enabling autoTracking");
+//        boolean autoTrack = false;
+//        // when global autotracking is enabled, autoTrack is true
+//        if(trackingConfiguration.isAutoTracked()) {
+//            autoTrack = true;
+//        }
+//        // enable autotracking when one of the activities has autoTracking enabled
+//        for(ActivityConfiguration activityConfiguration : trackingConfiguration.getActivityConfigurations().values()) {
+//            if(activityConfiguration.isAutoTrack()) {
+//                autoTrack = true;
+//            }
+//        }
+        if(callbacks == null) {
+            WebtrekkLogging.log("enabling callbacks");
             callbacks = new TrackedActivityLifecycleCallbacks(this);
             app.registerActivityLifecycleCallbacks(callbacks);
         }
@@ -689,6 +695,7 @@ public class Webtrekk {
         //last step add the internal parameter
         trackingParameter.add(internalParameter);
         //now map the string values from the xml/code tracking parameters to the custom values defined by webtrekk or the customer
+        customParameter.putAll(autoCustomParameter);
         trackingParameter.applyMapping(customParameter);
 
         return new TrackingRequest(trackingParameter, trackingConfiguration);
@@ -770,6 +777,9 @@ public class Webtrekk {
             throw new IllegalStateException("activity has not been started yet, call startActivity");
         }
         activityCount--;
+
+        //always clear the current activities custom parameter
+        customParameter.clear();
         if(activityCount == 0) {
             onLastActivityStop();
         }
@@ -948,4 +958,12 @@ public class Webtrekk {
     public boolean isAutoTracked() { return trackingConfiguration.isAutoTracked(); }
     public boolean isAutoTrackApiLevel() { return trackingConfiguration.isAutoTrackApiLevel(); }
     public boolean isEnableRemoteConfiguration() { return trackingConfiguration.isEnableRemoteConfiguration(); }
+
+    Map<String, String> getAutoCustomParameter() {
+        return autoCustomParameter;
+    }
+
+    void setAutoCustomParameter(Map<String, String> autoCustomParameter) {
+        this.autoCustomParameter = autoCustomParameter;
+    }
 }

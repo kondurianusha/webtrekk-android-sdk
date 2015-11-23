@@ -22,13 +22,13 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         webtrekk = Webtrekk.getInstance();
         try {
-            webtrekk.initWebtrekk(this);
+            webtrekk.initWebtrekk(getApplication());
         } catch (Exception e) {
             Log.d("MyApplication", "error initializing webtrekk", e);
         }
-        webtrekk.initWebtrekk(this);
+        //webtrekk.initWebtrekk(this);
         // optional für das automatische Aktivitätstracking
-        webtrekk.initAutoTracking(getApplication());
+        //webtrekk.initAutoTracking(getApplication());
 
     }
 

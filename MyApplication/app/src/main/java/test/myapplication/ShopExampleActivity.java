@@ -23,27 +23,30 @@ public class ShopExampleActivity extends ActionBarActivity {
         webtrekk.track();
         tp = new TrackingParameter();
         tp.add(Parameter.PRODUCT, "Brauner Herrenschuh Leder: Mike")
-                .add(Parameter.PRODUCT_CAT, "1", "Herren")
+                .add(Parameter.PRODUCT_CAT, "1", "testParameter")
                 .add(Parameter.PRODUCT_CAT, "2", "Schuhe")
                 .add(Parameter.PRODUCT_CAT, "3", "Leder")
                 .add(Parameter.PRODUCT_COUNT, "1")
                 .add(Parameter.PRODUCT_COST, "99,95")
                 .add(Parameter.PRODUCT_STATUS, "view")
                 .add(Parameter.CURRENCY, "EUR");
+        tp.add(Parameter.ECOM, "1", "test");
         webtrekk.track(tp);
+
+
+        //webtrekk.getCustomParameter().put("testParameter", myapplication.getProduct());
+
     }
     @Override
     public void onStart()
     {
         super.onStart();
-        webtrekk.startActivity("ShopActivity");
         webtrekk.track();
     }
 
     @Override
     public void onStop()
     {
-        webtrekk.stopActivity();
         super.onStop();
     }
 

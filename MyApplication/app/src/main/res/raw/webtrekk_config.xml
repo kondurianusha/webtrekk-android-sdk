@@ -107,7 +107,7 @@
 
     <!--activity configurations -->
     <activity>
-        <classname type="text">MainActivity</classname>
+        <classname type="text">test.myapplication.MainActivity</classname>
         <mappingname type="text">Startseite</mappingname>
         <autotrack type="text">true</autotrack>
         <!--activity tracking parameter -->

@@ -112,14 +112,20 @@ public class Webtrekk {
         return SingletonHolder.webtrekk;
     }
 
+    final public void initWebtrekk(final Application app) {
+        initAutoTracking(app);
+        initWebtrekk(app);
+    }
+
+
     /**
      * this initializes the webtrekk tracking configuration, it has to be called only once when the
      * application starts, for example in the Application Class or the Main Activitys onCreate
-     * @param app the application context / context of the main activity
+     * @param c the application context / context of the main activity
      *
      */
-    final public void initWebtrekk(final Application app) {
-        if (app == null) {
+    public void initWebtrekk(final Context c) {
+        if (c == null) {
             throw new IllegalArgumentException("no valid context");
         }
         if (this.context != null) {
@@ -128,7 +134,7 @@ public class Webtrekk {
             return;
             //throw new IllegalStateException("The initWebtrekk method must be called only once");
         }
-        this.context = app;
+        this.context = c;
 
         if(customParameter == null) {
             customParameter = new HashMap<>();
@@ -145,7 +151,7 @@ public class Webtrekk {
         initAdvertiserId();
         //TODO: make sure this can not break
         //Application act = (Application) context.getApplicationContext();
-        initAutoTracking(app);
+
 
         this.requestUrlStore = new RequestUrlStore(context, trackingConfiguration.getMaxRequests());
         globalTrackingParameter = new TrackingParameter();

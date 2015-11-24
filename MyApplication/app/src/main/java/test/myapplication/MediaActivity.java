@@ -193,7 +193,6 @@ public class MediaActivity extends ActionBarActivity {
     protected void onStart () {
         super.onStart();
         initMediaTracking();
-        webtrekk.startActivity("MediaActivity");
 
     }
 
@@ -205,7 +204,6 @@ public class MediaActivity extends ActionBarActivity {
 
     @Override
     protected void onStop() {
-        webtrekk.stopActivity();
         super.onStop();
     }
 }

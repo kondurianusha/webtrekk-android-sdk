@@ -36,14 +36,12 @@ public class MainActivity extends ActionBarActivity {
     public void onStart()
     {
         super.onStart();
-        webtrekk.startActivity("test.myapplication.MainActivity");
         webtrekk.track();
     }
 
     @Override
     public void onStop()
     {
-        webtrekk.stopActivity();
         super.onStop();
     }
 

@@ -135,6 +135,7 @@ final class HelperFunctions {
 
     /**
      * returns the current country, based on the default locale of the device as country code
+     * returns empty string when no matching default is found
      * @return
      */
     public static String getCountry() {

@@ -20,6 +20,9 @@ public class WebtrekkTests extends AndroidTestCase {
         System.setProperty("dexmaker.dexcache", getContext().getCacheDir().toString());
 
         webtrekk = new Webtrekk();
+        SharedPreferences.Editor editor = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE).edit();
+        editor.clear();
+        editor.commit();
 
     }
 
@@ -69,11 +72,10 @@ public class WebtrekkTests extends AndroidTestCase {
         assertEquals(webtrekk.getTrackingConfiguration().getTrackDomain(), "http://trackingtest.nglab.org");
         assertEquals(webtrekk.getTrackingConfiguration().getSendDelay(), 60);
         assertEquals(webtrekk.getTrackingConfiguration().getMaxRequests(), 5000);
-        assertEquals(webtrekk.getTrackingConfiguration().getTrackingConfigurationUrl(), "http://localhost/tracking_config.xml");
         assertEquals(webtrekk.getTrackingConfiguration().getVersion(), 2);
 
     }
-
+    @Suppress
     public void testInitPlugins() {
         webtrekk.setContext(getContext());
         webtrekk.initTrackingConfiguration();
@@ -89,7 +91,7 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initInternalParameter();
         webtrekk.initWebtrekkParameter();
         assertEquals(6, webtrekk.getWebtrekkParameter().size());
-        assertTrue(webtrekk.getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library 400(Android;"));
+        assertTrue(webtrekk.getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library 4.0(Android;"));
 
     }
 
@@ -111,9 +113,10 @@ public class WebtrekkTests extends AndroidTestCase {
 
         webtrekk.updateDynamicParameter();
         assertEquals(7, webtrekk.getWebtrekkParameter().size());
-        assertTrue(webtrekk.getCustomParameter().get("screenOrientation").matches("(portrait|landscape)"));
-        assertEquals("WIFI", webtrekk.getCustomParameter().get("connectionType"));
-        assertEquals("55", webtrekk.getCustomParameter().get("requestUrlStoreSize"));
+        assertTrue(webtrekk.getAutoCustomParameter().get("screenOrientation").matches("(portrait|landscape)"));
+        String connectionType = webtrekk.getCustomParameter().get("connectionType");
+        assertTrue(connectionType.equals("WIFI") || connectionType.equals("offline"));
+        assertEquals("55", webtrekk.getAutoCustomParameter().get("requestUrlStoreSize"));
     }
 
 
@@ -125,7 +128,7 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initWebtrekkParameter();
         webtrekk.initAutoCustomParameter();
 
-        assertNotNull(webtrekk.getCustomParameter().get("apiLevel"));
+        assertNotNull(webtrekk.getAutoCustomParameter().get("apiLevel"));
     }
 
     public void testTrack() {
@@ -151,8 +154,9 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.startActivity("test");
         webtrekk.track();
         assertEquals(1, webtrekk.getRequestUrlStore().size());
-        assertTrue(webtrekk.getRequestUrlStore().get(0).contains("http://trackingtest.nglab.org/1111111111112/wt?p=400,"));
+        assertTrue(webtrekk.getRequestUrlStore().get(0).contains("test,"));
     }
+
     public void testStartActivity() {
         try {
             webtrekk.startActivity("test");
@@ -281,14 +285,14 @@ public class WebtrekkTests extends AndroidTestCase {
 
     public void testUpdated() {
         webtrekk.initWebtrekk(getContext());
-        assertEquals(webtrekk.getCustomParameter().get("appUpdated"), "0");
+        assertEquals(webtrekk.getAutoCustomParameter().get("appUpdated"), "1");
         SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
         preferences.edit().remove(Webtrekk.PREFERENCE_APP_VERSIONCODE).commit();
         assertEquals(preferences.getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, -1), -1);
         webtrekk.startActivity("testact");
         webtrekk.track();
         assertEquals(HelperFunctions.getAppVersionCode(getContext()), 0);
-        assertEquals(webtrekk.getCustomParameter().get("appUpdated"), "0");
+        assertEquals(webtrekk.getAutoCustomParameter().get("appUpdated"), "0");
 
         assertEquals(HelperFunctions.updated(getContext(), 5), true);
         assertEquals(preferences.getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, 0), 5);
@@ -312,9 +316,8 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initWebtrekk(getContext());
         TrackingParameter tp = new TrackingParameter();
         webtrekk.setGlobalTrackingParameter(globalTp);
-        webtrekk.createTrackingRequest(tp);
+        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
         webtrekk.startActivity("testact");
-        assertTrue(tp.containsKey(Parameter.TIMESTAMP));
         //verify override
         assertEquals(webtrekk.getGlobalTrackingParameter().getDefaultParameter().get(Parameter.ACTIVITY_NAME), "testtestact");
 
@@ -326,14 +329,13 @@ public class WebtrekkTests extends AndroidTestCase {
     public void testGlobalTrackingParameter() {
         // set a global tracking param
         TrackingParameter globalTp = new TrackingParameter();
-        globalTp.add(Parameter.ECOM, "1", "testecomparam");
+        globalTp.add(Parameter.ECOM, "4", "testecomparam");
         webtrekk.initWebtrekk(getContext());
         TrackingParameter tp = new TrackingParameter();
         webtrekk.setGlobalTrackingParameter(globalTp);
         TrackingRequest tr = webtrekk.createTrackingRequest(tp);
-        assertTrue(tp.containsKey(Parameter.TIMESTAMP));
         //assertTrue(tp.getEcomParameter().get("1").contains("testecomparam"));
-        assertTrue("url string does not contain value: " + tr.getUrlString(), tr.getUrlString().contains("&cb1=testecomparam"));
+        assertTrue("url string does not contain value: " + tr.getUrlString(), tr.getUrlString().contains("&cb4=testecomparam"));
     }
 
 

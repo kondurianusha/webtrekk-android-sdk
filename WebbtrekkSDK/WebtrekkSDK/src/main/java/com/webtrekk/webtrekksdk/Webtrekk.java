@@ -113,6 +113,9 @@ public class Webtrekk {
     }
 
     final public void initWebtrekk(final Application app) {
+        if (app == null) {
+            throw new IllegalArgumentException("no valid app");
+        }
         initAutoTracking(app);
         initWebtrekk(app);
     }
@@ -218,7 +221,7 @@ public class Webtrekk {
         }
 
         if(trackingConfiguration != null && trackingConfiguration.isEnableRemoteConfiguration()) {
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences sharedPrefs = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
             // second check if a newer remote config version is stored locally
             if(sharedPrefs.contains(Webtrekk.PREFERENCE_KEY_CONFIGURATION)) {
                 WebtrekkLogging.log("found trackingConfiguration in preferences");
@@ -321,7 +324,7 @@ public class Webtrekk {
         // from here on they sampling either changed or is missing, so reinitialize it
         SharedPreferences.Editor editor = preferences.edit();
         // calculate if the device is sampling
-        if(trackingConfiguration.getSampling()>0) {
+        if(trackingConfiguration.getSampling()>1) {
             isSampling = (Long.valueOf(getEverId()) % trackingConfiguration.getSampling()) != 0;
         } else {
             isSampling = false;
@@ -737,7 +740,7 @@ public class Webtrekk {
         //TODO: special case where they could not be send and the url got removed?
         internalParameter.add(Parameter.FORCE_NEW_SESSION, "0");
         internalParameter.add(Parameter.APP_FIRST_START, "0");
-        customParameter.put("appUpdated", "0");
+        autoCustomParameter.put("appUpdated", "0");
     }
 
 

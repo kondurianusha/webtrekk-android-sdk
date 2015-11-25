@@ -7,7 +7,7 @@
     <!--customers trackid -->
     <trackId type="text">1111111111112</trackId>
     <!-- measure only a subset of the users -->
-    <sampling type="text">22</sampling>
+    <sampling type="text">0</sampling>
     <!-- interval between the requests are send in seconds -->
     <sendDelay type="text">60</sendDelay>
     <!--maximum amoount of requests to store when the user is offline -->
@@ -49,7 +49,7 @@
     <!--enable the hello world plugin functions -->
     <enablePluginHelloWorld>true</enablePluginHelloWorld>
     <!--enables the remote xml configuration -->
-    <enableRemoteConfiguration>true</enableRemoteConfiguration>
+    <enableRemoteConfiguration>false</enableRemoteConfiguration>
     <!--url of the remote configuration -->
     <trackingConfigurationUrl>http://localhost/tracking_config.xml</trackingConfigurationUrl>
     <!--sends the size of the current locally stored urls in a custom parameter -->

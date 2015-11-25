@@ -45,7 +45,7 @@ public class RequestProcessor implements Runnable {
      * @throws IOException
      */
 
-    HttpURLConnection getUrlConnection(URL url) throws IOException {
+    public HttpURLConnection getUrlConnection(URL url) throws IOException {
         return (HttpURLConnection) url.openConnection();
     }
 

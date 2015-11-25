@@ -138,7 +138,7 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
         assertEquals(2, config.getVersion());
         assertEquals("http://trackingtest.nglab.org", config.getTrackDomain());
         assertEquals("1111111111112", config.getTrackId());
-        assertEquals(22, config.getSampling());
+        assertEquals(0, config.getSampling());
         assertEquals(60, config.getSendDelay());
         assertEquals(5000, config.getMaxRequests());
 
@@ -157,7 +157,7 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
         assertEquals(true, config.isAutoTrackConnectionType());
         assertEquals(true, config.isAutoTrackAdvertismentOptOut());
 
-        assertEquals(true, config.isEnableRemoteConfiguration());
+        assertEquals(false, config.isEnableRemoteConfiguration());
         assertEquals("http://localhost/tracking_config.xml", config.getTrackingConfigurationUrl());
         assertEquals(true, config.isAutoTrackRequestUrlStoreSize());
         assertEquals(30, config.getResendOnStartEventTime());

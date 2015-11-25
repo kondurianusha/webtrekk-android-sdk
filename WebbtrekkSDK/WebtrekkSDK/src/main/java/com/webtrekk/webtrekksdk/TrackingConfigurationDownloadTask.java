@@ -64,6 +64,8 @@ public class TrackingConfigurationDownloadTask extends AsyncTask<String, Void, T
             WebtrekkLogging.log("xml parser error, ioexception", e);
         } catch (XmlPullParserException e) {
             WebtrekkLogging.log("xml parser error, no validate xml configuration file", e);
+        } catch (Exception e) {
+            WebtrekkLogging.log("error getting remove configuration", e);
         }
 
         return null;
@@ -128,7 +130,7 @@ public class TrackingConfigurationDownloadTask extends AsyncTask<String, Void, T
         return builder.toString();
     }
 
-    String getXmlFromUrl(String url) throws IOException {
+    public String getXmlFromUrl(String url) throws IOException {
         String xml = null;
         // defaultHttpClient
         HttpURLConnection urlConnection;

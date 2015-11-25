@@ -98,7 +98,7 @@ public class RequestProcessorTest extends AndroidTestCase {
         when(requestUrlStore.get(0)).thenReturn("http://nglab.org");
         HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
         when(mockHttpURLConnection.getResponseCode()).thenReturn(0);
-        doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL) any());
+        doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL)any());
         requestProcessor.run();
         // two times, first one returns the urlstring, second one is empty
         verify(requestUrlStore, times(1)).get(anyInt());

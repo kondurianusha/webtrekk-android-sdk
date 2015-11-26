@@ -9,9 +9,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.MediaController;
 
-import com.webtrekk.webbtrekksdk.TrackingParameter;
-import com.webtrekk.webbtrekksdk.Webtrekk;
-import com.webtrekk.webbtrekksdk.WebtrekkApplication;
+import com.webtrekk.webtrekksdk.TrackingParameter;
+import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Webtrekk;
+import com.webtrekk.webtrekksdk.WebtrekkApplication;
 
 public class MediaExampleActivity extends ActionBarActivity {
     private TrackedVideoView myVideoView;
@@ -35,7 +36,7 @@ public class MediaExampleActivity extends ActionBarActivity {
         try {
             myVideoView.setMediaController(mediaControls);
             mediaControls.setAnchorView(myVideoView);
-            myVideoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.marv3));
+            myVideoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.wt));
 
         } catch (Exception e) {
             Log.e("Error", e.getMessage());

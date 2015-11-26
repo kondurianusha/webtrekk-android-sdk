@@ -2,6 +2,7 @@ package test.myapplication;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,7 +21,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
-public class MediaActivity extends ActionBarActivity {
+public class MediaActivity extends AppCompatActivity {
     private static final int MEDIA_LENGTH = 360;
 
     SeekBar playProgressBar;
@@ -31,7 +32,7 @@ public class MediaActivity extends ActionBarActivity {
     private ScheduledExecutorService timerService;
 
     int getCurrentPlayProgress() {
-        return (int) (MEDIA_LENGTH * (this.playProgressBar.getProgress() / 100.0) * 1000);
+        return (int) (MEDIA_LENGTH * (this.playProgressBar.getProgress() / 100.0));
     }
 
     public void initMediaTracking() {

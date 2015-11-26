@@ -6,4 +6,5 @@
     <string name="title_activity_page_example_acitivity">PageExampleAcitivity</string>
     <string name="title_activity_shop_example">ShopExampleActivity</string>
     <string name="title_activity_media">MediaActivity</string>
+    <string name="loading_video">loading video</string>
 </resources>

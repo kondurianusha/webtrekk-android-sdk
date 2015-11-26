@@ -117,7 +117,7 @@ public class Webtrekk {
             throw new IllegalArgumentException("no valid app");
         }
         initAutoTracking(app);
-        initWebtrekk(app);
+        initWebtrekk(app.getApplicationContext());
     }
 
 

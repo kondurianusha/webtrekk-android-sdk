@@ -27,10 +27,10 @@ public class TrackedVideoView extends VideoView {
     }
     public void initMediaFile() {
         tp = new TrackingParameter();
-        tp.add(TrackingParameter.Parameter.MEDIA_FILE, getResources().getResourceEntryName(R.raw.marv3));
+        tp.add(TrackingParameter.Parameter.MEDIA_FILE, getResources().getResourceEntryName(R.raw.wt));
         tp.add(TrackingParameter.Parameter.MEDIA_LENGTH, String.valueOf(getDuration()));
-        tp.add(TrackingParameter.Parameter.MEDIA_POS, String.valueOf(getCurrentPosition()));
-        tp.add(TrackingParameter.Parameter.MEDIA_CAT, "1", "mp3");
+        tp.add(TrackingParameter.Parameter.MEDIA_POS, String.valueOf(getCurrentPosition()/1000));
+        tp.add(TrackingParameter.Parameter.MEDIA_CAT, "1", "mp4");
         tp.add(TrackingParameter.Parameter.MEDIA_CAT, "1", "example");
     }
 
@@ -38,7 +38,7 @@ public class TrackedVideoView extends VideoView {
     public void pause() {
         super.pause();
         tp.add(TrackingParameter.Parameter.MEDIA_ACTION, "pause");
-        tp.add(TrackingParameter.Parameter.MEDIA_POS, String.valueOf(getCurrentPosition()));
+        tp.add(TrackingParameter.Parameter.MEDIA_POS, String.valueOf(getCurrentPosition()/1000));
         webtrekk.track(tp);
     }
 
@@ -46,7 +46,7 @@ public class TrackedVideoView extends VideoView {
     public void start() {
         super.start();
         tp.add(TrackingParameter.Parameter.MEDIA_ACTION, "start");
-        tp.add(TrackingParameter.Parameter.MEDIA_POS, String.valueOf(getCurrentPosition()));
+        tp.add(TrackingParameter.Parameter.MEDIA_POS, String.valueOf(getCurrentPosition()/1000));
         webtrekk.track(tp);
     }
 
@@ -54,14 +54,15 @@ public class TrackedVideoView extends VideoView {
     public void seekTo(int msec) {
         super.seekTo(msec);
         tp.add(TrackingParameter.Parameter.MEDIA_ACTION, "seek");
-        tp.add(TrackingParameter.Parameter.MEDIA_POS, String.valueOf(msec));
+        int sec = msec/1000;
+        tp.add(TrackingParameter.Parameter.MEDIA_POS, String.valueOf(sec));
         webtrekk.track(tp);
     }
 
     @Override
     public void stopPlayback() {
         super.stopPlayback();
-        tp.add(TrackingParameter.Parameter.MEDIA_POS, String.valueOf(getCurrentPosition()));
+        tp.add(TrackingParameter.Parameter.MEDIA_POS, String.valueOf(getCurrentPosition()/1000));
         tp.add(TrackingParameter.Parameter.MEDIA_ACTION, "stop");
         webtrekk.track(tp);
     }

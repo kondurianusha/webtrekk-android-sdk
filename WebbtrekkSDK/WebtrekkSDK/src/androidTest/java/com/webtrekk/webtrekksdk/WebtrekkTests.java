@@ -8,6 +8,8 @@ import android.test.suitebuilder.annotation.Suppress;
 import static org.mockito.Mockito.*;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 
+import java.util.HashMap;
+
 
 public class WebtrekkTests extends AndroidTestCase {
 
@@ -338,12 +340,46 @@ public class WebtrekkTests extends AndroidTestCase {
         assertTrue("url string does not contain value: " + tr.getUrlString(), tr.getUrlString().contains("&cb4=testecomparam"));
     }
 
-
+    /**
+     * make sure that an activity only gets tracked when auto tracking is enabled globally or for the specific application
+     */
     public void testAutoTrackSettings() {
 
+        TrackingConfiguration configuration = new TrackingConfiguration();
+        // auto tracking globally enabled
+        configuration.setAutoTracked(true);
+
+
+
+        // auto tracking true
+        ActivityConfiguration act1 = new ActivityConfiguration("act1", "mapping.act1", true, new TrackingParameter());
+        // auto tracking false just for this activity
+        ActivityConfiguration act2 = new ActivityConfiguration("act2", "mapping.act2", false, new TrackingParameter());
+        HashMap<String, ActivityConfiguration> actConfigurations = new HashMap<>();
+        actConfigurations.put("act1", act1);
+        actConfigurations.put("act2", act2);
+        configuration.setActivityConfigurations(actConfigurations);
+
+        webtrekk.setTrackingConfiguration(configuration);
+
+        Webtrekk webtrekkSpy = spy(webtrekk);
+        doNothing().when(webtrekkSpy).track();
+
+        webtrekkSpy.setCurrentActivityName("act1");
+        webtrekkSpy.autoTrackActivity();
+
+        verify(webtrekkSpy, times(1)).track();
+
+        // make sure track is not called when the activity overrides the global autotracking settings
+        // so times is still 1
+        webtrekkSpy.setCurrentActivityName("act2");
+        webtrekkSpy.autoTrackActivity();
+
+        verify(webtrekkSpy, times(1)).track();
+
+
+
+
     }
 
-    public void testActivityNameOverride() {
-
-    }
 }

@@ -46,6 +46,7 @@ public class RequestUrlStoreTests extends AndroidTestCase {
         assertEquals(100, requestUrlStore.size());
         // make sure the oldest requests gets dropped when more than maxrequest urls are added
         requestUrlStore.add("url-101");
+        assertEquals(100, requestUrlStore.size());
         // the first is now url-2, url-1 got dropped
         assertEquals("url-2", requestUrlStore.get(0));
 

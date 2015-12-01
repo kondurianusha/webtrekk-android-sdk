@@ -88,7 +88,7 @@ public class TrackingConfigurationDownloadTaskTest extends InstrumentationTestCa
         webtrekk = spy(webtrekk);
         String config = "<webtrekkConfiguration>\n" +
                 "    <!--the version number for this configuration file -->\n" +
-                "    <version>2</version></webtrekkConfiguration>";
+                "    <version>2</version><trackDomain>http://trackingtest.nglab.org</trackDomain><trackId>12345</trackId></webtrekkConfiguration>";
         doReturn(config).when(task).getXmlFromUrl(anyString());
         try {
             task.execute("http://nglab.org/config.xml");
@@ -100,6 +100,8 @@ public class TrackingConfigurationDownloadTaskTest extends InstrumentationTestCa
 
         // make sure that no new tracking configuration is set
         //verify(webtrekk, times(0)).setTrackingConfiguration((TrackingConfiguration)any());
+        assertEquals("1111111111112", webtrekk.getTrackId());
+        assertEquals("http://trackingtest.nglab.org", webtrekk.getTrackDomain());
     }
 
     /**

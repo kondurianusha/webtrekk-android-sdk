@@ -38,6 +38,8 @@ public class TrackingRequestTests extends AndroidTestCase {
 
         // for all tests just start with an tmpy list of parameters
         webtrekk.initAutoCustomParameter();
+        webtrekk.setOptout(false);
+        webtrekk.setIsSampling(false);
 
 
         auto_tracked_values = new HashMap<>();
@@ -251,7 +253,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         tp.add(Parameter.ECOM, "100", "screenOrientation");
         TrackingRequest tr = webtrekk.createTrackingRequest(tp);
         String url = tr.getUrlString();
-        assertTrue(url, url.contains("cb100=portrait"));
+        assertTrue(url, url.contains("cb100=portrait") || url.contains("cb100=landscape"));
     }
 
     public void testAutoTrackConnectionType() {
@@ -259,7 +261,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         tp.add(Parameter.ECOM, "100", "connectionType");
         TrackingRequest tr = webtrekk.createTrackingRequest(tp);
         String url = tr.getUrlString();
-        assertTrue(url, url.contains("cb100=WIFI"));
+        assertTrue(url, url.contains("cb100=WIFI") || url.contains("cb100=offline")|| url.contains("cb100=3G")|| url.contains("cb100=4G"));
     }
 
     public void testAutoTrackPlaystoreUsername() {
@@ -311,7 +313,30 @@ public class TrackingRequestTests extends AndroidTestCase {
 
     }
 
+    public void testUserAgent() {
+        Webtrekk wt = new Webtrekk();
+        wt.setContext(getContext());
+        wt.setTrackingConfiguration(trackingConfiguration);
+        wt.initWebtrekkParameter();
+        TrackingParameter tp = new TrackingParameter();
+        TrackingRequest tr = wt.createTrackingRequest(tp);
+        assertTrue(tr.trackingParameter.getDefaultParameter().containsKey(Parameter.USERAGENT));
+        String url = tr.getUrlString();
+        assertTrue(url, url.contains("X-WT-UA"));
+    }
 
-
+    public void testActivityNameOverride() {
+        Webtrekk wt = new Webtrekk();
+        wt.setCurrentActivityName("autotrackname");
+        wt.setContext(getContext());
+        wt.setTrackingConfiguration(trackingConfiguration);
+        wt.initWebtrekkParameter();
+        TrackingParameter tp = new TrackingParameter();
+        tp.add(Parameter.ACTION_NAME, "customname");
+        TrackingRequest tr = wt.createTrackingRequest(tp);
+        assertTrue(tr.trackingParameter.getDefaultParameter().containsKey(Parameter.ACTION_NAME));
+        String url = tr.getUrlString();
+        assertTrue(url, url.contains("customname"));
+    }
 
 }

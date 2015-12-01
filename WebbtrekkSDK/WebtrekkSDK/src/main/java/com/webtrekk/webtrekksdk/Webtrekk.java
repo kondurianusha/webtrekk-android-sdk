@@ -484,15 +484,18 @@ public class Webtrekk {
      */
     void updateDynamicParameter() {
         // put the screen orientation to into the custom parameter, will change with every request
-        autoCustomParameter.put("screenOrientation", HelperFunctions.getOrientation(context));
-        autoCustomParameter.put("connectionType", HelperFunctions.getConnectionString(context));
+        if(autoCustomParameter != null) {
+            autoCustomParameter.put("screenOrientation", HelperFunctions.getOrientation(context));
+            autoCustomParameter.put("connectionType", HelperFunctions.getConnectionString(context));
+        }
+
         if(requestUrlStore != null) {
             autoCustomParameter.put("requestUrlStoreSize", String.valueOf(requestUrlStore.size()));
         }
-
-        // also update the webtrekk parameter
-        webtrekkParameter.put(Parameter.SCREEN_RESOLUTION, HelperFunctions.getResolution(context));
-
+        if(webtrekkParameter != null) {
+            // also update the webtrekk parameter
+            webtrekkParameter.put(Parameter.SCREEN_RESOLUTION, HelperFunctions.getResolution(context));
+        }
     }
 
 
@@ -581,7 +584,7 @@ public class Webtrekk {
     /**
      * this method gets called when auto tracking is enabled and one of the lifycycle methods is called
      */
-    void autoTrackActivity() {
+    public void autoTrackActivity() {
         // only track if auto tracking is enabled for that activity
         // the default value and the activities autoTracked value is based on the global xml settings
         boolean autoTrack = trackingConfiguration.isAutoTracked();
@@ -591,23 +594,6 @@ public class Webtrekk {
         if(autoTrack) {
             track();
         }
-
-//        TrackingParameter tp = new TrackingParameter();
-//        tp.add(webtrekkParameter);
-//        tp.add(TrackingParameter.Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
-//        tp.add(TrackingParameter.Parameter.ACTIVITY_NAME, currentActivityName);
-//        TrackingRequest request;
-//
-//        // apply mapping
-//        if(trackingConfiguration.getActivityConfigurations().containsKey(currentActivityName)) {
-//            TrackingConfiguration.ActivityConfiguration actConfig = trackingConfiguration.getActivityConfigurations().get(currentActivityName);
-//            // this activity is not configured
-//            //TODO: this basicly makes autoTrack obsolete
-//            tp.add(TrackingParameter.Parameter.ACTIVITY_NAME, actConfig.getMappingName());
-//        }
-//
-//        request = new TrackingRequest(tp, trackingConfiguration);
-//        addRequest(request);
     }
 
     /**
@@ -704,8 +690,11 @@ public class Webtrekk {
         //last step add the internal parameter
         trackingParameter.add(internalParameter);
         //now map the string values from the xml/code tracking parameters to the custom values defined by webtrekk or the customer
-        customParameter.putAll(autoCustomParameter);
-        trackingParameter.applyMapping(customParameter);
+        if(customParameter!= null) {
+            customParameter.putAll(autoCustomParameter);
+            trackingParameter.applyMapping(customParameter);
+        }
+
 
         return new TrackingRequest(trackingParameter, trackingConfiguration);
 
@@ -960,6 +949,7 @@ public class Webtrekk {
     public String getTrackDomain() { return trackingConfiguration.getTrackDomain(); }
     public String getTrackId() { return trackingConfiguration.getTrackId(); }
     public int getSampling() { return trackingConfiguration.getSampling(); }
+    public void setIsSampling(boolean isSampling ) { this.isSampling = isSampling; }
     public int getSendDelay() { return trackingConfiguration.getSendDelay(); }
     public int getResendOnStartEventTime() { return trackingConfiguration.getResendOnStartEventTime(); }
     public int getMaxRequests() { return trackingConfiguration.getMaxRequests(); }

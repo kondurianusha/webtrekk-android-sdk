@@ -70,11 +70,13 @@ public class HelperFunctionsTest extends AndroidTestCase {
     }
 
     public void testGetOrientation() {
-        assertEquals("portrait", HelperFunctions.getOrientation(getContext()));
+        String orientation = HelperFunctions.getOrientation(getContext());
+        assertTrue(orientation.equals("portrait") || orientation.equals("landscape"));
     }
 
     public void testGetConnectionString() {
-        assertEquals("WIFI", HelperFunctions.getConnectionString(getContext()));
+        String connection = HelperFunctions.getConnectionString(getContext());
+        assertTrue(connection.equals("WIFI") || connection.equals("offline") || connection.equals("3G")|| connection.equals("4G"));
     }
 
     public void testIsRoaming() {
@@ -82,7 +84,8 @@ public class HelperFunctionsTest extends AndroidTestCase {
     }
 
     public void testUrlEncode() {
-        assertEquals("this+test", HelperFunctions.urlEncode("this test"));
+        String encoded = HelperFunctions.urlEncode("this testüää-17%test.5.4.3-(8)?param=45#asdf");
+        assertEquals(encoded, "this+test%C3%BC%C3%A4%C3%A4-17%25test.5.4.3-%288%29%3Fparam%3D45%23asdf", encoded);
     }
 
     public void testIsNetworkConnection() {

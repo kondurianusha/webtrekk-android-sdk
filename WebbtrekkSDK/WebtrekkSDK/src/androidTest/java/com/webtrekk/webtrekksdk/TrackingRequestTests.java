@@ -199,6 +199,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         TrackingRequest tr = webtrekk.createTrackingRequest(tp);
         String url = tr.getUrlString();
         assertTrue(url, url.contains("cb100="));
+        assertNotNull(webtrekk.getCustomParameter().get("advertiserId"));
         assertTrue(webtrekk.getCustomParameter().get("advertiserId").length() > 10);
         assertTrue(url, url.contains("cb200=false"));
     }
@@ -310,6 +311,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         assertFalse(url, url.contains("cb1=test1"));
         assertTrue(url, url.contains("cb2=test2"));
         assertTrue(url, url.contains("OrderButton"));
+        assertTrue(url, url.contains("X-WT-UA"));
 
     }
 

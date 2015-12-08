@@ -651,6 +651,7 @@ public class Webtrekk {
             //when its an action only resolution and depth are neccesary
             trackingParameter.add(Parameter.SCREEN_RESOLUTION, webtrekkParameter.get(Parameter.SCREEN_RESOLUTION));
             trackingParameter.add(Parameter.SCREEN_DEPTH, webtrekkParameter.get(Parameter.SCREEN_DEPTH));
+            trackingParameter.add(Parameter.USERAGENT, webtrekkParameter.get(Parameter.USERAGENT));
             trackingParameter.add(tp);
             return new TrackingRequest(trackingParameter, trackingConfiguration);
         }

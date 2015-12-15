@@ -1,5 +1,6 @@
 package test.myapplication;
 
+import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,6 +11,9 @@ import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
+import java.io.OutputStream;
+import java.net.URLDecoder;
+
 
 public class ShopExampleActivity extends ActionBarActivity {
     private Webtrekk webtrekk;
@@ -19,29 +23,13 @@ public class ShopExampleActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop_example);
-        webtrekk = Webtrekk.getInstance();
-        webtrekk.track();
+
         tp = new TrackingParameter();
-        tp.add(Parameter.PRODUCT, "Brauner Herrenschuh Leder: Mike")
-                .add(Parameter.PRODUCT_CAT, "1", "testParameter")
-                .add(Parameter.PRODUCT_CAT, "2", "Schuhe")
-                .add(Parameter.PRODUCT_CAT, "3", "Leder")
-                .add(Parameter.PRODUCT_COUNT, "1")
-                .add(Parameter.PRODUCT_COST, "99,95")
-                .add(Parameter.PRODUCT_STATUS, "view")
-                .add(Parameter.CURRENCY, "EUR");
-        tp.add(Parameter.ECOM, "1", "test");
-        webtrekk.track(tp);
-
-
-        //webtrekk.getCustomParameter().put("testParameter", myapplication.getProduct());
-
+        webtrekk = Webtrekk.getInstance();
     }
     @Override
-    public void onStart()
-    {
+    public void onStart() {
         super.onStart();
-        webtrekk.track();
     }
 
     @Override
@@ -73,9 +61,19 @@ public class ShopExampleActivity extends ActionBarActivity {
     }
 
     public void onButtonOrderClicked(View view) {
-        TrackingParameter buttonParameter = new TrackingParameter();
-        buttonParameter.add(Parameter.PRODUCT_STATUS, "add")
-        .add(Parameter.ACTION_NAME, "orderButton");
-        webtrekk.track(buttonParameter);
+//        TrackingParameter buttonParameter = new TrackingParameter();
+//        buttonParameter.add(Parameter.PRODUCT_STATUS, "add")
+//        .add(Parameter.ACTION_NAME, "orderButton");
+//        webtrekk.track(buttonParameter);
+
+        try {
+            OutputStream output = this.getApplication().getApplicationContext().openFileOutput("webtrekk-referrer-store", Context.MODE_PRIVATE);
+            output.write(URLDecoder.decode("utm_source%3Dgoogle%26utm_medium%3Dcpc%26utm_term%3Drunning%252Bshoes%26utm_content%3DdisplayAd1%26utm_campaign%3Dshoe%252Bcampaign", "UTF-8").getBytes());
+            output.close();
+        }
+        catch (Exception e){}
+
+        webtrekk.track();
+
     }
 }

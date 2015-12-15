@@ -173,6 +173,50 @@ public class Webtrekk {
         initTrackingConfiguration(null);
     }
 
+    private String trackReferrer () {
+        String campaign = "";
+        String content = "";
+        String medium = "";
+        String source = "";
+        String term = "";
+
+        String referrer = ReferrerReceiver.getStoredReferrer(this.context);
+
+        if (referrer == null || referrer.length() == 0) {
+            return "";
+        }
+
+        String[] components = referrer.split("&");
+        for (String component : components) {
+            String parameter[] = component.split("=", 2);
+            if (parameter.length < 2) {
+                continue;
+            }
+
+            String key = HelperFunctions.urlDecode(parameter[0]);
+            String value = HelperFunctions.urlDecode(parameter[1]);
+
+            if ("utm_campaign".equals(key)) {
+                campaign = value;
+            } else if ("utm_content".equals(key)) {
+                content = value;
+            } else if ("utm_medium".equals(key)) {
+                medium = value;
+            } else if ("utm_source".equals(key)) {
+                source = value;
+            } else if ("utm_term".equals(key)) {
+                term = value;
+            }
+        }
+
+        String campaignId = "wt_mc%3D" + HelperFunctions.urlEncode(source + "." + medium + "." + content + "." + campaign);
+        if(!term.isEmpty()) {
+            campaignId += ";wt_kw%3D" + HelperFunctions.urlEncode(term);
+        }
+
+        return campaignId;
+    }
+
     void initInternalParameter() {
         if(internalParameter == null) {
             internalParameter = new TrackingParameter();
@@ -729,6 +773,17 @@ public class Webtrekk {
      * @param request the Tracking Request
      */
     private void addRequest(TrackingRequest request)  {
+
+        // ToDo: its not necessary to check each time for a campaign
+        // ToDo: also we have to implement a campaign tracking like the pixel version
+        String mediaCode = this.trackReferrer();
+        String mediaCodeClient = request.trackingParameter.getDefaultParameter().get(Parameter.ADVERTISEMENT);
+
+        if (!mediaCode.isEmpty() && (mediaCodeClient == null || mediaCodeClient.isEmpty())) {
+            request.trackingParameter.add(Parameter.ADVERTISEMENT, mediaCode);
+            request.trackingParameter.add(Parameter.ADVERTISEMENT_ACTION, "c");
+        }
+
 
         // execute the before plugin functions
         for(Plugin p: plugins){

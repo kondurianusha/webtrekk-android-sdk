@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.webtrekk.webbtrekksdk.R;
+import com.webtrekk.webtrekksdk.R;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 
 /**
@@ -68,6 +68,8 @@ public class Webtrekk {
     // this tracking params allows to add parameters globally to all tracking requests in the configured app
     // this values can also be configured in the xml file and will be overriten by the values configured there
     private TrackingParameter globalTrackingParameter;
+    // same as the globalTrackingParameter but will not be replaced, fixed values can be added from code or xml
+    private TrackingParameter constGlobalTrackingParameter;
 
     //additional customer params, this is a global avaiable hashmap with key, values,
     //before the requests are send the keys here are matched with the keys in the xml configurion or the global/
@@ -157,6 +159,7 @@ public class Webtrekk {
 
 
         this.requestUrlStore = new RequestUrlStore(context, trackingConfiguration.getMaxRequests());
+        constGlobalTrackingParameter = new TrackingParameter();
         globalTrackingParameter = new TrackingParameter();
 
 
@@ -661,25 +664,46 @@ public class Webtrekk {
         // add the default parameter
         trackingParameter.add(webtrekkParameter);
 
+        // add the autotracked custom params to the custom params
+        if(customParameter!= null) {
+            customParameter.putAll(autoCustomParameter);
+        }
+
 
         // first add the globally configured trackingparams which are defined in the webtrekk.globalTrackingParameter, if there are any
-        if(globalTrackingParameter != null) {
+        if(constGlobalTrackingParameter != null) {
+            trackingParameter.add(constGlobalTrackingParameter);
+        }
+        //now map the string values from the xml/code tracking parameters to the custom values defined by webtrekk or the customer
+        if(customParameter!= null && globalTrackingParameter != null) {
+            // first map the global tracking parameter
+            globalTrackingParameter.applyMapping(customParameter);
             trackingParameter.add(globalTrackingParameter);
         }
         // second add the globally configured trackingparams from the xml which may override the ones above
-        if(trackingConfiguration.getGlobalTrackingParameter() != null) {
-            trackingParameter.add(trackingConfiguration.getGlobalTrackingParameter());
+        if(trackingConfiguration.getConstGlobalTrackingParameter() != null) {
+            trackingParameter.add(trackingConfiguration.getConstGlobalTrackingParameter());
         }
 
         // third add the local ones from the activity which may override all of the above params, this are passed from the track call
         trackingParameter.add(tp);
+
         //forth add the local ones which each activity has defined in its xml configuration, they will override the ones above
         //TODO: make this better code, basicly check that the activity has params configured
         if(trackingConfiguration.getActivityConfigurations()!= null && trackingConfiguration.getActivityConfigurations().containsKey(currentActivityName)){
             ActivityConfiguration activityConfiguration = trackingConfiguration.getActivityConfigurations().get(currentActivityName);
             if(activityConfiguration != null) {
-                if(activityConfiguration.getActivityTrackingParameter() != null) {
-                    trackingParameter.add(activityConfiguration.getActivityTrackingParameter());
+                if(activityConfiguration.getConstActivityTrackingParameter() != null) {
+                    trackingParameter.add(activityConfiguration.getConstActivityTrackingParameter());
+                }
+                TrackingParameter mappedTrackingParameter = activityConfiguration.getActivityTrackingParameter();
+                if( mappedTrackingParameter != null) {
+                    //now map the string values from the xml/code tracking parameters to the custom values defined by webtrekk or the customer
+                    if(customParameter!= null) {
+                        // first map the global tracking parameter
+                        mappedTrackingParameter.applyMapping(customParameter);
+                        trackingParameter.add(mappedTrackingParameter);
+                    }
                 }
                 // override the activityname if a mapping name is given
                 if(activityConfiguration.getMappingName() != null) {
@@ -690,11 +714,7 @@ public class Webtrekk {
 
         //last step add the internal parameter
         trackingParameter.add(internalParameter);
-        //now map the string values from the xml/code tracking parameters to the custom values defined by webtrekk or the customer
-        if(customParameter!= null) {
-            customParameter.putAll(autoCustomParameter);
-            trackingParameter.applyMapping(customParameter);
-        }
+
 
 
         return new TrackingRequest(trackingParameter, trackingConfiguration);
@@ -846,6 +866,14 @@ public class Webtrekk {
 
     public void setGlobalTrackingParameter(TrackingParameter globalTrackingParameter) {
         this.globalTrackingParameter = globalTrackingParameter;
+    }
+
+    public TrackingParameter getConstGlobalTrackingParameter() {
+        return constGlobalTrackingParameter;
+    }
+
+    public void setConstGlobalTrackingParameter(TrackingParameter constGlobalTrackingParameter) {
+        this.constGlobalTrackingParameter = constGlobalTrackingParameter;
     }
 
     /**

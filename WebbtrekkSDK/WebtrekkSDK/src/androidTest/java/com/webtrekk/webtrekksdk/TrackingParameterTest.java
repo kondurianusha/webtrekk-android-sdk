@@ -93,6 +93,11 @@ public class TrackingParameterTest extends AndroidTestCase {
         assertEquals(tp.getSessionParameter().get("1"), "123x456");
         assertEquals(tp.getUserCategories().get("1"), "123x456");
         assertEquals(tp.getPageParameter().get("1"), "123x456");
+
+        // test no mapping value defined, return empty string
+        customParameter.clear();
+        tp.applyMapping(customParameter);
+        assertEquals(tp.getPageParameter().get("1"), "");
     }
 
 }

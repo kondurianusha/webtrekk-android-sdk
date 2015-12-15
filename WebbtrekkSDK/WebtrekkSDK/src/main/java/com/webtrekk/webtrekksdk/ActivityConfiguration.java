@@ -8,12 +8,17 @@ class ActivityConfiguration {
     private String mappingName;
     private boolean isAutoTrack;
     private TrackingParameter activityTrackingParameter;
+    private TrackingParameter constActivityTrackingParameter;
 
-    public ActivityConfiguration(String className, String mappingName, boolean isAutoTrack, TrackingParameter tp) {
+    public ActivityConfiguration() {
+    }
+
+    public ActivityConfiguration(String className, String mappingName, boolean isAutoTrack, TrackingParameter tp, TrackingParameter constTp) {
         this.className = className;
         this.mappingName = mappingName;
         this.isAutoTrack = isAutoTrack;
         this.activityTrackingParameter = tp;
+        this.constActivityTrackingParameter = constTp;
     }
 
     public String getClassName() {
@@ -46,5 +51,13 @@ class ActivityConfiguration {
 
     public void setActivityTrackingParameter(TrackingParameter activityTrackingParameter) {
         this.activityTrackingParameter = activityTrackingParameter;
+    }
+
+    public TrackingParameter getConstActivityTrackingParameter() {
+        return constActivityTrackingParameter;
+    }
+
+    public void setConstActivityTrackingParameter(TrackingParameter constActivityTrackingParameter) {
+        this.constActivityTrackingParameter = constActivityTrackingParameter;
     }
 }

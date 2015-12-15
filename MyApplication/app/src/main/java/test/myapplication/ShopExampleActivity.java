@@ -16,6 +16,7 @@ import java.net.URLDecoder;
 
 
 public class ShopExampleActivity extends ActionBarActivity {
+
     private Webtrekk webtrekk;
     TrackingParameter tp;
 
@@ -24,17 +25,17 @@ public class ShopExampleActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop_example);
 
-        tp = new TrackingParameter();
         webtrekk = Webtrekk.getInstance();
+        tp = new TrackingParameter();
     }
+
     @Override
     public void onStart() {
         super.onStart();
     }
 
     @Override
-    public void onStop()
-    {
+    public void onStop() {
         super.onStop();
     }
 
@@ -73,7 +74,9 @@ public class ShopExampleActivity extends ActionBarActivity {
         }
         catch (Exception e){}
 
-        webtrekk.track();
+        tp.add(Parameter.ACTION, "action");
+        tp.add(Parameter.ACTION_NAME, "action-name");
 
+        webtrekk.track();
     }
 }

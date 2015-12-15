@@ -24,7 +24,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.google.android.gms:play-services:8.1.0'
     compile(name:'WebtrekkSDK-release', ext:'aar')
-    //compile files('libs/wtracksdk.jar')
 }
 
 repositories{

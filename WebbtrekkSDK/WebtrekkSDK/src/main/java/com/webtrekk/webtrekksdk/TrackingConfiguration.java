@@ -50,6 +50,8 @@ class TrackingConfiguration {
 
     // global trackingparameter xml values
     private TrackingParameter globalTrackingParameter;
+    //global contant trackingparameter
+    private TrackingParameter constGlobalTrackingParameter;
 
     private Map<String, ActivityConfiguration> activityConfigurations;
 
@@ -58,7 +60,7 @@ class TrackingConfiguration {
 
     public TrackingConfiguration() {
         activityConfigurations = new HashMap<>();
-
+        customParameter = new HashMap<>();
     }
 
     /**
@@ -334,5 +336,13 @@ class TrackingConfiguration {
 
     public void setCustomParameter(Map<String, String> customParameter) {
         this.customParameter = customParameter;
+    }
+
+    public TrackingParameter getConstGlobalTrackingParameter() {
+        return constGlobalTrackingParameter;
+    }
+
+    public void setConstGlobalTrackingParameter(TrackingParameter constGlobalTrackingParameter) {
+        this.constGlobalTrackingParameter = constGlobalTrackingParameter;
     }
 }

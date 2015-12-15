@@ -2,8 +2,8 @@ package com.webtrekk.webtrekksdk;
 
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.Suppress;
+import android.util.Log;
 
-import com.webtrekk.webbtrekksdk.R;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -67,7 +67,7 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        assertEquals(0,  config.getSampling());
+        assertEquals(0, config.getSampling());
     }
 
     /**
@@ -135,12 +135,12 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
         } catch (Exception e) {
             android.util.Log.d("WebtrekkSDK", "parsing error", e);
         }
-        assertEquals(2, config.getVersion());
+        assertEquals(3, config.getVersion());
         assertEquals("http://trackingtest.nglab.org", config.getTrackDomain());
         assertEquals("1111111111112", config.getTrackId());
         assertEquals(0, config.getSampling());
-        assertEquals(60, config.getSendDelay());
-        assertEquals(5000, config.getMaxRequests());
+        assertEquals(30, config.getSendDelay());
+        assertEquals(4000, config.getMaxRequests());
 
         assertEquals(true, config.isAutoTracked());
         assertEquals(true, config.isAutoTrackAppUpdate());
@@ -152,13 +152,13 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
         assertEquals(true, config.isAutoTrackPlaystoreMail());
         assertEquals(true, config.isAutoTrackPlaystoreGivenName());
         assertEquals(true, config.isAutoTrackPlaystoreFamilyName());
-        assertEquals(true, config.isAutoTrackApiLevel());
+        assertEquals(false, config.isAutoTrackApiLevel());
         assertEquals(true, config.isAutoTrackScreenorientation());
         assertEquals(true, config.isAutoTrackConnectionType());
         assertEquals(true, config.isAutoTrackAdvertismentOptOut());
 
         assertEquals(false, config.isEnableRemoteConfiguration());
-        assertEquals("http://localhost/tracking_config.xml", config.getTrackingConfigurationUrl());
+        assertEquals("http://remotehost/tracking_config.xml", config.getTrackingConfigurationUrl());
         assertEquals(true, config.isAutoTrackRequestUrlStoreSize());
         assertEquals(30, config.getResendOnStartEventTime());
 
@@ -170,9 +170,9 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
             String trackingConfigurationString = HelperFunctions.stringFromStream(getContext().getResources().openRawResource(R.raw.webtrekk_config));
             config = trackingConfigurationXmlParser.parse(trackingConfigurationString);
         } catch (Exception e) {
-            android.util.Log.d("WebtrekkSDK", "parsing error", e);
+            Log.d("WebtrekkSDK", "parsing error", e);
         }
-        TrackingParameter tp = config.getGlobalTrackingParameter();
+        TrackingParameter tp = config.getConstGlobalTrackingParameter();
         assertNotNull(tp);
         assertEquals("test_product", tp.getDefaultParameter().get(Parameter.PRODUCT));
         assertEquals("443", tp.getDefaultParameter().get(Parameter.PRODUCT_COST));
@@ -233,12 +233,12 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
         }
         assertNotNull(config.getActivityConfigurations());
         assertEquals(1, config.getActivityConfigurations().size());
-        assertTrue(config.getActivityConfigurations().containsKey("MainActivity"));
-        ActivityConfiguration act = config.getActivityConfigurations().get("MainActivity");
+        assertTrue(config.getActivityConfigurations().containsKey("test.myapplication.MainActivity"));
+        ActivityConfiguration act = config.getActivityConfigurations().get("test.myapplication.MainActivity");
         assertNotNull(act);
         assertEquals(act.getMappingName(), "Startseite");
         assertEquals(act.isAutoTrack(), true);
-        TrackingParameter tp = act.getActivityTrackingParameter();
+        TrackingParameter tp = act.getConstActivityTrackingParameter();
 
         // check if all parameter maps have been initialized
         assertNotNull(tp.getPageParameter());
@@ -264,7 +264,13 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
         assertEquals("test_actionparam1", tp.getActionParameter().get("1"));
         assertEquals("test_productcategory1", tp.getProductCategories().get("1"));
         assertEquals("test_mediacategory1", tp.getMediaCategories().get("1"));
+
+        // check for the mapped values
+        TrackingParameter mappedTp = act.getActivityTrackingParameter();
+        assertEquals("mediacategory_from_app", mappedTp.getMediaCategories().get("1"));
     }
+
+
 
 
     public void testParseInvalidXML() {

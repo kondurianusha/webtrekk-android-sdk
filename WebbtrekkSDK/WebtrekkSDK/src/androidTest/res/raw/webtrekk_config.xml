@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <webtrekkConfiguration>
     <!--the version number for this configuration file -->
-    <version>2</version>
+    <version>3</version>
     <!--the webtrekk trackDomain where the requests are send -->
     <trackDomain type="text">http://trackingtest.nglab.org</trackDomain>
     <!--customers trackid -->
@@ -9,9 +9,9 @@
     <!-- measure only a subset of the users -->
     <sampling type="text">0</sampling>
     <!-- interval between the requests are send in seconds -->
-    <sendDelay type="text">60</sendDelay>
+    <sendDelay type="text">30</sendDelay>
     <!--maximum amoount of requests to store when the user is offline -->
-    <maxRequests type="number">5000</maxRequests>
+    <maxRequests type="number">4000</maxRequests>
 
     <!--optional settings -->
     <!--automaticly track activities onStart method -->
@@ -37,7 +37,7 @@
     <!--track the playstore family name, requires special permissions! -->
     <autoTrackPlaystoreFamilyName>true</autoTrackPlaystoreFamilyName>
     <!--track the supported api level of the device, requires special permissions! -->
-    <autoTrackApiLevel>true</autoTrackApiLevel>
+    <autoTrackApiLevel>false</autoTrackApiLevel>
     <!--track the devices screen orientation -->
     <autoTrackScreenOrientation>true</autoTrackScreenOrientation>
     <!--track the current connection type -->
@@ -47,52 +47,53 @@
 
 
     <!--enable the hello world plugin functions -->
-    <enablePluginHelloWorld>true</enablePluginHelloWorld>
+    <enablePluginHelloWorld>false</enablePluginHelloWorld>
     <!--enables the remote xml configuration -->
     <enableRemoteConfiguration>false</enableRemoteConfiguration>
     <!--url of the remote configuration -->
-    <trackingConfigurationUrl>http://localhost/tracking_config.xml</trackingConfigurationUrl>
+    <trackingConfigurationUrl>http://remotehost/tracking_config.xml</trackingConfigurationUrl>
     <!--sends the size of the current locally stored urls in a custom parameter -->
-    <autoTrackRequestUrlStoreSize>true</autoTrackRequestUrlStoreSize>
+    <sendRequestUrlStoreSize>true</sendRequestUrlStoreSize>
     <!--resend onStart time, this is the timeout for auto tracked sessions in case an activity was paused -->
     <resendOnStartEventTime>30</resendOnStartEventTime>
+
 
 
     <!--global tracking parameter -->
     <globalTrackingParameter>
         <!--define global tracking parameter which are send with every request, the key has to match a valid parameter name!
         entries made here are available as default parameters in the trackingparameter instance -->
-        <parameter key="PRODUCT" value="test_product"></parameter>
-        <parameter key="PRODUCT_COST" value="443"></parameter>
+        <parameter id="PRODUCT">test_product</parameter>
+        <parameter id="PRODUCT_COST">443</parameter>
         <!--define the global page parameter, the key is the index,  -->
         <pageParameter>
-            <parameter key="1" value="test_pageparam1"></parameter>
-            <parameter key="2" value="test_pageparam2"></parameter>
-            <parameter key="3" value="test_pageparam3"></parameter>
+            <parameter id="1">test_pageparam1</parameter>
+            <parameter id="2">test_pageparam2</parameter>
+            <parameter id="3">test_pageparam3</parameter>
         </pageParameter>
         <sessionParameter>
-            <parameter key="1" value="test_sessionparam1"></parameter>
+            <parameter id="1">test_sessionparam1</parameter>
         </sessionParameter>
         <ecomParameter>
-            <parameter key="1" value="test_ecomparam1"></parameter>
+            <parameter id="1">test_ecomparam1</parameter>
         </ecomParameter>
         <userCategories>
-            <parameter key="1" value="test_usercategory1"></parameter>
+            <parameter id="1">test_usercategory1</parameter>
         </userCategories>
         <pageCategories>
-            <parameter key="1" value="test_pagecategory1"></parameter>
+            <parameter id="1">test_pagecategory1</parameter>
         </pageCategories>
         <adParameter>
-            <parameter key="1" value="test_adparam"></parameter>
+            <parameter id="1">test_adparam</parameter>
         </adParameter>
         <actionParameter>
-            <parameter key="1" value="test_actionparam1"></parameter>
+            <parameter id="1">test_actionparam1</parameter>
         </actionParameter>
         <productCategories>
-            <parameter key="1" value="test_productcategory1"></parameter>
+            <parameter id="1">test_productcategory1</parameter>
         </productCategories>
         <mediaCategories>
-            <parameter key="1" value="test_mediacategory1"></parameter>
+            <parameter id="1">test_mediacategory1</parameter>
         </mediaCategories>
 
     </globalTrackingParameter>
@@ -101,46 +102,56 @@
 
     <!--activity configurations -->
     <activity>
-        <classname type="text">MainActivity</classname>
+        <classname type="text">test.myapplication.MainActivity</classname>
         <mappingname type="text">Startseite</mappingname>
-        <autoTracked>true</autoTracked>
+        <autoTracked type="text">true</autoTracked>
         <!--activity tracking parameter -->
         <activityTrackingParameter>
             <!--define global tracking parameter which are send with every request, the key has to match a valid parameter name!
             entries made here are available as default parameters in the trackingparameter instance -->
-            <parameter key="PRODUCT" value="test_product"></parameter>
-            <parameter key="PRODUCT_COST" value="443"></parameter>
+            <parameter id="PRODUCT">test_product</parameter>
+            <parameter id="PRODUCT_COST">443</parameter>
             <!--define the global page parameter, the key is the index,  -->
             <pageParameter>
-                <parameter key="1" value="test_pageparam1"></parameter>
-                <parameter key="2" value="test_pageparam2"></parameter>
-                <parameter key="3" value="test_pageparam3"></parameter>
+                <parameter id="1">test_pageparam1</parameter>
+                <parameter id="2">test_pageparam2</parameter>
+                <parameter id="3">test_pageparam3</parameter>
             </pageParameter>
             <sessionParameter>
-                <parameter key="1" value="test_sessionparam1"></parameter>
+                <parameter id="1">test_sessionparam1</parameter>
             </sessionParameter>
             <ecomParameter>
-                <parameter key="1" value="test_ecomparam1"></parameter>
+                <parameter id="1">test_ecomparam1</parameter>
             </ecomParameter>
             <userCategories>
-                <parameter key="1" value="test_usercategory1"></parameter>
+                <parameter id="1">test_usercategory1</parameter>
             </userCategories>
             <pageCategories>
-                <parameter key="1" value="test_pagecategory1"></parameter>
+                <parameter id="1">test_pagecategory1</parameter>
             </pageCategories>
             <adParameter>
-                <parameter key="1" value="test_adparam"></parameter>
+                <parameter id="1">test_adparam</parameter>
             </adParameter>
             <actionParameter>
-                <parameter key="1" value="test_actionparam1"></parameter>
+                <parameter id="1">test_actionparam1</parameter>
             </actionParameter>
             <productCategories>
-                <parameter key="1" value="test_productcategory1"></parameter>
+                <parameter id="1">test_productcategory1</parameter>
             </productCategories>
             <mediaCategories>
-                <parameter key="1" value="test_mediacategory1"></parameter>
+                <parameter id="1">test_mediacategory1</parameter>
+                <parameter id="1" key="mediacategory_from_app"></parameter>
             </mediaCategories>
 
         </activityTrackingParameter>
     </activity>
+
+
+    <!--custom parameter -->
+    <customParameter>
+        <parameter id="test_customer_parameter_key1">value1</parameter>
+        <parameter id="test_customer_parameter_key2">value2</parameter>
+        <parameter id="test_customer_parameter_key3">value3</parameter>
+    </customParameter>
+
 </webtrekkConfiguration>

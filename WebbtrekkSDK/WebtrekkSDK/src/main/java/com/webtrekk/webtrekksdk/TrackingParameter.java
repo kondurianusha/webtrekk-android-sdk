@@ -337,6 +337,9 @@ public class TrackingParameter {
             for (Map.Entry<String, String> entry : original.entrySet()) {
                 if(mappingValues.containsKey(entry.getValue())) {
                     entry.setValue(mappingValues.get(entry.getValue()));
+                } else {
+                    // pass empty string if no mapping value is found in the custom parameter
+                    entry.setValue("");
                 }
             }
         }

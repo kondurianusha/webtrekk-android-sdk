@@ -7,6 +7,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -371,10 +372,16 @@ class TrackingConfigurationXmlParser {
 
             } else if (name.equals("customParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "customParameter");
-                config.setCustomParameter(readParameterConfiguration(parser));
+                //TODO: make sure custom parameters via xml configuration are still neccesary
+                //setParameterConfigurationFromXml(parser, config.getCustomParameter(), config.getCustomParameter());
+                //config.setCustomParameter(setParameterConfigurationFromXml(parser));
             } else if (name.equals("globalTrackingParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "globalTrackingParameter");
-                config.setGlobalTrackingParameter(readTrackingParameterConfiguration(parser));
+                TrackingParameter tp = new TrackingParameter();
+                TrackingParameter constTp = new TrackingParameter();
+                setTrackingParameterFromXml(parser, tp, constTp);
+                config.setGlobalTrackingParameter(tp);
+                config.setConstGlobalTrackingParameter(constTp);
             } else if (name.equals("activity")) {
                 ActivityConfiguration act = readActivityConfiguration(parser, config.isAutoTracked());
                 config.getActivityConfigurations().put(act.getClassName(), act);
@@ -398,7 +405,9 @@ class TrackingConfigurationXmlParser {
         String className = null;
         String mappingName = null;
         boolean isAutoTrack = globalAutoTracked;
-        TrackingParameter trackingParameter = null;
+
+        ActivityConfiguration activityConfiguration = new ActivityConfiguration();
+
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -407,9 +416,11 @@ class TrackingConfigurationXmlParser {
             if (name.equals("classname")) {
                 parser.require(XmlPullParser.START_TAG, ns, "classname");
                 className = readText(parser);
+                activityConfiguration.setClassName(className);
             } else if (name.equals("mappingname")) {
                 parser.require(XmlPullParser.START_TAG, ns, "mappingname");
                 mappingName = readText(parser);
+                activityConfiguration.setMappingName(mappingName);
             } else if (name.equals("autoTracked")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTracked");
                 String autoTracked = readText(parser);
@@ -423,12 +434,17 @@ class TrackingConfigurationXmlParser {
                 if (autoTracked.equals("false")) {
                     isAutoTrack = false;
                 }
+                activityConfiguration.setIsAutoTrack(isAutoTrack);
             } else if (name.equals("activityTrackingParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "activityTrackingParameter");
-                trackingParameter = readTrackingParameterConfiguration(parser);
+                TrackingParameter tp = new TrackingParameter();
+                TrackingParameter constTp = new TrackingParameter();
+                setTrackingParameterFromXml(parser, tp, constTp);
+                activityConfiguration.setActivityTrackingParameter(tp);
+                activityConfiguration.setConstActivityTrackingParameter(constTp);
             }
         }
-        return new ActivityConfiguration(className, mappingName, isAutoTrack, trackingParameter);
+        return activityConfiguration;
     }
 
     /**
@@ -441,8 +457,7 @@ class TrackingConfigurationXmlParser {
      * @throws XmlPullParserException
      * @throws IOException
      */
-    private TrackingParameter readTrackingParameterConfiguration(XmlPullParser parser) throws XmlPullParserException, IOException {
-        TrackingParameter tp = new TrackingParameter();
+    private TrackingParameter setTrackingParameterFromXml(XmlPullParser parser, TrackingParameter tp, TrackingParameter constTp) throws XmlPullParserException, IOException {
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -451,41 +466,56 @@ class TrackingConfigurationXmlParser {
             String name = parser.getName();
             if (name.equals("parameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "parameter");
+                String id = parser.getAttributeValue(ns, "id");
+                //String value = parser.getAttributeValue(ns, "value");
                 String key = parser.getAttributeValue(ns, "key");
-                String value = parser.getAttributeValue(ns, "value");
-                if (key != null && value != null) {
-                    tp.add(Parameter.getParameterByName(key), value);
-                } else {
+                String value = readText(parser);
+                if (id == null || (value == null && key == null)) {
                     WebtrekkLogging.log("invalid parameter configuration while reading customParameter, missing key or value");
+                } else {
+                    Parameter p = Parameter.getParameterByName(id);
+                    if(p == null) {
+                        WebtrekkLogging.log("invalid parameter name: " + id);
+                    } else {
+                        // if no key is set, it is a const value
+                        if(key == null) {
+                            constTp.add(p, value);
+                        } else {
+                            // else its a mapped value which will be replaced at runtime
+                            tp.add(p, value);
+                        }
+                    }
+
                 }
-                parser.nextTag();
+                //parser.nextTag();
+                parser.require(XmlPullParser.END_TAG, ns, "parameter");
             } else if (name.equals("pageParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "pageParameter");
-                tp.setPageParameter(readParameterConfiguration(parser));
+                setParameterConfigurationFromXml(parser, tp.getPageParameter(), constTp.getPageParameter());
             } else if (name.equals("sessionParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "sessionParameter");
-                tp.setSessionParameter(readParameterConfiguration(parser));
+                setParameterConfigurationFromXml(parser, tp.getSessionParameter(), constTp.getSessionParameter());
             } else if (name.equals("ecomParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "ecomParameter");
-                tp.setEcomParameter(readParameterConfiguration(parser));
+                setParameterConfigurationFromXml(parser, tp.getEcomParameter(), constTp.getEcomParameter());
             } else if (name.equals("userCategories")) {
                 parser.require(XmlPullParser.START_TAG, ns, "userCategories");
-                tp.setUserCategories(readParameterConfiguration(parser));
+                setParameterConfigurationFromXml(parser, tp.getUserCategories(), constTp.getUserCategories());
             } else if (name.equals("pageCategories")) {
                 parser.require(XmlPullParser.START_TAG, ns, "pageCategories");
-                tp.setPageCategories(readParameterConfiguration(parser));
+                setParameterConfigurationFromXml(parser, tp.getPageCategories(), constTp.getPageCategories());
             } else if (name.equals("adParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "adParameter");
-                tp.setAdParameter(readParameterConfiguration(parser));
+                setParameterConfigurationFromXml(parser, tp.getAdParameter(), constTp.getAdParameter());
             } else if (name.equals("actionParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "actionParameter");
-                tp.setActionParameter(readParameterConfiguration(parser));
+                setParameterConfigurationFromXml(parser, tp.getActionParameter(), constTp.getActionParameter());
             } else if (name.equals("productCategories")) {
                 parser.require(XmlPullParser.START_TAG, ns, "productCategories");
-                tp.setProductCategories(readParameterConfiguration(parser));
+                setParameterConfigurationFromXml(parser, tp.getProductCategories(), constTp.getProductCategories());
             } else if (name.equals("mediaCategories")) {
                 parser.require(XmlPullParser.START_TAG, ns, "mediaCategories");
-                tp.setMediaCategories(readParameterConfiguration(parser));
+                setParameterConfigurationFromXml(parser, tp.getMediaCategories(), constTp.getMediaCategories());
             }
         }
 
@@ -493,9 +523,7 @@ class TrackingConfigurationXmlParser {
 
     }
 
-    private SortedMap<String, String> readParameterConfiguration(XmlPullParser parser) throws XmlPullParserException, IOException {
-
-        TreeMap<String, String> customParameter = new TreeMap<>();
+    private void setParameterConfigurationFromXml(XmlPullParser parser, Map<String, String> values, Map<String, String> constValues) throws XmlPullParserException, IOException {
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -504,17 +532,27 @@ class TrackingConfigurationXmlParser {
             String name = parser.getName();
             if (name.equals("parameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "parameter");
+                // the id from the parameter identifies the parameter
+                String id = parser.getAttributeValue(ns, "id");
+                // the key is the key in the custom parameter object
                 String key = parser.getAttributeValue(ns, "key");
-                String value = parser.getAttributeValue(ns, "value");
-                if (key != null && value != null) {
-                    customParameter.put(key, value);
-                } else {
+                String value = readText(parser);
+
+                if (id == null || (value == null && key == null)) {
                     WebtrekkLogging.log("invalid parameter configuration while reading customParameter, missing key or value");
+                } else {
+                    // if no key is set, it is a const value
+                    if(key == null) {
+                        constValues.put(id, value);
+                    } else {
+                        // else its a mapped value which will be replaced at runtime
+                        values.put(id, key);
+                        parser.nextTag();
+                    }
                 }
-                parser.nextTag();
+
             }
         }
-        return customParameter;
     }
 
     /**

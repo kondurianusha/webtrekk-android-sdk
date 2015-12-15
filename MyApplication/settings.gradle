@@ -1,1 +1,1 @@
-include ':app', ':wtracksdk-release'
+include ':app'

@@ -29,12 +29,11 @@ public class MainActivity extends ActionBarActivity {
     public void onStart()
     {
         super.onStart();
-        webtrekk.track();
+//        webtrekk.track();
     }
 
     @Override
-    public void onStop()
-    {
+    public void onStop() {
         super.onStop();
     }
 
@@ -45,6 +44,7 @@ public class MainActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

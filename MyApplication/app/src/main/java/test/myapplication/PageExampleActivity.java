@@ -22,15 +22,13 @@ public class PageExampleActivity extends ActionBarActivity {
     }
 
     @Override
-    public void onStart()
-    {
+    public void onStart() {
         super.onStart();
         //webtrekk.startActivity("PageExampleActivity");
     }
 
     @Override
-    public void onStop()
-    {
+    public void onStop() {
         //webtrekk.stopActivity();
         super.onStop();
     }

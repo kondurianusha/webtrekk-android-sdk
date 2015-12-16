@@ -258,6 +258,19 @@ public class TrackingRequest {
         return url.toString();
     }
 
+    public TrackingParameter getTrackingParameter() {
+        return trackingParameter;
+    }
 
+    public void setTrackingParameter(TrackingParameter trackingParameter) {
+        this.trackingParameter = trackingParameter;
+    }
 
+    public TrackingConfiguration getTrackingConfiguration() {
+        return trackingConfiguration;
+    }
+
+    public void setTrackingConfiguration(TrackingConfiguration trackingConfiguration) {
+        this.trackingConfiguration = trackingConfiguration;
+    }
 }

@@ -173,50 +173,6 @@ public class Webtrekk {
         initTrackingConfiguration(null);
     }
 
-    private String trackReferrer () {
-        String campaign = "";
-        String content = "";
-        String medium = "";
-        String source = "";
-        String term = "";
-
-        String referrer = ReferrerReceiver.getStoredReferrer(this.context);
-
-        if (referrer == null || referrer.length() == 0) {
-            return "";
-        }
-
-        String[] components = referrer.split("&");
-        for (String component : components) {
-            String parameter[] = component.split("=", 2);
-            if (parameter.length < 2) {
-                continue;
-            }
-
-            String key = HelperFunctions.urlDecode(parameter[0]);
-            String value = HelperFunctions.urlDecode(parameter[1]);
-
-            if ("utm_campaign".equals(key)) {
-                campaign = value;
-            } else if ("utm_content".equals(key)) {
-                content = value;
-            } else if ("utm_medium".equals(key)) {
-                medium = value;
-            } else if ("utm_source".equals(key)) {
-                source = value;
-            } else if ("utm_term".equals(key)) {
-                term = value;
-            }
-        }
-
-        String campaignId = "wt_mc%3D" + HelperFunctions.urlEncode(source + "." + medium + "." + content + "." + campaign);
-        if(!term.isEmpty()) {
-            campaignId += ";wt_kw%3D" + HelperFunctions.urlEncode(term);
-        }
-
-        return campaignId;
-    }
-
     void initInternalParameter() {
         if(internalParameter == null) {
             internalParameter = new TrackingParameter();
@@ -692,6 +648,8 @@ public class Webtrekk {
         trackingParameter.add(Parameter.ACTIVITY_NAME, currentActivityName);
 
         trackingParameter.add(Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
+        //add the internal parameter
+        trackingParameter.add(internalParameter);
 
         // action params are a special case, no other params but the ones given as parameter in the code
         if(tp.containsKey(Parameter.ACTION_NAME)) {
@@ -699,6 +657,10 @@ public class Webtrekk {
             trackingParameter.add(Parameter.SCREEN_RESOLUTION, webtrekkParameter.get(Parameter.SCREEN_RESOLUTION));
             trackingParameter.add(Parameter.SCREEN_DEPTH, webtrekkParameter.get(Parameter.SCREEN_DEPTH));
             trackingParameter.add(Parameter.USERAGENT, webtrekkParameter.get(Parameter.USERAGENT));
+            trackingParameter.add(Parameter.USERAGENT, webtrekkParameter.get(Parameter.EVERID));
+            trackingParameter.add(Parameter.SAMPLING, webtrekkParameter.get(Parameter.SAMPLING));
+            trackingParameter.add(Parameter.TIMEZONE, webtrekkParameter.get(Parameter.TIMEZONE));
+            trackingParameter.add(Parameter.DEV_LANG, webtrekkParameter.get(Parameter.DEV_LANG));
             trackingParameter.add(tp);
             return new TrackingRequest(trackingParameter, trackingConfiguration);
         }
@@ -756,11 +718,6 @@ public class Webtrekk {
             }
         }
 
-        //last step add the internal parameter
-        trackingParameter.add(internalParameter);
-
-
-
         return new TrackingRequest(trackingParameter, trackingConfiguration);
 
     }
@@ -784,7 +741,6 @@ public class Webtrekk {
             request.trackingParameter.add(Parameter.ADVERTISEMENT_ACTION, "c");
         }
 
-
         // execute the before plugin functions
         for(Plugin p: plugins){
             p.before_request(request);
@@ -806,6 +762,50 @@ public class Webtrekk {
         internalParameter.add(Parameter.FORCE_NEW_SESSION, "0");
         internalParameter.add(Parameter.APP_FIRST_START, "0");
         autoCustomParameter.put("appUpdated", "0");
+    }
+
+    private String trackReferrer () {
+        String campaign = "";
+        String content = "";
+        String medium = "";
+        String source = "";
+        String term = "";
+
+        String referrer = ReferrerReceiver.getStoredReferrer(this.context);
+
+        if (referrer == null || referrer.length() == 0) {
+            return "";
+        }
+
+        String[] components = referrer.split("&");
+        for (String component : components) {
+            String parameter[] = component.split("=", 2);
+            if (parameter.length < 2) {
+                continue;
+            }
+
+            String key = HelperFunctions.urlDecode(parameter[0]);
+            String value = HelperFunctions.urlDecode(parameter[1]);
+
+            if ("utm_campaign".equals(key)) {
+                campaign = value;
+            } else if ("utm_content".equals(key)) {
+                content = value;
+            } else if ("utm_medium".equals(key)) {
+                medium = value;
+            } else if ("utm_source".equals(key)) {
+                source = value;
+            } else if ("utm_term".equals(key)) {
+                term = value;
+            }
+        }
+
+        String campaignId = "wt_mc%3D" + HelperFunctions.urlEncode(source + "." + medium + "." + content + "." + campaign);
+        if(!term.isEmpty()) {
+            campaignId += ";wt_kw%3D" + HelperFunctions.urlEncode(term);
+        }
+
+        return campaignId;
     }
 
 

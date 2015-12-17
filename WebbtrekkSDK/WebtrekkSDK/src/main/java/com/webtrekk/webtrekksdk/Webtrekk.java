@@ -657,7 +657,7 @@ public class Webtrekk {
             trackingParameter.add(Parameter.SCREEN_RESOLUTION, webtrekkParameter.get(Parameter.SCREEN_RESOLUTION));
             trackingParameter.add(Parameter.SCREEN_DEPTH, webtrekkParameter.get(Parameter.SCREEN_DEPTH));
             trackingParameter.add(Parameter.USERAGENT, webtrekkParameter.get(Parameter.USERAGENT));
-            trackingParameter.add(Parameter.USERAGENT, webtrekkParameter.get(Parameter.EVERID));
+            trackingParameter.add(Parameter.EVERID, webtrekkParameter.get(Parameter.EVERID));
             trackingParameter.add(Parameter.SAMPLING, webtrekkParameter.get(Parameter.SAMPLING));
             trackingParameter.add(Parameter.TIMEZONE, webtrekkParameter.get(Parameter.TIMEZONE));
             trackingParameter.add(Parameter.DEV_LANG, webtrekkParameter.get(Parameter.DEV_LANG));

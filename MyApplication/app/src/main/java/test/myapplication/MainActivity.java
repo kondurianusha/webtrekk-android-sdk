@@ -23,6 +23,9 @@ public class MainActivity extends ActionBarActivity {
 
         webtrekk = Webtrekk.getInstance();
         webtrekk.initWebtrekk(getApplication());
+
+        webtrekk.getCustomParameter().put("own_para", "my-value");
+        webtrekk.track();
     }
 
     @Override

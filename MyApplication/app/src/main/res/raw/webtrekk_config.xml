@@ -37,7 +37,7 @@
     <!--track the playstore family name, requires special permissions! -->
     <autoTrackPlaystoreFamilyName>true</autoTrackPlaystoreFamilyName>
     <!--track the supported api level of the device, requires special permissions! -->
-    <autoTrackApiLevel>false</autoTrackApiLevel>
+    <autoTrackApiLevel>true</autoTrackApiLevel>
     <!--track the devices screen orientation -->
     <autoTrackScreenOrientation>true</autoTrackScreenOrientation>
     <!--track the current connection type -->
@@ -54,47 +54,46 @@
     <!--resend onStart time, this is the timeout for auto tracked sessions in case an activity was paused -->
     <resendOnStartEventTime>30</resendOnStartEventTime>
 
-    <!--custom parameter -->
-    <customParameter>
-        <parameter key="test_customer_parameter_key1" value="value1"></parameter>
-        <parameter key="test_customer_parameter_key2" value="value2"></parameter>
-        <parameter key="test_customer_parameter_key3" value="value3"></parameter>
-    </customParameter>
+    <!--<customParameter>-->
+        <!--<parameter id="own_para">my-value</parameter>-->
+    <!--</customParameter>-->
 
     <!--global tracking parameter -->
     <globalTrackingParameter>
         <!--define global tracking parameter which are send with every request, the key has to match a valid parameter name!
         entries made here are available as default parameters in the trackingparameter instance -->
+        <parameter id="PRODUCT">test_product</parameter>
+
 
         <!--define the global page parameter, the key is the index,  -->
         <pageParameter>
-            <parameter key="1" value="test_pageparam1"></parameter>
-            <parameter key="2" value="test_pageparam2"></parameter>
-            <parameter key="3" value="test_pageparam3"></parameter>
+            <parameter id="1" key="own_para"></parameter>
+            <parameter id="2">test_pageparam2</parameter>
+            <parameter id="3">test_pageparam3</parameter>
         </pageParameter>
         <sessionParameter>
-            <parameter key="1" value="test_sessionparam1"></parameter>
+            <parameter id="1">test_sessionparam1</parameter>
         </sessionParameter>
         <ecomParameter>
-            <parameter key="1" value="test_ecomparam1"></parameter>
+            <parameter id="1">test_ecomparam1</parameter>
         </ecomParameter>
         <userCategories>
-            <parameter key="1" value="test_usercategory1"></parameter>
+            <parameter key="1">test_usercategory1</parameter>
         </userCategories>
         <pageCategories>
-            <parameter key="1" value="test_pagecategory1"></parameter>
+            <parameter id="1">test_pagecategory1</parameter>
         </pageCategories>
         <adParameter>
-            <parameter key="1" value="test_adparam"></parameter>
+            <parameter id="1">test_adparam1</parameter>
         </adParameter>
         <actionParameter>
-            <parameter key="1" value="test_actionparam1"></parameter>
+            <parameter id="1">test_actionparam1</parameter>
         </actionParameter>
         <productCategories>
-            <parameter key="1" value="test_productcategory1"></parameter>
+            <parameter id="1">test_productcategory1</parameter>
         </productCategories>
         <mediaCategories>
-            <parameter key="1" value="test_mediacategory1"></parameter>
+            <parameter id="1">test_mediacategory1</parameter>
         </mediaCategories>
 
     </globalTrackingParameter>
@@ -105,41 +104,43 @@
     <activity>
         <classname type="text">test.myapplication.MainActivity</classname>
         <mappingname type="text">Startseite</mappingname>
-        <autotrack type="text">true</autotrack>
+        <autoTracked type="text">true</autoTracked>
+
         <!--activity tracking parameter -->
         <activityTrackingParameter>
             <!--define global tracking parameter which are send with every request, the key has to match a valid parameter name!
             entries made here are available as default parameters in the trackingparameter instance -->
+            <parameter id="CURRENCY">EUR</parameter>
 
             <!--define the global page parameter, the key is the index,  -->
             <pageParameter>
-                <parameter key="1" value="test_pageparam1"></parameter>
-                <parameter key="2" value="test_pageparam2"></parameter>
-                <parameter key="3" value="test_pageparam3"></parameter>
+                <parameter id="4">test_pageparam4</parameter>
+                <parameter id="5">test_pageparam5</parameter>
+                <parameter id="6">test_pageparam6</parameter>
             </pageParameter>
             <sessionParameter>
-                <parameter key="1" value="test_sessionparam1"></parameter>
+                <parameter id="2">test_sessionparam2</parameter>
             </sessionParameter>
             <ecomParameter>
-                <parameter key="1" value="test_ecomparam1"></parameter>
+                <parameter id="2">test_ecomparam2</parameter>
             </ecomParameter>
             <userCategories>
-                <parameter key="1" value="test_usercategory1"></parameter>
+                <parameter id="2">test_usercategory2</parameter>
             </userCategories>
             <pageCategories>
-                <parameter key="1" value="test_pagecategory1"></parameter>
+                <parameter id="2">test_pagecategory2</parameter>
             </pageCategories>
             <adParameter>
-                <parameter key="1" value="test_adparam"></parameter>
+                <parameter id="2">test_adparam2</parameter>
             </adParameter>
             <actionParameter>
-                <parameter key="1" value="test_actionparam1"></parameter>
+                <parameter id="2">test_actionparam2</parameter>
             </actionParameter>
             <productCategories>
-                <parameter key="1" value="test_productcategory1"></parameter>
+                <parameter id="2">test_productcategory2</parameter>
             </productCategories>
             <mediaCategories>
-                <parameter key="1" value="test_mediacategory1"></parameter>
+                <parameter id="2">test_mediacategory2</parameter>
             </mediaCategories>
 
         </activityTrackingParameter>

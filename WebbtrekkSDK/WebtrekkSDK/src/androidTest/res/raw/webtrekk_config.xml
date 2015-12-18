@@ -53,9 +53,16 @@
     <!--url of the remote configuration -->
     <trackingConfigurationUrl>http://remotehost/tracking_config.xml</trackingConfigurationUrl>
     <!--sends the size of the current locally stored urls in a custom parameter -->
-    <sendRequestUrlStoreSize>true</sendRequestUrlStoreSize>
+    <autoTrackRequestUrlStoreSize>true</autoTrackRequestUrlStoreSize>
     <!--resend onStart time, this is the timeout for auto tracked sessions in case an activity was paused -->
     <resendOnStartEventTime>30</resendOnStartEventTime>
+
+    <!--custom parameter -->
+    <customParameter>
+        <parameter id="test_customer_parameter_key1">value1</parameter>
+        <parameter id="test_customer_parameter_key2">value2</parameter>
+        <parameter id="test_customer_parameter_key3">value3</parameter>
+    </customParameter>
 
 
 
@@ -145,13 +152,4 @@
 
         </activityTrackingParameter>
     </activity>
-
-
-    <!--custom parameter -->
-    <customParameter>
-        <parameter id="test_customer_parameter_key1">value1</parameter>
-        <parameter id="test_customer_parameter_key2">value2</parameter>
-        <parameter id="test_customer_parameter_key3">value3</parameter>
-    </customParameter>
-
 </webtrekkConfiguration>

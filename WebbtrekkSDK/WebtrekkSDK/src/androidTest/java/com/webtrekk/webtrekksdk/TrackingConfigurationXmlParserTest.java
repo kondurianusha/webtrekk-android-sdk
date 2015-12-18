@@ -206,7 +206,7 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
 
     }
 
-    @Suppress
+    //@Suppress
     public void testParseValidXmlCustomParameters() {
         TrackingConfiguration config = null;
         try {

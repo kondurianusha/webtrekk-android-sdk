@@ -7,6 +7,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -49,10 +50,15 @@ class TrackingConfigurationXmlParser {
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
+
             }
             String name = parser.getName();
             // Starts by looking for the entry tag
-            if (name.equals("version")) {
+            if(name.equals("webtrekkConfiguration")) {
+                WebtrekkLogging.log("premature end of configuration");
+                break;
+            }
+            else if (name.equals("version")) {
                 parser.require(XmlPullParser.START_TAG, ns, "version");
                 String versionValue = readText(parser);
                 try {
@@ -373,8 +379,12 @@ class TrackingConfigurationXmlParser {
             } else if (name.equals("customParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "customParameter");
                 //TODO: make sure custom parameters via xml configuration are still neccesary
-                //setParameterConfigurationFromXml(parser, config.getCustomParameter(), config.getCustomParameter());
+                Map<String, String> customParameter = new HashMap<>();
+                setCustomParameterConfigurationFromXml(parser, customParameter);
                 //config.setCustomParameter(setParameterConfigurationFromXml(parser));
+                config.setCustomParameter(customParameter);
+                parser.require(XmlPullParser.END_TAG, ns, "customParameter");
+                WebtrekkLogging.log("customParameter read from xml");
             } else if (name.equals("globalTrackingParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "globalTrackingParameter");
                 TrackingParameter tp = new TrackingParameter();
@@ -382,13 +392,22 @@ class TrackingConfigurationXmlParser {
                 setTrackingParameterFromXml(parser, tp, constTp);
                 config.setGlobalTrackingParameter(tp);
                 config.setConstGlobalTrackingParameter(constTp);
+                parser.require(XmlPullParser.END_TAG, ns, "globalTrackingParameter");
+                WebtrekkLogging.log("globalTrackingParameter read from xml");
+
             } else if (name.equals("activity")) {
+                parser.require(XmlPullParser.START_TAG, ns, "activity");
                 ActivityConfiguration act = readActivityConfiguration(parser, config.isAutoTracked());
                 config.getActivityConfigurations().put(act.getClassName(), act);
+                parser.require(XmlPullParser.END_TAG, ns, "activity");
+                WebtrekkLogging.log("activity read from xml: "+ act.getClassName());
+
             } else {
+                WebtrekkLogging.log("unknown xml tag: " + name);
                 skip(parser);
             }
         }
+        WebtrekkLogging.log("configuration read from xml");
         return config;
     }
 
@@ -401,7 +420,7 @@ class TrackingConfigurationXmlParser {
      * @throws IOException
      */
     private ActivityConfiguration readActivityConfiguration(XmlPullParser parser, boolean globalAutoTracked) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, ns, "activity");
+
         String className = null;
         String mappingName = null;
         boolean isAutoTrack = globalAutoTracked;
@@ -434,7 +453,7 @@ class TrackingConfigurationXmlParser {
                 if (autoTracked.equals("false")) {
                     isAutoTrack = false;
                 }
-                activityConfiguration.setIsAutoTrack(isAutoTrack);
+
             } else if (name.equals("activityTrackingParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "activityTrackingParameter");
                 TrackingParameter tp = new TrackingParameter();
@@ -442,8 +461,13 @@ class TrackingConfigurationXmlParser {
                 setTrackingParameterFromXml(parser, tp, constTp);
                 activityConfiguration.setActivityTrackingParameter(tp);
                 activityConfiguration.setConstActivityTrackingParameter(constTp);
+                parser.require(XmlPullParser.END_TAG, ns, "activityTrackingParameter");
+            } else {
+                WebtrekkLogging.log("activity: unknown xml tag: " + name);
+                skip(parser);
             }
         }
+        activityConfiguration.setIsAutoTrack(isAutoTrack);
         return activityConfiguration;
     }
 
@@ -457,8 +481,7 @@ class TrackingConfigurationXmlParser {
      * @throws XmlPullParserException
      * @throws IOException
      */
-    private TrackingParameter setTrackingParameterFromXml(XmlPullParser parser, TrackingParameter tp, TrackingParameter constTp) throws XmlPullParserException, IOException {
-
+    private void setTrackingParameterFromXml(XmlPullParser parser, TrackingParameter tp, TrackingParameter constTp) throws XmlPullParserException, IOException {
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -516,11 +539,11 @@ class TrackingConfigurationXmlParser {
             } else if (name.equals("mediaCategories")) {
                 parser.require(XmlPullParser.START_TAG, ns, "mediaCategories");
                 setParameterConfigurationFromXml(parser, tp.getMediaCategories(), constTp.getMediaCategories());
+            } else {
+                WebtrekkLogging.log("trackingparameter: unknown xml tag: " + name);
+                skip(parser);
             }
         }
-
-        return tp;
-
     }
 
     private void setParameterConfigurationFromXml(XmlPullParser parser, Map<String, String> values, Map<String, String> constValues) throws XmlPullParserException, IOException {
@@ -539,7 +562,7 @@ class TrackingConfigurationXmlParser {
                 String value = readText(parser);
 
                 if (id == null || (value == null && key == null)) {
-                    WebtrekkLogging.log("invalid parameter configuration while reading customParameter, missing key or value");
+                    WebtrekkLogging.log("invalid parameter configuration while reading parameter, missing key or value");
                 } else {
                     // if no key is set, it is a const value
                     if(key == null) {
@@ -547,10 +570,39 @@ class TrackingConfigurationXmlParser {
                     } else {
                         // else its a mapped value which will be replaced at runtime
                         values.put(id, key);
-                        parser.nextTag();
+                        //parser.nextTag();
                     }
                 }
 
+            } else {
+                WebtrekkLogging.log("parameter: unknown xml tag: " + name);
+                skip(parser);
+            }
+        }
+    }
+
+    private void setCustomParameterConfigurationFromXml(XmlPullParser parser, Map<String, String> values) throws XmlPullParserException, IOException {
+
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+            String name = parser.getName();
+            if (name.equals("parameter")) {
+                parser.require(XmlPullParser.START_TAG, ns, "parameter");
+                // the id from the parameter identifies the parameter
+                String id = parser.getAttributeValue(ns, "id");
+                String value = readText(parser);
+
+                if (id == null || value == null ) {
+                    WebtrekkLogging.log("invalid parameter configuration while reading customParameter, missing key or value");
+                } else {
+                        // else its a mapped value which will be replaced at runtime
+                        values.put(id, value);
+                }
+            } else {
+                WebtrekkLogging.log("customparameter: unknown xml tag: " + name);
+                skip(parser);
             }
         }
     }

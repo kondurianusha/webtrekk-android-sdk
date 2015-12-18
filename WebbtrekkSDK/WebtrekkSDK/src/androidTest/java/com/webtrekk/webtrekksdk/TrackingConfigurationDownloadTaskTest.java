@@ -141,7 +141,7 @@ public class TrackingConfigurationDownloadTaskTest extends InstrumentationTestCa
         synchronizedWaiter.doWait();
         // make sure the current tracking configuration has been set and has the new version number
         //verify(webtrekk, times(1)).setTrackingConfiguration((TrackingConfiguration)any());
-        assertEquals(2, webtrekk.getTrackingConfiguration().getVersion());
+        assertEquals(3, webtrekk.getTrackingConfiguration().getVersion());
     }
 
     @Override

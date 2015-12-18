@@ -168,12 +168,14 @@ public class TrackingRequestTests extends AndroidTestCase {
     }
 
     public void testAutoTrackAppUpdate() {
+        webtrekk.setCustomParameter(new HashMap<String, String>());
+
         webtrekk.getAutoCustomParameter().put("appUpdated", "0");
         trackingConfiguration.setAutoTrackAppUpdate(true);
         TrackingParameter tp = new TrackingParameter();
         tp.add(Parameter.ECOM, "100", "appUpdated");
         webtrekk.setGlobalTrackingParameter(tp);
-        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        TrackingRequest tr = webtrekk.createTrackingRequest(new TrackingParameter());
         String url = tr.getUrlString();
         assertTrue(url, url.contains("cb100=0"));
 
@@ -181,7 +183,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         TrackingParameter tp2 = new TrackingParameter();
         tp2.add(Parameter.ECOM, "100", "appUpdated");
         webtrekk.setGlobalTrackingParameter(tp2);
-        TrackingRequest tr2 = webtrekk.createTrackingRequest(tp2);
+        TrackingRequest tr2 = webtrekk.createTrackingRequest(new TrackingParameter());
         String url2 = tr2.getUrlString();
         assertTrue(url2, url2.contains("cb100=1"));
     }
@@ -190,6 +192,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         trackingConfiguration.setAutoTrackAdvertiserId(true);
         assertTrue(webtrekk.getTrackingConfiguration().isAutoTrackAdvertiserId());
         webtrekk.initAdvertiserId();
+        webtrekk.setCustomParameter(new HashMap<String, String>());
         try {
             Thread.sleep(4000);
         } catch (InterruptedException e) {
@@ -199,20 +202,22 @@ public class TrackingRequestTests extends AndroidTestCase {
         tp.add(Parameter.ECOM, "100", "advertiserId");
         tp.add(Parameter.ECOM, "200", "advertisingOptOut");
         webtrekk.setGlobalTrackingParameter(tp);
-        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        TrackingRequest tr = webtrekk.createTrackingRequest(new TrackingParameter());
         String url = tr.getUrlString();
         assertTrue(url, url.contains("cb100="));
-        assertNotNull(webtrekk.getCustomParameter().get("advertiserId"));
-        assertTrue(webtrekk.getCustomParameter().get("advertiserId").length() > 10);
+        assertNotNull(webtrekk.getAutoCustomParameter().get("advertiserId"));
+        assertTrue(webtrekk.getAutoCustomParameter().get("advertiserId").length() > 10);
         assertTrue(url, url.contains("cb200=false"));
     }
 
     public void testAutoTrackAppVersion() {
+        webtrekk.setCustomParameter(new HashMap<String, String>());
+
         webtrekk.getAutoCustomParameter().put("appVersion", "10");
         TrackingParameter tp = new TrackingParameter();
         tp.add(Parameter.ECOM, "100", "appVersion");
         webtrekk.setGlobalTrackingParameter(tp);
-        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        TrackingRequest tr = webtrekk.createTrackingRequest(new TrackingParameter());
         String url = tr.getUrlString();
         assertTrue(url, url.contains("cb100=10"));
 
@@ -220,48 +225,56 @@ public class TrackingRequestTests extends AndroidTestCase {
         TrackingParameter tp2 = new TrackingParameter();
         tp2.add(Parameter.ECOM, "100", "appVersion");
         webtrekk.setGlobalTrackingParameter(tp2);
-        TrackingRequest tr2 = webtrekk.createTrackingRequest(tp2);
+        TrackingRequest tr2 = webtrekk.createTrackingRequest(new TrackingParameter());
         String url2 = tr2.getUrlString();
         assertTrue(url2, url2.contains("cb100=11"));
     }
 
     public void testAutoTrackAppVersionCode() {
+        webtrekk.setCustomParameter(new HashMap<String, String>());
+
         webtrekk.getAutoCustomParameter().put("appVersionCode", "10");
         TrackingParameter tp = new TrackingParameter();
         tp.add(Parameter.ECOM, "100", "appVersionCode");
         webtrekk.setGlobalTrackingParameter(tp);
-        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        TrackingRequest tr = webtrekk.createTrackingRequest(new TrackingParameter());
         String url = tr.getUrlString();
         assertTrue(url, url.contains("cb100=10"));
     }
 
     public void testAutoTrackAppPreinstalled() {
+        webtrekk.setCustomParameter(new HashMap<String, String>());
+
         webtrekk.getAutoCustomParameter().put("appPreinstalled", "1");
         TrackingParameter tp = new TrackingParameter();
         tp.add(Parameter.ECOM, "100", "appPreinstalled");
         webtrekk.setGlobalTrackingParameter(tp);
-        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        TrackingRequest tr = webtrekk.createTrackingRequest(new TrackingParameter());
         String url = tr.getUrlString();
         assertTrue(url, url.contains("cb100=1"));
     }
 
     public void testAutoTrackApiLevel() {
+        webtrekk.setCustomParameter(new HashMap<String, String>());
+
         webtrekk.getAutoCustomParameter().put("apiLevel", "19");
         TrackingParameter tp = new TrackingParameter();
         tp.add(Parameter.ECOM, "100", "apiLevel");
         webtrekk.setGlobalTrackingParameter(tp);
-        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        TrackingRequest tr = webtrekk.createTrackingRequest(new TrackingParameter());
         String url = tr.getUrlString();
         assertTrue(url, url.contains("cb100=19"));
     }
 
 
     public void testAutoTrackScreenOrientation() {
+        webtrekk.setCustomParameter(new HashMap<String, String>());
+
         //webtrekk.getCustomParameter().put("screenOrientation", "landscape");
         TrackingParameter tp = new TrackingParameter();
         tp.add(Parameter.ECOM, "100", "screenOrientation");
         webtrekk.setGlobalTrackingParameter(tp);
-        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        TrackingRequest tr = webtrekk.createTrackingRequest(new TrackingParameter());
         String url = tr.getUrlString();
         assertTrue(url, url.contains("cb100=portrait") || url.contains("cb100=landscape"));
     }
@@ -270,7 +283,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         TrackingParameter tp = new TrackingParameter();
         tp.add(Parameter.ECOM, "100", "connectionType");
         webtrekk.setGlobalTrackingParameter(tp);
-        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        TrackingRequest tr = webtrekk.createTrackingRequest(new TrackingParameter());
         String url = tr.getUrlString();
         assertTrue(url, url.contains("cb100=WIFI") || url.contains("cb100=offline")|| url.contains("cb100=3G")|| url.contains("cb100=4G"));
     }

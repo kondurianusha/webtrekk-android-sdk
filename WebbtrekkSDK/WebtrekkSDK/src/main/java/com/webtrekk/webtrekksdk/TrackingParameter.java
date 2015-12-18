@@ -1,5 +1,6 @@
 package com.webtrekk.webtrekksdk;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -318,31 +319,42 @@ public class TrackingParameter {
      * this method maps any values from mapping values to all the stored parameters
      * it matches by the key of the stored parameter and the mapping value, and replaces
      * the value of the stored parameter with the value from the mappingValues map
+     * this method must not modify the original object as its the configuration and key may change dynamicly
+     * so the original configuration must contain the placeholders
      *
      * @param mappingValues
      */
-    public void applyMapping(Map<String, String> mappingValues) {
-        applySingleMapping(actionParameter, mappingValues);
-        applySingleMapping(adParameter, mappingValues);
-        applySingleMapping(ecomParameter, mappingValues);
-        applySingleMapping(pageCategories, mappingValues);
-        applySingleMapping(productCategories, mappingValues);
-        applySingleMapping(sessionParameter, mappingValues);
-        applySingleMapping(userCategories, mappingValues);
-        applySingleMapping(pageParameter, mappingValues);
+    public TrackingParameter applyMapping(Map<String, String> mappingValues) {
+        // create a new mapped trackingparameter object
+        TrackingParameter mappedTrackingParameter = new TrackingParameter();
+        mappedTrackingParameter.setDefaultParameter(new TreeMap<Parameter, String>(this.defaultParameter));
+        mappedTrackingParameter.setActionParameter(applySingleMapping(actionParameter, mappingValues));
+        mappedTrackingParameter.setAdParameter(applySingleMapping(adParameter, mappingValues));
+        mappedTrackingParameter.setEcomParameter(applySingleMapping(ecomParameter, mappingValues));
+        mappedTrackingParameter.setPageParameter(applySingleMapping(pageParameter, mappingValues));
+        mappedTrackingParameter.setProductCategories(applySingleMapping(productCategories, mappingValues));
+        mappedTrackingParameter.setSessionParameter(applySingleMapping(sessionParameter, mappingValues));
+        mappedTrackingParameter.setUserCategories(applySingleMapping(userCategories, mappingValues));
+        mappedTrackingParameter.setPageCategories(applySingleMapping(pageCategories, mappingValues));
+        mappedTrackingParameter.setMediaCategories(applySingleMapping(mediaCategories, mappingValues));
+        return mappedTrackingParameter;
     }
 
-    private void applySingleMapping(Map<String, String> original, Map<String, String> mappingValues) {
+    private SortedMap<String, String> applySingleMapping(SortedMap<String, String> original, Map<String, String> mappingValues) {
+        SortedMap<String, String> mappedValues = new TreeMap<>();
         if (!original.isEmpty()) {
             for (Map.Entry<String, String> entry : original.entrySet()) {
-                if(mappingValues.containsKey(entry.getValue())) {
-                    entry.setValue(mappingValues.get(entry.getValue()));
+                String key = entry.getValue();
+                if(mappingValues.containsKey(key)) {
+                    //entry.setValue(mappingValues.get(entry.getValue()));
+                    mappedValues.put(entry.getKey(), mappingValues.get(key));
                 } else {
-                    // pass empty string if no mapping value is found in the custom parameter
-                    entry.setValue("");
+                    // pass empty string if no mapping value is found in the custom parameter, could also use get with default here
+                    mappedValues.put(entry.getKey(), "");
                 }
             }
         }
+        return mappedValues;
     }
 
 }

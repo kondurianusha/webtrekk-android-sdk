@@ -72,9 +72,9 @@ public class WebtrekkTests extends AndroidTestCase {
         assertNotNull(webtrekk.getTrackingConfiguration());
         assertEquals(webtrekk.getTrackingConfiguration().getTrackId(), "1111111111112");
         assertEquals(webtrekk.getTrackingConfiguration().getTrackDomain(), "http://trackingtest.nglab.org");
-        assertEquals(webtrekk.getTrackingConfiguration().getSendDelay(), 60);
-        assertEquals(webtrekk.getTrackingConfiguration().getMaxRequests(), 5000);
-        assertEquals(webtrekk.getTrackingConfiguration().getVersion(), 2);
+        assertEquals(webtrekk.getTrackingConfiguration().getSendDelay(), 30);
+        assertEquals(webtrekk.getTrackingConfiguration().getMaxRequests(), 4000);
+        assertEquals(webtrekk.getTrackingConfiguration().getVersion(), 3);
 
     }
     @Suppress
@@ -130,7 +130,7 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initWebtrekkParameter();
         webtrekk.initAutoCustomParameter();
 
-        assertNotNull(webtrekk.getAutoCustomParameter().get("apiLevel"));
+        assertTrue(webtrekk.getAutoCustomParameter().toString(), webtrekk.getAutoCustomParameter().size()>0);
     }
 
     public void testTrack() {
@@ -330,11 +330,11 @@ public class WebtrekkTests extends AndroidTestCase {
      */
     public void testGlobalTrackingParameter() {
         // set a global tracking param
-        TrackingParameter globalTp = new TrackingParameter();
-        globalTp.add(Parameter.ECOM, "4", "testecomparam");
+        TrackingParameter constGlobalTp = new TrackingParameter();
+        constGlobalTp.add(Parameter.ECOM, "4", "testecomparam");
         webtrekk.initWebtrekk(getContext());
         TrackingParameter tp = new TrackingParameter();
-        webtrekk.setGlobalTrackingParameter(globalTp);
+        webtrekk.setConstGlobalTrackingParameter(constGlobalTp);
         TrackingRequest tr = webtrekk.createTrackingRequest(tp);
         //assertTrue(tp.getEcomParameter().get("1").contains("testecomparam"));
         assertTrue("url string does not contain value: " + tr.getUrlString(), tr.getUrlString().contains("&cb4=testecomparam"));

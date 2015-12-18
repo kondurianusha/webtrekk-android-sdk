@@ -82,22 +82,22 @@ public class TrackingParameterTest extends AndroidTestCase {
         tp.add(Parameter.MEDIA_CAT, "1", "screen_resolution");
 
         // apply the mapping
-        tp.applyMapping(customParameter);
+        TrackingParameter mappedTp = tp.applyMapping(customParameter);
 
         // make sure all values where replaced
-        assertEquals(tp.getActionParameter().get("1"), "123x456");
-        assertEquals(tp.getAdParameter().get("1"), "123x456");
-        assertEquals(tp.getEcomParameter().get("1"), "123x456");
-        assertEquals(tp.getPageCategories().get("1"), "123x456");
-        assertEquals(tp.getProductCategories().get("1"), "123x456");
-        assertEquals(tp.getSessionParameter().get("1"), "123x456");
-        assertEquals(tp.getUserCategories().get("1"), "123x456");
-        assertEquals(tp.getPageParameter().get("1"), "123x456");
+        assertEquals(mappedTp.getActionParameter().get("1"), "123x456");
+        assertEquals(mappedTp.getAdParameter().get("1"), "123x456");
+        assertEquals(mappedTp.getEcomParameter().get("1"), "123x456");
+        assertEquals(mappedTp.getPageCategories().get("1"), "123x456");
+        assertEquals(mappedTp.getProductCategories().get("1"), "123x456");
+        assertEquals(mappedTp.getSessionParameter().get("1"), "123x456");
+        assertEquals(mappedTp.getUserCategories().get("1"), "123x456");
+        assertEquals(mappedTp.getPageParameter().get("1"), "123x456");
 
         // test no mapping value defined, return empty string
         customParameter.clear();
-        tp.applyMapping(customParameter);
-        assertEquals(tp.getPageParameter().get("1"), "");
+        mappedTp = tp.applyMapping(customParameter);
+        assertEquals(mappedTp.getPageParameter().get("1"), "");
     }
 
 }

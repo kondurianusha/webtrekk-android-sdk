@@ -31,10 +31,6 @@
     <autoTrackPlaystoreUsername>true</autoTrackPlaystoreUsername>
     <!--track the playstore email, requires special permissions! -->
     <autoTrackPlaystoreMail>true</autoTrackPlaystoreMail>
-    <!--track the playstore given name, requires special permissions! -->
-    <autoTrackPlaystoreGivenName>true</autoTrackPlaystoreGivenName>
-    <!--track the playstore family name, requires special permissions! -->
-    <autoTrackPlaystoreFamilyName>true</autoTrackPlaystoreFamilyName>
     <!--track the supported api level of the device, requires special permissions! -->
     <autoTrackApiLevel>true</autoTrackApiLevel>
     <!--track the devices screen orientation -->

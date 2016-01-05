@@ -25,6 +25,7 @@ public class PageExampleActivity extends ActionBarActivity {
     public void onStart() {
         super.onStart();
         //webtrekk.startActivity("PageExampleActivity");
+        webtrekk.getCustomParameter();
     }
 
     @Override

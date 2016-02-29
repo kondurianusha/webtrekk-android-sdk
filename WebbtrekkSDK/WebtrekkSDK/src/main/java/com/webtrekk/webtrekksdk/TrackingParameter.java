@@ -26,6 +26,7 @@ public class TrackingParameter {
     private SortedMap<String, String> actionParameter;
     private SortedMap<String, String> productCategories;
     private SortedMap<String, String> mediaCategories;
+    private SortedMap<String, String> mCustomUserParameters;
 
 
     public TrackingParameter() {
@@ -39,6 +40,8 @@ public class TrackingParameter {
         this.actionParameter = new TreeMap<>();
         this.productCategories = new TreeMap<>();
         this.mediaCategories = new TreeMap<>();
+        //Used for CDB feature;
+        mCustomUserParameters = new TreeMap<>();
     }
 
     /*
@@ -70,6 +73,7 @@ public class TrackingParameter {
         this.actionParameter.putAll(tp.getActionParameter());
         this.productCategories.putAll(tp.getProductCategories());
         this.mediaCategories.putAll(tp.getMediaCategories());
+        mCustomUserParameters.putAll(tp.getCustomUserParameters());
         return this;
     }
 
@@ -147,6 +151,10 @@ public class TrackingParameter {
         return ecomParameter;
     }
 
+    SortedMap<String, String> getCustomUserParameters() {
+        return mCustomUserParameters;
+    }
+
     public SortedMap<String, String> getUserCategories() {
         return userCategories;
     }
@@ -211,6 +219,10 @@ public class TrackingParameter {
         this.mediaCategories = mediaCategories;
     }
 
+    void setCustomUserParameters(SortedMap<String, String> customUserParameters) {
+        mCustomUserParameters = customUserParameters;
+    }
+
     /**
      * this enum contains all valid tracking parameter and their url string identifier
      */
@@ -270,6 +282,23 @@ public class TrackingParameter {
         MEDIA_VOLUME("vol"), // lautstaerke der mediendatei
         MEDIA_MUTED("mut"),
         MEDIA_TIMESTAMP("x"),// timestamp um caching zu umgehen
+
+        /**
+         * tracking Cross Device Bridge parameters
+         */
+        CDB_EMAIL_MD5("cdb1"),
+        CDB_EMAIL_SHA("cdb2"),
+        CDB_PHONE_MD5("cdb3"),
+        CDB_PHONE_SHA("cdb4"),
+        CDB_ADDRESS_MD5("cdb5"),
+        CDB_ADDRESS_SHA("cdb6"),
+        CDB_ANDROID_ID("cdb7"),
+        CDB_IOS_ADD_ID("cdb8"),
+        CDB_WIN_AD_ID("cdb9"),
+        CDB_FACEBOOK_ID("cdb10"),
+        CDB_TWITTER_ID("cdb11"),
+        CDB_GOOGLE_PLUS_ID("cdb12"),
+        CDB_LINKEDIN_ID("cdb13"),
 
         /**
          * multiple value trackingParameter and customer trackingParameter

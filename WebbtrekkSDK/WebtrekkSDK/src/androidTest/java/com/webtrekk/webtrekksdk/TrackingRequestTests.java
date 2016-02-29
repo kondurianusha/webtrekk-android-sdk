@@ -345,7 +345,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         wt.initWebtrekkParameter();
         TrackingParameter tp = new TrackingParameter();
         TrackingRequest tr = wt.createTrackingRequest(tp);
-        assertTrue(tr.trackingParameter.getDefaultParameter().containsKey(Parameter.USERAGENT));
+        assertTrue(tr.mTrackingParameter.getDefaultParameter().containsKey(Parameter.USERAGENT));
         String url = tr.getUrlString();
         assertTrue(url, url.contains("X-WT-UA"));
     }
@@ -359,7 +359,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         TrackingParameter tp = new TrackingParameter();
         tp.add(Parameter.ACTION_NAME, "customname");
         TrackingRequest tr = wt.createTrackingRequest(tp);
-        assertTrue(tr.trackingParameter.getDefaultParameter().containsKey(Parameter.ACTION_NAME));
+        assertTrue(tr.mTrackingParameter.getDefaultParameter().containsKey(Parameter.ACTION_NAME));
         String url = tr.getUrlString();
         assertTrue(url, url.contains("customname"));
     }

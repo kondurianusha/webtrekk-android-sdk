@@ -22,14 +22,10 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        //WebtrekkLogging.log("Tracking Activity Created: " + activity.getClass().getName());
-        //webtrekk.autoTrackActivity(activity.getClass().getName());
     }
 
     @Override
     public void onActivityDestroyed(Activity activity) {
-        //WebtrekkLogging.log("Tracking Activity Destroyed: " + activity.getClass().getName());
-        //webtrekk.autoTrackActivity(activity.getClass().getName());
     }
     @Override
     public void onActivityPaused(Activity activity) {
@@ -37,7 +33,6 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
         // this means the application is no longer in the foreground so save timestamp when this happened
         lastRequestTimestamp = System.currentTimeMillis();
         isPaused = true;
-        //webtrekk.autoTrackActivity(activity.getClass().getName());
     }
     @Override
     public void onActivityResumed(Activity activity) {
@@ -49,12 +44,9 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
             }
             isPaused = false;
         }
-        //webtrekk.autoTrackActivity(activity.getClass().getName());
     }
     @Override
     public void onActivitySaveInstanceState (Activity activity, Bundle outState) {
-        //WebtrekkLogging.log("Tracking Activity saved: " + activity.getClass().getName());
-        //app.getTracker().autoTrackActivity(activity.getClass().getName());
     }
     @Override
     public void onActivityStarted(Activity activity) {
@@ -67,6 +59,5 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
     public void onActivityStopped(Activity activity) {
         WebtrekkLogging.log("Tracking Activity stopped: " + activity.getClass().getName());
         webtrekk.stopActivity();
-        //webtrekk.autoTrackActivity(activity.getClass().getName());
     }
 }

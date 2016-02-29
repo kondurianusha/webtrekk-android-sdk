@@ -42,6 +42,13 @@
             android:layout_gravity="center_horizontal"
             android:onClick="showMediaExampleActivity" />
 
+v        <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CDB"
+        android:id="@+id/button_CDB"
+        android:layout_gravity="center_horizontal"
+        android:onClick="sendCDBRequest" />
     </LinearLayout>
 
 </RelativeLayout>

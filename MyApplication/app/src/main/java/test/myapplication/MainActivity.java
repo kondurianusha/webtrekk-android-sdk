@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Webtrekk;
+import com.webtrekk.webtrekksdk.WebtrekkUserParameters;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -32,7 +33,6 @@ public class MainActivity extends ActionBarActivity {
     public void onStart()
     {
         super.onStart();
-//        webtrekk.track();
     }
 
     @Override
@@ -77,9 +77,12 @@ public class MainActivity extends ActionBarActivity {
 
     public void showMediaExampleActivity(View view) {
         Intent intent = new Intent(this, MediaExampleActivity.class);
-        //Intent intent = new Intent(this, MediaActivity.class);
-        //Intent intent = new Intent(this, VideoActivity.class);
+        startActivity(intent);
+    }
 
+    public void sendCDBRequest(View view)
+    {
+        Intent intent = new Intent(this, CDBActivityTest.class);
         startActivity(intent);
     }
 

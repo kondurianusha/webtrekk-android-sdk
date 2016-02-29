@@ -46,6 +46,10 @@
             android:configChanges="keyboardHidden|orientation|screenSize" >
             android:label="@string/title_activity_media" >
         </activity>
+        <activity
+            android:name=".CDBActivityTest"
+            android:label="@string/title_activity_media" >
+        </activity>
     </application>
 
 </manifest>

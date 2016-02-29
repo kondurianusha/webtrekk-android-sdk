@@ -62,7 +62,7 @@ public class WebtrekkUserParameters {
         if (address.matches("(.+\\|(.)+){4}")) {
             putMd5ShaPair(Parameter.CDB_ADDRESS_MD5, Parameter.CDB_ADDRESS_SHA, normalizeAddress(address));
         }else
-          WebtrekkLogging.log("Address iыn't added. Format is incorrect use this one: prename|surename|zipcode|street|house number");
+          WebtrekkLogging.log("Address isn't added. Format is incorrect, use this one: prename|surename|zipcode|street|house number");
         return this;
     }
 

@@ -621,6 +621,17 @@ public class Webtrekk {
             return;
         }
 
+        //check if CDB request need repeat
+        if (WebtrekkUserParameters.needUpdateCDBRequest(context))
+        {
+            WebtrekkUserParameters userPar = new WebtrekkUserParameters();
+
+            if (userPar.restoreFromSettings(context))
+            {
+                track(userPar);
+            }
+        }
+
         // use the automatic name in case no activity name is given
         // for calls from class methods this must be overwritten
         //if(!tp.getDefaultParameter().containsKey(TrackingParams.Params.ACTIVITY_NAME)) {
@@ -634,6 +645,34 @@ public class Webtrekk {
 
         TrackingRequest request = createTrackingRequest(tp);
         addRequest(request);
+    }
+
+    /**
+     * Send CDB request with user parameters. You should use constructor of WebtrekkUserParameters to define any parameters you would like to include
+     * For example:
+     * webtrekk.track(new WebtrekkUserParameters.
+     * setEmail("some email").
+     * setPhone("some phone"))
+     * @param userParameters - user parameters
+     */
+    public void track(WebtrekkUserParameters userParameters)
+    {
+        if (userParameters.saveToSettings(context))
+            WebtrekkLogging.log("CDB request is received and saved to settings");
+        else {
+            WebtrekkLogging.log("Nothing to send as request don't have any not null parameters.");
+            return;
+        }
+
+        TrackingParameter trackingParameter = new TrackingParameter();
+        trackingParameter.add(userParameters.getParameters());
+        trackingParameter.add(Parameter.EVERID, webtrekkParameter.get(Parameter.EVERID));
+        trackingParameter.setCustomUserParameters(userParameters.getCustomParameters());
+
+        TrackingRequest request = new TrackingRequest(trackingParameter, trackingConfiguration, TrackingRequest.RequestType.CDB);
+        addRequest(request);
+        WebtrekkLogging.log("CDB request is sent to buffer");
+        WebtrekkUserParameters.updateCDBRequestDate(context);
     }
 
     /**
@@ -741,11 +780,11 @@ public class Webtrekk {
         // ToDo: its not necessary to check each time for a campaign
         // ToDo: also we have to implement a campaign tracking like the pixel version
         String mediaCode = this.trackReferrer();
-        String mediaCodeClient = request.trackingParameter.getDefaultParameter().get(Parameter.ADVERTISEMENT);
+        String mediaCodeClient = request.mTrackingParameter.getDefaultParameter().get(Parameter.ADVERTISEMENT);
 
         if (!mediaCode.isEmpty() && (mediaCodeClient == null || mediaCodeClient.isEmpty())) {
-            request.trackingParameter.add(Parameter.ADVERTISEMENT, mediaCode);
-            request.trackingParameter.add(Parameter.ADVERTISEMENT_ACTION, "c");
+            request.mTrackingParameter.add(Parameter.ADVERTISEMENT, mediaCode);
+            request.mTrackingParameter.add(Parameter.ADVERTISEMENT_ACTION, "c");
         }
 
         // execute the before plugin functions

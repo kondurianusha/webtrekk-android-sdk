@@ -113,7 +113,7 @@ public class RequestProcessor implements Runnable {
 
             int statusCode = sendRequest(url);
             if (statusCode >= 200 && statusCode <= 299) {
-                WebtrekkLogging.log("completed request");
+                WebtrekkLogging.log("completed request. Status code:"+statusCode);
                 //successful send, remove url from store
                 this.requestUrlStore.remove(0);
             } else if(statusCode == 0) {

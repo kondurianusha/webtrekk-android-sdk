@@ -1,6 +1,8 @@
 package com.webtrekk.webtrekksdk;
 
 
+import android.util.Log;
+
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -13,19 +15,197 @@ import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
  */
 public class TrackingRequest {
 
-    protected TrackingParameter trackingParameter;
-    private TrackingConfiguration trackingConfiguration;
+
+    final TrackingParameter mTrackingParameter;
+    final private TrackingConfiguration trackingConfiguration;
+    final private RequestType mRequestType;
+
+    enum RequestType
+    {
+        GENERAL,
+        CDB
+    }
+
+    /**
+     * creates a new tracking request object with default GENERAL type request
+     *
+     * @param tp the TrackingParameter for the TrackingRequest
+     * @param trackingConfiguration the tracking configuration of the webtrekk object
+     */
+    TrackingRequest(TrackingParameter tp, TrackingConfiguration trackingConfiguration) {
+        mTrackingParameter = tp;
+        this.trackingConfiguration = trackingConfiguration;
+        mRequestType = RequestType.GENERAL;
+    }
 
     /**
      * creates a new tracking request object
      *
      * @param tp the TrackingParameter for the TrackingRequest
      * @param trackingConfiguration the tracking configuration of the webtrekk object
+     * @param type of request
      */
-    public TrackingRequest(TrackingParameter tp, TrackingConfiguration trackingConfiguration) {
-        trackingParameter = tp;
+    TrackingRequest(TrackingParameter tp, TrackingConfiguration trackingConfiguration, RequestType type) {
+        mTrackingParameter = tp;
         this.trackingConfiguration = trackingConfiguration;
+        mRequestType = type;
     }
+
+    /**
+     * get address and track id part of request. It is common for all requests
+     */
+
+    private String getBaseURLPart()
+    {
+       return  trackingConfiguration.getTrackDomain() + "/" + trackingConfiguration.getTrackId() + "/wt?";
+    }
+
+    /**
+     * add to url bufer parameters defined in keys array with appropriate value in trackingParameters.
+     * @param trackingParameter
+     * @param url
+     * @param keys
+     */
+    private void addParametersArray(TrackingParameter trackingParameter, StringBuffer url, Parameter keys[])
+    {
+        SortedMap<Parameter, String> tp = trackingParameter.getDefaultParameter();
+        for (Parameter key:keys)
+        {
+            if(trackingParameter.containsKey(key)) {
+                url.append("&" + key.toString() + "=" + HelperFunctions.urlEncode(tp.get(key)));
+            }
+        }
+    }
+
+    /**
+     * fills url buffer with parameters defined in key/value map. Add sufix to each parameter name
+     * @param map
+     * @param sufix
+     * @param url
+     */
+    private void addKeyMap(SortedMap<String, String> map, String sufix, StringBuffer url)
+    {
+        if (!map.isEmpty()) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                url.append(sufix + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
+            }
+        }
+    }
+
+    /**
+     * this is interface for classes-factories that generate URL parameters.
+     */
+    private interface URLFactory
+    {
+        String getPValue(TrackingParameter trackingParameter);
+        void getTrackingPart(TrackingParameter trackingParameter, StringBuffer url);
+    }
+
+
+    private class CDBRequest implements URLFactory
+    {
+        // arrays of all keys for CDB request
+        final Parameter KEYZ[] = {Parameter.EVERID, Parameter.CDB_EMAIL_MD5, Parameter.CDB_EMAIL_SHA,
+                Parameter.CDB_PHONE_MD5, Parameter.CDB_PHONE_SHA, Parameter.CDB_ADDRESS_MD5, Parameter.CDB_ADDRESS_SHA,
+                Parameter.CDB_ANDROID_ID, Parameter.CDB_IOS_ADD_ID, Parameter.CDB_WIN_AD_ID, Parameter.CDB_FACEBOOK_ID,
+                Parameter.CDB_TWITTER_ID, Parameter.CDB_GOOGLE_PLUS_ID, Parameter.CDB_LINKEDIN_ID};
+
+        /**
+         * this method is generated p parameter for URL for specific implementation
+         * @param trackingParameter
+         * @return
+         */
+        @Override
+        public String getPValue(TrackingParameter trackingParameter) {
+            SortedMap<Parameter, String> tp = trackingParameter.getDefaultParameter();
+
+            return "p=" + Webtrekk.TRACKING_LIBRARY_VERSION + ",0";
+        }
+
+        /**
+         * Fills url buffer based on tracking parameters. use some help function.
+         * @param trackingParameter
+         * @param url
+         */
+        @Override
+        public void getTrackingPart(TrackingParameter trackingParameter, StringBuffer url) {
+            addParametersArray(trackingParameter, url, KEYZ);
+            addKeyMap(trackingParameter.getCustomUserParameters(), "&cdb", url);
+        }
+    }
+
+
+
+    private class GeneralRequest implements URLFactory
+    {
+        // arrays of all keys for General request
+        final Parameter KEYZ[] = {Parameter.EVERID, Parameter.ADVERTISER_ID, Parameter.FORCE_NEW_SESSION,
+        Parameter.APP_FIRST_START, Parameter.CURRENT_TIME, Parameter.TIMEZONE, Parameter.DEV_LANG, Parameter.CUSTOMER_ID,
+        Parameter.ACTION_NAME, Parameter.ORDER_TOTAL, Parameter.ORDER_NUMBER, Parameter.PRODUCT, Parameter.PRODUCT_COST,
+        Parameter.CURRENCY, Parameter.PRODUCT_COUNT, Parameter.PRODUCT_STATUS, Parameter.VOUCHER_VALUE, Parameter.ADVERTISEMENT,
+        Parameter.ADVERTISEMENT_ACTION, Parameter.INTERN_SEARCH, Parameter.EMAIL, Parameter.EMAIL_RID, Parameter.NEWSLETTER,
+        Parameter.GNAME, Parameter.SNAME, Parameter.PHONE, Parameter.GENDER, Parameter.BIRTHDAY, Parameter.CITY, Parameter.COUNTRY,
+        Parameter.ZIP, Parameter.STREET, Parameter.STREETNUMBER, Parameter.MEDIA_FILE, Parameter.MEDIA_ACTION,
+        Parameter.MEDIA_POS, Parameter.MEDIA_LENGTH, Parameter.MEDIA_BANDWITH, Parameter.MEDIA_VOLUME,
+        Parameter.MEDIA_MUTED, Parameter.MEDIA_TIMESTAMP, Parameter.SAMPLING, Parameter.IP_ADDRESS, Parameter.USERAGENT};
+
+        /**
+         * this method is generate p parameter for URL for specific implementation
+         * @param trackingParameter
+         * @return
+         */
+        @Override
+        public String getPValue(TrackingParameter trackingParameter)
+        {
+            SortedMap<Parameter, String> tp = trackingParameter.getDefaultParameter();
+
+
+            return "p=" + Webtrekk.TRACKING_LIBRARY_VERSION + "," +
+                    HelperFunctions.urlEncode(tp.get(Parameter.ACTIVITY_NAME)) + ",0,"+
+                    tp.get(Parameter.SCREEN_RESOLUTION) + ","+
+                    tp.get(Parameter.SCREEN_DEPTH) + ",0,"+
+                    tp.get(Parameter.TIMESTAMP) + ",0,0,0";
+        }
+
+        /**
+         * Fills url buffer based on tracking parameters. use some help function.
+         * @param trackingParameter
+         * @param url
+         */
+        @Override
+        public void getTrackingPart(TrackingParameter trackingParameter, StringBuffer url)
+        {
+            addParametersArray(trackingParameter, url, KEYZ);
+
+            //if ecom trackingParameter are given, append them to the url as well
+            addKeyMap(trackingParameter.getEcomParameter(), "&cb", url);
+
+            //if ad trackingParameter are given, append them to the url as well
+            addKeyMap(trackingParameter.getAdParameter(), "&cc", url);
+
+            //if action trackingParameter are given, append them to the url as well
+            addKeyMap(trackingParameter.getPageParameter(), "&cp", url);
+
+            //if session trackingParameter are given, append them to the url as well
+            addKeyMap(trackingParameter.getSessionParameter(), "&mg", url);
+
+            //if action trackingParameter are given, append them to the url as well
+            addKeyMap(trackingParameter.getActionParameter(), "&ck", url);
+
+            //if product category trackingParameter are given, append them to the url as well
+            addKeyMap(trackingParameter.getProductCategories(), "&ca", url);
+
+            //if page category trackingParameter are given, append them to the url as well
+            addKeyMap(trackingParameter.getPageCategories(), "&cg", url);
+
+            //if user category trackingParameter are given, append them to the url as well
+            addKeyMap(trackingParameter.getUserCategories(), "&uc", url);
+
+            //if media category trackingParameter are given, append them to the url as well
+            addKeyMap(trackingParameter.getMediaCategories(), "&mg", url);
+        }
+    }
+
 
     /**
      * creates a URL String from the given Request which can be send to the server/stores in the urlStore
@@ -33,237 +213,40 @@ public class TrackingRequest {
      * @return returns the URL as String with all the TrackingParameter url encoded
      */
     public String getUrlString() {
+
         StringBuffer url = new StringBuffer();
-        SortedMap<Parameter, String> tp = trackingParameter.getDefaultParameter();
-        // maybe add https here if that ssl option is set in the configs
-        url.append(trackingConfiguration.getTrackDomain() + "/" + trackingConfiguration.getTrackId() + "/wt?p=" + Webtrekk.TRACKING_LIBRARY_VERSION + ",");
-        url.append(HelperFunctions.urlEncode(tp.get(Parameter.ACTIVITY_NAME)) + ",0,");
-        url.append(tp.get(Parameter.SCREEN_RESOLUTION) + ",");
-        url.append(tp.get(Parameter.SCREEN_DEPTH) + ",0,");
-        url.append(tp.get(Parameter.TIMESTAMP) + ",0,0,0");
+        URLFactory urlFactory = null;
 
-        if(trackingParameter.containsKey(Parameter.EVERID)) {
-            url.append("&" + Parameter.EVERID.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.EVERID)));
-        }
-
-        if(trackingParameter.containsKey(Parameter.ADVERTISER_ID)) {
-            url.append("&" + Parameter.ADVERTISER_ID.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ADVERTISER_ID)));
+        switch (mRequestType)
+        {
+            case GENERAL:
+                urlFactory = new GeneralRequest();
+                break;
+            case CDB:
+                urlFactory = new CDBRequest();
+                break;
         }
 
-        if(trackingParameter.containsKey(Parameter.FORCE_NEW_SESSION)) {
-            url.append(("&" + Parameter.FORCE_NEW_SESSION.toString() + "=" + tp.get(Parameter.FORCE_NEW_SESSION)));
+        if (urlFactory == null)
+        {
+            WebtrekkLogging.log("urlFactory is null. Non supported mRequestType");
+            return null;
         }
 
-        if(trackingParameter.containsKey(Parameter.APP_FIRST_START)) {
-            url.append("&" + Parameter.APP_FIRST_START.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.APP_FIRST_START)));
-        }
+        url.append(getBaseURLPart());
+        url.append(urlFactory.getPValue(mTrackingParameter));
+        urlFactory.getTrackingPart(mTrackingParameter, url);
 
-        if(trackingParameter.containsKey(Parameter.CURRENT_TIME)) {
-            url.append( "&" + Parameter.CURRENT_TIME.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.CURRENT_TIME)));
-        }
-
-        if(trackingParameter.containsKey(Parameter.TIMEZONE)) {
-            url.append("&" + Parameter.TIMEZONE.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.TIMEZONE)));
-        }
-
-        if(trackingParameter.containsKey(Parameter.DEV_LANG)) {
-            url.append("&" + Parameter.DEV_LANG.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.DEV_LANG)));
-        }
-
-        if(trackingParameter.containsKey(Parameter.CUSTOMER_ID)) {
-            url.append("&" + Parameter.CUSTOMER_ID.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.CUSTOMER_ID)));
-        }
-
-        if(trackingParameter.containsKey(Parameter.ACTION_NAME)) {
-            url.append("&" + Parameter.ACTION_NAME.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ACTION_NAME)));
-        }
-
-        if(trackingParameter.containsKey(Parameter.ORDER_TOTAL)) {
-            url.append("&" + Parameter.ORDER_TOTAL.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ORDER_TOTAL)));
-        }
-        if(trackingParameter.containsKey(Parameter.ORDER_NUMBER)) {
-            url.append("&" + Parameter.ORDER_NUMBER.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ORDER_NUMBER)));
-        }
-        if(trackingParameter.containsKey(Parameter.PRODUCT)) {
-            url.append("&" + Parameter.PRODUCT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.PRODUCT)));
-        }
-        if(trackingParameter.containsKey(Parameter.PRODUCT_COST)) {
-            url.append("&" + Parameter.PRODUCT_COST.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.PRODUCT_COST)));
-        }
-
-        if(trackingParameter.containsKey(Parameter.CURRENCY)) {
-            url.append("&" + Parameter.CURRENCY.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.CURRENCY)));
-        }
-
-        if(trackingParameter.containsKey(Parameter.PRODUCT_COUNT)) {
-            url.append("&" + Parameter.PRODUCT_COUNT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.PRODUCT_COUNT)));
-        }
-        if(trackingParameter.containsKey(Parameter.PRODUCT_STATUS)) {
-            url.append("&" + Parameter.PRODUCT_STATUS.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.PRODUCT_STATUS)));
-        }
-        if(trackingParameter.containsKey(Parameter.VOUCHER_VALUE)) {
-            url.append("&" + Parameter.VOUCHER_VALUE.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.VOUCHER_VALUE)));
-        }
-        if(trackingParameter.containsKey(Parameter.ADVERTISEMENT)) {
-            url.append("&" + Parameter.ADVERTISEMENT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ADVERTISEMENT)));
-        }
-        if(trackingParameter.containsKey(Parameter.ADVERTISEMENT_ACTION)) {
-            url.append("&" + Parameter.ADVERTISEMENT_ACTION.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ADVERTISEMENT_ACTION)));
-        }
-        if(trackingParameter.containsKey(Parameter.INTERN_SEARCH)) {
-            url.append("&" + Parameter.INTERN_SEARCH.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.INTERN_SEARCH)));
-        }
-
-////////////////////////////////////
-
-        if(trackingParameter.containsKey(Parameter.EMAIL)) {
-            url.append("&" + Parameter.EMAIL.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.EMAIL)));
-        }
-        if(trackingParameter.containsKey(Parameter.EMAIL_RID)) {
-            url.append("&" + Parameter.EMAIL_RID.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.EMAIL_RID)));
-        }
-        if(trackingParameter.containsKey(Parameter.NEWSLETTER)) {
-            url.append("&" + Parameter.NEWSLETTER.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.NEWSLETTER)));
-        }
-        if(trackingParameter.containsKey(Parameter.GNAME)) {
-            url.append("&" + Parameter.GNAME.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.GNAME)));
-        }
-        if(trackingParameter.containsKey(Parameter.SNAME)) {
-            url.append("&" + Parameter.SNAME.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.SNAME)));
-        }
-        if(trackingParameter.containsKey(Parameter.PHONE)) {
-            url.append("&" + Parameter.PHONE.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.PHONE)));
-        }
-        if(trackingParameter.containsKey(Parameter.GENDER)) {
-            url.append("&" + Parameter.GENDER.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.GENDER)));
-        }
-        if(trackingParameter.containsKey(Parameter.BIRTHDAY)) {
-            url.append("&" + Parameter.BIRTHDAY.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.BIRTHDAY)));
-        }
-        if(trackingParameter.containsKey(Parameter.CITY)) {
-            url.append("&" + Parameter.CITY.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.CITY)));
-        }
-        if(trackingParameter.containsKey(Parameter.COUNTRY)) {
-            url.append("&" + Parameter.COUNTRY.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.COUNTRY)));
-        }
-        if(trackingParameter.containsKey(Parameter.ZIP)) {
-            url.append("&" + Parameter.ZIP.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.ZIP)));
-        }
-        if(trackingParameter.containsKey(Parameter.STREET)) {
-            url.append("&" + Parameter.STREET.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.STREET)));
-        }
-        if(trackingParameter.containsKey(Parameter.STREETNUMBER)) {
-            url.append("&" + Parameter.STREETNUMBER.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.STREETNUMBER)));
-        }
-
-
-
-        // media tracking
-        if(trackingParameter.containsKey(Parameter.MEDIA_FILE)) {
-            url.append("&" + Parameter.MEDIA_FILE.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_FILE)));
-        }
-        if(trackingParameter.containsKey(Parameter.MEDIA_ACTION)) {
-            url.append("&" + Parameter.MEDIA_ACTION.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_ACTION)));
-        }
-        if(trackingParameter.containsKey(Parameter.MEDIA_POS)) {
-            url.append("&" + Parameter.MEDIA_POS.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_POS)));
-        }
-        if(trackingParameter.containsKey(Parameter.MEDIA_LENGTH)) {
-            url.append("&" + Parameter.MEDIA_LENGTH.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_LENGTH)));
-        }
-        if(trackingParameter.containsKey(Parameter.MEDIA_BANDWITH)) {
-            url.append("&" + Parameter.MEDIA_BANDWITH.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_BANDWITH)));
-        }
-        if(trackingParameter.containsKey(Parameter.MEDIA_VOLUME)) {
-            url.append("&" + Parameter.MEDIA_VOLUME.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_VOLUME)));
-        }
-        if(trackingParameter.containsKey(Parameter.MEDIA_MUTED)) {
-            url.append("&" + Parameter.MEDIA_MUTED.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_MUTED)));
-        }
-        if(trackingParameter.containsKey(Parameter.MEDIA_TIMESTAMP)) {
-            url.append("&" + Parameter.MEDIA_TIMESTAMP.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.MEDIA_TIMESTAMP)));
-        }
-        //if ecom trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getEcomParameter().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getEcomParameter().entrySet()) {
-                url.append("&cb" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
-            }
-        }
-        //if ad trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getAdParameter().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getAdParameter().entrySet()) {
-                url.append("&cc" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
-            }
-        }
-        //if action trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getPageParameter().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getPageParameter().entrySet()) {
-                url.append("&cp" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
-            }
-        }
-        //if session trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getSessionParameter().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getSessionParameter().entrySet()) {
-                url.append("&cs" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
-            }
-        }
-        //if action trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getActionParameter().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getActionParameter().entrySet()) {
-                url.append("&ck" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
-            }
-        }
-
-        //if product category trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getProductCategories().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getProductCategories().entrySet()) {
-                url.append( "&ca" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
-            }
-        }
-        //if page category trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getPageCategories().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getPageCategories().entrySet()) {
-                url.append("&cg" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
-            }
-        }
-
-        //if user category trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getUserCategories().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getUserCategories().entrySet()) {
-                url.append("&uc" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
-            }
-        }
-
-        //if media category trackingParameter are given, append them to the url as well
-        if (!trackingParameter.getMediaCategories().isEmpty()) {
-            for (Map.Entry<String, String> entry : trackingParameter.getMediaCategories().entrySet()) {
-                url.append("&mg" + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
-            }
-        }
-
-
-        if(trackingParameter.containsKey(Parameter.SAMPLING)) {
-            url.append("&" + Parameter.SAMPLING.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.SAMPLING)));
-        }
-
-        if(trackingParameter.containsKey(Parameter.IP_ADDRESS)) {
-            url.append("&" + Parameter.IP_ADDRESS.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.IP_ADDRESS)));
-        }
-
-        if(trackingParameter.containsKey(Parameter.USERAGENT)) {
-            url.append("&" + Parameter.USERAGENT.toString() + "=" + HelperFunctions.urlEncode(tp.get(Parameter.USERAGENT)));
-        }
-        // append eor to make shure the request is valid
         url.append("&eor=1");
         return url.toString();
     }
 
     public TrackingParameter getTrackingParameter() {
-        return trackingParameter;
+        return mTrackingParameter;
     }
 
     public void setTrackingParameter(TrackingParameter trackingParameter) {
-        this.trackingParameter = trackingParameter;
+        trackingParameter = trackingParameter;
     }
 
     public TrackingConfiguration getTrackingConfiguration() {
@@ -271,6 +254,6 @@ public class TrackingRequest {
     }
 
     public void setTrackingConfiguration(TrackingConfiguration trackingConfiguration) {
-        this.trackingConfiguration = trackingConfiguration;
+        trackingConfiguration = trackingConfiguration;
     }
 }

@@ -61,3 +61,16 @@ dependencies {
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
+
+
+task copyFiles (type: Copy) {
+    description = 'Copies aar file to app module'
+    from 'build/outputs/aar'
+    into '../../MyApplication/app/libs'
+    include '**/*.aar'
+}
+
+assembleDebug{}.doLast
+{
+    tasks.copyFiles.execute()
+}

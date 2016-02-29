@@ -25,12 +25,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -551,4 +554,46 @@ final class HelperFunctions {
         return conn.getInputStream();
     }
 
+    /**
+     * return sha256 coded string
+     * @param value
+     * @return
+     */
+    static String makeSha256(String value)
+    {
+        return getHash(value, "SHA-256");
+    }
+
+    /**
+     * return md5 code based on string
+     * @param value
+     * @return
+     */
+    static String makeMd5(String value)
+    {
+        if (value == null)
+            return null;
+
+        return getHash(value, "MD5");
+    }
+
+    private static String getHash(String value, String hasType)
+    {
+        if (value == null)
+            return null;
+
+        byte[] digest = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance(hasType);
+            digest = md.digest(value.getBytes("UTF-8"));
+        } catch (NoSuchAlgorithmException e) {
+            WebtrekkLogging.log(hasType+" isn't found");
+            return null;
+        } catch (UnsupportedEncodingException e) {
+            WebtrekkLogging.log("encoding error for UTF-8");
+            return null;
+        }
+
+        return new BigInteger(1, digest).toString(16);
+    }
 }

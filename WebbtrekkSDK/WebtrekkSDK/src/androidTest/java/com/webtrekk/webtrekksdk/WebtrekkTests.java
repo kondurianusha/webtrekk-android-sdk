@@ -68,7 +68,7 @@ public class WebtrekkTests extends AndroidTestCase {
 
     public void testInitTrackingConfiguration() {
         webtrekk.setContext(getContext());
-        webtrekk.initTrackingConfiguration();
+        webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
         assertNotNull(webtrekk.getTrackingConfiguration());
         assertEquals(webtrekk.getTrackingConfiguration().getTrackId(), "1111111111112");
         assertEquals(webtrekk.getTrackingConfiguration().getTrackDomain(), "http://trackingtest.nglab.org");
@@ -80,7 +80,7 @@ public class WebtrekkTests extends AndroidTestCase {
     @Suppress
     public void testInitPlugins() {
         webtrekk.setContext(getContext());
-        webtrekk.initTrackingConfiguration();
+        webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
         webtrekk.initPlugins();
         assertNotNull(webtrekk.getPlugins());
         assertEquals(1, webtrekk.getPlugins().size());
@@ -89,7 +89,7 @@ public class WebtrekkTests extends AndroidTestCase {
     public void testInitWebtrekkParameter() {
         // make sure the default params have valid values
         webtrekk.setContext(getContext());
-        webtrekk.initTrackingConfiguration();
+        webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
         webtrekk.initInternalParameter();
         webtrekk.initWebtrekkParameter();
         assertEquals(6, webtrekk.getWebtrekkParameter().size());
@@ -100,7 +100,7 @@ public class WebtrekkTests extends AndroidTestCase {
     public void testUpdateDynamicParameter() {
         // make sure that the values which change with every request are inserted as well
         webtrekk.setContext(getContext());
-        webtrekk.initTrackingConfiguration();
+        webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
         webtrekk.initInternalParameter();
         webtrekk.initWebtrekkParameter();
         webtrekk.initAutoCustomParameter();
@@ -125,7 +125,7 @@ public class WebtrekkTests extends AndroidTestCase {
     public void testInitCustomParameter() {
         // make sure that the values which change with every request are inserted as well
         webtrekk.setContext(getContext());
-        webtrekk.initTrackingConfiguration();
+        webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
         webtrekk.initInternalParameter();
         webtrekk.initWebtrekkParameter();
         webtrekk.initAutoCustomParameter();

@@ -116,22 +116,53 @@ public class Webtrekk {
         return SingletonHolder.webtrekk;
     }
 
-    final public void initWebtrekk(final Application app) {
+    /**
+     * this initializes the webtrekk tracking configuration, it has to be called only once when the
+     * application starts, for example in the Application Class or the Main Activitys onCreate.
+     * Use R.raw.webtrekk_config as default configID
+     * @param app application instance
+     *
+     */
+    final public void initWebtrekk(final Application app)
+    {
+        initWebtrekk(app, R.raw.webtrekk_config);
+    }
+
+    /**
+     * this initializes the webtrekk tracking configuration, it has to be called only once when the
+     * application starts, for example in the Application Class or the Main Activitys onCreate.
+     * @param app application instance
+     * @param configResourceID id of config resource
+     *
+     */
+    final public void initWebtrekk(final Application app, int configResourceID) {
         if (app == null) {
             throw new IllegalArgumentException("no valid app");
         }
         initAutoTracking(app);
-        initWebtrekk(app.getApplicationContext());
+        initWebtrekk(app.getApplicationContext(), configResourceID);
     }
 
+    /**
+     * @Deprecated use (@link #initWebtrekk(final Application app, int configResourceID)) instead
+     * this initializes the webtrekk tracking configuration, it has to be called only once when the
+     * application starts, for example in the Application Class or the Main Activitys onCreate.
+     * Use R.raw.webtrekk_config as default configID
+     * @param c
+     *
+     */
+    public void initWebtrekk(final Context c)
+    {
+        initWebtrekk(c, R.raw.webtrekk_config);
+    }
 
     /**
      * this initializes the webtrekk tracking configuration, it has to be called only once when the
      * application starts, for example in the Application Class or the Main Activitys onCreate
      * @param c the application context / context of the main activity
-     *
+     * @param configResourceID resource config ID.
      */
-    public void initWebtrekk(final Context c) {
+    void initWebtrekk(final Context c, int configResourceID) {
         if (c == null) {
             throw new IllegalArgumentException("no valid context");
         }
@@ -147,7 +178,7 @@ public class Webtrekk {
             customParameter = new HashMap<>();
         }
 
-        initTrackingConfiguration();
+        initTrackingConfiguration(configResourceID);
         initOptedOut();
         initSampling();
         initInternalParameter();
@@ -171,8 +202,8 @@ public class Webtrekk {
 
     }
 
-    final void initTrackingConfiguration() {
-        initTrackingConfiguration(null);
+    final void initTrackingConfiguration(int configResourceID) {
+        initTrackingConfiguration(null, configResourceID);
     }
 
     void initInternalParameter() {
@@ -196,7 +227,7 @@ public class Webtrekk {
      *
      * @param configurationString for unit testing only
      */
-    final void initTrackingConfiguration(final String configurationString) {
+    final void initTrackingConfiguration(final String configurationString, int configResourceID) {
 
             // always parse the local raw config version first, this is fallback, default and also the way to fix broken online configs
             //TODO: this could me more elegant by only parsing it when its a new app version which needs to be set anyway
@@ -204,14 +235,14 @@ public class Webtrekk {
             String defaultConfigurationString = null;
             if (configurationString == null) {
                 try {
-                    trackingConfigurationString = HelperFunctions.stringFromStream(context.getResources().openRawResource(R.raw.webtrekk_config));
+                    trackingConfigurationString = HelperFunctions.stringFromStream(context.getResources().openRawResource(configResourceID));
                 } catch (IOException e) {
-                    WebtrekkLogging.log("no custom config was found, illegal state, provide a valid config in res/raw/webtrekk_config.xml");
+                    WebtrekkLogging.log("no custom config was found, illegal state, provide a valid config in res id:"+configResourceID);
                     throw new IllegalStateException("can not load xml configuration file, invalid state");
                 }
                 if(trackingConfigurationString.length() < 80) {
                     // neccesary to make sure it uses the placeholder which has 66 chars length
-                    WebtrekkLogging.log("no custom config was found, illegal state, provide a valid config in res/raw/webtrekk_config.xml");
+                    WebtrekkLogging.log("no custom config was found, illegal state, provide a valid config in res id:"+configResourceID);
                     throw new IllegalStateException("can not load xml configuration file, invalid state");
                 }
             } else {

@@ -18,6 +18,9 @@ import java.util.regex.Pattern;
 
 /**
  * Created by vartbaronov on 03.03.16.
+ * Class is responsible for calling thread that is get Advertizing ID and processing referrer id. It is extracts click id and sends install request.
+ *
+ * @hide
  */
 class Campaign extends Thread
 {
@@ -45,6 +48,15 @@ class Campaign extends Thread
         mStopNotification = stopNotification;
     }
 
+    /**
+     * @hide
+     * Starts thread for collecting Campain data
+     * @param context context
+     * @param trackID track id
+     * @param isFirstStart if this is first start
+     * @param stopNotification notify about that work is done. It is required to free instance of this class for GC
+     * @return instance of Campain class. you need it to interrupt process if application is closed.
+     */
     static Campaign start(Context context, String trackID, boolean isFirstStart,
                           Runnable stopNotification)
     {
@@ -70,6 +82,7 @@ class Campaign extends Thread
         return result;
     }
 
+    /** @hide */
     //Parse refferer and get media code
     private String getGoogleAnalyticMediaCode(String referrer)
     {
@@ -114,6 +127,7 @@ class Campaign extends Thread
 
     }
 
+    /** @hide */
     private String getClickID(String referrer)
     {
         Pattern pattern = Pattern.compile("(^|&)wt_clickid=([^&#=]*)([#&]|$)");
@@ -128,6 +142,7 @@ class Campaign extends Thread
 
     /**
      * @hide
+     * Main thread
      */
     @Override
     public void run() {
@@ -162,6 +177,7 @@ class Campaign extends Thread
             WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
         }
 
+        //if this is first start wait for referrer for 1 min.
         final long waitForReferrerDelay = 60000;
         long timeToEndListener = System.currentTimeMillis() + waitForReferrerDelay;
         String referrer = null;
@@ -185,18 +201,20 @@ class Campaign extends Thread
             WebtrekkLogging.log("Referrer is received and readed:"+referrer);
         }
         String clickID = null;
+        String googleMediaCode = null;
 
-        // for non first start it is always null
+        // for non first start referrer is always null
         if (referrer != null)
         {
+            // is it referrer from Webtrekk
             clickID = getClickID(referrer);
 
-            if (clickID == null)
+            if (clickID != null)
             {
                 WebtrekkLogging.log("Click ID:" + clickID);
             }else
             {
-                String googleMediaCode = getGoogleAnalyticMediaCode(referrer);
+                googleMediaCode = getGoogleAnalyticMediaCode(referrer);
                 if (googleMediaCode != null)
                     SaveCodeAndAdID(googleMediaCode, advID, isLimitAdEnabled);
             }
@@ -204,24 +222,28 @@ class Campaign extends Thread
 
         String webtrekkMediaCode = null;
 
-        if (mFirstStart){
-            if (!isInterrupted())
-              webtrekkMediaCode = requestMediaCode(advID, clickID, HelperFunctions.getUserAgent());
-            else
-            {
-                setInterruptedThread();
-                return;
+        // if this is webtrekk referrer get media code.
+        if (googleMediaCode == null) {
+            if (mFirstStart) {
+                // if thread isn't interrupted. Request for media code
+                if (!isInterrupted())
+                    webtrekkMediaCode = requestMediaCode(advID, clickID, HelperFunctions.getUserAgent());
+                else {
+                    setInterruptedThread();
+                    return;
+                }
             }
-        }
 
-        SaveCodeAndAdID(webtrekkMediaCode, advID, isLimitAdEnabled);
+            SaveCodeAndAdID(webtrekkMediaCode, advID, isLimitAdEnabled);
+        }
 
         if (mStopNotification != null)
             mStopNotification.run();
     }
 
     /*
-    Request media code with Install request
+    Request media code with Install request. Provides all infromation in request it can.
+    Sends request anyway as userAgent should be present.
      */
     private String requestMediaCode(String advID, String clickID, String userAgent)
     {
@@ -309,7 +331,9 @@ class Campaign extends Thread
         return  mMediaCode;
     }
 
-
+    /**
+     Save all information to settings. So it can be used in future and in case something happened with application.
+     */
     private void SaveCodeAndAdID(String mediaCode, String advertizingID, boolean isOptOut)
     {
         SharedPreferences.Editor editor = HelperFunctions.getWebTrekkSharedPreference(mContext).edit();
@@ -324,6 +348,9 @@ class Campaign extends Thread
         editor.apply();
     }
 
+    /**
+     * save if thread was interrupted just after first start. So we can process referrer one more time after second start
+     */
     private void setInterruptedThread()
     {
         SharedPreferences.Editor editor = HelperFunctions.getWebTrekkSharedPreference(mContext).edit();
@@ -331,6 +358,11 @@ class Campaign extends Thread
         editor.putBoolean(FIRST_START_INTERRUPTED, true).apply();
     }
 
+    /**
+     * {@hide}
+     * get if thread was interrupted see {@link #setInterruptedThread()}
+     * @return
+     */
     private boolean getInterruptedThread()
     {
         SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(mContext);
@@ -358,6 +390,13 @@ class Campaign extends Thread
         return preferences.getBoolean(OPT_OUT, false);
     }
 
+    /**
+     * help funtion that get information from setting and optionally remove it
+     * @param context
+     * @param key
+     * @param remove
+     * @return
+     */
     static private String getAndRemoveInstallSpecificCode(Context context, String key, boolean remove)
     {
         String value;

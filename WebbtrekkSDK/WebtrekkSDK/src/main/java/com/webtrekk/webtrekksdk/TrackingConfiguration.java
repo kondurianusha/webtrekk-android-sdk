@@ -37,7 +37,7 @@ class TrackingConfiguration {
     private boolean autoTrackApiLevel = true;
     private boolean autoTrackScreenorientation = true;
     private boolean autoTrackConnectionType = true;
-    private boolean autoTrackAdvertismentOptOut= false;
+    private boolean autoTrackAdvertismentOptOut= true;
 
     // enabled plugins
     private boolean enablePluginHelloWorld;

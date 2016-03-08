@@ -301,6 +301,14 @@ public class TrackingParameter {
         CDB_LINKEDIN_ID("cdb13"),
 
         /**
+         * Install request
+         */
+
+        INST_TRACK_ID("trackid"),
+        INST_AD_ID("aid"),
+        INST_CLICK_ID("clickid"),
+
+        /**
          * multiple value trackingParameter and customer trackingParameter
          */
 

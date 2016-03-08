@@ -2,6 +2,7 @@ package com.webtrekk.webtrekksdk;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -18,6 +19,11 @@ public class RequestProcessor implements Runnable {
     static final int NETWORK_READ_TIMEOUT = 60 * 1000;  // 1 minute
 
     private final RequestUrlStore requestUrlStore;
+
+    interface ProcessOutputCallback
+    {
+        public void process(int statusCode, HttpURLConnection connection);
+    }
 
     public RequestProcessor(RequestUrlStore requestUrlStore) {
         this.requestUrlStore = requestUrlStore;
@@ -55,7 +61,7 @@ public class RequestProcessor implements Runnable {
      * @param url
      * @return statusCode, 0 for retry, -1 for remove, 200 for success
      */
-    public int sendRequest(URL url) {
+    public int sendRequest(URL url, ProcessOutputCallback processOutput) {
         HttpURLConnection connection = null;
         try {
             connection = getUrlConnection(url);
@@ -64,8 +70,13 @@ public class RequestProcessor implements Runnable {
             connection.setReadTimeout(NETWORK_READ_TIMEOUT);
             connection.setUseCaches(false);
             connection.connect();
+
             try {
                 int statusCode = connection.getResponseCode();
+
+                if (processOutput != null)
+                    processOutput.process(statusCode, connection);
+
                 return statusCode;
             } catch (Exception e) {
                 WebtrekkLogging.log("unknown exception: ", e);
@@ -111,7 +122,7 @@ public class RequestProcessor implements Runnable {
                 continue;
             }
 
-            int statusCode = sendRequest(url);
+            int statusCode = sendRequest(url, null);
             if (statusCode >= 200 && statusCode <= 299) {
                 WebtrekkLogging.log("completed request. Status code:"+statusCode);
                 //successful send, remove url from store

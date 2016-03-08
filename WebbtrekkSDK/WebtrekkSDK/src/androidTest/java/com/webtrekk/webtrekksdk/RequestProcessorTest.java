@@ -31,7 +31,7 @@ public class RequestProcessorTest extends AndroidTestCase {
         requestProcessor.run();
         // make sure that the request processor returns without further actions
         verify(requestProcessor, times(0)).getUrl(anyString());
-        verify(requestProcessor, times(0)).sendRequest((URL)any());
+        verify(requestProcessor, times(0)).sendRequest((URL)any(), null);
         //verifyNoMoreInteractions(requestUrlStore);
     }
 

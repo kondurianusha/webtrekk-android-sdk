@@ -30,11 +30,13 @@ public class TrackingRequestTests extends AndroidTestCase {
         trackingConfiguration.setTrackId("1111111111");
         trackingConfiguration.setTrackDomain("http://q3.webtrekk.net");
 
+        boolean isFirstStart = HelperFunctions.firstStart(mContext);
+
         webtrekk.setTrackingConfiguration(trackingConfiguration);
         webtrekk.setCurrentActivityName("test");
         webtrekk.setContext(getContext());
         webtrekk.initWebtrekkParameter();
-        webtrekk.initInternalParameter();
+        webtrekk.initInternalParameter(isFirstStart);
 
         // for all tests just start with an tmpy list of parameters
         webtrekk.initAutoCustomParameter();
@@ -191,7 +193,6 @@ public class TrackingRequestTests extends AndroidTestCase {
     public void testAutoAdvertiserId() {
         trackingConfiguration.setAutoTrackAdvertiserId(true);
         assertTrue(webtrekk.getTrackingConfiguration().isAutoTrackAdvertiserId());
-        webtrekk.initAdvertiserId();
         webtrekk.setCustomParameter(new HashMap<String, String>());
         try {
             Thread.sleep(4000);

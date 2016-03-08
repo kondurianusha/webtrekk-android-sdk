@@ -238,7 +238,7 @@ final class HelperFunctions {
     }
 
     public static String getEverId(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getWebTrekkSharedPreference(context);
         if (!preferences.contains(Webtrekk.PREFERENCE_KEY_EVER_ID)) {
             preferences.edit().putString(Webtrekk.PREFERENCE_KEY_EVER_ID, HelperFunctions.generateEverid()).commit();
             // for compatibility reasons put the key here for new installation
@@ -282,7 +282,7 @@ final class HelperFunctions {
     }
 
     public static void setAppVersionCode(int versionCode, Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getWebTrekkSharedPreference(context);;
         preferences.edit().putInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, versionCode).commit();
     }
 
@@ -293,7 +293,7 @@ final class HelperFunctions {
      * @return
      */
     public static boolean updated(Context context, int currentVersion) {
-        int stored_version = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE).getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, -1);
+        int stored_version = getWebTrekkSharedPreference(context).getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, -1);
         if(currentVersion > stored_version ) {
             // update the stored version
             setAppVersionCode(currentVersion, context);
@@ -319,8 +319,14 @@ final class HelperFunctions {
      */
     public static boolean firstStart(Context context) {
         // if no everid is set, this is the first start
-        SharedPreferences preferences = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences preferences = getWebTrekkSharedPreference(context);
         return !preferences.contains(Webtrekk.PREFERENCE_KEY_EVER_ID);
+    }
+
+
+    static SharedPreferences getWebTrekkSharedPreference(Context context)
+    {
+        return context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
     }
 
     /**
@@ -339,7 +345,7 @@ final class HelperFunctions {
     }
 
     public static boolean isNewInstallation(Context context) {
-            SharedPreferences preferences = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+            SharedPreferences preferences = getWebTrekkSharedPreference(context);
             String installationFlag = preferences.getString(Webtrekk.PREFERENCE_KEY_INSTALLATION_FLAG, null);
             return (installationFlag != null && installationFlag.equals("1"));
 

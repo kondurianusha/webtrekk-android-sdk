@@ -90,7 +90,7 @@ public class WebtrekkTests extends AndroidTestCase {
         // make sure the default params have valid values
         webtrekk.setContext(getContext());
         webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
-        webtrekk.initInternalParameter();
+        webtrekk.initInternalParameter(false);
         webtrekk.initWebtrekkParameter();
         assertEquals(6, webtrekk.getWebtrekkParameter().size());
         assertTrue(webtrekk.getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library 4.0(Android;"));
@@ -101,7 +101,7 @@ public class WebtrekkTests extends AndroidTestCase {
         // make sure that the values which change with every request are inserted as well
         webtrekk.setContext(getContext());
         webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
-        webtrekk.initInternalParameter();
+        webtrekk.initInternalParameter(false);
         webtrekk.initWebtrekkParameter();
         webtrekk.initAutoCustomParameter();
 
@@ -126,7 +126,7 @@ public class WebtrekkTests extends AndroidTestCase {
         // make sure that the values which change with every request are inserted as well
         webtrekk.setContext(getContext());
         webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
-        webtrekk.initInternalParameter();
+        webtrekk.initInternalParameter(false);
         webtrekk.initWebtrekkParameter();
         webtrekk.initAutoCustomParameter();
 

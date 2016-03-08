@@ -29,7 +29,7 @@ public class WebtrekkUserParameters {
     private static final long DATE_DELIMETER = 1000*60*60*24;
 
     /**
-     * Set Email should be normalized - lower case only and no whitespaces
+     * Set Email will be normalized - lower case only and no whitespaces
      * To remove parameter use null
      * @param email
      * @return instance of to WebtrekkUserParameters
@@ -40,7 +40,7 @@ public class WebtrekkUserParameters {
     }
 
     /**
-     * Set Phone should be normalized - lower case only, no whitespaces, no non-number characters
+     * Set Phone will be normalized - lower case only, no whitespaces, no non-number characters
      * @param phone phone number
      * @return instance of to WebtrekkUserParameters
      */
@@ -52,6 +52,7 @@ public class WebtrekkUserParameters {
 
     /**
      * Set address should be in form prename|surename|zipcode|street|house number
+     * address will be normalized
      * @param address
      * @return instance of to WebtrekkUserParameters
      */
@@ -200,7 +201,7 @@ public class WebtrekkUserParameters {
      */
     boolean saveToSettings(Context context)
     {
-        SharedPreferences preferences = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
         SharedPreferences.Editor editor = preferences.edit();
 
         //Save standard parameters and remove nulls
@@ -246,7 +247,7 @@ public class WebtrekkUserParameters {
      */
     boolean restoreFromSettings(Context context)
     {
-        SharedPreferences preferences = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
 
         for (Parameter par: ALL_CDB_PAR)
         {
@@ -301,7 +302,7 @@ public class WebtrekkUserParameters {
 
     static boolean needUpdateCDBRequest(Context context)
     {
-        SharedPreferences preferences = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
 
         if (preferences.contains(LAST_CBD_REQUEST_DATE)) {
             long dates = preferences.getLong(LAST_CBD_REQUEST_DATE, 0);
@@ -317,7 +318,7 @@ public class WebtrekkUserParameters {
      */
     static void updateCDBRequestDate(Context context)
     {
-        SharedPreferences preferences = context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
 
         preferences.edit().putLong(LAST_CBD_REQUEST_DATE, getCurrentDateCounter()).apply();
     }

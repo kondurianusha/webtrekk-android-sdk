@@ -23,7 +23,8 @@ public class TrackingRequest {
     enum RequestType
     {
         GENERAL,
-        CDB
+        CDB,
+        INSTALL
     }
 
     /**
@@ -65,16 +66,35 @@ public class TrackingRequest {
      * @param trackingParameter
      * @param url
      * @param keys
+     * @param isAmp
      */
-    private void addParametersArray(TrackingParameter trackingParameter, StringBuffer url, Parameter keys[])
+    private void addParametersArray(TrackingParameter trackingParameter, StringBuffer url, Parameter keys[],
+                                    boolean isAmpToFirstParameter)
     {
         SortedMap<Parameter, String> tp = trackingParameter.getDefaultParameter();
+        boolean isAmp = isAmpToFirstParameter;
+
         for (Parameter key:keys)
         {
             if(trackingParameter.containsKey(key)) {
-                url.append("&" + key.toString() + "=" + HelperFunctions.urlEncode(tp.get(key)));
+                url.append((isAmp ? "&" : "") + key.toString() + "=" + HelperFunctions.urlEncode(tp.get(key)));
+
+                if (!isAmp)
+                    isAmp = true;
             }
         }
+    }
+
+    /**
+     * The same as {@link #addParametersArray(TrackingParameter, StringBuffer, Parameter[], boolean)}
+     * @param trackingParameter
+     * @param url
+     * @param keys
+     * @param isAmp
+     */
+    private void addParametersArray(TrackingParameter trackingParameter, StringBuffer url, Parameter keys[])
+    {
+        addParametersArray(trackingParameter, url, keys, true);
     }
 
     /**
@@ -99,6 +119,8 @@ public class TrackingRequest {
     {
         String getPValue(TrackingParameter trackingParameter);
         void getTrackingPart(TrackingParameter trackingParameter, StringBuffer url);
+        String getBasePart();
+        boolean isEORAppend();
     }
 
 
@@ -131,6 +153,16 @@ public class TrackingRequest {
         public void getTrackingPart(TrackingParameter trackingParameter, StringBuffer url) {
             addParametersArray(trackingParameter, url, KEYZ);
             addKeyMap(trackingParameter.getCustomUserParameters(), "&cdb", url);
+        }
+
+        @Override
+        public String getBasePart() {
+            return getBaseURLPart();
+        }
+
+        @Override
+        public boolean isEORAppend() {
+            return true;
         }
     }
 
@@ -204,6 +236,43 @@ public class TrackingRequest {
             //if media category trackingParameter are given, append them to the url as well
             addKeyMap(trackingParameter.getMediaCategories(), "&mg", url);
         }
+
+        @Override
+        public String getBasePart() {
+            return getBaseURLPart();
+        }
+
+        @Override
+        public boolean isEORAppend() {
+            return true;
+        }
+    }
+
+    private class InstallRequest implements URLFactory
+    {
+        final Parameter KEYZ[] = {Parameter.INST_TRACK_ID, Parameter.INST_AD_ID, Parameter.INST_CLICK_ID,
+                Parameter.USERAGENT};
+
+        @Override
+        public String getPValue(TrackingParameter trackingParameter) {
+            return "";
+        }
+
+        @Override
+        public void getTrackingPart(TrackingParameter trackingParameter, StringBuffer url)
+        {
+            addParametersArray(trackingParameter, url, KEYZ, false);
+        }
+
+        @Override
+        public String getBasePart() {
+            return "http://appinstall.webtrekk.net/appinstall/v1/install?";
+        }
+
+        @Override
+        public boolean isEORAppend() {
+            return false;
+        }
     }
 
 
@@ -225,6 +294,9 @@ public class TrackingRequest {
             case CDB:
                 urlFactory = new CDBRequest();
                 break;
+            case INSTALL:
+                urlFactory = new InstallRequest();
+                break;
         }
 
         if (urlFactory == null)
@@ -233,11 +305,12 @@ public class TrackingRequest {
             return null;
         }
 
-        url.append(getBaseURLPart());
+        url.append(urlFactory.getBasePart());
         url.append(urlFactory.getPValue(mTrackingParameter));
         urlFactory.getTrackingPart(mTrackingParameter, url);
 
-        url.append("&eor=1");
+        if (urlFactory.isEORAppend())
+           url.append("&eor=1");
         return url.toString();
     }
 

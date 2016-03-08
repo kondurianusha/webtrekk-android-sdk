@@ -66,11 +66,14 @@ dependencies {
 task copyFiles (type: Copy) {
     description = 'Copies aar file to app module'
     from 'build/outputs/aar'
-    into '../../MyApplication/app/libs'
+    into '../../SDKTest/app/libs'
     include '**/*.aar'
 }
 
-assembleDebug{}.doLast
-{
+assembleDebug{}.doLast{
     tasks.copyFiles.execute()
+}
+
+assembleRelease{}.doLast{
+            tasks.copyFiles.execute()
 }

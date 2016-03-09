@@ -1,7 +1,9 @@
 package com.webtrekk.webtrekksdk;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.JsonReader;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
@@ -35,6 +37,7 @@ class Campaign extends Thread
     private static final String MEDIA_CODE = "INSTALL_SETTINGS_MEDIA_CODE";
     private static final String OPT_OUT = "INSTALL_SETTINGS_OPT_OUT";
     private static final String FIRST_START_INTERRUPTED = "FIRST_START_INTERRUPTED";
+    private static final String CAMPAIN_MEDIA_CODE_DEFINED_MESSAGE = "com.Webtrekk.CampainMediaMessage";
 
 
     Campaign(Context context, String trackID, boolean isFirstStart,
@@ -215,8 +218,10 @@ class Campaign extends Thread
             }else
             {
                 googleMediaCode = getGoogleAnalyticMediaCode(referrer);
-                if (googleMediaCode != null)
+                if (googleMediaCode != null) {
                     SaveCodeAndAdID(googleMediaCode, advID, isLimitAdEnabled);
+                    campaignNotificationMessage(googleMediaCode, advID);
+                }
             }
         }
 
@@ -235,6 +240,7 @@ class Campaign extends Thread
             }
 
             SaveCodeAndAdID(webtrekkMediaCode, advID, isLimitAdEnabled);
+            campaignNotificationMessage(webtrekkMediaCode, advID);
         }
 
         if (mStopNotification != null)
@@ -405,5 +411,21 @@ class Campaign extends Thread
         if (value != null && remove)
           preferences.edit().remove(key).apply();
         return value;
+    }
+
+    /**
+     * Some test message for test application
+     * @param mediaCode
+     * @param advID
+     */
+    private void campaignNotificationMessage(String mediaCode, String advID)
+    {
+        if (!mFirstStart)
+            return;
+        Intent intent = new Intent(CAMPAIN_MEDIA_CODE_DEFINED_MESSAGE);
+
+        intent.putExtra(MEDIA_CODE, mediaCode);
+        intent.putExtra(ADV_ID, advID);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 }

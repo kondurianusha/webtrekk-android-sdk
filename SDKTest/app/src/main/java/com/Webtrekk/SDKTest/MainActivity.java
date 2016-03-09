@@ -1,7 +1,14 @@
 package com.Webtrekk.SDKTest;
 
+import android.app.AlertDialog;
 import android.app.Application;
+import android.app.DialogFragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +28,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mediaCodeReceiverRegister();
 
         webtrekk = Webtrekk.getInstance();
         webtrekk.initWebtrekk(getApplication());
@@ -48,6 +57,52 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
+    @Override
+    protected void onDestroy() {
+        mediaCodeReceiverUnRegister();
+        super.onDestroy();
+    }
+
+
+    private BroadcastReceiver mSDKReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String mediaCode = intent.getStringExtra("INSTALL_SETTINGS_MEDIA_CODE");
+            String advID = intent.getStringExtra("INSTALL_SETTINGS_ADV_ID");
+
+            Log.d(getClass().getName(),"Broad case message from SDK is received");
+
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Media Code")
+                    .setMessage("Media code is received: " + mediaCode + "\nAdv id is: " + advID)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .show();
+
+        }
+    };
+
+    /**
+     * This is just for testing. To receive Campain installation data
+     */
+    private void mediaCodeReceiverRegister()
+    {
+        LocalBroadcastManager.getInstance(this).registerReceiver(mSDKReceiver,
+                new IntentFilter("com.Webtrekk.CampainMediaMessage"));
+    }
+
+    /**
+     * This is just for testing. To receive Campain installation data
+     */
+    private void mediaCodeReceiverUnRegister()
+    {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSDKReceiver);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

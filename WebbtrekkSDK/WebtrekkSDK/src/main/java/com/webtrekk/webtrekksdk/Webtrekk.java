@@ -486,8 +486,11 @@ public class Webtrekk {
             if(trackingConfiguration.isAutoTrackAdvertiserId() && !autoCustomParameter.containsKey("advertiserId")
                     && Campaign.getAdvId(mContext) != null) {
                 autoCustomParameter.put("advertiserId", Campaign.getAdvId(mContext));
-                autoCustomParameter.put("advertisingOptOut", String.valueOf(Campaign.getOptOut(mContext)));
+
+                if (trackingConfiguration.isAutoTrackAdvertismentOptOut() && !autoCustomParameter.containsKey("advertisingOptOut"))
+                    autoCustomParameter.put("advertisingOptOut", String.valueOf(Campaign.getOptOut(mContext)));
             }
+
 
             if(requestUrlStore != null) {
                 autoCustomParameter.put("requestUrlStoreSize", String.valueOf(requestUrlStore.size()));

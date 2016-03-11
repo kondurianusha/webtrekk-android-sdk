@@ -30,7 +30,7 @@ public class WebtrekkUserParameters {
 
     /**
      * Set Email will be normalized - lower case only and no whitespaces
-     * To remove parameter use null
+     * in that case MD5 and SHA256 were sent for normalized string
      * @param email
      * @return instance of to WebtrekkUserParameters
      */
@@ -40,7 +40,30 @@ public class WebtrekkUserParameters {
     }
 
     /**
+     * Set email as MD5
+     * Only low case normalization in that case
+     * @param emailMD5
+     * @return instance of to WebtrekkUserParameters
+     */
+    public WebtrekkUserParameters setEmailMD5(String emailMD5) {
+        mParameters.put(Parameter.CDB_EMAIL_MD5, emailMD5.toLowerCase());
+        return this;
+    }
+
+    /**
+     * Set email as SHA256
+     * Only low case normalization in that case
+     * @param emailSHA256
+     * @return instance of to WebtrekkUserParameters
+     */
+    public WebtrekkUserParameters setEmailSHA256(String emailSHA256) {
+        mParameters.put(Parameter.CDB_EMAIL_SHA, emailSHA256.toLowerCase());
+        return this;
+    }
+
+    /**
      * Set Phone will be normalized - lower case only, no whitespaces, no non-number characters
+     * in that case MD5 and SHA256 were sent for normalized string
      * @param phone phone number
      * @return instance of to WebtrekkUserParameters
      */
@@ -48,6 +71,28 @@ public class WebtrekkUserParameters {
     {
         putMd5ShaPair(Parameter.CDB_PHONE_MD5, Parameter.CDB_PHONE_SHA, normalizePhone(phone));
        return this;
+    }
+
+    /**
+     * Set phone as MD5
+     * Only low case normalization in that case
+     * @param phoneMD5
+     * @return instance of to WebtrekkUserParameters
+     */
+    public WebtrekkUserParameters setPhoneMD5(String phoneMD5) {
+        mParameters.put(Parameter.CDB_PHONE_MD5, phoneMD5.toLowerCase());
+        return this;
+    }
+
+    /**
+     * Set phone as SHA256
+     * Only low case normalization in that case
+     * @param phoneSHA256
+     * @return instance of to WebtrekkUserParameters
+     */
+    public WebtrekkUserParameters setPhoneSHA256(String phoneSHA256) {
+        mParameters.put(Parameter.CDB_PHONE_SHA, phoneSHA256.toLowerCase());
+        return this;
     }
 
     /**
@@ -68,80 +113,110 @@ public class WebtrekkUserParameters {
     }
 
     /**
+     * Set address as MD5
+     * Only low case normalization in that case
+     * @param addressMD5
+     * @return instance of to WebtrekkUserParameters
+     */
+    public WebtrekkUserParameters setAddressMD5(String addressMD5) {
+        mParameters.put(Parameter.CDB_ADDRESS_MD5, addressMD5.toLowerCase());
+        return this;
+    }
+
+    /**
+     * Set address as SHA256
+     * Only low case normalization in that case
+     * @param addressSHA256
+     * @return instance of to WebtrekkUserParameters
+     */
+    public WebtrekkUserParameters setAddressSHA256(String addressSHA256) {
+        mParameters.put(Parameter.CDB_ADDRESS_SHA, addressSHA256.toLowerCase());
+        return this;
+    }
+
+    /**
      * set android ID
+     * parameters normalized to lower case
      * @param androidId
      * @return instance of to WebtrekkUserParameters
      */
     public WebtrekkUserParameters setAndroidId(String androidId) {
-        mParameters.put(Parameter.CDB_ANDROID_ID, androidId);
+        mParameters.put(Parameter.CDB_ANDROID_ID, androidId.toLowerCase());
         return this;
     }
 
     /**
      * set iOS id
+     * parameters normalized to lower case
      * @param iOSId
      * @return instance of to WebtrekkUserParameters
      */
     public WebtrekkUserParameters setiOSId(String iOSId) {
-        mParameters.put(Parameter.CDB_IOS_ADD_ID, iOSId);
+        mParameters.put(Parameter.CDB_IOS_ADD_ID, iOSId.toLowerCase());
         return this;
     }
 
     /**
      * set WindowsID
+     * parameters normalized to lower case
      * @param windowsId
      * @return instance of to WebtrekkUserParameters
      */
     public WebtrekkUserParameters setWindowsId(String windowsId) {
-        mParameters.put(Parameter.CDB_WIN_AD_ID, windowsId);
+        mParameters.put(Parameter.CDB_WIN_AD_ID, windowsId.toLowerCase());
         return this;
     }
 
     /**
      * set Facebook ID
+     * parameters normalized to lower case
      * @param facebookID
      * @return instance of to WebtrekkUserParameters
      */
     public WebtrekkUserParameters setFacebookID(String facebookID) {
-        mParameters.put(Parameter.CDB_FACEBOOK_ID, HelperFunctions.makeSha256(facebookID));
+        mParameters.put(Parameter.CDB_FACEBOOK_ID, HelperFunctions.makeSha256(facebookID.toLowerCase()));
         return this;
     }
 
     /**
      * set Twitter ID
+     * parameters normalized to lower case
      * @param twitterID
      * @return instance of to WebtrekkUserParameters
      */
     public WebtrekkUserParameters setTwitterID(String twitterID)
     {
-        mParameters.put(Parameter.CDB_TWITTER_ID, HelperFunctions.makeSha256(twitterID));
+        mParameters.put(Parameter.CDB_TWITTER_ID, HelperFunctions.makeSha256(twitterID.toLowerCase()));
         return this;
     }
 
     /**
      * set Google Plus ID
+     * parameters normalized to lower case
      * @param googlePlusID
      * @return instance of to WebtrekkUserParameters
      */
     public WebtrekkUserParameters setGooglePlusID(String googlePlusID)
     {
-        mParameters.put(Parameter.CDB_GOOGLE_PLUS_ID, HelperFunctions.makeSha256(googlePlusID));
+        mParameters.put(Parameter.CDB_GOOGLE_PLUS_ID, HelperFunctions.makeSha256(googlePlusID.toLowerCase()));
         return this;
     }
 
     /**
      * set LinkedIn ID
+     * parameters normalized to lower case
      * @param liknedInID
      * @return instance of to WebtrekkUserParameters
      */
     public WebtrekkUserParameters setLiknedInID(String liknedInID)
     {
-        mParameters.put(Parameter.CDB_LINKEDIN_ID, HelperFunctions.makeSha256(liknedInID));
+        mParameters.put(Parameter.CDB_LINKEDIN_ID, HelperFunctions.makeSha256(liknedInID.toLowerCase()));
         return this;
     }
 
     /**
      * set Custom User Parameters
+     * parameters normalized to lower case
      * @param id id of custom parameter should be id > 0 && id < 30
      * @param value custom user value
      * @return instance of to WebtrekkUserParameters
@@ -150,7 +225,7 @@ public class WebtrekkUserParameters {
     {
         if (id > 0 && id < 30)
         {
-            mCustomParameters.put(new Integer(CUSTOM_PAR_BASE_INDEX+id).toString(), value);
+            mCustomParameters.put(new Integer(CUSTOM_PAR_BASE_INDEX+id).toString(), value.toLowerCase());
         }else
         {
             WebtrekkLogging.log("Custom parameter isn't set as id is incorrect please use id > 0 && id < 30 ");

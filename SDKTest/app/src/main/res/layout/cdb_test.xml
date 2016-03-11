@@ -138,5 +138,18 @@
             android:src = "@null"
             />
         </LinearLayout>
+        <Button
+            android:id="@+id/cdb_unit_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Do unit test"
+            android:src = "@null"
+            />
+        <TextView
+            android:textSize="16sp"
+            android:id="@+id/cdb_unit_test_console"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
     </LinearLayout>
 </ScrollView>

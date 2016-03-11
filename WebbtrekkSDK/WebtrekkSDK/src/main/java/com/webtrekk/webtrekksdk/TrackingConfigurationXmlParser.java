@@ -157,6 +157,20 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.END_TAG, ns, "autoTracked");
 
 
+            } else if (name.equals("testMode")) {
+                parser.require(XmlPullParser.START_TAG, ns, "testMode");
+
+                String value = readText(parser);
+                if (value.equals("true")) {
+                    config.setTestMode(true);
+                } else if (value.equals("false")) {
+                    config.setTestMode(false);
+                } else {
+                    WebtrekkLogging.log("invalid testMode value, using default");
+                }
+                parser.require(XmlPullParser.END_TAG, ns, "testMode");
+
+
             } else if (name.equals("autoTrackAppUpdate")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackAppUpdate");
 

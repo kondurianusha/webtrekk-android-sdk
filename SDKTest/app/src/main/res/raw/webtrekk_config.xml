@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <webtrekkConfiguration>
     <!--the version number for this configuration file -->
-    <version>3</version>
+    <version>1</version>
+    <testMode>true</testMode>
 
 
     <!--the webtrekk trackDomain where the requests are send  for appinstall-->
@@ -61,9 +62,9 @@
     <autoTrackRequestUrlStoreSize>true</autoTrackRequestUrlStoreSize>
 
     <!--enables the remote xml configuration -->
-    <enableRemoteConfiguration>true</enableRemoteConfiguration>
+    <enableRemoteConfiguration>false</enableRemoteConfiguration>
     <!--url of the remote configuration -->
-    <trackingConfigurationUrl>https://www.dropbox.com/s/pn5vln7gai679lm/webtrekk_config.xml?dl=0</trackingConfigurationUrl>
+    <trackingConfigurationUrl>https://d1r27qvpjiaqj3.cloudfront.net/238713152098253/34629.xml</trackingConfigurationUrl>
     <!--resend onStart time, this is the timeout for auto tracked sessions in case an activity was paused -->
     <resendOnStartEventTime>30</resendOnStartEventTime>
 

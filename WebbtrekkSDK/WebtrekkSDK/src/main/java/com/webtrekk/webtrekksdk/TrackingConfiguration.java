@@ -24,6 +24,9 @@ class TrackingConfiguration {
     // activitylifycycle callbacks for automated activity tracking
     private boolean autoTracked = true;
 
+    //special test mode
+    private boolean mTestMode;
+
     // auto tracking configuration
     private boolean autoTrackAppUpdate = true;
     private boolean autoTrackAdvertiserId = true;
@@ -188,6 +191,14 @@ class TrackingConfiguration {
 
     public void setIsAutoTracking(boolean isAutoTracking) {
         this.autoTracked = isAutoTracking;
+    }
+
+    public void setTestMode(boolean value){
+        mTestMode = value;
+    }
+
+    public boolean isTestMode(){
+        return mTestMode;
     }
 
     public TrackingParameter getGlobalTrackingParameter() {

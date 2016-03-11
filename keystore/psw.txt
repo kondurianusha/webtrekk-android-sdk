@@ -1,0 +1,7 @@
+file
+wttestapplication.jks
+
+psw: Webtrekk
+
+Alias Webtrekk
+psw: Webtrekk

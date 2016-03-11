@@ -2,7 +2,9 @@ package com.webtrekk.webtrekksdk;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.content.LocalBroadcastManager;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -37,6 +39,7 @@ public class Webtrekk {
     public static final String PREFERENCE_KEY_CONFIGURATION = "webtrekkTrackingConfiguration";
     public static final String TRACKING_LIBRARY_VERSION = "401";
     public static final String TRACKING_LIBRARY_VERSION_UA = "4.0.1";
+    private static final String TEST_ULR = "com.webtrekk.webtrekksdk.TEST_URL";
 
 
     private RequestUrlStore requestUrlStore;
@@ -788,6 +791,8 @@ public class Webtrekk {
         if(!isOptout && !isSampling) {
             String urlString = request.getUrlString();
             WebtrekkLogging.log("adding url: " + urlString);
+            if (trackingConfiguration.isTestMode())
+                 sendURLStringForTest(urlString);
             requestUrlStore.add(request.getUrlString());
         }
 
@@ -803,6 +808,15 @@ public class Webtrekk {
         autoCustomParameter.put("appUpdated", "0");
     }
 
+    private void sendURLStringForTest(String url)
+    {
+        Intent intent = new Intent(TEST_ULR);
+
+        intent.putExtra("URL", url);
+
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+    }
+
     /*
     Process campainData
      */
@@ -813,6 +827,7 @@ public class Webtrekk {
         if (mediaCode != null && !mediaCode.isEmpty()) {
             request.mTrackingParameter.add(Parameter.ADVERTISEMENT, mediaCode);
             request.mTrackingParameter.add(Parameter.ADVERTISEMENT_ACTION, "c");
+            request.mTrackingParameter.add(Parameter.ECOM, "900", "1");
         }
     }
 

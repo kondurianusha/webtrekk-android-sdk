@@ -600,6 +600,14 @@ final class HelperFunctions {
             return null;
         }
 
-        return new BigInteger(1, digest).toString(16);
+        String retStr = new BigInteger(1, digest).toString(16);
+
+        //add leading zero value if value less then 16
+        if (digest.length > 0 && digest[0] >= 0 && digest[0] < 16)
+        {
+            retStr= "0"+retStr;
+        }
+
+        return retStr;
     }
 }

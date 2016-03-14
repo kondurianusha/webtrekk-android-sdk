@@ -183,9 +183,9 @@ public class CDBActivityTest extends Activity {
     String[] mParametersValue = {
             "test@tester.com", "TEST@TESTER.COM",  "Test@Tester.com", " Test@Tester.com ", "EF8CA1C0FF7D2E34DC0953D4222655B8", "1F9E575AD4234C30A81D30C70AFFD4BBA7B0D57D8E8607AD255496863D72C8BB",
             "01799586148", "+49179 9586148", "+49 179/9586148", "00 179/9586148", "0179 95 86 148", "6AF3CC537AB15FFB500167AF24D2B9D6", "629D99E8350B704511F8FE6506C38888C0749DACC0F091D7F8914CDD6B5B7862",
-            "pe|se|ze|st|12", "pe|se|ze|st|12", "pe|se|ze|st|12", "pe|se|ze|st|12",
-            "pe|se|ze|st|12", "pe|se|ze|st|12", "pe|se|ze|st|12", "pe|se|ze|st|12",
-            "FA06DD5D3AD984D54E31885E8D9887A3", "D168AC51BBB95DE3AEE4F7157B40289F9E98603C50A3E0C5C32DF9F97AFB33AE",
+            "stephan|guenther|10115|teststrasse|7", "Stephan|Guenther|10115|Teststrasse|7", "Stephan|Günther|10115|Teststraße|7", "Stephan|Günther|10115|Teststr|7",
+            "Stephan|Günther|10115|Teststr.|7", "Stephan|Günther|10115|Teststr. |7", " Stephan | Günther | 10 115 | Teststr. | 7 ", " Ste-phan | Günt_her | 10 1 15 | Test - str. | 7 ",
+            "756E1FD66E46D930707ACD1B2D2DCC14", "6E65555EA5D3C707EF3E7BBC6A7E09D33C23DD2E23C36D6750B25BF86EFDF843",
             "ABC123DEF456", "ABC123DEF456", "ABC123DEF456", "100001603870661",
             "333887969", "103942815740852792445", "1R2RtA", "CustomField"
     };
@@ -194,8 +194,8 @@ public class CDBActivityTest extends Activity {
     String[] mFirstOrSha256KeyName={
             "cdb2", "cdb2", "cdb2", "cdb2", null, "cdb2",
             "cdb4", "cdb4", "cdb4", "cdb4", "cdb4", null, "cdb4",
-            null, null, null, null,
-            null, null, null, null,
+            "cdb6", "cdb6", "cdb6", "cdb6",
+            "cdb6", "cdb6", "cdb6", "cdb6",
 /*
                 "cdb6", "cdb6","cdb6","cdb6",
                 "cdb6", "cdb6","cdb6","cdb6",
@@ -208,8 +208,8 @@ public class CDBActivityTest extends Activity {
     String[] mMdKeyName={
             "cdb1", "cdb1", "cdb1", "cdb1", "cdb1", null,
             "cdb3", "cdb3", "cdb3", "cdb3", "cdb3", "cdb3", null,
-            null, null, null, null,
-            null, null, null, null,
+            "cdb5", "cdb5", "cdb5", "cdb5",
+            "cdb5", "cdb5", "cdb5", "cdb5",
 /*
                 "cdb5", "cd5","cdb5","cdb5",
                 "cdb5", "cd5","cdb5","cdb5",
@@ -222,9 +222,9 @@ public class CDBActivityTest extends Activity {
     String[] mFirstOrSha256Value = {
             "1f9e575ad4234c30a81d30c70affd4bba7b0d57d8e8607ad255496863d72c8bb", "1f9e575ad4234c30a81d30c70affd4bba7b0d57d8e8607ad255496863d72c8bb","1f9e575ad4234c30a81d30c70affd4bba7b0d57d8e8607ad255496863d72c8bb","1f9e575ad4234c30a81d30c70affd4bba7b0d57d8e8607ad255496863d72c8bb", null, "1f9e575ad4234c30a81d30c70affd4bba7b0d57d8e8607ad255496863d72c8bb",
             "629d99e8350b704511f8fe6506c38888c0749dacc0f091d7f8914cdd6b5b7862", "27e75156a4134c75a019efcb7f899d62fb23d300667a79289fd4a11c4bcdbf87", "27e75156a4134c75a019efcb7f899d62fb23d300667a79289fd4a11c4bcdbf87", "6497ae00a154a09fc6b39c9e4c4ba6f64885e8279d587b66626fec44e8cc468c", "629d99e8350b704511f8fe6506c38888c0749dacc0f091d7f8914cdd6b5b7862",null, "629d99e8350b704511f8fe6506c38888c0749dacc0f091d7f8914cdd6b5b7862",
-            null, null, null, null,
-            null, null, null, null,
-            null, "d168ac51bbb95de3aee4f7157b40289f9e98603c50a3e0c5c32df9f97afb33ae",
+            "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843", "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843", "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843", "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843",
+            "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843", "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843", "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843", "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843",
+            null, "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843",
             "abc123def456", "abc123def456", "abc123def456", "574852115fa603e477907c4284f5a45d92f3194a759f33b2d66f72309cc7ba07",
             "8182771b8680ca5bd979b339f3e3c1416342c3ea62133819c76c71aebaa38efb", "af3e9f1b964c6a377ba4ad61a37a84f5ba527ffd7b014515885217919c900ba6", "44a6998e43e432440de3b0045c278664b62fa9e77b32b12937561c67d385a732", "customfield"
     };
@@ -232,9 +232,9 @@ public class CDBActivityTest extends Activity {
     String[] mMdFieldValue={
             "ef8ca1c0ff7d2e34dc0953d4222655b8", "ef8ca1c0ff7d2e34dc0953d4222655b8", "ef8ca1c0ff7d2e34dc0953d4222655b8", "ef8ca1c0ff7d2e34dc0953d4222655b8","ef8ca1c0ff7d2e34dc0953d4222655b8", null,
             "6af3cc537ab15ffb500167af24d2b9d6", "15a7498681d67ecc0b9c62c0087a9faa", "15a7498681d67ecc0b9c62c0087a9faa", "03f5113c45423448356b1c1c5a3e0027", "6af3cc537ab15ffb500167af24d2b9d6","6af3cc537ab15ffb500167af24d2b9d6", null,
-            null, null, null, null,
-            null, null, null, null,
-            "fa06dd5d3ad984d54e31885e8d9887a3", null,
+            "756e1fd66e46d930707acd1b2d2dcc14", "756e1fd66e46d930707acd1b2d2dcc14", "756e1fd66e46d930707acd1b2d2dcc14", "756e1fd66e46d930707acd1b2d2dcc14",
+            "756e1fd66e46d930707acd1b2d2dcc14", "756e1fd66e46d930707acd1b2d2dcc14", "756e1fd66e46d930707acd1b2d2dcc14", "756e1fd66e46d930707acd1b2d2dcc14",
+            "756e1fd66e46d930707acd1b2d2dcc14", null,
             null, null, null, null,
             null, null, null, null
     };

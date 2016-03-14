@@ -36,7 +36,7 @@ class Campaign extends Thread
     private static final String ADV_ID = "INSTALL_SETTINGS_ADV_ID";
     private static final String MEDIA_CODE = "INSTALL_SETTINGS_MEDIA_CODE";
     private static final String OPT_OUT = "INSTALL_SETTINGS_OPT_OUT";
-    private static final String FIRST_START_INTERRUPTED = "FIRST_START_INTERRUPTED";
+    private static final String FIRST_START_INITIATED = "FIRST_START_INITIATED";
     private static final String CAMPAIN_MEDIA_CODE_DEFINED_MESSAGE = "com.Webtrekk.CampainMediaMessage";
 
 
@@ -46,7 +46,7 @@ class Campaign extends Thread
         mContext = context;
         //if it is not first start check if thread was interrupted on first start.
         //It is case when application was closed just after first start.
-        mFirstStart = isFirstStart ? isFirstStart : getInterruptedThread();
+        mFirstStart = isFirstStart ? isFirstStart : getFirstStartInitiated();
         mTrackID = trackID;
         mStopNotification = stopNotification;
     }
@@ -188,6 +188,7 @@ class Campaign extends Thread
         if (mFirstStart) {
             //Wait for referrer max 1 minute
             WebtrekkLogging.log("Start waiting for referrer");
+            setFirstStartInitiated();
             while (System.currentTimeMillis() < timeToEndListener) {
                 if ((referrer = getStoredReferrer(mContext)) != null)
                     break;
@@ -196,8 +197,6 @@ class Campaign extends Thread
                     //ask each 5 seconds for referer;
                     sleep(5000);
                 } catch (InterruptedException e) {
-                    //thread is interupted. So exit and save status;
-                    setInterruptedThread();
                     return;
                 }
             }
@@ -221,6 +220,8 @@ class Campaign extends Thread
                 if (googleMediaCode != null) {
                     SaveCodeAndAdID(googleMediaCode, advID, isLimitAdEnabled);
                     campaignNotificationMessage(googleMediaCode, advID);
+                    //delete first start
+                    getFirstStartInitiated();
                 }
             }
         }
@@ -233,14 +234,14 @@ class Campaign extends Thread
                 // if thread isn't interrupted. Request for media code
                 if (!isInterrupted())
                     webtrekkMediaCode = requestMediaCode(advID, clickID, HelperFunctions.getUserAgent());
-                else {
-                    setInterruptedThread();
+                else
                     return;
-                }
             }
 
             SaveCodeAndAdID(webtrekkMediaCode, advID, isLimitAdEnabled);
             campaignNotificationMessage(webtrekkMediaCode, advID);
+            //delete first start
+            getFirstStartInitiated();
         }
 
         if (mStopNotification != null)
@@ -357,25 +358,25 @@ class Campaign extends Thread
     /**
      * save if thread was interrupted just after first start. So we can process referrer one more time after second start
      */
-    private void setInterruptedThread()
+    private void setFirstStartInitiated()
     {
         SharedPreferences.Editor editor = HelperFunctions.getWebTrekkSharedPreference(mContext).edit();
 
-        editor.putBoolean(FIRST_START_INTERRUPTED, true).apply();
+        editor.putBoolean(FIRST_START_INITIATED, true).apply();
     }
 
     /**
      * {@hide}
-     * get if thread was interrupted see {@link #setInterruptedThread()}
+     * get if thread was interrupted see {@link #setFirstStartInitiated()} delete flag from settings
      * @return
      */
-    private boolean getInterruptedThread()
+    private boolean getFirstStartInitiated()
     {
         SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(mContext);
 
-        boolean result = preferences.getBoolean(FIRST_START_INTERRUPTED, false);
+        boolean result = preferences.getBoolean(FIRST_START_INITIATED, false);
 
-        preferences.edit().remove(FIRST_START_INTERRUPTED).apply();
+        preferences.edit().remove(FIRST_START_INITIATED).apply();
 
         return result;
     }

@@ -46,7 +46,7 @@ class Campaign extends Thread
         mContext = context;
         //if it is not first start check if thread was interrupted on first start.
         //It is case when application was closed just after first start.
-        mFirstStart = isFirstStart ? isFirstStart : getFirstStartInitiated();
+        mFirstStart = isFirstStart ? isFirstStart : getFirstStartInitiated(context, true);
         mTrackID = trackID;
         mStopNotification = stopNotification;
     }
@@ -150,102 +150,106 @@ class Campaign extends Thread
     @Override
     public void run() {
 
-        WebtrekkLogging.log("starting campain thread. Getting advertiying ID");
-        AdvertisingIdClient.Info adInfo = null;
-        String advID = null;
-        boolean isLimitAdEnabled = false;
+        try{
+            WebtrekkLogging.log("starting campain thread. Getting advertiying ID");
+            AdvertisingIdClient.Info adInfo = null;
+            String advID = null;
+            boolean isLimitAdEnabled = false;
 
-        //get adv ID
+            //get adv ID
 
-        try {
-            adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
+            try {
+                adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
 
-            advID = adInfo.getId();
-            isLimitAdEnabled = adInfo.isLimitAdTrackingEnabled();
+                advID = adInfo.getId();
+                isLimitAdEnabled = adInfo.isLimitAdTrackingEnabled();
 
-            WebtrekkLogging.log("advertiserId: " + advID);
+                WebtrekkLogging.log("advertiserId: " + advID);
 
-        } catch (IOException e) {
-            // Unrecoverable error connecting to Google Play services (e.g.,
-            // the old version of the service doesn't support getting AdvertisingId).
-            WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
+            } catch (IOException e) {
+                // Unrecoverable error connecting to Google Play services (e.g.,
+                // the old version of the service doesn't support getting AdvertisingId).
+                WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
 
-        } catch (GooglePlayServicesNotAvailableException e) {
-            // Google Play services is not available entirely.
-            WebtrekkLogging.log("GooglePlayServicesNotAvailableException", e);
-        } catch (GooglePlayServicesRepairableException e) {
-            // maybe will work with another try, recheck
-        } catch (NullPointerException e) {
-            // adinfo was null or could not get the id/optout setting
-            WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
-        }
-
-        //if this is first start wait for referrer for 1 min.
-        final long waitForReferrerDelay = 60000;
-        long timeToEndListener = System.currentTimeMillis() + waitForReferrerDelay;
-        String referrer = null;
-
-        if (mFirstStart) {
-            //Wait for referrer max 1 minute
-            WebtrekkLogging.log("Start waiting for referrer");
-            setFirstStartInitiated();
-            while (System.currentTimeMillis() < timeToEndListener) {
-                if ((referrer = getStoredReferrer(mContext)) != null)
-                    break;
-
-                try {
-                    //ask each 5 seconds for referer;
-                    sleep(5000);
-                } catch (InterruptedException e) {
-                    return;
-                }
+            } catch (GooglePlayServicesNotAvailableException e) {
+                // Google Play services is not available entirely.
+                WebtrekkLogging.log("GooglePlayServicesNotAvailableException", e);
+            } catch (GooglePlayServicesRepairableException e) {
+                // maybe will work with another try, recheck
+            } catch (NullPointerException e) {
+                // adinfo was null or could not get the id/optout setting
+                WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
             }
-            WebtrekkLogging.log("Referrer is received and readed:"+referrer);
-        }
-        String clickID = null;
-        String googleMediaCode = null;
 
-        // for non first start referrer is always null
-        if (referrer != null)
-        {
-            // is it referrer from Webtrekk
-            clickID = getClickID(referrer);
+            //if this is first start wait for referrer for 30 seconds.
+            final long waitForReferrerDelay = 30000;
+            long timeToEndListener = System.currentTimeMillis() + waitForReferrerDelay;
+            String referrer = null;
 
-            if (clickID != null)
-            {
-                WebtrekkLogging.log("Click ID:" + clickID);
-            }else
-            {
-                googleMediaCode = getGoogleAnalyticMediaCode(referrer);
-                if (googleMediaCode != null) {
-                    SaveCodeAndAdID(googleMediaCode, advID, isLimitAdEnabled);
-                    campaignNotificationMessage(googleMediaCode, advID);
-                    //delete first start
-                    getFirstStartInitiated();
-                }
-            }
-        }
-
-        String webtrekkMediaCode = null;
-
-        // if this is webtrekk referrer get media code.
-        if (googleMediaCode == null) {
             if (mFirstStart) {
-                // if thread isn't interrupted. Request for media code
-                if (!isInterrupted())
-                    webtrekkMediaCode = requestMediaCode(advID, clickID, HelperFunctions.getUserAgent());
-                else
-                    return;
+                //Wait for referrer max 1 minute
+                WebtrekkLogging.log("Start waiting for referrer");
+                setFirstStartInitiated();
+                while (System.currentTimeMillis() < timeToEndListener) {
+                    if ((referrer = getStoredReferrer(mContext)) != null)
+                        break;
+
+                    try {
+                        //ask each 5 seconds for referer;
+                        sleep(5000);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+                WebtrekkLogging.log("Referrer is received and readed:"+referrer);
+            }
+            String clickID = null;
+            String googleMediaCode = null;
+
+            // for non first start referrer is always null
+            if (referrer != null)
+            {
+                // is it referrer from Webtrekk
+                clickID = getClickID(referrer);
+
+                if (clickID != null)
+                {
+                    WebtrekkLogging.log("Click ID:" + clickID);
+                }else
+                {
+                    googleMediaCode = getGoogleAnalyticMediaCode(referrer);
+                    if (googleMediaCode != null) {
+                        SaveCodeAndAdID(googleMediaCode, advID, isLimitAdEnabled);
+                        campaignNotificationMessage(googleMediaCode, advID);
+                        //delete first start
+                        getFirstStartInitiated(mContext, true);
+                    }
+                }
             }
 
-            SaveCodeAndAdID(webtrekkMediaCode, advID, isLimitAdEnabled);
-            campaignNotificationMessage(webtrekkMediaCode, advID);
-            //delete first start
-            getFirstStartInitiated();
+            String webtrekkMediaCode = null;
+
+            // if this is webtrekk referrer get media code.
+            if (googleMediaCode == null) {
+                if (mFirstStart) {
+                    // if thread isn't interrupted. Request for media code
+                    if (!isInterrupted())
+                        webtrekkMediaCode = requestMediaCode(advID, clickID, HelperFunctions.getUserAgent());
+                    else
+                        return;
+                }
+
+                SaveCodeAndAdID(webtrekkMediaCode, advID, isLimitAdEnabled);
+                campaignNotificationMessage(webtrekkMediaCode, advID);
+                //delete first start
+                getFirstStartInitiated(mContext, true);
+            }
+        }finally {
+
+            if (mStopNotification != null)
+                mStopNotification.run();
         }
 
-        if (mStopNotification != null)
-            mStopNotification.run();
     }
 
     /*
@@ -370,13 +374,14 @@ class Campaign extends Thread
      * get if thread was interrupted see {@link #setFirstStartInitiated()} delete flag from settings
      * @return
      */
-    private boolean getFirstStartInitiated()
+    static boolean getFirstStartInitiated(Context context, boolean deleteFlag)
     {
-        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(mContext);
+        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
 
         boolean result = preferences.getBoolean(FIRST_START_INITIATED, false);
 
-        preferences.edit().remove(FIRST_START_INITIATED).apply();
+        if (deleteFlag)
+            preferences.edit().remove(FIRST_START_INITIATED).apply();
 
         return result;
     }

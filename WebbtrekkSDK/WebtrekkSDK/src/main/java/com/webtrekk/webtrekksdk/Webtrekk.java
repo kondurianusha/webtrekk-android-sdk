@@ -859,6 +859,10 @@ public class Webtrekk {
         // remove the old backupfile after the requests are loaded into memory/requestUrlStore
         requestUrlStore.deleteRequestsFile();
         onSendIntervalOver();
+
+        //restart referrer getting if applicaiton was paused and resumed back
+        if (Campaign.getFirstStartInitiated(mContext, false))
+            startAdvertizingThread(true);
     }
 
     /**

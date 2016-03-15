@@ -34,7 +34,11 @@ public class ReferrerReceiver extends BroadcastReceiver {
      */
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        WebtrekkLogging.log("New action for referrer is received:"+intent.getAction());
+
         String campaign = intent.getStringExtra(KEY_REFERRER);
+
         if (!"com.android.vending.INSTALL_REFERRER".equals(intent.getAction()) || campaign == null) {
             return;
         }

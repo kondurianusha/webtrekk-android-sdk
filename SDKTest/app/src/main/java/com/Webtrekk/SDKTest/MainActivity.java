@@ -141,6 +141,12 @@ public class MainActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
+    public void pushTest(View view)
+    {
+        Intent intent = new Intent(this, PushNotificationActivity.class);
+        startActivity(intent);
+    }
+
     public Webtrekk getWebtrekk() {
         return webtrekk;
     }

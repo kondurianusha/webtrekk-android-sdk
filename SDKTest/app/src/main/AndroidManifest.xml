@@ -55,8 +55,22 @@
         </activity>
         <activity
             android:name=".CDBActivityTest"
-            android:label="@string/title_activity_media" >
+            android:label="@string/title_activity_CDB" >
         </activity>
+        <activity
+            android:name=".PushNotificationActivity"
+            android:label="@string/title_activity_push" >
+        </activity>
+        <receiver
+            android:name="com.webtrekk.webtrekksdk.WebtrekkGcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="com.Webtrekk.SDKTest" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -20,6 +20,9 @@ import android.util.Log;
 import android.util.Patterns;
 import android.view.WindowManager;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,6 +61,7 @@ final class HelperFunctions {
 
     /**
      * returns a string of the display resolution, like 400x300
+     *
      * @param context
      * @return
      */
@@ -77,6 +81,7 @@ final class HelperFunctions {
 
     /**
      * gets the screendepth, as its 32 default, return this value
+     *
      * @param context
      * @return
      */
@@ -90,6 +95,7 @@ final class HelperFunctions {
 
     /**
      * returns the default language of the device as human readable String
+     *
      * @return
      */
     public static String getLanguage() {
@@ -98,14 +104,16 @@ final class HelperFunctions {
 
     /**
      * returns the UTC Offset of the current timezone at the current time, in hours
+     *
      * @return
      */
     public static String getTimezone() {
-        return "" + (TimeZone.getDefault().getRawOffset()/1000/60/60);
+        return "" + (TimeZone.getDefault().getRawOffset() / 1000 / 60 / 60);
     }
 
     /**
      * returns the name of the os, defualt android is its an android lib
+     *
      * @return
      */
     public static String getOSName() {
@@ -114,6 +122,7 @@ final class HelperFunctions {
 
     /**
      * returns the release version of the os, as human readable String like : Lollipop
+     *
      * @return
      */
     public static String getOSVersion() {
@@ -122,6 +131,7 @@ final class HelperFunctions {
 
     /**
      * returns the API level, like 22 for Lollipop
+     *
      * @return
      */
     public static String getAPILevel() {
@@ -130,6 +140,7 @@ final class HelperFunctions {
 
     /**
      * returns the manufactures device string
+     *
      * @return
      */
     public static String getDevice() {
@@ -139,6 +150,7 @@ final class HelperFunctions {
     /**
      * returns the current country, based on the default locale of the device as country code
      * returns empty string when no matching default is found
+     *
      * @return
      */
     public static String getCountry() {
@@ -147,6 +159,7 @@ final class HelperFunctions {
 
     /**
      * returns the user agent string of the default browser
+     *
      * @return
      */
     public static String getHttpUserAgent() {
@@ -156,6 +169,7 @@ final class HelperFunctions {
     /**
      * reads the contact information of the user like email, name, sname
      * important: you need to set read_profile/read_contacts permissions for this to work
+     *
      * @param context
      * @return
      */
@@ -193,11 +207,10 @@ final class HelperFunctions {
         while (cursor.moveToNext()) {
             // get the typ, 4.column in the query result
             mime_type = cursor.getString(4);
-            if (mime_type.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)){
+            if (mime_type.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)) {
                 // this automaticly stores the first found email in the result, but its sorted by primary, so if a user has a primary one, its the default
                 result.put("email", cursor.getString(0));
-            }
-            else if (mime_type.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)) {
+            } else if (mime_type.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)) {
                 result.put("gname", cursor.getString(2));
                 result.put("sname", cursor.getString(3));
             }
@@ -221,6 +234,7 @@ final class HelperFunctions {
 
     /**
      * generates the everid, a unique identifier for the tracking
+     *
      * @return
      */
     public static String generateEverid() {
@@ -249,6 +263,7 @@ final class HelperFunctions {
 
     /**
      * returns the version of the application
+     *
      * @param context
      * @return
      */
@@ -282,19 +297,21 @@ final class HelperFunctions {
     }
 
     public static void setAppVersionCode(int versionCode, Context context) {
-        SharedPreferences preferences = getWebTrekkSharedPreference(context);;
+        SharedPreferences preferences = getWebTrekkSharedPreference(context);
+        ;
         preferences.edit().putInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, versionCode).commit();
     }
 
     /**
      * this method checks if the application was updated, therefore it writes its version_code in a shared preference
      * and in case its a higher number on the next start, it was updated
+     *
      * @param context
      * @return
      */
     public static boolean updated(Context context, int currentVersion) {
         int stored_version = getWebTrekkSharedPreference(context).getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, -1);
-        if(currentVersion > stored_version ) {
+        if (currentVersion > stored_version) {
             // update the stored version
             setAppVersionCode(currentVersion, context);
             return true;
@@ -304,6 +321,7 @@ final class HelperFunctions {
 
     /**
      * returns the user agent string for the device
+     *
      * @return
      */
     public static String getUserAgent() {
@@ -324,13 +342,13 @@ final class HelperFunctions {
     }
 
 
-    static SharedPreferences getWebTrekkSharedPreference(Context context)
-    {
+    static SharedPreferences getWebTrekkSharedPreference(Context context) {
         return context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
     }
 
     /**
      * this is true when its a system app or was preinstalled on the phone
+     *
      * @param context
      * @return
      */
@@ -345,14 +363,15 @@ final class HelperFunctions {
     }
 
     public static boolean isNewInstallation(Context context) {
-            SharedPreferences preferences = getWebTrekkSharedPreference(context);
-            String installationFlag = preferences.getString(Webtrekk.PREFERENCE_KEY_INSTALLATION_FLAG, null);
-            return (installationFlag != null && installationFlag.equals("1"));
+        SharedPreferences preferences = getWebTrekkSharedPreference(context);
+        String installationFlag = preferences.getString(Webtrekk.PREFERENCE_KEY_INSTALLATION_FLAG, null);
+        return (installationFlag != null && installationFlag.equals("1"));
 
     }
 
     /**
      * this function checks if the user has auto screen rotation disabled
+     *
      * @return
      */
     public static boolean isSysAutoRotate(Context context) {
@@ -362,7 +381,7 @@ final class HelperFunctions {
         } catch (Settings.SettingNotFoundException ex) {
             WebtrekkLogging.log("error getting sysAutoRotate settings", ex);
         }
-        if(sysAutoRotate>0) {
+        if (sysAutoRotate > 0) {
             return true;
         }
         return false;
@@ -382,7 +401,7 @@ final class HelperFunctions {
             } else {
                 orientationString = "undefined";
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             WebtrekkLogging.log("error getting orientation settings", e);
         }
         return orientationString;
@@ -390,6 +409,7 @@ final class HelperFunctions {
 
     /**
      * returns the networkInfo
+     *
      * @param context
      * @return
      */
@@ -402,12 +422,13 @@ final class HelperFunctions {
 
     /**
      * returns the type of the internet connection as string
+     *
      * @param context
      * @return
      */
     public static String getConnectionString(Context context) {
         NetworkInfo networkInfo = getNetworkInfo(context);
-        if(networkInfo == null || !networkInfo.isConnected()) {
+        if (networkInfo == null || !networkInfo.isConnected()) {
             return "offline";
         } else if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
             return "WIFI";
@@ -442,12 +463,13 @@ final class HelperFunctions {
 
     /**
      * returns true if the device uses roaming
+     *
      * @param context
      * @return
      */
     public static boolean isRoaming(Context context) {
         NetworkInfo networkInfo = getNetworkInfo(context);
-        if(networkInfo != null) {
+        if (networkInfo != null) {
             return networkInfo.isRoaming();
         }
         return false;
@@ -457,6 +479,7 @@ final class HelperFunctions {
     /**
      * url encodes the given string as utf8
      * replaces special strings like " " with %20
+     *
      * @param string
      * @return
      */
@@ -486,6 +509,7 @@ final class HelperFunctions {
 
     /**
      * Checks if there is wifi or mobile connection available
+     *
      * @param context The application context
      * @return true if there is network connection available
      */
@@ -496,16 +520,17 @@ final class HelperFunctions {
 
     /**
      * Reads a stream and writes it into a string. Closes inputStream when done.
+     *
      * @param inputStream The stream to read
      * @return A string, containing stream data
      * @throws java.io.IOException
      */
-    public static String stringFromStream(InputStream inputStream) throws java.io.IOException{
+    public static String stringFromStream(InputStream inputStream) throws java.io.IOException {
         String encoding = "UTF-8";
         StringBuilder builder = new StringBuilder();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, encoding));
         String line;
-        while((line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             builder.append(line);
         }
         reader.close();
@@ -514,34 +539,33 @@ final class HelperFunctions {
 
     public String getXmlFromUrl(String url) throws IOException {
         String xml = null;
-            // defaultHttpClient
-            HttpURLConnection urlConnection;
-            InputStream is = null;
-            try {
-                URL trackingConfigurationUrl = new URL(url);
-                urlConnection = (HttpURLConnection) trackingConfigurationUrl.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setConnectTimeout(RequestProcessor.NETWORK_CONNECTION_TIMEOUT);
-                urlConnection.setReadTimeout(RequestProcessor.NETWORK_CONNECTION_TIMEOUT);
-                urlConnection.setRequestProperty("Content-Type", "application/xml");
-                urlConnection.connect();
-                int response = urlConnection.getResponseCode();
-                is = urlConnection.getInputStream();
-                String xmlConfiguration = stringFromStream(is);
-                return xmlConfiguration;
+        // defaultHttpClient
+        HttpURLConnection urlConnection;
+        InputStream is = null;
+        try {
+            URL trackingConfigurationUrl = new URL(url);
+            urlConnection = (HttpURLConnection) trackingConfigurationUrl.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setConnectTimeout(RequestProcessor.NETWORK_CONNECTION_TIMEOUT);
+            urlConnection.setReadTimeout(RequestProcessor.NETWORK_CONNECTION_TIMEOUT);
+            urlConnection.setRequestProperty("Content-Type", "application/xml");
+            urlConnection.connect();
+            int response = urlConnection.getResponseCode();
+            is = urlConnection.getInputStream();
+            String xmlConfiguration = stringFromStream(is);
+            return xmlConfiguration;
+        } catch (MalformedURLException e) {
+            WebtrekkLogging.log("getXmlFromUrl: invalid URL", e);
+            return null;
+        } catch (ProtocolException e) {
+            WebtrekkLogging.log("getXmlFromUrl: invalid URL", e);
+        } catch (IOException e) {
+            WebtrekkLogging.log("getXmlFromUrl: invalid URL", e);
+        } finally {
+            if (is != null) {
+                is.close();
             }
-            catch (MalformedURLException e) {
-                WebtrekkLogging.log("getXmlFromUrl: invalid URL", e);
-                return null;
-            } catch (ProtocolException e) {
-                WebtrekkLogging.log("getXmlFromUrl: invalid URL", e);
-            } catch (IOException e) {
-                WebtrekkLogging.log("getXmlFromUrl: invalid URL", e);
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
-            }
+        }
         // return XML
         return xml;
     }
@@ -562,29 +586,28 @@ final class HelperFunctions {
 
     /**
      * return sha256 coded string
+     *
      * @param value
      * @return
      */
-    static String makeSha256(String value)
-    {
+    static String makeSha256(String value) {
         return getHash(value, "SHA-256");
     }
 
     /**
      * return md5 code based on string
+     *
      * @param value
      * @return
      */
-    static String makeMd5(String value)
-    {
+    static String makeMd5(String value) {
         if (value == null)
             return null;
 
         return getHash(value, "MD5");
     }
 
-    private static String getHash(String value, String hasType)
-    {
+    private static String getHash(String value, String hasType) {
         if (value == null)
             return null;
 
@@ -593,7 +616,7 @@ final class HelperFunctions {
             MessageDigest md = MessageDigest.getInstance(hasType);
             digest = md.digest(value.getBytes("UTF-8"));
         } catch (NoSuchAlgorithmException e) {
-            WebtrekkLogging.log(hasType+" isn't found");
+            WebtrekkLogging.log(hasType + " isn't found");
             return null;
         } catch (UnsupportedEncodingException e) {
             WebtrekkLogging.log("encoding error for UTF-8");
@@ -603,11 +626,16 @@ final class HelperFunctions {
         String retStr = new BigInteger(1, digest).toString(16);
 
         //add leading zero value if value less then 16
-        if (digest.length > 0 && digest[0] >= 0 && digest[0] < 16)
-        {
-            retStr= "0"+retStr;
+        if (digest.length > 0 && digest[0] >= 0 && digest[0] < 16) {
+            retStr = "0" + retStr;
         }
 
         return retStr;
+    }
+
+    static boolean isGooglePlayAvailable(Context context) {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(context);
+        return (resultCode == ConnectionResult.SUCCESS);
     }
 }

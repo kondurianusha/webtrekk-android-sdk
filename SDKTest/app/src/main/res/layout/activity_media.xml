@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/mediademotext" />
 
-        <test.myapplication.TrackedVideoView
+        <com.Webtrekk.SDKTest.TrackedVideoView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/videoView"

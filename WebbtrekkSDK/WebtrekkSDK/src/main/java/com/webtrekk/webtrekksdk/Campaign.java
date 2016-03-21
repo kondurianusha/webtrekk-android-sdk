@@ -156,13 +156,18 @@ class Campaign extends Thread
             String advID = null;
             boolean isLimitAdEnabled = false;
 
+            if (mFirstStart)
+                setFirstStartInitiated();
+
             //get adv ID
 
             try {
                 adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
 
-                advID = adInfo.getId();
-                isLimitAdEnabled = adInfo.isLimitAdTrackingEnabled();
+                if (adInfo != null) {
+                    advID = adInfo.getId();
+                    isLimitAdEnabled = adInfo.isLimitAdTrackingEnabled();
+                }
 
                 WebtrekkLogging.log("advertiserId: " + advID);
 
@@ -170,15 +175,14 @@ class Campaign extends Thread
                 // Unrecoverable error connecting to Google Play services (e.g.,
                 // the old version of the service doesn't support getting AdvertisingId).
                 WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
-
+                // the only way understand that process was interrupted.
+                if (e.getMessage().equals("Interrupted exception"))
+                    return;
             } catch (GooglePlayServicesNotAvailableException e) {
                 // Google Play services is not available entirely.
                 WebtrekkLogging.log("GooglePlayServicesNotAvailableException", e);
             } catch (GooglePlayServicesRepairableException e) {
                 // maybe will work with another try, recheck
-            } catch (NullPointerException e) {
-                // adinfo was null or could not get the id/optout setting
-                WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
             }
 
             //if this is first start wait for referrer for 30 seconds.
@@ -189,7 +193,6 @@ class Campaign extends Thread
             if (mFirstStart) {
                 //Wait for referrer max 1 minute
                 WebtrekkLogging.log("Start waiting for referrer");
-                setFirstStartInitiated();
                 while (System.currentTimeMillis() < timeToEndListener) {
                     if ((referrer = getStoredReferrer(mContext)) != null)
                         break;

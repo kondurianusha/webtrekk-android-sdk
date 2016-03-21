@@ -874,7 +874,7 @@ public class Webtrekk {
         onSendIntervalOver();
 
         //restart referrer getting if applicaiton was paused and resumed back
-        if (Campaign.getFirstStartInitiated(mContext, false))
+        if (Campaign.getFirstStartInitiated(mContext, false) && mCampaign == null)
             startAdvertizingThread(true);
     }
 

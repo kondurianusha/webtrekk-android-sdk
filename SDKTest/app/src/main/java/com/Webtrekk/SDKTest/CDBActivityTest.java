@@ -32,7 +32,7 @@ public class CDBActivityTest extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.cdb_test);
+        setContentView(R.layout.activity_cdb_test);
 
         findViewById(R.id.cdb_send_request).setOnClickListener(new View.OnClickListener() {
             @Override

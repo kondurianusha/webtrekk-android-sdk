@@ -1,1 +1,3 @@
 include ':app'
+include ':WebtrekkSDK'
+project(':WebtrekkSDK').projectDir = new File('../WebbtrekkSDK/WebtrekkSDK')

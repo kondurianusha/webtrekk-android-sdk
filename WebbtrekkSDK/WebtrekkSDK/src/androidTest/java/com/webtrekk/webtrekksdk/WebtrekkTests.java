@@ -355,7 +355,7 @@ public class WebtrekkTests extends AndroidTestCase {
         ActivityConfiguration act1 = new ActivityConfiguration("act1", "mapping.act1", true, new TrackingParameter(), new TrackingParameter());
         // auto tracking false just for this activity
         ActivityConfiguration act2 = new ActivityConfiguration("act2", "mapping.act2", false, new TrackingParameter(), new TrackingParameter());
-        HashMap<String, ActivityConfiguration> actConfigurations = new HashMap<>();
+        HashMap<String, ActivityConfiguration> actConfigurations = new HashMap<String, ActivityConfiguration>();
         actConfigurations.put("act1", act1);
         actConfigurations.put("act2", act2);
         configuration.setActivityConfigurations(actConfigurations);

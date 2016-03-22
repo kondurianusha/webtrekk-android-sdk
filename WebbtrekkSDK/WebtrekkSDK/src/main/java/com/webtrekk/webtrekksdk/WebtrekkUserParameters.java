@@ -13,8 +13,8 @@ import java.util.TreeMap;
 
 /**
  * Created by vartbaronov on 24.02.16.
- * Class is manage user parameters as part of Cross Device Bridge implementation.
- * Class should be used for customer to set user parameter, It can Save/Restore user data from settings
+ * Class manages user parameters as part of Cross Device Bridge implementation.
+ * Class should be used for customer to set user parameter,
  */
 public class WebtrekkUserParameters {
 
@@ -29,8 +29,8 @@ public class WebtrekkUserParameters {
     private static final long DATE_DELIMETER = 1000*60*60*24;
 
     /**
-     * Set Email will be normalized - lower case only and no whitespaces
-     * in that case MD5 and SHA256 were sent for normalized string
+     * Set Email. String will be normalized - lower case only and no whitespaces
+     * MD5 and SHA256 will be sent for normalized string
      * @param email
      * @return instance of to WebtrekkUserParameters
      */
@@ -41,7 +41,7 @@ public class WebtrekkUserParameters {
 
     /**
      * Set email as MD5
-     * Only low case normalization in that case
+     * String will be normalized to lower case
      * @param emailMD5
      * @return instance of to WebtrekkUserParameters
      */
@@ -52,7 +52,7 @@ public class WebtrekkUserParameters {
 
     /**
      * Set email as SHA256
-     * Only low case normalization in that case
+     * String will be normalized to lower case
      * @param emailSHA256
      * @return instance of to WebtrekkUserParameters
      */
@@ -62,8 +62,8 @@ public class WebtrekkUserParameters {
     }
 
     /**
-     * Set Phone will be normalized - lower case only, no whitespaces, no non-number characters
-     * in that case MD5 and SHA256 were sent for normalized string
+     * Set Phone. It will be normalized - lower case only, no whitespaces, no non-number characters
+     * MD5 and SHA256 will be sent for normalized string
      * @param phone phone number
      * @return instance of to WebtrekkUserParameters
      */
@@ -75,7 +75,7 @@ public class WebtrekkUserParameters {
 
     /**
      * Set phone as MD5
-     * Only low case normalization in that case
+     * String will be normalized to lower case
      * @param phoneMD5
      * @return instance of to WebtrekkUserParameters
      */
@@ -86,7 +86,7 @@ public class WebtrekkUserParameters {
 
     /**
      * Set phone as SHA256
-     * Only low case normalization in that case
+     * String will be normalized to lower case
      * @param phoneSHA256
      * @return instance of to WebtrekkUserParameters
      */
@@ -114,7 +114,7 @@ public class WebtrekkUserParameters {
 
     /**
      * Set address as MD5
-     * Only low case normalization in that case
+     * String will be normalized to lower case
      * @param addressMD5
      * @return instance of to WebtrekkUserParameters
      */
@@ -125,7 +125,7 @@ public class WebtrekkUserParameters {
 
     /**
      * Set address as SHA256
-     * Only low case normalization in that case
+     * String will be normalized to lower case
      * @param addressSHA256
      * @return instance of to WebtrekkUserParameters
      */
@@ -135,8 +135,8 @@ public class WebtrekkUserParameters {
     }
 
     /**
-     * set android ID
-     * parameters normalized to lower case
+     * Set android ID
+     * String will be normalized to lower case
      * @param androidId
      * @return instance of to WebtrekkUserParameters
      */
@@ -146,8 +146,8 @@ public class WebtrekkUserParameters {
     }
 
     /**
-     * set iOS id
-     * parameters normalized to lower case
+     * Set iOS id
+     * String will be normalized to lower case
      * @param iOSId
      * @return instance of to WebtrekkUserParameters
      */
@@ -157,8 +157,8 @@ public class WebtrekkUserParameters {
     }
 
     /**
-     * set WindowsID
-     * parameters normalized to lower case
+     * Set WindowsID
+     * String will be normalized to lower case
      * @param windowsId
      * @return instance of to WebtrekkUserParameters
      */
@@ -168,8 +168,8 @@ public class WebtrekkUserParameters {
     }
 
     /**
-     * set Facebook ID
-     * parameters normalized to lower case
+     * Set Facebook ID
+     * String will be normalized to lower case
      * @param facebookID
      * @return instance of to WebtrekkUserParameters
      */
@@ -179,8 +179,8 @@ public class WebtrekkUserParameters {
     }
 
     /**
-     * set Twitter ID
-     * parameters normalized to lower case
+     * Set Twitter ID
+     * String will be normalized to lower case
      * @param twitterID
      * @return instance of to WebtrekkUserParameters
      */
@@ -191,8 +191,8 @@ public class WebtrekkUserParameters {
     }
 
     /**
-     * set Google Plus ID
-     * parameters normalized to lower case
+     * Set Google Plus ID
+     * String will be normalized to lower case
      * @param googlePlusID
      * @return instance of to WebtrekkUserParameters
      */
@@ -203,8 +203,8 @@ public class WebtrekkUserParameters {
     }
 
     /**
-     * set LinkedIn ID
-     * parameters normalized to lower case
+     * Set LinkedIn ID
+     * String will be normalized to lower case
      * @param liknedInID
      * @return instance of to WebtrekkUserParameters
      */
@@ -215,8 +215,8 @@ public class WebtrekkUserParameters {
     }
 
     /**
-     * set Custom User Parameters
-     * parameters normalized to lower case
+     * Set Custom User Parameters
+     * String will be normalized to lower case
      * @param id id of custom parameter should be id > 0 && id < 30
      * @param value custom user value
      * @return instance of to WebtrekkUserParameters

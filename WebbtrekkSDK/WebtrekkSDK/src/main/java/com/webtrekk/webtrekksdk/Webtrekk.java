@@ -172,7 +172,7 @@ public class Webtrekk {
         this.mContext = c;
 
         if(customParameter == null) {
-            customParameter = new HashMap<>();
+            customParameter = new HashMap<String, String>();
         }
 
         boolean isFirstStart = HelperFunctions.firstStart(mContext);
@@ -325,7 +325,7 @@ public class Webtrekk {
      * he has to enable the plugin in the xml to load it here, therefore each plugin needs a unique name
      */
     void initPlugins() {
-        plugins = new ArrayList<>();
+        plugins = new ArrayList<Plugin>();
         if(trackingConfiguration.isEnablePluginHelloWorld()){
             plugins.add(new HelloWorldPlugin(this));
             WebtrekkLogging.log("loaded plugin: HelloWorldPlugin");
@@ -398,7 +398,7 @@ public class Webtrekk {
     void initWebtrekkParameter() {
         // collect all static device information which remain the same for all requests
         if(webtrekkParameter == null) {
-            webtrekkParameter = new HashMap<>();
+            webtrekkParameter = new HashMap<Parameter, String>();
         }
 
         webtrekkParameter.put(Parameter.SCREEN_DEPTH, HelperFunctions.getDepth(mContext));
@@ -424,10 +424,10 @@ public class Webtrekk {
      */
     public void initAutoCustomParameter() {
         if(autoCustomParameter == null) {
-            autoCustomParameter = new HashMap<>();
+            autoCustomParameter = new HashMap<String, String>();
         }
         if(customParameter == null) {
-            customParameter = new HashMap<>();
+            customParameter = new HashMap<String, String>();
         }
 
         if(trackingConfiguration.isAutoTrackAppVersionName()) {
@@ -667,8 +667,8 @@ public class Webtrekk {
     /**
      * Send CDB request with user parameters. You should use constructor of WebtrekkUserParameters to define any parameters you would like to include
      * For example:
-     * webtrekk.track(new WebtrekkUserParameters.
-     * setEmail("some email").
+     * webtrekk.track(new WebtrekkUserParameters.</br>
+     * setEmail("some email").</br>
      * setPhone("some phone"))
      * @param userParameters - user parameters
      */

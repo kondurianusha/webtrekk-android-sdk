@@ -667,8 +667,8 @@ public class Webtrekk {
     /**
      * Send CDB request with user parameters. You should use constructor of WebtrekkUserParameters to define any parameters you would like to include
      * For example:
-     * webtrekk.track(new WebtrekkUserParameters.
-     * setEmail("some email").
+     * webtrekk.track(new WebtrekkUserParameters.</br>
+     * setEmail("some email").</br>
      * setPhone("some phone"))
      * @param userParameters - user parameters
      */

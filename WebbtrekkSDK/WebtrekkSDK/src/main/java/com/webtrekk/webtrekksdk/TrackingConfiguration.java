@@ -62,8 +62,8 @@ class TrackingConfiguration {
     private Map<String, String> customParameter;
 
     public TrackingConfiguration() {
-        activityConfigurations = new HashMap<>();
-        customParameter = new HashMap<>();
+        activityConfigurations = new HashMap<String, ActivityConfiguration>();
+        customParameter = new HashMap<String, String>();
     }
 
     /**

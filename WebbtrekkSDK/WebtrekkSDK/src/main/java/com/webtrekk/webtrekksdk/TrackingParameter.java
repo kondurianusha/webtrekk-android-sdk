@@ -30,18 +30,18 @@ public class TrackingParameter {
 
 
     public TrackingParameter() {
-        this.defaultParameter = new TreeMap<>();
-        this.pageParameter = new TreeMap<>();
-        this.sessionParameter = new TreeMap<>();
-        this.ecomParameter = new TreeMap<>();
-        this.userCategories = new TreeMap<>();
-        this.pageCategories = new TreeMap<>();
-        this.adParameter = new TreeMap<>();
-        this.actionParameter = new TreeMap<>();
-        this.productCategories = new TreeMap<>();
-        this.mediaCategories = new TreeMap<>();
+        this.defaultParameter = new TreeMap<Parameter, String>();
+        this.pageParameter = new TreeMap<String, String>();
+        this.sessionParameter = new TreeMap<String, String>();
+        this.ecomParameter = new TreeMap<String, String>();
+        this.userCategories = new TreeMap<String, String>();
+        this.pageCategories = new TreeMap<String, String>();
+        this.adParameter = new TreeMap<String, String>();
+        this.actionParameter = new TreeMap<String, String>();
+        this.productCategories = new TreeMap<String, String>();
+        this.mediaCategories = new TreeMap<String, String>();
         //Used for CDB feature;
-        mCustomUserParameters = new TreeMap<>();
+        mCustomUserParameters = new TreeMap<String, String>();
     }
 
     /*
@@ -378,7 +378,7 @@ public class TrackingParameter {
     }
 
     private SortedMap<String, String> applySingleMapping(SortedMap<String, String> original, Map<String, String> mappingValues) {
-        SortedMap<String, String> mappedValues = new TreeMap<>();
+        SortedMap<String, String> mappedValues = new TreeMap<String, String>();
         if (!original.isEmpty()) {
             for (Map.Entry<String, String> entry : original.entrySet()) {
                 String key = entry.getValue();

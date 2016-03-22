@@ -38,7 +38,7 @@ public class RequestUrlStore {
             throw new IllegalArgumentException("maximum requests must be greater than 0");
         }
         this.maximumRequests = maximumRequests;
-        requestList = new ArrayList<>();
+        requestList = new ArrayList<String>();
         // if the system is running low on storage, this file might be removed and the requests are lost
         // TODO: there are cleaner apps which delete cache files, this could be avoided when using the internal storage instead of cache
         requestStoreFile = new File(context.getCacheDir(), "wt-tracking-requests");

@@ -44,7 +44,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         webtrekk.setIsSampling(false);
 
 
-        auto_tracked_values = new HashMap<>();
+        auto_tracked_values = new HashMap<Parameter, String>();
         //auto_tracked_values.put(Parameter.DEVICE, "Google Nexus 4");
         auto_tracked_values.put(Parameter.EVERID, "12345678901234");
         //auto_tracked_values.put(Parameter.TRACKING_LIB_VERSION, "400");

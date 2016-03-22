@@ -393,7 +393,7 @@ class TrackingConfigurationXmlParser {
             } else if (name.equals("customParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "customParameter");
                 //TODO: make sure custom parameters via xml configuration are still neccesary
-                Map<String, String> customParameter = new HashMap<>();
+                Map<String, String> customParameter = new HashMap<String, String>();
                 setCustomParameterConfigurationFromXml(parser, customParameter);
                 //config.setCustomParameter(setParameterConfigurationFromXml(parser));
                 config.setCustomParameter(customParameter);

@@ -1,8 +1,6 @@
 package com.Webtrekk.SDKTest;
 
 import android.app.AlertDialog;
-import android.app.Application;
-import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,9 +14,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Webtrekk;
-import com.webtrekk.webtrekksdk.WebtrekkUserParameters;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
+
 
 
 public class MainActivity extends ActionBarActivity {
@@ -27,6 +25,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         mediaCodeReceiverRegister();
@@ -36,6 +35,9 @@ public class MainActivity extends ActionBarActivity {
 
         webtrekk.getCustomParameter().put("own_para", "my-value");
         webtrekk.track();
+
+        MixpanelAPI mixpanel = MixpanelAPI.getInstance(this, "9e956a2e5169ddb44eb87b6acb0eee95");
+
     }
 
     @Override

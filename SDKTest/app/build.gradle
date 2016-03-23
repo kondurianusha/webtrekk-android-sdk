@@ -26,6 +26,7 @@ dependencies {
     compile 'org.apache.commons:commons-io:1.3.2'
     compile 'org.json:json:20140107'
     compile project(':WebtrekkSDK')
+    compile "com.mixpanel.android:mixpanel-android:4.8.0"
 }
 
 repositories{

@@ -15,3 +15,39 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# this congiguration should be considered when it would be time for resourse shrink.
+
+-keep public class com.webtrekk.webtrekksdk.Webtrekk {
+    public <methods>;
+}
+-keep public class com.webtrekk.webtrekksdk.WebtrekkApplication {
+    public <methods>;
+}
+-keep public class com.webtrekk.webtrekksdk.WebtrekkPushNotification {
+    public <methods>;
+}
+-keep public enum com.webtrekk.webtrekksdk.TrackingParameter$** {
+    public *;
+    **[] $VALUES;
+}
+-keep public class com.webtrekk.webtrekksdk.TrackingParameter {
+    public <methods>;
+}
+-keep public class com.webtrekk.webtrekksdk.WebtrekkUserParameters {
+    public <methods>;
+}
+
+-keep public class com.webtrekk.webtrekksdk.** extends android.content.BroadcastReceiver {
+    public <methods>;
+}
+
+-keep public class com.webtrekk.webtrekksdk.Plugin {
+    public <methods>;
+}
+
+-keep public class com.webtrekk.webtrekksdk.** extends com.webtrekk.webtrekksdk.Plugin {
+    public <methods>;
+}
+
+-keepattributes InnerClasses, EnclosingMethod

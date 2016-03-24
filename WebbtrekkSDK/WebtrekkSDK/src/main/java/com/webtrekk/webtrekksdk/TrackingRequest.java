@@ -13,7 +13,7 @@ import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
  * this class contains the tracking event and the trackingparams, and handles the creation of an url string
  * which is send as get request to the configured track domain of the customer
  */
-public class TrackingRequest {
+class TrackingRequest {
 
 
     final TrackingParameter mTrackingParameter;
@@ -66,7 +66,6 @@ public class TrackingRequest {
      * @param trackingParameter
      * @param url
      * @param keys
-     * @param isAmp
      */
     private void addParametersArray(TrackingParameter trackingParameter, StringBuffer url, Parameter keys[],
                                     boolean isAmpToFirstParameter)
@@ -90,7 +89,6 @@ public class TrackingRequest {
      * @param trackingParameter
      * @param url
      * @param keys
-     * @param isAmp
      */
     private void addParametersArray(TrackingParameter trackingParameter, StringBuffer url, Parameter keys[])
     {

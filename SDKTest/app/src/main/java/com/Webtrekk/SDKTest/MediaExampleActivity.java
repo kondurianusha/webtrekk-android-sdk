@@ -10,9 +10,7 @@ import android.view.MenuItem;
 import android.widget.MediaController;
 
 import com.webtrekk.webtrekksdk.TrackingParameter;
-import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Webtrekk;
-import com.webtrekk.webtrekksdk.WebtrekkApplication;
 
 public class MediaExampleActivity extends ActionBarActivity {
     private TrackedVideoView myVideoView;

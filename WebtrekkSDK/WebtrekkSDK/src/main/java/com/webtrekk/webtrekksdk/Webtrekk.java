@@ -270,7 +270,7 @@ public class Webtrekk {
             // parse default configuration without default, willl throw exceptions when its not valid
             trackingConfiguration = new TrackingConfigurationXmlParser().parse(trackingConfigurationString);
         } catch (Exception e) {
-            throw new IllegalStateException("invalid xml configuration file, invalid state");
+            throw new IllegalStateException("invalid xml configuration file, invalid state: " + e.getMessage() + "\n"+trackingConfigurationString);
         }
 
         if(trackingConfiguration != null && trackingConfiguration.isEnableRemoteConfiguration()) {

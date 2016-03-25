@@ -50,4 +50,8 @@
     public <methods>;
 }
 
+-keep public class com.webtrekk.webtrekksdk.R$raw {
+    public <fields>;
+}
+
 -keepattributes InnerClasses, EnclosingMethod

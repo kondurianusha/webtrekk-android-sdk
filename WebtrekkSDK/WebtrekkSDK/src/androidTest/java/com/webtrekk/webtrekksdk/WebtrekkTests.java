@@ -93,7 +93,7 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initInternalParameter(false);
         webtrekk.initWebtrekkParameter();
         assertEquals(6, webtrekk.getWebtrekkParameter().size());
-        assertTrue(webtrekk.getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library 4.0(Android;"));
+        assertTrue(webtrekk.getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library "+Webtrekk.TRACKING_LIBRARY_VERSION_UA+"(Android;"));
 
     }
 

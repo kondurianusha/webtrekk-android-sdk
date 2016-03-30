@@ -19,7 +19,7 @@ import java.util.List;
  * it gets instantiated only once by the main webtrekk class
  */
 
-class RequestUrlStore {
+public class RequestUrlStore {
     private ArrayList<String> requestList;
     private int maximumRequests;
     private File requestStoreFile;

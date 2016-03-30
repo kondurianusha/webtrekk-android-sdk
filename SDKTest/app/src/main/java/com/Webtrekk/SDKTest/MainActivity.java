@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.webtrekk.webtrekksdk.Webtrekk;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
@@ -36,8 +37,8 @@ public class MainActivity extends ActionBarActivity {
         webtrekk.getCustomParameter().put("own_para", "my-value");
         webtrekk.track();
 
+        ((TextView)findViewById(R.id.main_version)).setText(getString(R.string.hello_world) + "\nLibrary Version:" + Webtrekk.TRACKING_LIBRARY_VERSION_UA);
         MixpanelAPI mixpanel = MixpanelAPI.getInstance(this, "9e956a2e5169ddb44eb87b6acb0eee95");
-        ((TextView)findViewById(R.id.main_version)).setText(getString(R.string.hello_world)+"\nVersion:"+Webtrekk.TRACKING_LIBRARY_VERSION_UA);
     }
 
     @Override

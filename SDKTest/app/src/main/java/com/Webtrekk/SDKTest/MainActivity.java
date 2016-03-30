@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Webtrekk;
@@ -36,6 +38,8 @@ public class MainActivity extends ActionBarActivity {
 
         webtrekk.getCustomParameter().put("own_para", "my-value");
         webtrekk.track();
+
+        ((TextView)findViewById(R.id.main_version)).setText(getString(R.string.hello_world)+"\nVersion:"+Webtrekk.TRACKING_LIBRARY_VERSION_UA);
     }
 
     @Override
@@ -143,8 +147,11 @@ public class MainActivity extends ActionBarActivity {
 
     public void pushTest(View view)
     {
+        Toast.makeText(this, "not implemented yet", Toast.LENGTH_LONG).show();
+/*
         Intent intent = new Intent(this, PushNotificationActivity.class);
         startActivity(intent);
+*/
     }
 
     public Webtrekk getWebtrekk() {

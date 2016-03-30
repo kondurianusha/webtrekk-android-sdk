@@ -29,7 +29,7 @@
     <!--track if the app was already installed -->
     <autoTrackAppPreInstalled>true</autoTrackAppPreInstalled>
     <!--track the playstore username, requires special permissions! -->
-    <autoTrackPlaystoreUsername>true</autoTrackPlaystoreUsername>
+    <autoTrackPlaystoreUsername>false</autoTrackPlaystoreUsername>
     <!--track the playstore email, requires special permissions! -->
     <autoTrackPlaystoreMail>true</autoTrackPlaystoreMail>
     <!--track the playstore given name, requires special permissions! -->

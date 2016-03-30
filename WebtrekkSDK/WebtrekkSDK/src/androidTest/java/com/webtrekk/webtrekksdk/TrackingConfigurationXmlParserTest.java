@@ -148,7 +148,7 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
         assertEquals(true, config.isAutoTrackAppVersionName());
         assertEquals(true, config.isAutoTrackAppVersionCode());
         assertEquals(true, config.isAutoTrackAppPreInstalled());
-        assertEquals(true, config.isAutoTrackPlaystoreUsername());
+        assertEquals(false, config.isAutoTrackPlaystoreUsername());
         assertEquals(true, config.isAutoTrackPlaystoreMail());
         assertEquals(true, config.isAutoTrackPlaystoreGivenName());
         assertEquals(true, config.isAutoTrackPlaystoreFamilyName());

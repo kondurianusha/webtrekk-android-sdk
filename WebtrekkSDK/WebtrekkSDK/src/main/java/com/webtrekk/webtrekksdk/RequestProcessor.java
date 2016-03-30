@@ -20,7 +20,7 @@ public class RequestProcessor implements Runnable {
 
     private final RequestUrlStore requestUrlStore;
 
-    interface ProcessOutputCallback
+    public interface ProcessOutputCallback
     {
         public void process(int statusCode, HttpURLConnection connection);
     }

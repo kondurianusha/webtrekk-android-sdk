@@ -210,7 +210,7 @@ public class Webtrekk {
      * After thread is finished make link to object null for GC
      * @param isFirstStart
      */
-    private void startAdvertizingThread(boolean isFirstStart)
+    void startAdvertizingThread(boolean isFirstStart)
     {
         if (!isOptout) {
             mCampaign = Campaign.start(mContext, trackingConfiguration.getTrackId(), isFirstStart,

@@ -43,16 +43,16 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      */
     public void testAllValuesOverrideWithApplicationConfig() {
 
-        assertEquals(wt.getTrackDomain(), "http://trackingtest.nglab.orgO");
-        assertEquals(wt.getVersion(), 3);
-        assertEquals(wt.getTrackId(), "1111111111112O");
-        assertEquals(wt.getSampling(), 333);
-        assertEquals(wt.getSendDelay(), 602);
+        assertEquals(wt.getTrackDomain(), "http://q3.webtrekk.net");
+        assertEquals(wt.getVersion(), 1);
+        assertEquals(wt.getTrackId(), "123451234512345");
+        assertEquals(wt.getSampling(), 0);
+        assertEquals(wt.getSendDelay(), 30);
         //assertEquals(wt.getResendOnStartEventTime(), 303);
-        assertEquals(wt.getMaxRequests(), 4000);
-        assertEquals(wt.getTrackingConfigurationUrl(), "http://remotehost/tracking_config.xml");
-        assertEquals(wt.isAutoTracked(), false);
-        assertEquals(wt.isAutoTrackApiLevel(), false);
+        assertEquals(wt.getMaxRequests(), 100);
+        assertEquals(wt.getTrackingConfigurationUrl(), "https://d1r27qvpjiaqj3.cloudfront.net/238713152098253/34629.xml");
+        assertEquals(wt.isAutoTracked(), true);
+        assertEquals(wt.isAutoTrackApiLevel(), true);
 
     }
 

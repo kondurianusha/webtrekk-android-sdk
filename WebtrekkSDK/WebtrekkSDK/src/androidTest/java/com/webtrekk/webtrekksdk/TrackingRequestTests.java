@@ -195,7 +195,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         webtrekk.startAdvertizingThread(false);
         webtrekk.setCustomParameter(new HashMap<String, String>());
         try {
-            Thread.sleep(4000);
+            Thread.sleep(34000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

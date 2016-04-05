@@ -111,7 +111,7 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2<MainActivity> 
     }
 
 
-    String[] mParametersName = {
+    final String[] mParametersName = {
             //0, 1, 2, 3, 4, 5
             "email1", "email2", "email3", "email4", "emailmd", "emailsha",
             //6, 7, 8, 9, 10, 11, 12
@@ -128,7 +128,7 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2<MainActivity> 
             "TwitterID","GooglePludID", "LinkedID", "Custom"
     };
 
-    String[] mParametersValue = {
+    final String[] mParametersValue = {
             "test@tester.com", "TEST@TESTER.COM",  "Test@Tester.com", " Test@Tester.com ", "EF8CA1C0FF7D2E34DC0953D4222655B8", "1F9E575AD4234C30A81D30C70AFFD4BBA7B0D57D8E8607AD255496863D72C8BB",
             "01799586148", "+49179 9586148", "+49 179/9586148", "00 179/9586148", "0179 95 86 148", "6AF3CC537AB15FFB500167AF24D2B9D6", "629D99E8350B704511F8FE6506C38888C0749DACC0F091D7F8914CDD6B5B7862",
             "stephan|guenther|10115|teststrasse|7", "Stephan|Guenther|10115|Teststrasse|7", "Stephan|Günther|10115|Teststraße|7", "Stephan|Günther|10115|Teststr|7",
@@ -139,7 +139,7 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2<MainActivity> 
     };
 
     //sha256 or original value
-    String[] mFirstOrSha256KeyName={
+    final String[] mFirstOrSha256KeyName={
             "cdb2", "cdb2", "cdb2", "cdb2", null, "cdb2",
             "cdb4", "cdb4", "cdb4", "cdb4", "cdb4", null, "cdb4",
             "cdb6", "cdb6", "cdb6", "cdb6",
@@ -153,7 +153,7 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2<MainActivity> 
             "cdb11", "cdb12", "cdb13", "cdb51"
     };
 
-    String[] mMdKeyName={
+    final String[] mMdKeyName={
             "cdb1", "cdb1", "cdb1", "cdb1", "cdb1", null,
             "cdb3", "cdb3", "cdb3", "cdb3", "cdb3", "cdb3", null,
             "cdb5", "cdb5", "cdb5", "cdb5",
@@ -167,7 +167,7 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2<MainActivity> 
             null, null, null, null
     };
 
-    String[] mFirstOrSha256Value = {
+    final String[] mFirstOrSha256Value = {
             "1f9e575ad4234c30a81d30c70affd4bba7b0d57d8e8607ad255496863d72c8bb", "1f9e575ad4234c30a81d30c70affd4bba7b0d57d8e8607ad255496863d72c8bb","1f9e575ad4234c30a81d30c70affd4bba7b0d57d8e8607ad255496863d72c8bb","1f9e575ad4234c30a81d30c70affd4bba7b0d57d8e8607ad255496863d72c8bb", null, "1f9e575ad4234c30a81d30c70affd4bba7b0d57d8e8607ad255496863d72c8bb",
             "629d99e8350b704511f8fe6506c38888c0749dacc0f091d7f8914cdd6b5b7862", "27e75156a4134c75a019efcb7f899d62fb23d300667a79289fd4a11c4bcdbf87", "27e75156a4134c75a019efcb7f899d62fb23d300667a79289fd4a11c4bcdbf87", "6497ae00a154a09fc6b39c9e4c4ba6f64885e8279d587b66626fec44e8cc468c", "629d99e8350b704511f8fe6506c38888c0749dacc0f091d7f8914cdd6b5b7862",null, "629d99e8350b704511f8fe6506c38888c0749dacc0f091d7f8914cdd6b5b7862",
             "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843", "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843", "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843", "6e65555ea5d3c707ef3e7bbc6a7e09d33c23dd2e23c36d6750b25bf86efdf843",
@@ -177,7 +177,7 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2<MainActivity> 
             "8182771b8680ca5bd979b339f3e3c1416342c3ea62133819c76c71aebaa38efb", "af3e9f1b964c6a377ba4ad61a37a84f5ba527ffd7b014515885217919c900ba6", "44a6998e43e432440de3b0045c278664b62fa9e77b32b12937561c67d385a732", "customfield"
     };
 
-    String[] mMdFieldValue={
+    final String[] mMdFieldValue={
             "ef8ca1c0ff7d2e34dc0953d4222655b8", "ef8ca1c0ff7d2e34dc0953d4222655b8", "ef8ca1c0ff7d2e34dc0953d4222655b8", "ef8ca1c0ff7d2e34dc0953d4222655b8","ef8ca1c0ff7d2e34dc0953d4222655b8", null,
             "6af3cc537ab15ffb500167af24d2b9d6", "15a7498681d67ecc0b9c62c0087a9faa", "15a7498681d67ecc0b9c62c0087a9faa", "03f5113c45423448356b1c1c5a3e0027", "6af3cc537ab15ffb500167af24d2b9d6","6af3cc537ab15ffb500167af24d2b9d6", null,
             "756e1fd66e46d930707acd1b2d2dcc14", "756e1fd66e46d930707acd1b2d2dcc14", "756e1fd66e46d930707acd1b2d2dcc14", "756e1fd66e46d930707acd1b2d2dcc14",
@@ -188,7 +188,7 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2<MainActivity> 
     };
 
 
-    int[][] mCycleTestArr = {{0,6,13,23,24,25,26,27,28,29, 30},
+    final int[][] mCycleTestArr = {{0,6,13,23,24,25,26,27,28,29, 30},
             {1, 7, 14}, {2, 8, 15},  {3, 9, 16}, {4, 5, 10, 17},
             {11, 12, 18}, {19}, {20}, {21, 22}};
 

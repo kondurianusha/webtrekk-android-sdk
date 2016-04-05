@@ -56,6 +56,12 @@
             android:text="Push test"
             android:layout_gravity="center_horizontal"
             android:onClick="pushTest" />
+
+        <WebView
+            android:id="@+id/main_web_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
     </LinearLayout>
 
 </RelativeLayout>

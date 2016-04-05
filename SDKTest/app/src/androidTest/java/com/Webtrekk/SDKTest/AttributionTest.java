@@ -42,13 +42,13 @@ public class AttributionTest extends ActivityInstrumentationTestCase2<MainActivi
         super.setUp();
     }
 
-    public void testAttributionRunLinkWithAdID()
+    public void doTestAttributionRunLinkWithAdID()
     {
         launchClickID("http://appinstall.webtrekk.net/appinstall/v1/redirect?mc="+MEDIA_CODE+"&trackid=&as1=market%3A//details%3Fid%3Dcom.Webtrekk.SDKTest&aid=", true);
     }
 
 
-    public void testAttributionRunLinkWithoutAdID()
+    public void doTestAttributionRunLinkWithoutAdID()
     {
         launchClickID("http://appinstall.webtrekk.net/appinstall/v1/redirect?mc="+MEDIA_CODE+"&trackid=&as1=market%3A//details%3Fid%3Dcom.Webtrekk.SDKTest", false);
     }
@@ -138,7 +138,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2<MainActivi
         }
     }
 
-    public void testDefineAdID()
+    public void testAdID()
     {
         Object notifier = new Object();
         mContext = getActivity();
@@ -204,7 +204,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2<MainActivi
         }
     }
 
-    public void testFirstStart()
+    public void doFirstStart()
     {
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mSDKReceiver,
                 new IntentFilter("com.Webtrekk.CampainMediaMessage"));

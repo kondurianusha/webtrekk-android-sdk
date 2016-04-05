@@ -74,7 +74,7 @@ public class MainActivity extends ActionBarActivity {
             String mediaCode = intent.getStringExtra("INSTALL_SETTINGS_MEDIA_CODE");
             String advID = intent.getStringExtra("INSTALL_SETTINGS_ADV_ID");
 
-            Log.d(getClass().getName(),"Broad case message from SDK is received");
+            Log.d(getClass().getName(),"Broad cast message from SDK is received");
 
             new AlertDialog.Builder(MainActivity.this)
                     .setTitle("Media Code")

@@ -44,7 +44,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     public void testAllValuesOverrideWithApplicationConfig() {
 
         assertTrue(wt.getTrackDomain().contains("://q3.webtrekk.net"));
-        assertEquals(wt.getVersion(), 4);
+        assertEquals(wt.getVersion(), 1);
         assertEquals(wt.getTrackId(), "123451234512345");
         assertEquals(wt.getSampling(), 0);
         assertEquals(wt.getSendDelay(), 30);
@@ -60,7 +60,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      * test that when a config value is invalid it chooses the default from the sdk
      */
     public void testInvalidValuesInApplicationConfig() {
-        assertEquals(wt.isEnableRemoteConfiguration(), true);
+        assertEquals(wt.isEnableRemoteConfiguration(), false);
     }
 
     /**

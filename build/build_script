@@ -4,6 +4,7 @@ git clone http://stash.webtrekk.com/scm/pixlib/sdk-android-v2.git AndroidSDK
 
 cd AndroidSDK/SDKTest
 ./gradlew assembleRelease
+./gradlew assembleDebug
 
 #do unit tests
 

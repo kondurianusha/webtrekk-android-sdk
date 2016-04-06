@@ -1,10 +1,9 @@
 package com.Webtrekk.SDKTest;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Debug;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,7 @@ import java.util.logging.Level;
 /**
  * Created by user on 26/11/15.
  */
-public class VideoActivity extends AppCompatActivity {
+public class VideoActivity extends Activity {
     private VideoEnabledWebView webView;
     private VideoEnabledWebChromeClient webChromeClient;
 

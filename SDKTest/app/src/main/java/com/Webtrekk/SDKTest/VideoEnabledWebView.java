@@ -27,7 +27,7 @@ public class VideoEnabledWebView extends WebView
 {
     public class JavascriptInterface
     {
-        @android.webkit.JavascriptInterface @SuppressWarnings("unused")
+        //@android.webkit.JavascriptInterface @SuppressWarnings("unused")
         public void notifyVideoEnd() // Must match Javascript interface method of VideoEnabledWebChromeClient
         {
             Log.d("___", "GOT IT");

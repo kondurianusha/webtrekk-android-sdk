@@ -1,5 +1,6 @@
 package com.Webtrekk.SDKTest;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,7 +20,7 @@ import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
     private Webtrekk webtrekk;
 
     @Override

@@ -1,8 +1,8 @@
 package com.Webtrekk.SDKTest;
 
+import android.app.Activity;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -12,7 +12,7 @@ import android.widget.MediaController;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-public class MediaExampleActivity extends ActionBarActivity {
+public class MediaExampleActivity extends Activity {
     private TrackedVideoView myVideoView;
     private int position = 0;
     private MediaController mediaControls;

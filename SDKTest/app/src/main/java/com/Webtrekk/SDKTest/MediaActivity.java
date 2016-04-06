@@ -1,8 +1,7 @@
 package com.Webtrekk.SDKTest;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
-public class MediaActivity extends AppCompatActivity {
+public class MediaActivity extends Activity {
     private static final int MEDIA_LENGTH = 360;
 
     SeekBar playProgressBar;

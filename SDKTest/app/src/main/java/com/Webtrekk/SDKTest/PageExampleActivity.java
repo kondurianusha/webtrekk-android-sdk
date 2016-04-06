@@ -1,6 +1,6 @@
 package com.Webtrekk.SDKTest;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,7 +11,7 @@ import com.webtrekk.webtrekksdk.Webtrekk;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 
 
-public class PageExampleActivity extends ActionBarActivity {
+public class PageExampleActivity extends Activity {
     private Webtrekk webtrekk;
 
     @Override

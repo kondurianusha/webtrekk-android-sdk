@@ -1,7 +1,7 @@
 package com.Webtrekk.SDKTest;
 
+import android.app.Activity;
 import android.content.Context;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +15,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 
 
-public class ShopExampleActivity extends ActionBarActivity {
+public class ShopExampleActivity extends Activity {
 
     private Webtrekk webtrekk;
     TrackingParameter tp;

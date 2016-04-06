@@ -213,7 +213,7 @@ public class Webtrekk {
     private void startAdvertizingThread(boolean isFirstStart)
     {
         if (!isOptout) {
-            mCampaign = Campaign.start(mContext, trackingConfiguration.getTrackId(), isFirstStart,
+            mCampaign = Campaign.start(mContext, trackingConfiguration.getTrackId(), isFirstStart, trackingConfiguration.isAutoTrackAdvertiserId(),
                     new Runnable() {
                         @Override
                         public void run() {
@@ -831,7 +831,7 @@ public class Webtrekk {
     }
 
     /*
-    Process campainData
+    Process campaignData
      */
     void processCompaignData(TrackingRequest request)
     {

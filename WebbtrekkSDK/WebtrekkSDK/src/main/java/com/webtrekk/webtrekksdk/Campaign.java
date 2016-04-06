@@ -28,6 +28,7 @@ class Campaign extends Thread
 {
     private final String mTrackID;
     private final boolean mFirstStart;
+    private final boolean mIsAutoTrackAdvID;
     private final Context mContext;
 
     private String mMediaCode;
@@ -40,7 +41,7 @@ class Campaign extends Thread
     private static final String CAMPAIN_MEDIA_CODE_DEFINED_MESSAGE = "com.Webtrekk.CampainMediaMessage";
 
 
-    Campaign(Context context, String trackID, boolean isFirstStart,
+    Campaign(Context context, String trackID, boolean isFirstStart, boolean isAutoTrackAdvID,
              Runnable stopNotification) {
 
         mContext = context;
@@ -49,6 +50,7 @@ class Campaign extends Thread
         mFirstStart = isFirstStart ? isFirstStart : getFirstStartInitiated(context, true);
         mTrackID = trackID;
         mStopNotification = stopNotification;
+        mIsAutoTrackAdvID = isAutoTrackAdvID;
     }
 
     /**
@@ -60,7 +62,7 @@ class Campaign extends Thread
      * @param stopNotification notify about that work is done. It is required to free instance of this class for GC
      * @return instance of Campain class. you need it to interrupt process if application is closed.
      */
-    static Campaign start(Context context, String trackID, boolean isFirstStart,
+    static Campaign start(Context context, String trackID, boolean isFirstStart, boolean isAutoTrackAdvID,
                           Runnable stopNotification)
     {
         if (trackID == null || trackID.isEmpty())
@@ -69,7 +71,7 @@ class Campaign extends Thread
             return null;
         }
 
-        Campaign service = new Campaign(context, trackID, isFirstStart, stopNotification);
+        Campaign service = new Campaign(context, trackID, isFirstStart, isAutoTrackAdvID, stopNotification);
         service.start();
         return service;
     }
@@ -159,31 +161,36 @@ class Campaign extends Thread
             if (mFirstStart)
                 setFirstStartInitiated();
 
-            //get adv ID
+            //get adv ID only if either autoTrackAdID or firstSTart
 
-            try {
-                adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
+            if (mIsAutoTrackAdvID || mFirstStart) {
+                try {
+                    adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
 
-                if (adInfo != null) {
-                    advID = adInfo.getId();
-                    isLimitAdEnabled = adInfo.isLimitAdTrackingEnabled();
+                    if (adInfo != null) {
+                        advID = adInfo.getId();
+                        isLimitAdEnabled = adInfo.isLimitAdTrackingEnabled();
+                    }
+
+                    WebtrekkLogging.log("advertiserId: " + advID);
+
+                } catch (IOException e) {
+                    // Unrecoverable error connecting to Google Play services (e.g.,
+                    // the old version of the service doesn't support getting AdvertisingId).
+                    WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
+                    // the only way understand that process was interrupted.
+                    if (e.getMessage().equals("Interrupted exception"))
+                        return;
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    // Google Play services is not available entirely.
+                    WebtrekkLogging.log("GooglePlayServicesNotAvailableException", e);
+                } catch (GooglePlayServicesRepairableException e) {
+                    // maybe will work with another try, recheck
+                } catch (NoClassDefFoundError e) {
+                    WebtrekkLogging.log("Can't define AdvID as library com.google.android.gms:play-services-ads isn't imported to project");
                 }
-
-                WebtrekkLogging.log("advertiserId: " + advID);
-
-            } catch (IOException e) {
-                // Unrecoverable error connecting to Google Play services (e.g.,
-                // the old version of the service doesn't support getting AdvertisingId).
-                WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
-                // the only way understand that process was interrupted.
-                if (e.getMessage().equals("Interrupted exception"))
-                    return;
-            } catch (GooglePlayServicesNotAvailableException e) {
-                // Google Play services is not available entirely.
-                WebtrekkLogging.log("GooglePlayServicesNotAvailableException", e);
-            } catch (GooglePlayServicesRepairableException e) {
-                // maybe will work with another try, recheck
             }
+
 
             //if this is first start wait for referrer for 30 seconds.
             final long waitForReferrerDelay = 30000;

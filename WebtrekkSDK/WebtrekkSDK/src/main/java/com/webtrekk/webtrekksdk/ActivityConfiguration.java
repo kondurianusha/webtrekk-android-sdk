@@ -4,60 +4,82 @@ package com.webtrekk.webtrekksdk;
  * Created by user on 12/11/15.
  */
 class ActivityConfiguration {
-    private String className;
-    private String mappingName;
-    private boolean isAutoTrack;
-    private TrackingParameter activityTrackingParameter;
-    private TrackingParameter constActivityTrackingParameter;
+    private String mClassName;
+    private String mMappingName;
+    private boolean mIsAutoTrack;
+    private TrackingParameter mActivityTrackingParameter;
+    private TrackingParameter mConstActivityTrackingParameter;
 
     public ActivityConfiguration() {
     }
 
     public ActivityConfiguration(String className, String mappingName, boolean isAutoTrack, TrackingParameter tp, TrackingParameter constTp) {
-        this.className = className;
-        this.mappingName = mappingName;
-        this.isAutoTrack = isAutoTrack;
-        this.activityTrackingParameter = tp;
-        this.constActivityTrackingParameter = constTp;
+        mClassName = className;
+        mMappingName = mappingName;
+        mIsAutoTrack = isAutoTrack;
+        mActivityTrackingParameter = tp;
+        mConstActivityTrackingParameter = constTp;
     }
 
     public String getClassName() {
-        return className;
+        return mClassName;
     }
 
     public void setClassName(String className) {
-        this.className = className;
+        mClassName = className;
     }
 
     public String getMappingName() {
-        return mappingName;
+        return mMappingName;
     }
 
     public void setMappingName(String mappingName) {
-        this.mappingName = mappingName;
+        mMappingName = mappingName;
     }
 
     public boolean isAutoTrack() {
-        return isAutoTrack;
+        return mIsAutoTrack;
     }
 
     public void setIsAutoTrack(boolean isAutoTrack) {
-        this.isAutoTrack = isAutoTrack;
+        mIsAutoTrack = isAutoTrack;
     }
 
     public TrackingParameter getActivityTrackingParameter() {
-        return activityTrackingParameter;
+        return mActivityTrackingParameter;
     }
 
     public void setActivityTrackingParameter(TrackingParameter activityTrackingParameter) {
-        this.activityTrackingParameter = activityTrackingParameter;
+        this.mActivityTrackingParameter = activityTrackingParameter;
     }
 
     public TrackingParameter getConstActivityTrackingParameter() {
-        return constActivityTrackingParameter;
+        return mConstActivityTrackingParameter;
     }
 
     public void setConstActivityTrackingParameter(TrackingParameter constActivityTrackingParameter) {
-        this.constActivityTrackingParameter = constActivityTrackingParameter;
+        mConstActivityTrackingParameter = constActivityTrackingParameter;
+        //validae URL if any
+        if (mConstActivityTrackingParameter.containsKey(TrackingParameter.Parameter.PAGE_URL))
+        {
+            String url = mConstActivityTrackingParameter.getDefaultParameter().get(TrackingParameter.Parameter.PAGE_URL);
+            if (!HelperFunctions.testIsValidURL(url))
+            {
+                WebtrekkLogging.log("Incorrece URL:"+url+" in configuration. Don't track it for pu parameter");
+                mConstActivityTrackingParameter.getDefaultParameter().remove(TrackingParameter.Parameter.PAGE_URL);
+            }
+        }
     }
+
+    public void setOverridenPageURL(String url)
+    {
+        mActivityTrackingParameter.getDefaultParameter().put(TrackingParameter.Parameter.PAGE_URL, url);
+    }
+
+    public void resetOverridenPageURL()
+    {
+        mActivityTrackingParameter.getDefaultParameter().remove(TrackingParameter.Parameter.PAGE_URL);
+    }
+
+
 }

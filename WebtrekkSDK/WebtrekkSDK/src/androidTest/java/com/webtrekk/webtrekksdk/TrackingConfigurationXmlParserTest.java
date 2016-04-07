@@ -1,7 +1,6 @@
 package com.webtrekk.webtrekksdk;
 
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.Suppress;
 import android.util.Log;
 
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;

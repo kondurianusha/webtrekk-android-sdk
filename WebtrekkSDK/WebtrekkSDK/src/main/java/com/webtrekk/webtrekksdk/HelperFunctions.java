@@ -638,4 +638,17 @@ final class HelperFunctions {
         int resultCode = apiAvailability.isGooglePlayServicesAvailable(context);
         return (resultCode == ConnectionResult.SUCCESS);
     }
+
+    static boolean testIsValidURL(String url)
+    {
+        try {
+            URL urlObject = new URL(url);
+        }catch(MalformedURLException e)
+        {
+            return false;
+        }
+        return true;
+    }
+
+
 }

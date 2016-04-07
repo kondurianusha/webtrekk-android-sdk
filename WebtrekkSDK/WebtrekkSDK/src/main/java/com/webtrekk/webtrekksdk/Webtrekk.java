@@ -75,7 +75,7 @@ public class Webtrekk {
     //in the xml configuraton then is the trackingparameter requests defined with ecomerce_parameter "1" and the key orientation
     // before the request url is generated this keys will be replaced with values from this map
     // the customParameter are set by the user and are only valid for the current activity
-    private Map<String, String> customParameter;
+    private Map<String, String> mCustomParameter;
     private Map<String, String> autoCustomParameter;
 
     // this hashmap contains all the default parameter which are defined by webtrekk and have an url mapping
@@ -171,8 +171,8 @@ public class Webtrekk {
         }
         this.mContext = c;
 
-        if(customParameter == null) {
-            customParameter = new HashMap<String, String>();
+        if(mCustomParameter == null) {
+            mCustomParameter = new HashMap<String, String>();
         }
 
         boolean isFirstStart = HelperFunctions.firstStart(mContext);
@@ -426,8 +426,8 @@ public class Webtrekk {
         if(autoCustomParameter == null) {
             autoCustomParameter = new HashMap<String, String>();
         }
-        if(customParameter == null) {
-            customParameter = new HashMap<String, String>();
+        if(mCustomParameter == null) {
+            mCustomParameter = new HashMap<String, String>();
         }
 
         if(trackingConfiguration.isAutoTrackAppVersionName()) {
@@ -729,8 +729,8 @@ public class Webtrekk {
         trackingParameter.add(webtrekkParameter);
 
         // add the autotracked custom params to the custom params
-        if(customParameter!= null) {
-            customParameter.putAll(autoCustomParameter);
+        if(mCustomParameter!= null) {
+            mCustomParameter.putAll(autoCustomParameter);
         }
 
 
@@ -739,9 +739,9 @@ public class Webtrekk {
             trackingParameter.add(constGlobalTrackingParameter);
         }
         //now map the string values from the code tracking parameters to the custom values defined by webtrekk or the customer
-        if(customParameter!= null && globalTrackingParameter != null) {
+        if(mCustomParameter!= null && globalTrackingParameter != null) {
             // first map the global tracking parameter
-            TrackingParameter mappedTrackingParameter = globalTrackingParameter.applyMapping(customParameter);
+            TrackingParameter mappedTrackingParameter = globalTrackingParameter.applyMapping(mCustomParameter);
             trackingParameter.add(mappedTrackingParameter);
         }
         // second add the globally configured const trackingparams from the xml which may override the ones above
@@ -750,7 +750,7 @@ public class Webtrekk {
         }
         // also add the globally configured mapped trackingparams from the xml which may override the ones above
         if(trackingConfiguration.getGlobalTrackingParameter() != null) {
-            TrackingParameter mappedTrackingParameter = trackingConfiguration.getGlobalTrackingParameter().applyMapping(customParameter);
+            TrackingParameter mappedTrackingParameter = trackingConfiguration.getGlobalTrackingParameter().applyMapping(mCustomParameter);
             trackingParameter.add(mappedTrackingParameter);
         }
 
@@ -768,9 +768,9 @@ public class Webtrekk {
                 TrackingParameter mappedTrackingParameter = activityConfiguration.getActivityTrackingParameter();
                 if( mappedTrackingParameter != null) {
                     //now map the string values from the xml/code tracking parameters to the custom values defined by webtrekk or the customer
-                    if(customParameter!= null) {
+                    if(mCustomParameter!= null) {
                         // first map the global tracking parameter
-                        mappedTrackingParameter.applyMapping(customParameter);
+                        mappedTrackingParameter.applyMapping(mCustomParameter);
                         trackingParameter.add(mappedTrackingParameter);
                     }
                 }
@@ -856,7 +856,12 @@ public class Webtrekk {
             throw new IllegalStateException("webtrekk has not been initialized");
         }
         activityCount++;
-        this.currentActivityName = activityName;
+
+        //reset page URL if activity is changed
+        if (currentActivityName != null && !currentActivityName.equals(activityName))
+            resetPageURLTrack();
+
+        currentActivityName = activityName;
         if(activityCount == 1) {
             onFirstActivityStart();
         }
@@ -892,7 +897,7 @@ public class Webtrekk {
         activityCount--;
 
         //always clear the current activities custom parameter
-        customParameter.clear();
+        mCustomParameter.clear();
         if(activityCount == 0) {
             onLastActivityStop();
         }
@@ -938,7 +943,7 @@ public class Webtrekk {
 
 
     /**
-     * this method is for the opt out switcht, when called it will set the shared preferences of opt out
+     * this method is for the opt out switch, when called it will set the shared preferences of opt out
      * and also stops tracking in case the user opts out
      * @param oo boolean value indicating if the user opted out or not
      */
@@ -950,6 +955,41 @@ public class Webtrekk {
 
         SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(mContext);
         preferences.edit().putBoolean(PREFERENCE_KEY_OPTED_OUT, isOptout).commit();
+    }
+
+    /**
+     * Set url for tracking for each activity. This value is reset for each new activity
+     * Value is override PAGE_URL parameter in activity configuration if any.
+     * @param url
+     * @return
+     */
+
+    public boolean setPageURL(String url)
+    {
+        ActivityConfiguration acConf = trackingConfiguration.getActivityConfigurations().get(currentActivityName);
+
+        if (!HelperFunctions.testIsValidURL(url)) {
+            WebtrekkLogging.log("setPageURL. Invalid url format");
+            return false;
+        }else {
+
+            if (acConf != null) {
+                acConf.setOverridenPageURL(url);
+                return true;
+            } else {
+                WebtrekkLogging.log("setPageURL. Activity configuration isn't defined.");
+                return false;
+            }
+        }
+    }
+
+    //reset overrided URLTrack
+    private void resetPageURLTrack()
+    {
+        ActivityConfiguration acConf = trackingConfiguration.getActivityConfigurations().get(currentActivityName);
+
+        if (acConf != null)
+            acConf.resetOverridenPageURL();
     }
 
     /**
@@ -978,7 +1018,7 @@ public class Webtrekk {
      * @return
      */
     public Map<String, String> getCustomParameter() {
-        return customParameter;
+        return mCustomParameter;
     }
 
     /**
@@ -986,7 +1026,7 @@ public class Webtrekk {
      *
      */
     public void setCustomParameter(Map<String, String> customParameter) {
-        this.customParameter = customParameter;
+        mCustomParameter = customParameter;
     }
 
     public String getEverId() {

@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 

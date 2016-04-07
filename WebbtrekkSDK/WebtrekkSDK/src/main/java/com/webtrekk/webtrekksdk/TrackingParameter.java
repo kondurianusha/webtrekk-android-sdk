@@ -269,6 +269,7 @@ public class TrackingParameter {
         ADVERTISEMENT("mc"), // Werbemittel
         ADVERTISEMENT_ACTION("mca"), // Werbemittel
         ADVERTISER_ID("geid"),
+        PAGE_URL("pu"),
 
         /**
          * Media tracking parameter
@@ -364,7 +365,7 @@ public class TrackingParameter {
     public TrackingParameter applyMapping(Map<String, String> mappingValues) {
         // create a new mapped trackingparameter object
         TrackingParameter mappedTrackingParameter = new TrackingParameter();
-        mappedTrackingParameter.setDefaultParameter(new TreeMap<Parameter, String>(this.defaultParameter));
+        mappedTrackingParameter.setDefaultParameter(applySingleMapping(defaultParameter, mappingValues));
         mappedTrackingParameter.setActionParameter(applySingleMapping(actionParameter, mappingValues));
         mappedTrackingParameter.setAdParameter(applySingleMapping(adParameter, mappingValues));
         mappedTrackingParameter.setEcomParameter(applySingleMapping(ecomParameter, mappingValues));
@@ -377,21 +378,35 @@ public class TrackingParameter {
         return mappedTrackingParameter;
     }
 
-    private SortedMap<String, String> applySingleMapping(SortedMap<String, String> original, Map<String, String> mappingValues) {
-        SortedMap<String, String> mappedValues = new TreeMap<String, String>();
-        if (!original.isEmpty()) {
-            for (Map.Entry<String, String> entry : original.entrySet()) {
-                String key = entry.getValue();
-                if(mappingValues.containsKey(key)) {
-                    //entry.setValue(mappingValues.get(entry.getValue()));
-                    mappedValues.put(entry.getKey(), mappingValues.get(key));
-                } else {
-                    // pass empty string if no mapping value is found in the custom parameter, could also use get with default here
-                    mappedValues.put(entry.getKey(), "");
-                }
+    private <T> SortedMap<T, String> applySingleMapping(SortedMap<T, String> original, Map<String, String> mappingValues) {
+        SortedMap<T, String> mappedValues = new TreeMap<T, String>();
+        for (Map.Entry<T, String> entry : original.entrySet()) {
+            String key = entry.getValue();
+            if(mappingValues.containsKey(key)) {
+                //entry.setValue(mappingValues.get(entry.getValue()));
+                mappedValues.put(entry.getKey(), mappingValues.get(key));
+            } else {
+                // pass empty string if no mapping value is found in the custom parameter, could also use get with default here
+                mappedValues.put(entry.getKey(), "");
             }
         }
         return mappedValues;
     }
 
+/*
+    private SortedMap<Parameter, String> applySingleDefaultMapping(SortedMap<Parameter, String> original, Map<String, String> mappingValues) {
+        SortedMap<Parameter, String> mappedValues = new TreeMap<Parameter, String>();
+        for (Map.Entry<Parameter, String> entry : original.entrySet()) {
+            String key = entry.getValue();
+            if(mappingValues.containsKey(key)) {
+                //entry.setValue(mappingValues.get(entry.getValue()));
+                mappedValues.put(entry.getKey(), mappingValues.get(key));
+            } else {
+                // pass empty string if no mapping value is found in the custom parameter, could also use get with default here
+                mappedValues.put(entry.getKey(), "");
+            }
+        }
+        return mappedValues;
+    }
+*/
 }

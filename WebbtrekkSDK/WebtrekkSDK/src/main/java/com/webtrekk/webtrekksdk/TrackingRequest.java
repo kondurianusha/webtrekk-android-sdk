@@ -179,7 +179,8 @@ public class TrackingRequest {
         Parameter.GNAME, Parameter.SNAME, Parameter.PHONE, Parameter.GENDER, Parameter.BIRTHDAY, Parameter.CITY, Parameter.COUNTRY,
         Parameter.ZIP, Parameter.STREET, Parameter.STREETNUMBER, Parameter.MEDIA_FILE, Parameter.MEDIA_ACTION,
         Parameter.MEDIA_POS, Parameter.MEDIA_LENGTH, Parameter.MEDIA_BANDWITH, Parameter.MEDIA_VOLUME,
-        Parameter.MEDIA_MUTED, Parameter.MEDIA_TIMESTAMP, Parameter.SAMPLING, Parameter.IP_ADDRESS, Parameter.USERAGENT};
+        Parameter.MEDIA_MUTED, Parameter.MEDIA_TIMESTAMP, Parameter.SAMPLING, Parameter.IP_ADDRESS, Parameter.USERAGENT,
+        Parameter.PAGE_URL};
 
         /**
          * this method is generate p parameter for URL for specific implementation

@@ -118,6 +118,7 @@
             entries made here are available as default parameters in the trackingparameter instance -->
             <parameter id="PRODUCT">test_product</parameter>
             <parameter id="PRODUCT_COST">443</parameter>
+            <parameter id="PAGE_URL">http://www.yandex.ru</parameter>
             <!--define the global page parameter, the key is the index,  -->
             <pageParameter>
                 <parameter id="1">test_pageparam1</parameter>

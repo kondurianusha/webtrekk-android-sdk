@@ -365,4 +365,28 @@ public class TrackingRequestTests extends AndroidTestCase {
         assertTrue(url, url.contains("customname"));
     }
 
+    public void testPageURLTest() {
+        Webtrekk wt = new Webtrekk();
+
+        //test URL page in configuration xml
+        wt.initWebtrekk(getContext());
+        wt.startActivity("test.myapplication.MainActivity");
+
+        TrackingParameter tp = new TrackingParameter();
+        TrackingRequest tr = wt.createTrackingRequest(tp);
+        assertTrue(tr.mTrackingParameter.getDefaultParameter().containsKey(Parameter.PAGE_URL));
+        assertTrue(tr.mTrackingParameter.getDefaultParameter().get(Parameter.PAGE_URL).equals("http://www.yandex.ru"));
+
+        //test URL page override by function
+        assertTrue(wt.setPageURL("http://wwww.google.com"));
+
+        tr = wt.createTrackingRequest(tp = new TrackingParameter());
+        assertTrue(tr.mTrackingParameter.getDefaultParameter().containsKey(Parameter.PAGE_URL));
+        assertEquals(tr.mTrackingParameter.getDefaultParameter().get(Parameter.PAGE_URL), "http://wwww.google.com");
+
+        //test URL page after activity is changed
+        wt.startActivity("test.myapplication.MainActivity2");
+        tr = wt.createTrackingRequest(tp = new TrackingParameter());
+        assertFalse(tr.mTrackingParameter.getDefaultParameter().containsKey(Parameter.PAGE_URL));
+    }
 }

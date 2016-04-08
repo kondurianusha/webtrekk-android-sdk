@@ -10,10 +10,13 @@ sleep 30
  #do test
 ./gradlew cAT
 
+bash testIntallAttribution.sh yes
+
+
  #extract logs
-cd ../..
+cd ..
 adb logcat -d > all_log.txt
 adb logcat -d WebtrekkSDK:* *:S > webtrekk_log.txt
 
- #kill emulator
+#kill emulator
 adb emu kill

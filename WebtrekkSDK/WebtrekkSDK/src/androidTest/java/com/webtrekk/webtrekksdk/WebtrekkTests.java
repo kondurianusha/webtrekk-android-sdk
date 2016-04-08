@@ -192,36 +192,6 @@ public class WebtrekkTests extends AndroidTestCase {
         assertEquals(1, webtrekk.getActivityCount());
     }
 
-
-
-/*
-    public void testStopActivity() {
-        try {
-            webtrekk.stopActivity();
-            fail("not initalized, IllegalStateException");
-        } catch (IllegalStateException e){
-        }
-        webtrekk.initWebtrekk(getContext());
-        //init called but not the startActivity
-        try {
-            webtrekk.stopActivity();
-            fail("activity has not been started yet, call startAcitivity");
-        } catch (IllegalStateException e){
-        }
-        webtrekk.increaseActivityCounter();
-        webtrekk.startActivity("test");
-        webtrekk.startActivity("test2");
-
-        webtrekk.stopActivity();
-        assertEquals(1, webtrekk.getActivityCount());
-        RequestUrlStore requestUrlStore = mock(RequestUrlStore.class);
-        webtrekk.setRequestUrlStore(requestUrlStore);
-        webtrekk.stopActivity();
-        assertEquals(0, webtrekk.getActivityCount());
-        verify(requestUrlStore).saveRequestsToFile();
-    }
-*/
-
     public void testOnSendIntervalOver() {
         webtrekk.initWebtrekk(getContext());
         RequestUrlStore requestUrlStore = mock(RequestUrlStore.class);

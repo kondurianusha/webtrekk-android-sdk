@@ -62,14 +62,12 @@ public class MediaExampleActivity extends ActionBarActivity {
     public void onStart()
     {
         super.onStart();
-        webtrekk.startActivity("MediaExampleActivity");
         webtrekk.track();
     }
 
     @Override
     public void onStop()
     {
-        webtrekk.stopActivity();
         super.onStop();
     }
 

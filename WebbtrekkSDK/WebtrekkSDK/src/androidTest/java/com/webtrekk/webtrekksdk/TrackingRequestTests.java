@@ -370,7 +370,8 @@ public class TrackingRequestTests extends AndroidTestCase {
 
         //test URL page in configuration xml
         wt.initWebtrekk(getContext());
-        wt.startActivity("test.myapplication.MainActivity");
+        wt.increaseActivityCounter();
+        wt.startActivity("test.myapplication.MainActivity", false);
 
         TrackingParameter tp = new TrackingParameter();
         TrackingRequest tr = wt.createTrackingRequest(tp);
@@ -385,7 +386,8 @@ public class TrackingRequestTests extends AndroidTestCase {
         assertEquals(tr.mTrackingParameter.getDefaultParameter().get(Parameter.PAGE_URL), "http://wwww.google.com");
 
         //test URL page after activity is changed
-        wt.startActivity("test.myapplication.MainActivity2");
+        wt.increaseActivityCounter();
+        wt.startActivity("test.myapplication.MainActivity2", false);
         tr = wt.createTrackingRequest(tp = new TrackingParameter());
         assertFalse(tr.mTrackingParameter.getDefaultParameter().containsKey(Parameter.PAGE_URL));
     }

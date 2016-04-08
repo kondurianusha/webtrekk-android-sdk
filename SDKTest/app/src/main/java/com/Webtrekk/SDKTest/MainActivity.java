@@ -35,7 +35,6 @@ public class MainActivity extends Activity {
         webtrekk.initWebtrekk(getApplication());
 
         webtrekk.getCustomParameter().put("own_para", "my-value");
-        webtrekk.track();
 
         ((TextView)findViewById(R.id.main_version)).setText(getString(R.string.hello_world) + "\nLibrary Version:" + Webtrekk.TRACKING_LIBRARY_VERSION_UA);
         MixpanelAPI mixpanel = MixpanelAPI.getInstance(this, "9e956a2e5169ddb44eb87b6acb0eee95");

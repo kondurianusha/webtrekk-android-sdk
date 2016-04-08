@@ -14,6 +14,7 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
     // timestamp when the last request was send, this is usefull for resending onStart track events
     long lastRequestTimestamp;
     boolean isPaused;
+    boolean mIsRecreationStart;
 
     public TrackedActivityLifecycleCallbacks(Webtrekk webtrekk) {
         this.webtrekk = webtrekk;
@@ -22,6 +23,10 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            webtrekk.increaseActivityCounter();
+        }else
+            mIsRecreationStart = true;
     }
 
     @Override
@@ -51,13 +56,24 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
     @Override
     public void onActivityStarted(Activity activity) {
         WebtrekkLogging.log("Tracking Activity started: " + activity.getClass().getName());
-        webtrekk.startActivity(activity.getClass().getName());
+
+        //Increaase activity counter for first activity
+        if (webtrekk.getActivityCount() == 0)
+            webtrekk.increaseActivityCounter();
+
+        webtrekk.startActivity(activity.getClass().getName(), mIsRecreationStart);
+        //reset recreation start
+        mIsRecreationStart = false;
         webtrekk.autoTrackActivity();
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
         WebtrekkLogging.log("Tracking Activity stopped: " + activity.getClass().getName());
+
+        if (activity.isFinishing())
+            webtrekk.decreaseActivityCounter();
+
         webtrekk.stopActivity();
     }
 }

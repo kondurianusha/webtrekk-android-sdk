@@ -8,7 +8,6 @@ import android.app.Application;
  * variables and the getTracker function to his own custom application class
  */
 public class WebtrekkApplication extends Application {
-    TrackedActivityLifecycleCallbacks callbacks;
     private Webtrekk webtrekk;
 
     synchronized public Webtrekk getWebtrekk() {
@@ -18,10 +17,6 @@ public class WebtrekkApplication extends Application {
             webtrekk.initWebtrekk(this);
         }
 
-        if(callbacks == null && webtrekk.getTrackingConfiguration().isAutoTracked()) {
-            callbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
-            registerActivityLifecycleCallbacks(callbacks);
-        }
         return webtrekk;
     }
 }

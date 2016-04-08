@@ -10,7 +10,11 @@ sleep 30
  #do test
 ./gradlew cAT
 
+#do test with AdvID
 bash testIntallAttribution.sh yes
+
+#do test without AdvID
+bash testIntallAttribution.sh
 
 
  #extract logs

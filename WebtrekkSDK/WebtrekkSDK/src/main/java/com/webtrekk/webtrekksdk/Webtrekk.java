@@ -55,7 +55,7 @@ public class Webtrekk {
     private String currentActivityName;
 
     //determins the number of currently running activitys
-    private int activityCount;
+    private int mActivityCount;
 
     private ScheduledExecutorService timerService;
     private ScheduledFuture<?> timerFuture;
@@ -541,7 +541,6 @@ public class Webtrekk {
         if(requestUrlStore != null) {
             requestUrlStore.clear();
         }
-        activityCount = 0;
         timerFuture.cancel(true);
     }
 
@@ -606,7 +605,7 @@ public class Webtrekk {
     /**
      * this method gets called when auto tracking is enabled and one of the lifycycle methods is called
      */
-    public void autoTrackActivity() {
+    void autoTrackActivity() {
         // only track if auto tracking is enabled for that activity
         // the default value and the activities autoTracked value is based on the global xml settings
         boolean autoTrack = trackingConfiguration.isAutoTracked();
@@ -629,7 +628,7 @@ public class Webtrekk {
             WebtrekkLogging.log("webtrekk has not been initialized");
             return;
         }
-        if (activityCount == 0) {
+        if (mActivityCount == 0) {
             WebtrekkLogging.log("no running activity, call startActivity first");
             return;
         }
@@ -851,18 +850,17 @@ public class Webtrekk {
      *
      * @param activityName a string containing the name of the activity
      */
-    public void startActivity(String activityName) {
+    void startActivity(String activityName, boolean isRecreationStart) {
         if (requestUrlStore == null || trackingConfiguration == null) {
             throw new IllegalStateException("webtrekk has not been initialized");
         }
-        activityCount++;
 
         //reset page URL if activity is changed
-        if (currentActivityName != null && !currentActivityName.equals(activityName))
+        if (!isRecreationStart)
             resetPageURLTrack();
 
         currentActivityName = activityName;
-        if(activityCount == 1) {
+        if(mActivityCount == 1 && !isRecreationStart) {
             onFirstActivityStart();
         }
     }
@@ -887,18 +885,17 @@ public class Webtrekk {
      * this has to be called in every Activitys onStop method, that way the SDk can track the current
      * open activities and knows when to exit
      */
-    public void stopActivity() {
+    void stopActivity() {
         if (requestUrlStore == null || trackingConfiguration == null) {
             throw new IllegalStateException("webtrekk has not been initialized");
         }
-        if (activityCount == 0) {
+        if (mActivityCount == 0) {
             throw new IllegalStateException("activity has not been started yet, call startActivity");
         }
-        activityCount--;
 
         //always clear the current activities custom parameter
         mCustomParameter.clear();
-        if(activityCount == 0) {
+        if(mActivityCount == 0) {
             onLastActivityStop();
         }
     }
@@ -914,12 +911,22 @@ public class Webtrekk {
             mCampaign.interrupt();
     }
 
+    void decreaseActivityCounter()
+    {
+        mActivityCount--;
+    }
+
+    void increaseActivityCounter()
+    {
+        mActivityCount++;
+    }
+
     /**
      * this method gets called whenever the send delay is over, it executes the requesthandler in a
      * new thread
      */
     void onSendIntervalOver() {
-        WebtrekkLogging.log("onSendIntervalOver: activity count: " + activityCount + " request urls: " + requestUrlStore.size());
+        WebtrekkLogging.log("onSendIntervalOver: activity count: " + mActivityCount + " request urls: " + requestUrlStore.size());
         if(requestUrlStore.size() > 0  && (requestProcessorFuture == null || requestProcessorFuture.isDone())) {
             if (executorService == null) {
                 executorService = Executors.newSingleThreadExecutor();
@@ -1052,7 +1059,7 @@ public class Webtrekk {
      * @return
      */
     int getActivityCount() {
-        return activityCount;
+        return mActivityCount;
     }
     /**
      * for unit testing only

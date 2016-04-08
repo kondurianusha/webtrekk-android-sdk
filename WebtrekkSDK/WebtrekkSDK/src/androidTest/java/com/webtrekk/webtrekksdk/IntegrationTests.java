@@ -56,7 +56,8 @@ public class IntegrationTests extends AndroidTestCase {
         String url = tr.getUrlString();
         assertTrue(url, url.contains("ba=test_product"));
         // now call track method
-        webtrekk.startActivity("test");
+        webtrekk.increaseActivityCounter();
+        webtrekk.startActivity("test", false);
         webtrekk.track();
         //make sure the tracking request is created correct and the url is on the requesturlstore
         assertEquals(1, webtrekk.getRequestUrlStore().size());
@@ -98,7 +99,8 @@ public class IntegrationTests extends AndroidTestCase {
         assertTrue(url, url.contains("cb1=dynamic-value"));
 
         // now call track method
-        webtrekk.startActivity("test");
+        webtrekk.increaseActivityCounter();
+        webtrekk.startActivity("test",false);
         webtrekk.track();
         //make sure the tracking request is created correct and the url is on the requesturlstore
         assertEquals(1, webtrekk.getRequestUrlStore().size());

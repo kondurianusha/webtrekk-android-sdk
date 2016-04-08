@@ -889,9 +889,6 @@ public class Webtrekk {
         if (requestUrlStore == null || trackingConfiguration == null) {
             throw new IllegalStateException("webtrekk has not been initialized");
         }
-        if (mActivityCount == 0) {
-            throw new IllegalStateException("activity has not been started yet, call startActivity");
-        }
 
         //always clear the current activities custom parameter
         mCustomParameter.clear();

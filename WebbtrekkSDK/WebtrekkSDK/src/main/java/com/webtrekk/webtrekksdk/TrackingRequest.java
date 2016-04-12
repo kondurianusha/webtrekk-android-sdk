@@ -220,7 +220,7 @@ public class TrackingRequest {
             addKeyMap(trackingParameter.getPageParameter(), "&cp", url);
 
             //if session trackingParameter are given, append them to the url as well
-            addKeyMap(trackingParameter.getSessionParameter(), "&mg", url);
+            addKeyMap(trackingParameter.getSessionParameter(), "&cs", url);
 
             //if action trackingParameter are given, append them to the url as well
             addKeyMap(trackingParameter.getActionParameter(), "&ck", url);

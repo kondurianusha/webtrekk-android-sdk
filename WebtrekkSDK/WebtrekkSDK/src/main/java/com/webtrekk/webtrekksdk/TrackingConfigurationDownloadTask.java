@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
+import com.webtrekk.webtrekksdk.Utils.AsyncTest;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;

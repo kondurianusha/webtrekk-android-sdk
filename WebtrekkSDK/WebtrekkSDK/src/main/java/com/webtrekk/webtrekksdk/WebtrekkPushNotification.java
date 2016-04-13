@@ -16,6 +16,8 @@ import android.widget.RemoteViews;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 import java.io.IOException;
 import java.io.InputStream;

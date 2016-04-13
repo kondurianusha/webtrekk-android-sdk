@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.test.InstrumentationTestCase;
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
+import com.webtrekk.webtrekksdk.Utils.AsyncTest;
 
 import static org.mockito.Mockito.*;
 

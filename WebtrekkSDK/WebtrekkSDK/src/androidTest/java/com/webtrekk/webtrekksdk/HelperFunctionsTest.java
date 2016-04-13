@@ -2,6 +2,8 @@ package com.webtrekk.webtrekksdk;
 
 import android.test.AndroidTestCase;
 
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+
 /**
  * tests the helper functions, based on genymotion nexus 4 5.1 default device
  */

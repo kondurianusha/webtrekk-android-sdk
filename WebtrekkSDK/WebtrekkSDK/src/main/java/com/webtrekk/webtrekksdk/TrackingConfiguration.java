@@ -1,5 +1,7 @@
 package com.webtrekk.webtrekksdk;
 
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -9,7 +11,7 @@ import java.util.Map;
  * a global configuration class which gets its values from the xml config parser
  * all plugins, activity and other tracking details are configured here
  */
-class TrackingConfiguration {
+public class TrackingConfiguration {
     // the current version of the configuration, used to check if a new one is available
     private int version = 0;
 

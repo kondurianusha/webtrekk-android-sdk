@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 /**
  * parses the xml for the tracking configuration

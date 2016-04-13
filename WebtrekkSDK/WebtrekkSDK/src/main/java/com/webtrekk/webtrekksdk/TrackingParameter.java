@@ -1,6 +1,7 @@
 package com.webtrekk.webtrekksdk;
 
-import java.util.HashMap;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -151,7 +152,7 @@ public class TrackingParameter {
         return ecomParameter;
     }
 
-    SortedMap<String, String> getCustomUserParameters() {
+    public SortedMap<String, String> getCustomUserParameters() {
         return mCustomUserParameters;
     }
 
@@ -219,7 +220,7 @@ public class TrackingParameter {
         this.mediaCategories = mediaCategories;
     }
 
-    void setCustomUserParameters(SortedMap<String, String> customUserParameters) {
+    public void setCustomUserParameters(SortedMap<String, String> customUserParameters) {
         mCustomUserParameters = customUserParameters;
     }
 

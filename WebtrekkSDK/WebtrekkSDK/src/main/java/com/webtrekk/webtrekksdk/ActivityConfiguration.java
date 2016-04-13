@@ -1,9 +1,12 @@
 package com.webtrekk.webtrekksdk;
 
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+
 /**
  * Created by user on 12/11/15.
  */
-class ActivityConfiguration {
+public class ActivityConfiguration {
     private String mClassName;
     private String mMappingName;
     private boolean mIsAutoTrack;
@@ -65,7 +68,7 @@ class ActivityConfiguration {
             String url = mConstActivityTrackingParameter.getDefaultParameter().get(TrackingParameter.Parameter.PAGE_URL);
             if (!HelperFunctions.testIsValidURL(url))
             {
-                WebtrekkLogging.log("Incorrece URL:"+url+" in configuration. Don't track it for pu parameter");
+                WebtrekkLogging.log("Incorrece URL:" + url + " in configuration. Don't track it for pu parameter");
                 mConstActivityTrackingParameter.getDefaultParameter().remove(TrackingParameter.Parameter.PAGE_URL);
             }
         }

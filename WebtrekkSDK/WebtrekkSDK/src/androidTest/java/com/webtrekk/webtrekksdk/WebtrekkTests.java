@@ -3,12 +3,15 @@ package com.webtrekk.webtrekksdk;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.Suppress;
 
 import static org.mockito.Mockito.*;
+
+import com.webtrekk.webtrekksdk.Request.RequestFactory;
+import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 
 import java.util.HashMap;
 
@@ -52,10 +55,10 @@ public class WebtrekkTests extends AndroidTestCase {
 
         webtrekk.initWebtrekk(getContext());
         assertNotNull(webtrekk.getTrackingConfiguration());
-        assertNotNull(webtrekk.getPlugins());
+        assertNotNull(webtrekk.getRequestFactory().getPlugins());
         assertNotNull(webtrekk.getContext());
-        assertNotNull(webtrekk.getRequestUrlStore());
-        assertNotNull(webtrekk.getWebtrekkParameter());
+        assertNotNull(webtrekk.getRequestFactory().getRequestUrlStore());
+        assertNotNull(webtrekk.getRequestFactory().getWebtrekkParameter());
         assertNotNull(webtrekk.getTimerService());
         assertEquals(0, webtrekk.getActivityCount());
         // make shure it fails when init is called twice
@@ -83,19 +86,18 @@ public class WebtrekkTests extends AndroidTestCase {
     public void testInitPlugins() {
         webtrekk.setContext(getContext());
         webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
-        webtrekk.initPlugins();
-        assertNotNull(webtrekk.getPlugins());
-        assertEquals(1, webtrekk.getPlugins().size());
+        webtrekk.getRequestFactory().init(mContext, webtrekk.getTrackingConfiguration(), webtrekk);
+        assertNotNull(webtrekk.getRequestFactory().getPlugins());
+        assertEquals(1, webtrekk.getRequestFactory().getPlugins().size());
     }
 
     public void testInitWebtrekkParameter() {
         // make sure the default params have valid values
         webtrekk.setContext(getContext());
         webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
-        webtrekk.initInternalParameter(false);
-        webtrekk.initWebtrekkParameter();
-        assertEquals(6, webtrekk.getWebtrekkParameter().size());
-        assertTrue(webtrekk.getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library " + Webtrekk.TRACKING_LIBRARY_VERSION_UA + "(Android;"));
+        webtrekk.getRequestFactory().init(mContext, webtrekk.getTrackingConfiguration(), webtrekk);
+        assertEquals(6, webtrekk.getRequestFactory().getWebtrekkParameter().size());
+        assertTrue(webtrekk.getRequestFactory().getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library " + Webtrekk.TRACKING_LIBRARY_VERSION_UA + "(Android;"));
 
     }
 
@@ -103,24 +105,22 @@ public class WebtrekkTests extends AndroidTestCase {
         // make sure that the values which change with every request are inserted as well
         webtrekk.setContext(getContext());
         webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
-        webtrekk.initInternalParameter(false);
-        webtrekk.initWebtrekkParameter();
-        webtrekk.initAutoCustomParameter();
+        webtrekk.getRequestFactory().init(mContext, webtrekk.getTrackingConfiguration(), webtrekk);
 
         RequestUrlStore requestUrlStore = mock(RequestUrlStore.class);
-        webtrekk.setRequestUrlStore(requestUrlStore);
+        webtrekk.getRequestFactory().setRequestUrlStore(requestUrlStore);
         when(requestUrlStore.size()).thenReturn(55);
 
         //set some different default values
         webtrekk.getCustomParameter().put("screenOrientation", "stttr");
         webtrekk.getCustomParameter().put("connectionType", "offline");
 
-        webtrekk.updateDynamicParameter();
-        assertEquals(7, webtrekk.getWebtrekkParameter().size());
-        assertTrue(webtrekk.getAutoCustomParameter().get("screenOrientation").matches("(portrait|landscape)"));
+        webtrekk.getRequestFactory().updateDynamicParameter();
+        assertEquals(7, webtrekk.getRequestFactory().getWebtrekkParameter().size());
+        assertTrue(webtrekk.getRequestFactory().getAutoCustomParameter().get("screenOrientation").matches("(portrait|landscape)"));
         String connectionType = webtrekk.getCustomParameter().get("connectionType");
         assertTrue(connectionType.equals("WIFI") || connectionType.equals("offline"));
-        assertEquals("55", webtrekk.getAutoCustomParameter().get("requestUrlStoreSize"));
+        assertEquals("55", webtrekk.getRequestFactory().getAutoCustomParameter().get("requestUrlStoreSize"));
     }
 
 
@@ -128,11 +128,9 @@ public class WebtrekkTests extends AndroidTestCase {
         // make sure that the values which change with every request are inserted as well
         webtrekk.setContext(getContext());
         webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
-        webtrekk.initInternalParameter(false);
-        webtrekk.initWebtrekkParameter();
-        webtrekk.initAutoCustomParameter();
+        webtrekk.getRequestFactory().init(mContext, webtrekk.getTrackingConfiguration(), webtrekk);
 
-        assertTrue(webtrekk.getAutoCustomParameter().toString(), webtrekk.getAutoCustomParameter().size()>0);
+        assertTrue(webtrekk.getRequestFactory().getAutoCustomParameter().toString(), webtrekk.getRequestFactory().getAutoCustomParameter().size()>0);
     }
 
     public void testTrack() {
@@ -158,8 +156,8 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.increaseActivityCounter();
         webtrekk.startActivity("test", false);
         webtrekk.track();
-        assertEquals(1, webtrekk.getRequestUrlStore().size());
-        assertTrue(webtrekk.getRequestUrlStore().get(0).contains("test,"));
+        assertEquals(1, webtrekk.getRequestFactory().getRequestUrlStore().size());
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("test,"));
     }
 
 
@@ -195,7 +193,7 @@ public class WebtrekkTests extends AndroidTestCase {
     public void testOnSendIntervalOver() {
         webtrekk.initWebtrekk(getContext());
         RequestUrlStore requestUrlStore = mock(RequestUrlStore.class);
-        webtrekk.setRequestUrlStore(requestUrlStore);
+        webtrekk.getRequestFactory().setRequestUrlStore(requestUrlStore);
         webtrekk.onSendIntervalOver();
         assertNull(webtrekk.getExecutorService());
         assertNull(webtrekk.getRequestProcessorFuture());
@@ -212,10 +210,10 @@ public class WebtrekkTests extends AndroidTestCase {
 
         webtrekk.setOptout(true);
         assertTrue(webtrekk.isOptout());
-        assertTrue(preferences.getBoolean(Webtrekk.PREFERENCE_KEY_OPTED_OUT, false));
+        assertTrue(preferences.getBoolean(RequestFactory.PREFERENCE_KEY_OPTED_OUT, false));
 
         webtrekk.setOptout(false);
-        assertFalse(preferences.getBoolean(Webtrekk.PREFERENCE_KEY_OPTED_OUT, true));
+        assertFalse(preferences.getBoolean(RequestFactory.PREFERENCE_KEY_OPTED_OUT, true));
         assertFalse(webtrekk.isOptout());
 
     }
@@ -225,10 +223,10 @@ public class WebtrekkTests extends AndroidTestCase {
         SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
 
         webtrekk.getTrackingConfiguration().setSampling(0);
-        webtrekk.initSampling();
+        webtrekk.getRequestFactory().init(mContext, webtrekk.getTrackingConfiguration(), webtrekk);
         assertFalse(webtrekk.isSampling());
-        assertFalse(preferences.getBoolean(Webtrekk.PREFERENCE_KEY_IS_SAMPLING, true));
-        assertEquals(0, preferences.getInt(Webtrekk.PREFERENCE_KEY_SAMPLING, -1));
+        assertFalse(preferences.getBoolean(RequestFactory.PREFERENCE_KEY_IS_SAMPLING, true));
+        assertEquals(0, preferences.getInt(RequestFactory.PREFERENCE_KEY_SAMPLING, -1));
     }
 
     public void testInitSamplingNotNull() {
@@ -236,12 +234,12 @@ public class WebtrekkTests extends AndroidTestCase {
         SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
 
         webtrekk.getTrackingConfiguration().setSampling(10);
-        webtrekk.initSampling();
-        assertEquals(10, preferences.getInt(Webtrekk.PREFERENCE_KEY_SAMPLING, -1));
+        webtrekk.getRequestFactory().init(mContext, webtrekk.getTrackingConfiguration(), webtrekk);
+        assertEquals(10, preferences.getInt(RequestFactory.PREFERENCE_KEY_SAMPLING, -1));
         // also make sure the value is reinitalized after change
         webtrekk.getTrackingConfiguration().setSampling(20);
-        webtrekk.initSampling();
-        assertEquals(20, preferences.getInt(Webtrekk.PREFERENCE_KEY_SAMPLING, -1));
+        webtrekk.getRequestFactory().init(mContext, webtrekk.getTrackingConfiguration(), webtrekk);
+        assertEquals(20, preferences.getInt(RequestFactory.PREFERENCE_KEY_SAMPLING, -1));
     }
 
     public void testFnsParameter() {
@@ -252,10 +250,10 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.startActivity("testact", false);
         webtrekk.track();
         //assertEquals(webtrekk.getRequestUrlStore().get(0), "test");
-        assertTrue(webtrekk.getRequestUrlStore().get(0).contains("&fns=1"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("&fns=1"));
         webtrekk.track();
-        assertEquals(webtrekk.getInternalParameter().getDefaultParameter().get(Parameter.FORCE_NEW_SESSION), "0");
-        assertTrue(webtrekk.getRequestUrlStore().get(1).contains("&fns=0"));
+        assertEquals(webtrekk.getRequestFactory().getInternalParameter().getDefaultParameter().get(Parameter.FORCE_NEW_SESSION), "0");
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(1).contains("&fns=0"));
     }
 
     public void testFirstParameter() {
@@ -267,17 +265,17 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.startActivity("testact", false);
         webtrekk.track();
         //assertEquals(webtrekk.getRequestUrlStore().get(0), "test");
-        assertTrue(webtrekk.getRequestUrlStore().get(0).contains("&one=1"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("&one=1"));
 
         //webtrekk.initInternalParameter();
         webtrekk.track();
-        assertTrue(webtrekk.getRequestUrlStore().get(1).contains("&one=0"));
-        assertEquals(webtrekk.getInternalParameter().getDefaultParameter().get(Parameter.APP_FIRST_START), "0");
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(1).contains("&one=0"));
+        assertEquals(webtrekk.getRequestFactory().getInternalParameter().getDefaultParameter().get(Parameter.APP_FIRST_START), "0");
     }
 
     public void testUpdated() {
         webtrekk.initWebtrekk(getContext());
-        assertEquals(webtrekk.getAutoCustomParameter().get("appUpdated"), "1");
+        assertEquals(webtrekk.getRequestFactory().getAutoCustomParameter().get("appUpdated"), "1");
         SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
         preferences.edit().remove(Webtrekk.PREFERENCE_APP_VERSIONCODE).commit();
         assertEquals(preferences.getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, -1), -1);
@@ -285,7 +283,7 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.startActivity("testact", false);
         webtrekk.track();
         assertEquals(HelperFunctions.getAppVersionCode(getContext()), 0);
-        assertEquals(webtrekk.getAutoCustomParameter().get("appUpdated"), "0");
+        assertEquals(webtrekk.getRequestFactory().getAutoCustomParameter().get("appUpdated"), "0");
 
         assertEquals(HelperFunctions.updated(getContext(), 5), true);
         assertEquals(preferences.getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, 0), 5);
@@ -309,11 +307,11 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initWebtrekk(getContext());
         TrackingParameter tp = new TrackingParameter();
         webtrekk.setGlobalTrackingParameter(globalTp);
-        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        TrackingRequest tr = webtrekk.getRequestFactory().createTrackingRequest(tp);
         webtrekk.increaseActivityCounter();
         webtrekk.startActivity("testact",false);
         //verify override
-        assertEquals(webtrekk.getGlobalTrackingParameter().getDefaultParameter().get(Parameter.ACTIVITY_NAME), "testtestact");
+        assertEquals(webtrekk.getRequestFactory().getGlobalTrackingParameter().getDefaultParameter().get(Parameter.ACTIVITY_NAME), "testtestact");
 
     }
 
@@ -327,7 +325,7 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initWebtrekk(getContext());
         TrackingParameter tp = new TrackingParameter();
         webtrekk.setConstGlobalTrackingParameter(constGlobalTp);
-        TrackingRequest tr = webtrekk.createTrackingRequest(tp);
+        TrackingRequest tr = webtrekk.getRequestFactory().createTrackingRequest(tp);
         //assertTrue(tp.getEcomParameter().get("1").contains("testecomparam"));
         assertTrue("url string does not contain value: " + tr.getUrlString(), tr.getUrlString().contains("&cb4=testecomparam"));
     }

@@ -1,4 +1,4 @@
-package com.webtrekk.webtrekksdk;
+package com.webtrekk.webtrekksdk.Utils;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -22,6 +22,8 @@ import android.view.WindowManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.webtrekk.webtrekksdk.RequestProcessor;
+import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,7 +52,7 @@ import java.util.regex.Pattern;
  * this class contains various static helper functions to get device details
  * TODO: discus if it should be available to the customer or not
  */
-final class HelperFunctions {
+final public class HelperFunctions {
 
     /**
      * private constructor as this is a utility class
@@ -342,7 +344,7 @@ final class HelperFunctions {
     }
 
 
-    static SharedPreferences getWebTrekkSharedPreference(Context context) {
+    public static SharedPreferences getWebTrekkSharedPreference(Context context) {
         return context.getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
     }
 
@@ -590,7 +592,7 @@ final class HelperFunctions {
      * @param value
      * @return
      */
-    static String makeSha256(String value) {
+    public static String makeSha256(String value) {
         return getHash(value, "SHA-256");
     }
 
@@ -600,7 +602,7 @@ final class HelperFunctions {
      * @param value
      * @return
      */
-    static String makeMd5(String value) {
+    public static String makeMd5(String value) {
         if (value == null)
             return null;
 
@@ -633,13 +635,13 @@ final class HelperFunctions {
         return retStr;
     }
 
-    static boolean isGooglePlayAvailable(Context context) {
+    public static boolean isGooglePlayAvailable(Context context) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         int resultCode = apiAvailability.isGooglePlayServicesAvailable(context);
         return (resultCode == ConnectionResult.SUCCESS);
     }
 
-    static boolean testIsValidURL(String url)
+    public static boolean testIsValidURL(String url)
     {
         try {
             URL urlObject = new URL(url);

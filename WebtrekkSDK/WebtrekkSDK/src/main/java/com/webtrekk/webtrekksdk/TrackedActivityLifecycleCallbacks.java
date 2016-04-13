@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+
 /**
  * this class provides global functions to override the activitylivecycle callbacks
  * it calls the original function but also sends a track request before
@@ -75,5 +77,6 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
             webtrekk.decreaseActivityCounter();
 
         webtrekk.stopActivity();
+        //throw new NullPointerException();
     }
 }

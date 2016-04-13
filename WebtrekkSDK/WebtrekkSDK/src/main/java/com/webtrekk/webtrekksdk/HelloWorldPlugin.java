@@ -1,6 +1,9 @@
 package com.webtrekk.webtrekksdk;
 
 
+import com.webtrekk.webtrekksdk.Request.TrackingRequest;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+
 /**
  * example plugin class to demonstrate how to implement plugins
  */

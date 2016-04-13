@@ -2,6 +2,8 @@ package com.webtrekk.webtrekksdk;
 
 import android.content.Context;
 
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -133,7 +135,7 @@ public class RequestUrlStore {
     /**
      * this method removes the old cache file, it should be called after the requests are loaded into the store
      */
-    void deleteRequestsFile() {
+    public void deleteRequestsFile() {
         WebtrekkLogging.log("deleting old backupfile");
         if (requestStoreFile == null || !requestStoreFile.exists()) {
             return;

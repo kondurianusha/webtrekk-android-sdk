@@ -1,13 +1,14 @@
 package com.webtrekk.webtrekksdk;
 
 
+import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 
 /**
  * Created by user on 08/04/15.
  */
 
 // abstract base class for all plugins, maybe switch to interface later when more information are avail
-abstract class Plugin {
+public abstract class Plugin {
     Webtrekk webtrekk;
 
     public Plugin(Webtrekk webtrekk) {

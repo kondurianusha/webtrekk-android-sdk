@@ -1,26 +1,29 @@
-package com.webtrekk.webtrekksdk;
+package com.webtrekk.webtrekksdk.Request;
 
-
-import android.util.Log;
 
 import java.util.Map;
 import java.util.SortedMap;
 
+import com.webtrekk.webtrekksdk.TrackingConfiguration;
+import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+import com.webtrekk.webtrekksdk.Webtrekk;
 
 
 /**
  * this class contains the tracking event and the trackingparams, and handles the creation of an url string
  * which is send as get request to the configured track domain of the customer
  */
-class TrackingRequest {
+public class TrackingRequest {
 
 
-    final TrackingParameter mTrackingParameter;
+    public final TrackingParameter mTrackingParameter;
     final private TrackingConfiguration trackingConfiguration;
     final private RequestType mRequestType;
 
-    enum RequestType
+    public enum RequestType
     {
         GENERAL,
         CDB,
@@ -33,7 +36,7 @@ class TrackingRequest {
      * @param tp the TrackingParameter for the TrackingRequest
      * @param trackingConfiguration the tracking configuration of the webtrekk object
      */
-    TrackingRequest(TrackingParameter tp, TrackingConfiguration trackingConfiguration) {
+    public TrackingRequest(TrackingParameter tp, TrackingConfiguration trackingConfiguration) {
         mTrackingParameter = tp;
         this.trackingConfiguration = trackingConfiguration;
         mRequestType = RequestType.GENERAL;
@@ -46,7 +49,7 @@ class TrackingRequest {
      * @param trackingConfiguration the tracking configuration of the webtrekk object
      * @param type of request
      */
-    TrackingRequest(TrackingParameter tp, TrackingConfiguration trackingConfiguration, RequestType type) {
+    public TrackingRequest(TrackingParameter tp, TrackingConfiguration trackingConfiguration, RequestType type) {
         mTrackingParameter = tp;
         this.trackingConfiguration = trackingConfiguration;
         mRequestType = type;

@@ -1,8 +1,9 @@
 package com.webtrekk.webtrekksdk;
 
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -15,7 +16,7 @@ import java.net.UnknownHostException;
  */
 public class RequestProcessor implements Runnable {
 
-    static final int NETWORK_CONNECTION_TIMEOUT = 60 * 1000;  // 1 minute
+    public static final int NETWORK_CONNECTION_TIMEOUT = 60 * 1000;  // 1 minute
     static final int NETWORK_READ_TIMEOUT = 60 * 1000;  // 1 minute
 
     private final RequestUrlStore requestUrlStore;

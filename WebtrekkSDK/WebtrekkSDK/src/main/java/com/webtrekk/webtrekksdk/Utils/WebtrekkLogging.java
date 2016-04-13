@@ -1,20 +1,20 @@
-package com.webtrekk.webtrekksdk;
+package com.webtrekk.webtrekksdk.Utils;
 
 /**
  * custom logging class for the sdk defining the logTag and allows a global isLogging switch
  *
  */
-class WebtrekkLogging {
+public class WebtrekkLogging {
     public static final String logTag = "WebtrekkSDK";
     public static boolean isLogging = true;
 
-    static void log(String message) {
+    public static void log(String message) {
         if(isLogging) {
             android.util.Log.d(logTag, message);
         }
     }
 
-    static void log(String message, Throwable t) {
+    public static void log(String message, Throwable t) {
         if(isLogging) {
             android.util.Log.d(logTag, message, t);
         }

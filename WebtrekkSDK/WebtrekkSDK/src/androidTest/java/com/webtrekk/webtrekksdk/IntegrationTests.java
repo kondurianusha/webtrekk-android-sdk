@@ -5,6 +5,8 @@ import android.test.AndroidTestCase;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+
+import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 
 /**
@@ -51,7 +53,7 @@ public class IntegrationTests extends AndroidTestCase {
         // set the config in the webtrekk object
         webtrekk.setTrackingConfiguration(config);
         // test request creation
-        TrackingRequest tr = webtrekk.createTrackingRequest(new TrackingParameter());
+        TrackingRequest tr = webtrekk.getRequestFactory().createTrackingRequest(new TrackingParameter());
         assertTrue(tr.getTrackingParameter().getDefaultParameter().containsKey(Parameter.PRODUCT));
         String url = tr.getUrlString();
         assertTrue(url, url.contains("ba=test_product"));
@@ -60,11 +62,11 @@ public class IntegrationTests extends AndroidTestCase {
         webtrekk.startActivity("test", false);
         webtrekk.track();
         //make sure the tracking request is created correct and the url is on the requesturlstore
-        assertEquals(1, webtrekk.getRequestUrlStore().size());
-        assertTrue(webtrekk.getRequestUrlStore().get(0).contains("ba=test_product"));
+        assertEquals(1, webtrekk.getRequestFactory().getRequestUrlStore().size());
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("ba=test_product"));
 
         // make sure the custom ecom parameter is available
-        assertTrue(webtrekk.getRequestUrlStore().get(0), webtrekk.getRequestUrlStore().get(0).contains("cb1=test_ecomparam1"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0), webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("cb1=test_ecomparam1"));
     }
 
     /**
@@ -74,7 +76,7 @@ public class IntegrationTests extends AndroidTestCase {
     public void testGlobalMappedParameter(){
         TrackingConfiguration config = null;
         // clear request store before
-        webtrekk.getRequestUrlStore().clear();
+        webtrekk.getRequestFactory().getRequestUrlStore().clear();
 
         String configString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><webtrekkConfiguration><globalTrackingParameter><parameter id=\"PRODUCT\">test_product</parameter><ecomParameter><parameter id=\"1\" key=\"example-key\"></parameter></ecomParameter></globalTrackingParameter></webtrekkConfiguration>";
         try {
@@ -93,7 +95,7 @@ public class IntegrationTests extends AndroidTestCase {
         webtrekk.setTrackingConfiguration(config);
         webtrekk.getCustomParameter().put("example-key", "dynamic-value");
         // test request creation
-        TrackingRequest tr = webtrekk.createTrackingRequest(new TrackingParameter());
+        TrackingRequest tr = webtrekk.getRequestFactory().createTrackingRequest(new TrackingParameter());
         assertTrue(tr.getTrackingParameter().getDefaultParameter().containsKey(Parameter.PRODUCT));
         String url = tr.getUrlString();
         assertTrue(url, url.contains("cb1=dynamic-value"));
@@ -103,10 +105,10 @@ public class IntegrationTests extends AndroidTestCase {
         webtrekk.startActivity("test",false);
         webtrekk.track();
         //make sure the tracking request is created correct and the url is on the requesturlstore
-        assertEquals(1, webtrekk.getRequestUrlStore().size());
-        assertTrue(webtrekk.getRequestUrlStore().get(0), webtrekk.getRequestUrlStore().get(0).contains("cb1=dynamic-value"));
+        assertEquals(1, webtrekk.getRequestFactory().getRequestUrlStore().size());
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0), webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("cb1=dynamic-value"));
         // assert that the constant param is also set
-        assertTrue(webtrekk.getRequestUrlStore().get(0).contains("ba=test_product"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("ba=test_product"));
         webtrekk.stopTracking();
 
     }

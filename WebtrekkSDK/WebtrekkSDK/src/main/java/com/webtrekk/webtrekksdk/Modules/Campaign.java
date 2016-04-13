@@ -1,4 +1,4 @@
-package com.webtrekk.webtrekksdk;
+package com.webtrekk.webtrekksdk.Modules;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,12 @@ import android.util.JsonReader;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.webtrekk.webtrekksdk.ReferrerReceiver;
+import com.webtrekk.webtrekksdk.Request.TrackingRequest;
+import com.webtrekk.webtrekksdk.RequestProcessor;
+import com.webtrekk.webtrekksdk.TrackingParameter;
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,7 +30,7 @@ import java.util.regex.Pattern;
  *
  * @hide
  */
-class Campaign extends Thread
+public class Campaign extends Thread
 {
     private final String mTrackID;
     private final boolean mFirstStart;
@@ -62,8 +68,8 @@ class Campaign extends Thread
      * @param stopNotification notify about that work is done. It is required to free instance of this class for GC
      * @return instance of Campain class. you need it to interrupt process if application is closed.
      */
-    static Campaign start(Context context, String trackID, boolean isFirstStart, boolean isAutoTrackAdvID,
-                          Runnable stopNotification)
+    public static Campaign start(Context context, String trackID, boolean isFirstStart, boolean isAutoTrackAdvID,
+                                 Runnable stopNotification)
     {
         if (trackID == null || trackID.isEmpty())
         {
@@ -384,7 +390,7 @@ class Campaign extends Thread
      * get if thread was interrupted see {@link #setFirstStartInitiated()} delete flag from settings
      * @return
      */
-    static boolean getFirstStartInitiated(Context context, boolean deleteFlag)
+    public static boolean getFirstStartInitiated(Context context, boolean deleteFlag)
     {
         SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
 
@@ -396,17 +402,17 @@ class Campaign extends Thread
         return result;
     }
 
-    static String getAdvId(Context context)
+    public static String getAdvId(Context context)
     {
         return getAndRemoveInstallSpecificCode(context, ADV_ID, false);
     }
 
-    static String getMediaCode(Context context)
+    public static String getMediaCode(Context context)
     {
         return getAndRemoveInstallSpecificCode(context, MEDIA_CODE, true);
     }
 
-    static boolean getOptOut(Context context)
+    public static boolean getOptOut(Context context)
     {
         SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
         return preferences.getBoolean(OPT_OUT, false);

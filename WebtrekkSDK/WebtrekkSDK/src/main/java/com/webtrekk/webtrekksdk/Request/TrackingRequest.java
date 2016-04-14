@@ -292,6 +292,9 @@ public class TrackingRequest {
 
         @Override
         public void getTrackingPart(TrackingParameter trackingParameter, StringBuffer url) {
+
+            Parameter KEYZ[] = {Parameter.ACTION_NAME};
+            addParametersArray(trackingParameter, url, KEYZ);
             //if action trackingParameter are given, append them to the url as well
             addKeyMap(trackingParameter.getActionParameter(), "&ck", url);
         }

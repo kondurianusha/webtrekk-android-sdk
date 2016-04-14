@@ -65,6 +65,9 @@
             android:name=".PushNotificationActivity"
             android:label="@string/title_activity_push" >
         </activity>
+        <activity
+            android:name=".EmptyActivity">
+        </activity>
         <receiver
             android:name="com.webtrekk.webtrekksdk.WebtrekkGcmReceiver"
             android:exported="true"

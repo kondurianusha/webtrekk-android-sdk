@@ -97,8 +97,8 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActi
             }
         }
 
-        mSendedURL = mSendedURL.substring(mSendedURL.indexOf("ck910"), mSendedURL.length());
-        assertEquals(mSendedURL, "ck910=2&ck911=java.lang.NullPointerException&ck912=Attempt+to+invoke+virtual+method+%27int+java.lang.String.length%28%29%27+on+a+null+object+reference&ck914=com.Webtrekk.SDKTest.ErrorHandlerTest%242.run%28ErrorHandlerTest.java%3A82%29%7Cjava.lang.Thread.run%28Thread.java%3A818%29&eor=1");
+        mSendedURL = mSendedURL.substring(mSendedURL.indexOf("ct=webtrekk_ignore"), mSendedURL.length());
+        assertEquals(mSendedURL, "ct=webtrekk_ignore&ck910=2&ck911=java.lang.NullPointerException&ck912=Attempt+to+invoke+virtual+method+%27int+java.lang.String.length%28%29%27+on+a+null+object+reference&ck914=com.Webtrekk.SDKTest.ErrorHandlerTest%242.run%28ErrorHandlerTest.java%3A82%29%7Cjava.lang.Thread.run%28Thread.java%3A818%29&eor=1");
 
 
     }
@@ -129,8 +129,9 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActi
             }
         }
 
-        mSendedURL = mSendedURL.substring(mSendedURL.indexOf("ck910"), mSendedURL.length());
-        assertEquals(mSendedURL, "ck910=3&ck911=nameEx&ck912=messsage+Ex&eor=1");
+        mSendedURL = mSendedURL.substring(mSendedURL.indexOf("ct=webtrekk_ignore"), mSendedURL.length());
+        assertEquals(mSendedURL, "ct=webtrekk_ignore&ck910=3&ck911=nameEx&ck912=messsage+Ex&eor=1");
+        assertTrue(mSendedURL.contains("ct=webtrekk_ignore"));
     }
 
     public void testFatalInit()
@@ -171,5 +172,6 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActi
         assertTrue(mSendedURL.contains("ck911=java.lang.NullPointerException&ck912=Attempt+to+invoke+virtual+method+%27int+java.lang.String.length"));
         assertTrue(mSendedURL.contains("+on+a+null+object+reference&ck914=com.Webtrekk.SDKTest.ErrorHandlerTest.testFatalInit%28ErrorHandlerTest.java"));
         assertTrue(mSendedURL.contains("java.lang.reflect.Method.invoke%28Method.java"));
+        assertTrue(mSendedURL.contains("ct=webtrekk_ignore"));
     }
 }

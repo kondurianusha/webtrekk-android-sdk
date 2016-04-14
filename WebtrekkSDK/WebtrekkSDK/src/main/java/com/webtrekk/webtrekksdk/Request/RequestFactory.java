@@ -12,6 +12,7 @@ import com.webtrekk.webtrekksdk.Plugin;
 import com.webtrekk.webtrekksdk.RequestUrlStore;
 import com.webtrekk.webtrekksdk.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter;
+import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
@@ -48,7 +49,7 @@ public class RequestFactory {
     private Map<String, String> mAutoCustomParameter;
 
     // this hashmap contains all the default parameter which are defined by webtrekk and have an url mapping
-    private HashMap<TrackingParameter.Parameter, String> mWebtrekkParameter;
+    private HashMap<Parameter, String> mWebtrekkParameter;
 
     // this TrackingParameter object contains keys or parameter which needs to be send to manage the internal state
     // this are only 1 once, for one request, the customer must not have access to this ones,
@@ -133,7 +134,7 @@ public class RequestFactory {
         return mCustomParameter;
     }
 
-    public HashMap<TrackingParameter.Parameter, String> getWebtrekkParameter() {
+    public HashMap<Parameter, String> getWebtrekkParameter() {
         return mWebtrekkParameter;
     }
 
@@ -185,17 +186,21 @@ public class RequestFactory {
         mTrackingConfiguration = trackingConfiguration;
     }
 
+    public TrackingConfiguration getTrackingConfiguration() {
+        return mTrackingConfiguration;
+    }
+
     private void initInternalParameter(boolean isFirstStart) {
         if(mInternalParameter == null) {
             mInternalParameter = new TrackingParameter();
         }
         // first initalization of the webtrekk instance, so set fns to 1
-        mInternalParameter.add(TrackingParameter.Parameter.FORCE_NEW_SESSION, "1");
+        mInternalParameter.add(Parameter.FORCE_NEW_SESSION, "1");
         // if the app is started for the first time, the param "one" is 1 otherwise its always 0
         if(isFirstStart) {
-            mInternalParameter.add(TrackingParameter.Parameter.APP_FIRST_START, "1");
+            mInternalParameter.add(Parameter.APP_FIRST_START, "1");
         } else {
-            mInternalParameter.add(TrackingParameter.Parameter.APP_FIRST_START, "0");
+            mInternalParameter.add(Parameter.APP_FIRST_START, "0");
         }
     }
 
@@ -262,21 +267,21 @@ public class RequestFactory {
     private void initWebtrekkParameter() {
         // collect all static device information which remain the same for all requests
         if(mWebtrekkParameter == null) {
-            mWebtrekkParameter = new HashMap<TrackingParameter.Parameter, String>();
+            mWebtrekkParameter = new HashMap<Parameter, String>();
         }
 
-        mWebtrekkParameter.put(TrackingParameter.Parameter.SCREEN_DEPTH, HelperFunctions.getDepth(mContext));
-        mWebtrekkParameter.put(TrackingParameter.Parameter.TIMEZONE, HelperFunctions.getTimezone());
-        mWebtrekkParameter.put(TrackingParameter.Parameter.USERAGENT, HelperFunctions.getUserAgent());
-        mWebtrekkParameter.put(TrackingParameter.Parameter.DEV_LANG, HelperFunctions.getCountry());
+        mWebtrekkParameter.put(Parameter.SCREEN_DEPTH, HelperFunctions.getDepth(mContext));
+        mWebtrekkParameter.put(Parameter.TIMEZONE, HelperFunctions.getTimezone());
+        mWebtrekkParameter.put(Parameter.USERAGENT, HelperFunctions.getUserAgent());
+        mWebtrekkParameter.put(Parameter.DEV_LANG, HelperFunctions.getCountry());
 
 
 
         // for comatilility reasons always add the sampling rate param to the url
-        mWebtrekkParameter.put(TrackingParameter.Parameter.SAMPLING, "" + mTrackingConfiguration.getSampling());
+        mWebtrekkParameter.put(Parameter.SAMPLING, "" + mTrackingConfiguration.getSampling());
 
         // always track the wt everid
-        mWebtrekkParameter.put(TrackingParameter.Parameter.EVERID, HelperFunctions.getEverId(mContext));
+        mWebtrekkParameter.put(Parameter.EVERID, HelperFunctions.getEverId(mContext));
 
 
         WebtrekkLogging.log("collected static automatic data");
@@ -367,7 +372,7 @@ public class RequestFactory {
 
         if(mWebtrekkParameter != null) {
             // also update the webtrekk parameter
-            mWebtrekkParameter.put(TrackingParameter.Parameter.SCREEN_RESOLUTION, HelperFunctions.getResolution(mContext));
+            mWebtrekkParameter.put(Parameter.SCREEN_RESOLUTION, HelperFunctions.getResolution(mContext));
         }
     }
 
@@ -379,9 +384,9 @@ public class RequestFactory {
         String mediaCode = Campaign.getMediaCode(mContext);
 
         if (mediaCode != null && !mediaCode.isEmpty()) {
-            request.mTrackingParameter.add(TrackingParameter.Parameter.ADVERTISEMENT, mediaCode);
-            request.mTrackingParameter.add(TrackingParameter.Parameter.ADVERTISEMENT_ACTION, "c");
-            request.mTrackingParameter.add(TrackingParameter.Parameter.ECOM, "900", "1");
+            request.mTrackingParameter.add(Parameter.ADVERTISEMENT, mediaCode);
+            request.mTrackingParameter.add(Parameter.ADVERTISEMENT_ACTION, "c");
+            request.mTrackingParameter.add(Parameter.ECOM, "900", "1");
         }
     }
 
@@ -414,22 +419,22 @@ public class RequestFactory {
         // create a new trackingParameter object
         TrackingParameter trackingParameter = new TrackingParameter();
         // add the name of the current activity
-        trackingParameter.add(TrackingParameter.Parameter.ACTIVITY_NAME, mCurrentActivityName);
+        trackingParameter.add(Parameter.ACTIVITY_NAME, mCurrentActivityName);
 
-        trackingParameter.add(TrackingParameter.Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
+        trackingParameter.add(Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
         //add the internal parameter
         trackingParameter.add(mInternalParameter);
 
         // action params are a special case, no other params but the ones given as parameter in the code
-        if(tp.containsKey(TrackingParameter.Parameter.ACTION_NAME)) {
+        if(tp.containsKey(Parameter.ACTION_NAME)) {
             //when its an action only resolution and depth are neccesary
-            trackingParameter.add(TrackingParameter.Parameter.SCREEN_RESOLUTION, mWebtrekkParameter.get(TrackingParameter.Parameter.SCREEN_RESOLUTION));
-            trackingParameter.add(TrackingParameter.Parameter.SCREEN_DEPTH, mWebtrekkParameter.get(TrackingParameter.Parameter.SCREEN_DEPTH));
-            trackingParameter.add(TrackingParameter.Parameter.USERAGENT, mWebtrekkParameter.get(TrackingParameter.Parameter.USERAGENT));
-            trackingParameter.add(TrackingParameter.Parameter.EVERID, mWebtrekkParameter.get(TrackingParameter.Parameter.EVERID));
-            trackingParameter.add(TrackingParameter.Parameter.SAMPLING, mWebtrekkParameter.get(TrackingParameter.Parameter.SAMPLING));
-            trackingParameter.add(TrackingParameter.Parameter.TIMEZONE, mWebtrekkParameter.get(TrackingParameter.Parameter.TIMEZONE));
-            trackingParameter.add(TrackingParameter.Parameter.DEV_LANG, mWebtrekkParameter.get(TrackingParameter.Parameter.DEV_LANG));
+            trackingParameter.add(Parameter.SCREEN_RESOLUTION, mWebtrekkParameter.get(Parameter.SCREEN_RESOLUTION));
+            trackingParameter.add(Parameter.SCREEN_DEPTH, mWebtrekkParameter.get(Parameter.SCREEN_DEPTH));
+            trackingParameter.add(Parameter.USERAGENT, mWebtrekkParameter.get(Parameter.USERAGENT));
+            trackingParameter.add(Parameter.EVERID, mWebtrekkParameter.get(Parameter.EVERID));
+            trackingParameter.add(Parameter.SAMPLING, mWebtrekkParameter.get(Parameter.SAMPLING));
+            trackingParameter.add(Parameter.TIMEZONE, mWebtrekkParameter.get(Parameter.TIMEZONE));
+            trackingParameter.add(Parameter.DEV_LANG, mWebtrekkParameter.get(Parameter.DEV_LANG));
             trackingParameter.add(tp);
             return new TrackingRequest(trackingParameter, mTrackingConfiguration);
         }
@@ -487,7 +492,7 @@ public class RequestFactory {
                 }
                 // override the activityname if a mapping name is given
                 if(activityConfiguration.getMappingName() != null) {
-                    trackingParameter.add(TrackingParameter.Parameter.ACTIVITY_NAME, activityConfiguration.getMappingName());
+                    trackingParameter.add(Parameter.ACTIVITY_NAME, activityConfiguration.getMappingName());
                 }
             }
         }
@@ -527,8 +532,8 @@ public class RequestFactory {
 
         // after the url is created reset the internal parameters to zero
         //TODO: special case where they could not be send and the url got removed?
-        mInternalParameter.add(TrackingParameter.Parameter.FORCE_NEW_SESSION, "0");
-        mInternalParameter.add(TrackingParameter.Parameter.APP_FIRST_START, "0");
+        mInternalParameter.add(Parameter.FORCE_NEW_SESSION, "0");
+        mInternalParameter.add(Parameter.APP_FIRST_START, "0");
         mAutoCustomParameter.put("appUpdated", "0");
     }
 

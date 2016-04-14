@@ -56,6 +56,10 @@
     <autoTrackRequestUrlStoreSize>true</autoTrackRequestUrlStoreSize>
     <!--resend onStart time, this is the timeout for auto tracked sessions in case an activity was paused -->
     <resendOnStartEventTime>30</resendOnStartEventTime>
+    <!--enable or disable exception logging. By default is disabled -->
+    <errorLogEnable>true</errorLogEnable>
+    <!--set log level to do loging 1- only fatals 2 - fatal and catchd, 3- all logs. By default = 3 -->
+    <errorLogLevel>3</errorLogLevel>
 
     <!--custom parameter -->
     <customParameter>

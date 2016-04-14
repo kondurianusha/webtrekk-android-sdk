@@ -176,7 +176,7 @@ public class TrackingParameter {
         return productCategories;
     }
 
-    public void setDefaultParameter(SortedMap<Parameter, String> defaultParameter) {
+    private void setDefaultParameter(SortedMap<Parameter, String> defaultParameter) {
         this.defaultParameter = defaultParameter;
     }
 
@@ -184,39 +184,39 @@ public class TrackingParameter {
         return mediaCategories;
     }
 
-    public void setPageParameter(SortedMap<String, String> pageParameter) {
+    private void setPageParameter(SortedMap<String, String> pageParameter) {
         this.pageParameter = pageParameter;
     }
 
-    public void setSessionParameter(SortedMap<String, String> sessionParameter) {
+    private void setSessionParameter(SortedMap<String, String> sessionParameter) {
         this.sessionParameter = sessionParameter;
     }
 
-    public void setEcomParameter(SortedMap<String, String> ecomParameter) {
+    private void setEcomParameter(SortedMap<String, String> ecomParameter) {
         this.ecomParameter = ecomParameter;
     }
 
-    public void setUserCategories(SortedMap<String, String> userCategories) {
+    private void setUserCategories(SortedMap<String, String> userCategories) {
         this.userCategories = userCategories;
     }
 
-    public void setPageCategories(SortedMap<String, String> pageCategories) {
+    private void setPageCategories(SortedMap<String, String> pageCategories) {
         this.pageCategories = pageCategories;
     }
 
-    public void setAdParameter(SortedMap<String, String> adParameter) {
+    private void setAdParameter(SortedMap<String, String> adParameter) {
         this.adParameter = adParameter;
     }
 
-    public void setActionParameter(SortedMap<String, String> actionParameter) {
+    private void setActionParameter(SortedMap<String, String> actionParameter) {
         this.actionParameter = actionParameter;
     }
 
-    public void setProductCategories(SortedMap<String, String> productCategories) {
+    private void setProductCategories(SortedMap<String, String> productCategories) {
         this.productCategories = productCategories;
     }
 
-    public void setMediaCategories(SortedMap<String, String> mediaCategories) {
+    private void setMediaCategories(SortedMap<String, String> mediaCategories) {
         this.mediaCategories = mediaCategories;
     }
 
@@ -394,20 +394,4 @@ public class TrackingParameter {
         return mappedValues;
     }
 
-/*
-    private SortedMap<Parameter, String> applySingleDefaultMapping(SortedMap<Parameter, String> original, Map<String, String> mappingValues) {
-        SortedMap<Parameter, String> mappedValues = new TreeMap<Parameter, String>();
-        for (Map.Entry<Parameter, String> entry : original.entrySet()) {
-            String key = entry.getValue();
-            if(mappingValues.containsKey(key)) {
-                //entry.setValue(mappingValues.get(entry.getValue()));
-                mappedValues.put(entry.getKey(), mappingValues.get(key));
-            } else {
-                // pass empty string if no mapping value is found in the custom parameter, could also use get with default here
-                mappedValues.put(entry.getKey(), "");
-            }
-        }
-        return mappedValues;
-    }
-*/
 }

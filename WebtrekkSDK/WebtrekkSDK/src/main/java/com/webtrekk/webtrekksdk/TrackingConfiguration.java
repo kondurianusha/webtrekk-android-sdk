@@ -51,6 +51,8 @@ public class TrackingConfiguration {
     private boolean autoTrackRequestUrlStoreSize = true;
     //intervall when autotracked start activity is send again
     private int resendOnStartEventTime = 30;
+    private boolean mErrorLogEnable = false;
+    private int mErrorLogLevel = 3;
 
 
     // global trackingparameter xml values
@@ -202,6 +204,12 @@ public class TrackingConfiguration {
     public boolean isTestMode(){
         return mTestMode;
     }
+
+    public boolean isErrorLogEnable() {return mErrorLogEnable;}
+    public void setErrorLogEnable(boolean value) {mErrorLogEnable = value;}
+
+    public int getErrorLogLevel() {return mErrorLogLevel;}
+    public void setErrorLogLevel(int value) {mErrorLogLevel = value;}
 
     public TrackingParameter getGlobalTrackingParameter() {
         return globalTrackingParameter;

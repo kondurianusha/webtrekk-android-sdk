@@ -53,6 +53,7 @@ public class Webtrekk {
 
     private TrackedActivityLifecycleCallbacks callbacks;
     private WebtrekkPushNotification mPushNotification;
+    final private ExceptionHandler mExceptionHandler = new ExceptionHandler();
 
 
     /**
@@ -86,7 +87,6 @@ public class Webtrekk {
     final public void initWebtrekk(final Application app)
     {
         initWebtrekk(app, R.raw.webtrekk_config);
-        new ExceptionHandler().init();
     }
 
     /**
@@ -142,6 +142,8 @@ public class Webtrekk {
         initTimerService();
         //TODO: make sure this can not break
         //Application act = (Application) mContext.getApplicationContext();
+        mExceptionHandler.init(mRequestFactory, mContext);
+
 
         WebtrekkLogging.log("requestUrlStore created: max requests - " + trackingConfiguration.getMaxRequests());
 
@@ -431,6 +433,25 @@ public class Webtrekk {
         mRequestFactory.addRequest(request);
         WebtrekkLogging.log("CDB request is sent to buffer");
         WebtrekkUserParameters.updateCDBRequestDate(mContext);
+    }
+
+    /**
+     * track exception that is catched by internal application handler.
+     * @param ex - catched exception
+     */
+    public void trackException(Throwable ex)
+    {
+        mExceptionHandler.trackCatched(ex);
+    }
+
+    /**
+     * track exception info that user can provide.
+     * @param name max 255 characters
+     * @param message max 255 characters
+     */
+    public void trackException(String name, String message)
+    {
+        mExceptionHandler.trackInfo(name, message);
     }
 
     /**

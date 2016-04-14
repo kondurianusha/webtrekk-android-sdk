@@ -53,11 +53,10 @@ class TrackingConfigurationXmlParser {
             }
             String name = parser.getName();
             // Starts by looking for the entry tag
-            if(name.equals("webtrekkConfiguration")) {
+            if (name.equals("webtrekkConfiguration")) {
                 WebtrekkLogging.log("premature end of configuration");
                 break;
-            }
-            else if (name.equals("version")) {
+            } else if (name.equals("version")) {
                 parser.require(XmlPullParser.START_TAG, ns, "version");
                 String versionValue = readText(parser);
                 try {
@@ -369,7 +368,7 @@ class TrackingConfigurationXmlParser {
                     config.setAutoTrackRequestUrlStoreSize(true);
                 } else if (value.equals("false")) {
                     config.setAutoTrackRequestUrlStoreSize(false);
-                }else {
+                } else {
                     WebtrekkLogging.log("invalid autoTrackRequestUrlStoreSize value, using default");
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "autoTrackRequestUrlStoreSize");
@@ -388,6 +387,34 @@ class TrackingConfigurationXmlParser {
 
                 parser.require(XmlPullParser.END_TAG, ns, "resendOnStartEventTime");
 
+
+            } else if (name.equals("errorLogEnable")) {
+                parser.require(XmlPullParser.START_TAG, ns, "errorLogEnable");
+
+                String value = readText(parser);
+                if (value.equals("true")) {
+                    config.setErrorLogEnable(true);
+                } else if (value.equals("false")) {
+                    config.setErrorLogEnable(false);
+                } else {
+                    WebtrekkLogging.log("invalid errorLogEnable value, using default");
+                }
+
+               parser.require(XmlPullParser.END_TAG, ns, "errorLogEnable");
+
+            } else if (name.equals("errorLogLevel")) {
+                parser.require(XmlPullParser.START_TAG, ns, "errorLogLevel");
+                String samplingValue = readText(parser);
+                try {
+                    int level = Integer.parseInt(samplingValue);
+                    if (level >= 1 && level <= 3) {
+                        config.setErrorLogLevel(level);
+                    }
+                } catch (Exception ex) {
+                    WebtrekkLogging.log("invalid errorLogLevel value, using default", ex);
+                }
+
+                parser.require(XmlPullParser.END_TAG, ns, "errorLogLevel");
 
             } else if (name.equals("customParameter")) {
                 parser.require(XmlPullParser.START_TAG, ns, "customParameter");

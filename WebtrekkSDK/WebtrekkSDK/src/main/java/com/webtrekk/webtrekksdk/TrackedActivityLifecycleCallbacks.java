@@ -77,6 +77,5 @@ class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycle
             webtrekk.decreaseActivityCounter();
 
         webtrekk.stopActivity();
-        //throw new NullPointerException();
     }
 }

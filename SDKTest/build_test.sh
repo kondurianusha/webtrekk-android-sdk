@@ -15,6 +15,7 @@ bash testIntallAttribution.sh yes
 
 #do test without AdvID
 bash testIntallAttribution.sh
+bash errorHandlingTest.sh
 
 
  #extract logs

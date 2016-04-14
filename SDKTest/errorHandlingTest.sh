@@ -1,0 +1,2 @@
+adb shell am instrument -w -e class com.Webtrekk.SDKTest.ErrorHandlerTest#testFatalInit com.Webtrekk.SDKTest.test/android.test.InstrumentationTestRunner
+adb shell am instrument -w -e class com.Webtrekk.SDKTest.ErrorHandlerTest#testFatalComplete com.Webtrekk.SDKTest.test/android.test.InstrumentationTestRunner

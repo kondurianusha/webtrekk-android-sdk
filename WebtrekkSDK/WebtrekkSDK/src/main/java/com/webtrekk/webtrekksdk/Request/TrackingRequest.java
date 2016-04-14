@@ -20,14 +20,15 @@ public class TrackingRequest {
 
 
     public final TrackingParameter mTrackingParameter;
-    final private TrackingConfiguration trackingConfiguration;
+    final private TrackingConfiguration mTrackingConfiguration;
     final private RequestType mRequestType;
 
     public enum RequestType
     {
         GENERAL,
         CDB,
-        INSTALL
+        INSTALL,
+        ECXEPTION
     }
 
     /**
@@ -38,7 +39,7 @@ public class TrackingRequest {
      */
     public TrackingRequest(TrackingParameter tp, TrackingConfiguration trackingConfiguration) {
         mTrackingParameter = tp;
-        this.trackingConfiguration = trackingConfiguration;
+        mTrackingConfiguration = trackingConfiguration;
         mRequestType = RequestType.GENERAL;
     }
 
@@ -51,7 +52,7 @@ public class TrackingRequest {
      */
     public TrackingRequest(TrackingParameter tp, TrackingConfiguration trackingConfiguration, RequestType type) {
         mTrackingParameter = tp;
-        this.trackingConfiguration = trackingConfiguration;
+        mTrackingConfiguration = trackingConfiguration;
         mRequestType = type;
     }
 
@@ -61,7 +62,7 @@ public class TrackingRequest {
 
     private String getBaseURLPart()
     {
-       return  trackingConfiguration.getTrackDomain() + "/" + trackingConfiguration.getTrackId() + "/wt?";
+       return  mTrackingConfiguration.getTrackDomain() + "/" + mTrackingConfiguration.getTrackId() + "/wt?";
     }
 
     /**
@@ -278,6 +279,35 @@ public class TrackingRequest {
     }
 
 
+    private class ExceptionRequest implements URLFactory
+    {
+
+        @Override
+        public String getPValue(TrackingParameter trackingParameter) {
+            SortedMap<Parameter, String> tp = trackingParameter.getDefaultParameter();
+
+            return "p=" + Webtrekk.TRACKING_LIBRARY_VERSION + ",,0,,,0,"+
+                    tp.get(Parameter.TIMESTAMP) + ",0,0,0";
+        }
+
+        @Override
+        public void getTrackingPart(TrackingParameter trackingParameter, StringBuffer url) {
+            //if action trackingParameter are given, append them to the url as well
+            addKeyMap(trackingParameter.getActionParameter(), "&ck", url);
+        }
+
+        @Override
+        public String getBasePart() {
+            return getBaseURLPart();
+        }
+
+        @Override
+        public boolean isEORAppend() {
+            return true;
+        }
+    }
+
+
     /**
      * creates a URL String from the given Request which can be send to the server/stores in the urlStore
      *
@@ -298,6 +328,9 @@ public class TrackingRequest {
                 break;
             case INSTALL:
                 urlFactory = new InstallRequest();
+                break;
+            case ECXEPTION:
+                urlFactory = new ExceptionRequest();
                 break;
         }
 
@@ -325,10 +358,6 @@ public class TrackingRequest {
     }
 
     public TrackingConfiguration getTrackingConfiguration() {
-        return trackingConfiguration;
-    }
-
-    public void setTrackingConfiguration(TrackingConfiguration trackingConfiguration) {
-        trackingConfiguration = trackingConfiguration;
+        return mTrackingConfiguration;
     }
 }

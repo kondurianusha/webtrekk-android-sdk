@@ -99,6 +99,11 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler
         if (!isLevelAllowed(Type.INFO))
             return;
 
+        if (name.length() > 255 || message.length() > 255) {
+            WebtrekkLogging.log("Can't track info exceptoin. Some of fileds more than 255 characters");
+            return;
+        }
+
         track(Type.INFO.ordinal(), name, message, null, null, null);
     }
 

@@ -585,14 +585,16 @@ public class Webtrekk {
      * this functionality is for future release only
      * @return WebtrekkPushNotification object
      */
+/*
     public WebtrekkPushNotification getPushNotification()
     {
         return null;
-/*
+
         return mPushNotification == null ? new WebtrekkPushNotification(mContext, trackingConfiguration.isTestMode()):
                                                   mPushNotification;
-*/
+
     }
+*/
 
     /**
      * this is the default tracking method which creates an empty tracking trackingParameter object

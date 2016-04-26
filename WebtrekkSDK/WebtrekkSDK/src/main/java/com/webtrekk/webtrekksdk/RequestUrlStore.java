@@ -53,10 +53,12 @@ public class RequestUrlStore {
      */
     public void add(String requestUrl) {
         // if the maximumRequest number  is reached drop the oldest request
-        if(requestList.size() >= maximumRequests) {
-            requestList.remove(0);
-        }
+        synchronized (requestList) {
+            if (size() >= maximumRequests) {
+                remove(0);
+            }
         requestList.add(requestUrl);
+        }
     }
 
     public String get(int index) {
@@ -64,7 +66,9 @@ public class RequestUrlStore {
     }
 
     public void remove(int index) {
-        requestList.remove(index);
+        synchronized (requestList) {
+            requestList.remove(index);
+        }
     }
 
     public int size() {

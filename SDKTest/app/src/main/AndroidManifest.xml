@@ -68,6 +68,10 @@
         <activity
             android:name=".EmptyActivity">
         </activity>
+        <activity
+            android:name=".NoAutoTrackActivity">
+        </activity>
+        <service android:name=".LoadOSService"/>
         <receiver
             android:name="com.webtrekk.webtrekksdk.WebtrekkGcmReceiver"
             android:exported="true"

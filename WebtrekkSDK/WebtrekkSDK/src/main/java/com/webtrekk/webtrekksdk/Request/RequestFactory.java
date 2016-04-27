@@ -281,10 +281,13 @@ public class RequestFactory {
         mWebtrekkParameter.put(Parameter.SAMPLING, "" + mTrackingConfiguration.getSampling());
 
         // always track the wt everid
-        mWebtrekkParameter.put(Parameter.EVERID, HelperFunctions.getEverId(mContext));
-
+        initEverID();
 
         WebtrekkLogging.log("collected static automatic data");
+    }
+
+    public void initEverID() {
+        mWebtrekkParameter.put(Parameter.EVERID, HelperFunctions.getEverId(mContext));
     }
 
     /**

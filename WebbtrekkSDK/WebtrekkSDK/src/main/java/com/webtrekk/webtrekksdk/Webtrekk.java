@@ -846,6 +846,13 @@ public class Webtrekk {
             request.mTrackingParameter.add(Parameter.ADVERTISEMENT, mediaCode);
             request.mTrackingParameter.add(Parameter.ADVERTISEMENT_ACTION, "c");
             request.mTrackingParameter.add(Parameter.ECOM, "900", "1");
+        }else
+        {
+            String deepLinkMediaCode = HelperFunctions.getDeepLinkMediaCode(mContext, true);
+            if (deepLinkMediaCode != null && !deepLinkMediaCode.isEmpty())
+            {
+                request.mTrackingParameter.add(Parameter.ADVERTISEMENT, deepLinkMediaCode);
+            }
         }
     }
 
@@ -1068,6 +1075,21 @@ public class Webtrekk {
 
         HelperFunctions.setEverId(mContext, everId);
         initEverID();
+    }
+
+    /**
+     * Set deeplink attribution media code. This media code will be sent once with the next tracking request
+     * @param mediaCode - media code
+     */
+    public void setMediaCode(String mediaCode)
+    {
+        if (mContext == null)
+        {
+            WebtrekkLogging.log("Can't set media code. Please initialize SDK first.");
+            return;
+        }
+
+        HelperFunctions.setDeepLinkMediaCode(mContext, mediaCode);
     }
 
     /**

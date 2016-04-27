@@ -52,6 +52,7 @@ import java.util.regex.Pattern;
  */
 final class HelperFunctions {
 
+    private static final String MEDIA_CODE_DEEP_LINK = "DEEP_LINK_SETTINGS_MEDIA_CODE";
     /**
      * private constructor as this is a utility class
      */
@@ -655,5 +656,22 @@ final class HelperFunctions {
         return true;
     }
 
+    public static void setDeepLinkMediaCode(Context context, String value)
+    {
+        SharedPreferences.Editor editor = HelperFunctions.getWebTrekkSharedPreference(context).edit();
 
+        editor.putString(MEDIA_CODE_DEEP_LINK, value).apply();
+    }
+
+    public static String getDeepLinkMediaCode(Context context, boolean deleteFlag)
+    {
+        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
+
+        String result = preferences.getString(MEDIA_CODE_DEEP_LINK, null);
+
+        if (deleteFlag)
+            preferences.edit().remove(MEDIA_CODE_DEEP_LINK).apply();
+
+        return result;
+    }
 }

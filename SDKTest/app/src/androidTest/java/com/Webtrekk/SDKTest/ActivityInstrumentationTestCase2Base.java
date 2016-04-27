@@ -61,7 +61,7 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mURLReceiver);
     }
 
-    protected void initWaitingForString(Runnable process)
+    protected void initWaitingForTrack(Runnable process)
     {
         mSendedURL = null;
         mStringReceived = false;
@@ -69,7 +69,7 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
         new Thread(process).start();
     }
 
-    protected String waitForString()
+    protected String waitForTrackedURL()
     {
         synchronized (mSynchronize) {
             while (!mStringReceived) {

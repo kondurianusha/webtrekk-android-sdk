@@ -127,7 +127,7 @@ public class Webtrekk {
         if (c == null) {
             throw new IllegalArgumentException("no valid mContext");
         }
-        if (this.mContext != null) {
+        if (mContext != null) {
             //this can also occur on screen orientation changes
             //TODO: recheck desired behaviour
             return;
@@ -631,8 +631,28 @@ public class Webtrekk {
         mRequestFactory.setCustomParameter(customParameter);
     }
 
+    /**
+     *Returns current EverId. EverId is generated automatically by SDK, but you can set is manual as well.
+     * @return current EverId
+     */
     public String getEverId() {
         return HelperFunctions.getEverId(mContext);
+    }
+
+    /**
+     * set EverId. This ever ID will be used for all tracking request until application reinstall.
+     * @param everId
+     */
+    public void setEverId(String everId)
+    {
+        if (mContext == null)
+        {
+            WebtrekkLogging.log("Can't set ever id. Please initialize SDK first.");
+            return;
+        }
+
+        HelperFunctions.setEverId(mContext, everId);
+        mRequestFactory.initEverID();
     }
 
     /**

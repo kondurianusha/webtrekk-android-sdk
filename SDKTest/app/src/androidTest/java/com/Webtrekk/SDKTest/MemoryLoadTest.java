@@ -54,10 +54,10 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<NoAutoT
             }
         };
 
-        initWaitingForString(runnableTrackOnly);
-        waitForString();
-        initWaitingForString(runnableTrackOnly);
-        waitForString();
+        initWaitingForTrack(runnableTrackOnly);
+        waitForTrackedURL();
+        initWaitingForTrack(runnableTrackOnly);
+        waitForTrackedURL();
     }
 
     public void testLoadCPU()
@@ -77,8 +77,8 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<NoAutoT
         };
 
         for (int i = 0 ; i < 10; i++) {
-            initWaitingForString(runnableTrackOnly);
-            waitForString();
+            initWaitingForTrack(runnableTrackOnly);
+            waitForTrackedURL();
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

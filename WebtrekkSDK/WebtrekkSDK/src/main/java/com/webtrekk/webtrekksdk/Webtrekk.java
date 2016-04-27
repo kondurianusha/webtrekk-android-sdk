@@ -656,6 +656,21 @@ public class Webtrekk {
     }
 
     /**
+     * Set deeplink attribution media code. This media code will be sent once with the next tracking request
+     * @param mediaCode - media code
+     */
+    public void setMediaCode(String mediaCode)
+    {
+        if (mContext == null)
+        {
+            WebtrekkLogging.log("Can't set media code. Please initialize SDK first.");
+            return;
+        }
+
+        HelperFunctions.setDeepLinkMediaCode(mContext, mediaCode);
+    }
+
+    /**
      * for unit testing only
      * @return
      */

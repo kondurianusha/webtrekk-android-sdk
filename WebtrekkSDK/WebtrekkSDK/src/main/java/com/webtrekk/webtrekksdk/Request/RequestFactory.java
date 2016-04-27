@@ -382,7 +382,7 @@ public class RequestFactory {
     /*
     Process campaignData
      */
-    private void processCampaignData(TrackingRequest request)
+    private void processMediaCode(TrackingRequest request)
     {
         String mediaCode = Campaign.getMediaCode(mContext);
 
@@ -390,6 +390,13 @@ public class RequestFactory {
             request.mTrackingParameter.add(Parameter.ADVERTISEMENT, mediaCode);
             request.mTrackingParameter.add(Parameter.ADVERTISEMENT_ACTION, "c");
             request.mTrackingParameter.add(Parameter.ECOM, "900", "1");
+        }else
+        {
+            String deepLinkMediaCode = HelperFunctions.getDeepLinkMediaCode(mContext, true);
+            if (deepLinkMediaCode != null && !deepLinkMediaCode.isEmpty())
+            {
+                request.mTrackingParameter.add(Parameter.ADVERTISEMENT, deepLinkMediaCode);
+            }
         }
     }
 
@@ -513,7 +520,7 @@ public class RequestFactory {
      */
     public void addRequest(TrackingRequest request)  {
 
-        processCampaignData(request);
+        processMediaCode(request);
 
         // execute the before plugin functions
         for(Plugin p: mPlugins){

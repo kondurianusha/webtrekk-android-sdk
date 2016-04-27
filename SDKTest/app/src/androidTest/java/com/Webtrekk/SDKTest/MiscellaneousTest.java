@@ -57,8 +57,52 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoA
             }
         });
 
+        URL = waitForTrackedURL();
+
         assertTrue(URL.contains(newEverID));
         assertFalse(URL.contains(oldEverID));
 
+    }
+
+    public void testMediaCodeSet()
+    {
+        final String mediaCode = "mediaCode";
+
+        // just ordinary track. no media code
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.track();
+            }
+        });
+
+        String URL = waitForTrackedURL();
+
+        assertFalse(URL.contains("&"+TrackingParameter.Parameter.ADVERTISEMENT+"="));
+
+        // media code check
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.setMediaCode(mediaCode);
+                mWebtrekk.track();
+            }
+        });
+
+        URL = waitForTrackedURL();
+
+        assertTrue(URL.contains("&"+TrackingParameter.Parameter.ADVERTISEMENT+"="+mediaCode));
+
+        //next track - no media code
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.track();
+            }
+        });
+
+        URL = waitForTrackedURL();
+
+        assertFalse(URL.contains("&"+TrackingParameter.Parameter.ADVERTISEMENT+"="));
     }
 }

@@ -63,6 +63,9 @@
             android:name=".PushNotificationActivity"
             android:label="@string/title_activity_push" >
         </activity>
+        <activity
+            android:name=".NoAutoTrackActivity">
+        </activity>
         <receiver
             android:name="com.webtrekk.webtrekksdk.WebtrekkGcmReceiver"
             android:exported="true"

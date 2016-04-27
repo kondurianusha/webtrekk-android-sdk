@@ -57,8 +57,8 @@ public class PushNotificationActivity extends Activity {
     {
         tokenReceiverRegister();
         final Webtrekk webtrekk = Webtrekk.getInstance();
-        if (mPushNotification == null)
-            mPushNotification = webtrekk.getPushNotification();
+//        if (mPushNotification == null)
+//            mPushNotification = webtrekk.getPushNotification();
 
         mPushNotification.start(/*new WebtrekkPushNotification.PushNotificationMessageCallback() {
             @Override
@@ -72,6 +72,7 @@ public class PushNotificationActivity extends Activity {
                 ((LinearLayout) findViewById(R.id.push_images_root)).addView(image, layoutParams);
             }
         }*/null);
+
     }
 
     public void unsubscribe(View view)

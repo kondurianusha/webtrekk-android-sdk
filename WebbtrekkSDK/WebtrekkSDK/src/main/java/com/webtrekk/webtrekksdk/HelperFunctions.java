@@ -261,6 +261,11 @@ final class HelperFunctions {
         return preferences.getString(Webtrekk.PREFERENCE_KEY_EVER_ID, "");
     }
 
+    public static void setEverId(Context context, String value) {
+        SharedPreferences preferences = getWebTrekkSharedPreference(context);
+        preferences.edit().putString(Webtrekk.PREFERENCE_KEY_EVER_ID, value).commit();
+    }
+
     /**
      * returns the version of the application
      *

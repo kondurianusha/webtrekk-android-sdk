@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.webtrekk.webtrekksdk.Webtrekk;
+
 /**
  * Created by vartbaronov on 22.04.16.
  */
@@ -63,7 +65,10 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
         mSendedURL = null;
         mStringReceived = false;
 
-        new Thread(process).start();
+        synchronized (Webtrekk.getInstance()) {
+
+            new Thread(process).start();
+        }
     }
 
     protected String waitForTrackedURL()

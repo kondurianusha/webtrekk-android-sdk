@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.AndroidTestCase;
 
 import com.webtrekk.webtrekksdk.Modules.ExceptionHandler;
-import com.webtrekk.webtrekksdk.TrackingConfiguration;
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by vartbaronov on 14.04.16.
@@ -18,19 +20,21 @@ import com.webtrekk.webtrekksdk.Webtrekk;
 public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActivity> {
 
     Webtrekk mWebtrekk;
-    volatile String mSendedURL;
+    volatile List<String> mSendedURLArray = new ArrayList<String>();
     volatile boolean mStringReceived;
     final Object mSynchronize = new Object();
+    int mStringNumbersToWait = 1;
 
     private BroadcastReceiver mURLReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mSendedURL = intent.getStringExtra("URL");
-            mStringReceived = true;
+            mSendedURLArray.add(intent.getStringExtra("URL"));
 
-            synchronized (mSynchronize)
-            {
-                mSynchronize.notifyAll();
+            if (mStringNumbersToWait == mSendedURLArray.size()) {
+                mStringReceived = true;
+                synchronized (mSynchronize) {
+                    mSynchronize.notifyAll();
+                }
             }
             }
     };
@@ -69,8 +73,9 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActi
     public void testCatchedError()
     {
 
-        mSendedURL = null;
+        mSendedURLArray.clear();
         mStringReceived = false;
+        mStringNumbersToWait = 1;
 
         new Thread(new Runnable() {
             @Override
@@ -97,17 +102,25 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActi
             }
         }
 
-        mSendedURL = mSendedURL.substring(mSendedURL.indexOf("ct=webtrekk_ignore"), mSendedURL.length());
-        assertEquals(mSendedURL, "ct=webtrekk_ignore&ck910=2&ck911=java.lang.NullPointerException&ck912=Attempt+to+invoke+virtual+method+%27int+java.lang.String.length%28%29%27+on+a+null+object+reference&ck914=com.Webtrekk.SDKTest.ErrorHandlerTest%242.run%28ErrorHandlerTest.java%3A82%29%7Cjava.lang.Thread.run%28Thread.java%3A818%29&eor=1");
+        String URL = mSendedURLArray.get(0);
 
+        URLParsel parcel = new URLParsel();
+        parcel.parseURL(URL);
 
+        URL = URL.substring(URL.indexOf("ct=webtrekk_ignore"), URL.length());
+        assertEquals(parcel.getValue("ct"), "webtrekk_ignore");
+        assertEquals(parcel.getValue("ck910"), "2");
+        assertEquals(parcel.getValue("ck911"), "java.lang.NullPointerException");
+        assertEquals(parcel.getValue("ck912"), "Attempt+to+invoke+virtual+method+%27int+java.lang.String.length%28%29%27+on+a+null+object+reference");
+        assertEquals(getNormString(parcel.getValue("ck914")), "com.Webtrekk.SDKTest.ErrorHandlerTest%242.run%28ErrorHandlerTest.java%3A%29%7Cjava.lang.Thread.run%28Thread.java%29");
     }
 
     public void testInfoError()
     {
 
-        mSendedURL = null;
+        mSendedURLArray.clear();
         mStringReceived = false;
+        mStringNumbersToWait = 1;
 
         new Thread(new Runnable() {
             @Override
@@ -129,30 +142,28 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActi
             }
         }
 
-        mSendedURL = mSendedURL.substring(mSendedURL.indexOf("ct=webtrekk_ignore"), mSendedURL.length());
-        assertEquals(mSendedURL, "ct=webtrekk_ignore&ck910=3&ck911=nameEx&ck912=messsage+Ex&eor=1");
-        assertTrue(mSendedURL.contains("ct=webtrekk_ignore"));
+        String URL = mSendedURLArray.get(0);
+        URL = URL.substring(URL.indexOf("ct=webtrekk_ignore"), URL.length());
+        assertEquals(URL, "ct=webtrekk_ignore&ck910=3&ck911=nameEx&ck912=messsage+Ex&eor=1");
+        assertTrue(URL.contains("ct=webtrekk_ignore"));
     }
 
-    public void testFatalInit()
+    public void testFatalCompeteSimple()
     {
-        if (Thread.getDefaultUncaughtExceptionHandler() instanceof ExceptionHandler)
-            return;
-
-        Thread.setDefaultUncaughtExceptionHandler(null);
-        mWebtrekk.initWebtrekk(getActivity().getApplication());
-
-        String s = null;
-
-        try {
-            s.length();
-        } catch (NullPointerException e) {
-            Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
-        }
+        internalTestFatalComplete(1);
     }
 
-    public void testFatalComplete()
+    public void testFatalCompeteComplex()
     {
+        internalTestFatalComplete(2);
+    }
+
+    private void internalTestFatalComplete(int errorNumbers)
+    {
+        mSendedURLArray.clear();
+        mStringReceived = false;
+        mStringNumbersToWait = errorNumbers;
+
         if (Thread.getDefaultUncaughtExceptionHandler() instanceof ExceptionHandler)
             return;
 
@@ -169,9 +180,45 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActi
             }
         }
 
-        assertTrue(mSendedURL.contains("ck911=java.lang.NullPointerException&ck912=Attempt+to+invoke+virtual+method+%27int+java.lang.String.length"));
-        assertTrue(mSendedURL.contains("+on+a+null+object+reference&ck914=com.Webtrekk.SDKTest.ErrorHandlerTest.testFatalInit%28ErrorHandlerTest.java"));
-        assertTrue(mSendedURL.contains("java.lang.reflect.Method.invoke%28Method.java"));
-        assertTrue(mSendedURL.contains("ct=webtrekk_ignore"));
+        assertEquals(mSendedURLArray.size(), errorNumbers);
+
+
+        for (int i = 0 ; i < mSendedURLArray.size(); i++)
+        {
+            URLParsel parcel = new URLParsel();
+            parcel.parseURL(mSendedURLArray.get(i));
+
+            assertEquals(parcel.getValue("ct"), "webtrekk_ignore");
+            assertTrue(HelperFunctions.urlDecode(parcel.getValue("ck911")).length() <= 255);
+            assertTrue(HelperFunctions.urlDecode(parcel.getValue("ck912")).length() <= 255);
+            assertTrue(HelperFunctions.urlDecode(parcel.getValue("ck913")).length() <= 255);
+            assertTrue(HelperFunctions.urlDecode(parcel.getValue("ck914")).length() <= 255);
+            assertTrue(HelperFunctions.urlDecode(parcel.getValue("ck915")).length() <= 255);
+            assertEquals(parcel.getValue("ck910"), "1");
+
+            switch (i)
+            {
+                case 0:
+                    assertEquals(parcel.getValue("ck911"), "java.lang.RuntimeException");
+                    assertEquals(getNormString(parcel.getValue("ck912")), "Unable+to+start+activity+ComponentInfo%7Bcom.Webtrekk.SDKTest%2Fcom.Webtrekk.SDKTest.ThrowExceptionActivity%7D%3A+java.lang.NullPointerException%3A+Attempt+to+invoke+virtual+method+%27int+java.lang.String.length%28%29%27+on+a+null+object+reference");
+                    assertEquals(getNormString(parcel.getValue("ck913")), "Attempt+to+invoke+virtual+method+%27int+java.lang.String.length%28%29%27+on+a+null+object+reference");
+                    assertEquals(getNormString(parcel.getValue("ck914")), "android.app.ActivityThread.performLaunchActivity%28ActivityThread.java%29%7Candroid.app.ActivityThread.handleLaunchActivity%28ActivityThread.java%29%7Candroid.app.ActivityThread.access%24800%28ActivityThread.java%29%7C");
+                    assertEquals(getNormString(parcel.getValue("ck915")), "com.Webtrekk.SDKTest.ThrowExceptionActivity.onCreate%28ThrowExceptionActivity.java%3A%29%7Candroid.app.Activity.performCreate%28Activity.java%29%7Candroid.app.Instrumentation.callActivityOnCreate%28Instrumentation.java%29%7C");
+                    break;
+                case 1:
+                    assertEquals(parcel.getValue("ck911"), "java.lang.RuntimeException");
+                    assertEquals(getNormString(parcel.getValue("ck912")), "Unable+to+start+activity+ComponentInfo%7Bcom.Webtrekk.SDKTest%2Fcom.Webtrekk.SDKTest.ThrowExceptionActivity%7D%3A+java.lang.NumberFormatException%3A+Invalid+int%3A+%22sdfsdf%22");
+                    assertEquals(getNormString(parcel.getValue("ck913")), "Invalid+int%3A+%22sdfsdf%22");
+                    assertEquals(getNormString(parcel.getValue("ck914")), "android.app.ActivityThread.performLaunchActivity%28ActivityThread.java%29%7Candroid.app.ActivityThread.handleLaunchActivity%28ActivityThread.java%29%7Candroid.app.ActivityThread.access%24800%28ActivityThread.java%29%7C");
+                    assertEquals(getNormString(parcel.getValue("ck915")), "java.lang.Integer.invalidInt%28Integer.java%29%7Cjava.lang.Integer.parse%28Integer.java%29%7Cjava.lang.Integer.parseInt%28Integer.java%29%7Cjava.lang.Integer.parseInt%28Integer.java%29%7Cjava.lang.Integer.valueOf%28Integer.java%29%7C");
+                    break;
+            }
+
+        }
+    }
+
+    private String getNormString(String orig)
+    {
+        return orig.replaceAll("%3A([-\\d]+)", "%3A");
     }
 }

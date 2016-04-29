@@ -152,7 +152,7 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler
 
         if (loadFile.exists())
         {
-            //dumpFile();
+            dumpFile();
             BufferedReader br = null;
             try {
                 br = new BufferedReader(new FileReader(fileName));
@@ -240,7 +240,7 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler
             if (!stackString.isEmpty())
                 stackString += separator;
 
-            int lineNumber = element.getClassName().contains("android.app.") ? -1 : element.getLineNumber();
+            int lineNumber = (element.getClassName().contains("android.app.") || element.getClassName().contains("java.lang.")) ? -1 : element.getLineNumber();
 
             String stackItem = element.getClassName() + "."+
                     element.getMethodName()+"("+element.getFileName();
@@ -324,7 +324,7 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler
         }
 
         public String getCauseMessage() {
-            return mMessage.isEmpty() ? null : mMessage;
+            return mCauseMessage.isEmpty() ? null : mCauseMessage;
         }
 
         public String getStack() {

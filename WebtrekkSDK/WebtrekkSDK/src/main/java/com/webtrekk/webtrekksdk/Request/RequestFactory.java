@@ -489,9 +489,11 @@ public class RequestFactory {
         }
 
         // third add the local ones from the activity which may override all of the above params, this are passed from the track call
+        trackingParameter.add(tp);
+
+        //forth add the local ones which each activity has defined in its xml configuration, they will override the ones above
         applyActivityConfiguration(trackingParameter);
         overrideCustomPageName(trackingParameter);
-        trackingParameter.add(tp);
 
         return new TrackingRequest(trackingParameter, mTrackingConfiguration);
 
@@ -499,7 +501,6 @@ public class RequestFactory {
 
     private void applyActivityConfiguration(TrackingParameter trackingParameter)
     {
-        //forth add the local ones which each activity has defined in its xml configuration, they will override the ones above
         //TODO: make this better code, basicly check that the activity has params configured
         if(mTrackingConfiguration.getActivityConfigurations()!= null && mTrackingConfiguration.getActivityConfigurations().containsKey(mCurrentActivityName)){
             ActivityConfiguration activityConfiguration = mTrackingConfiguration.getActivityConfigurations().get(mCurrentActivityName);

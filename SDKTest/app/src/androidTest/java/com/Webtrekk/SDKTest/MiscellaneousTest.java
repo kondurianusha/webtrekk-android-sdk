@@ -1,5 +1,7 @@
 package com.Webtrekk.SDKTest;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.provider.Settings;
 
 import com.webtrekk.webtrekksdk.TrackingConfiguration;
@@ -105,4 +107,56 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoA
 
         assertFalse(URL.contains("&"+TrackingParameter.Parameter.ADVERTISEMENT+"="));
     }
+
+    public void testCustomPageOverride()
+    {
+        final String customPageName = "customPageName";
+
+        //next track - no media code
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.track();
+            }
+        });
+
+        String URL = waitForTrackedURL();
+
+        assertTrue(URL.contains(NoAutoTrackActivity.class.getName()));
+        assertFalse(URL.contains(customPageName));
+
+        //next track - no media code
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.setCustomPageName(customPageName);
+                mWebtrekk.track();
+            }
+        });
+
+        URL = waitForTrackedURL();
+
+        assertFalse(URL.contains(NoAutoTrackActivity.class.getName()));
+        assertTrue(URL.contains(customPageName));
+
+        Intent newActivityIntent = new Intent(getActivity(), NoAutoTrackActivity.class);
+        newActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Activity newActivity = getInstrumentation().startActivitySync(newActivityIntent);
+
+        //next track - no media code
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.track();
+            }
+        });
+
+        URL = waitForTrackedURL();
+
+        assertTrue(URL.contains(NoAutoTrackActivity.class.getName()));
+        assertFalse(URL.contains(customPageName));
+        newActivity.finish();
+    }
+
+
 }

@@ -66,7 +66,10 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
         mSendedURL = null;
         mStringReceived = false;
 
-        new Thread(process).start();
+        synchronized (Webtrekk.getInstance()) {
+
+            new Thread(process).start();
+        }
     }
 
     protected String waitForTrackedURL()

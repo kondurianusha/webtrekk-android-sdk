@@ -158,5 +158,42 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoA
         newActivity.finish();
     }
 
+    public void testDifferentParameterTrack()
+    {
+        final String s1 = "logged.in1";
+        final String s2 = "logged.in2";
+        final String search = "someSearch";
+        final String customerID = "customerID";
+        final String cat1 = "userCat1";
+        final String cat2 = "userCat2";
+        // Session parameter, internal search and custom visitor ID
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                TrackingParameter tp = new TrackingParameter();
+                tp.add(TrackingParameter.Parameter.SESSION, "1", s1);
+                tp.add(TrackingParameter.Parameter.SESSION, "2", s2);
+                tp.add(TrackingParameter.Parameter.INTERN_SEARCH, search);
+                tp.add(TrackingParameter.Parameter.CUSTOMER_ID, customerID);
+                tp.add(TrackingParameter.Parameter.USER_CAT, "1", cat1);
+                tp.add(TrackingParameter.Parameter.USER_CAT, "2", cat2);
+                mWebtrekk.track(tp);
+            }
+        });
+
+        String URL = waitForTrackedURL();
+
+        URLParsel parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertEquals(parcel.getValue("cs1"), s1);
+        assertEquals(parcel.getValue("cs2"), s2);
+        assertEquals(parcel.getValue("is"), search);
+        assertEquals(parcel.getValue("cd"), customerID);
+        assertEquals(parcel.getValue("uc1"), cat1);
+        assertEquals(parcel.getValue("uc2"), cat2);
+    }
+
 
 }

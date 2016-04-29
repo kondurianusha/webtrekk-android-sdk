@@ -321,8 +321,23 @@ public class Webtrekk {
         return mRequestFactory.getCurrentActivityName();
     }
 
+    /**
+     * @deprecated
+     * Don't call this function. If you need override page name call {@link Webtrekk#setCustomPageName(String)}} instead
+     * @param currentActivityName
+     */
     public void setCurrentActivityName(String currentActivityName) {
         mRequestFactory.setCurrentActivityName(currentActivityName);
+    }
+
+    /**
+     * set custom page name. This name overrides page name that either provided by activity name or
+     *set in <mappingname> tag in configuration xml. name is cleaned on next activity start.
+     * @param pageName
+     */
+    public void setCustomPageName(String pageName)
+    {
+        mRequestFactory.setCustomPageName(pageName);
     }
 
     /**
@@ -455,10 +470,7 @@ public class Webtrekk {
     }
 
     /**
-     * this developer has to call this function each time a new activity starts, except when he uses auto tracking
-     * best place to call this is during the activitys onStart method, it also allows overriding the
-     * current activity name, which gets tracked
-     *
+     * this function is be called automatically by activity flow listener
      * @param activityName a string containing the name of the activity
      */
     void startActivity(String activityName, boolean isRecreationStart) {
@@ -467,10 +479,11 @@ public class Webtrekk {
         }
 
         //reset page URL if activity is changed
-        if (!isRecreationStart)
+        if (!isRecreationStart) {
             resetPageURLTrack();
+            mRequestFactory.setCurrentActivityName(activityName);
+        }
 
-        mRequestFactory.setCurrentActivityName(activityName);
         if(mActivityCount == 1 && !isRecreationStart) {
             onFirstActivityStart();
         }
@@ -487,7 +500,7 @@ public class Webtrekk {
     }
 
     /**
-     * this has to be called in every Activitys onStop method, that way the SDk can track the current
+     * this function is be called automatically by activity flow listener
      * open activities and knows when to exit
      */
     void stopActivity() {

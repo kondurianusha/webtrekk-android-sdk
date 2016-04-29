@@ -71,6 +71,7 @@ public class RequestFactory {
     private ArrayList<Plugin> mPlugins;
 
     private RequestUrlStore mRequestUrlStore;
+    private String mCustomPageName;
 
 
 
@@ -152,6 +153,11 @@ public class RequestFactory {
 
     public void setCurrentActivityName(String currentActivityName) {
         mCurrentActivityName = currentActivityName;
+        mCustomPageName = null;
+    }
+
+    public void setCustomPageName(String customPageName) {
+        mCustomPageName = customPageName;
     }
 
     public ArrayList<Plugin> getPlugins() {
@@ -438,6 +444,8 @@ public class RequestFactory {
         // action params are a special case, no other params but the ones given as parameter in the code
         if(tp.containsKey(Parameter.ACTION_NAME)) {
             //when its an action only resolution and depth are neccesary
+            applyActivityConfiguration(trackingParameter);
+            overrideCustomPageName(trackingParameter);
             trackingParameter.add(Parameter.SCREEN_RESOLUTION, mWebtrekkParameter.get(Parameter.SCREEN_RESOLUTION));
             trackingParameter.add(Parameter.SCREEN_DEPTH, mWebtrekkParameter.get(Parameter.SCREEN_DEPTH));
             trackingParameter.add(Parameter.USERAGENT, mWebtrekkParameter.get(Parameter.USERAGENT));
@@ -481,8 +489,16 @@ public class RequestFactory {
         }
 
         // third add the local ones from the activity which may override all of the above params, this are passed from the track call
+        applyActivityConfiguration(trackingParameter);
+        overrideCustomPageName(trackingParameter);
         trackingParameter.add(tp);
 
+        return new TrackingRequest(trackingParameter, mTrackingConfiguration);
+
+    }
+
+    private void applyActivityConfiguration(TrackingParameter trackingParameter)
+    {
         //forth add the local ones which each activity has defined in its xml configuration, they will override the ones above
         //TODO: make this better code, basicly check that the activity has params configured
         if(mTrackingConfiguration.getActivityConfigurations()!= null && mTrackingConfiguration.getActivityConfigurations().containsKey(mCurrentActivityName)){
@@ -506,9 +522,12 @@ public class RequestFactory {
                 }
             }
         }
+    }
 
-        return new TrackingRequest(trackingParameter, mTrackingConfiguration);
-
+    private void overrideCustomPageName(TrackingParameter trackingParameter)
+    {
+        if (mCustomPageName != null)
+            trackingParameter.add(Parameter.ACTIVITY_NAME, mCustomPageName);
     }
 
     /**

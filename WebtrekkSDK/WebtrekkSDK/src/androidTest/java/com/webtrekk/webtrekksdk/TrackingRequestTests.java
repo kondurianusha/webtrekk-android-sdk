@@ -148,6 +148,18 @@ public class TrackingRequestTests extends AndroidTestCase {
         assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.TRACKING_LIBRARY_VERSION+",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=pause&mt1=0&mt2=300&mg1=example&eor=1", url);
 
     }
+
+    public void testMediaTrackingPosition() {
+        tpMedia.add(auto_tracked_values);
+        tpMedia.add(Parameter.MEDIA_ACTION, "pos");
+        tpMedia.add(Parameter.MEDIA_POS, "0");
+        TrackingRequest tm = new TrackingRequest(tpMedia, trackingConfiguration);
+
+        String url = tm.getUrlString();
+        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.TRACKING_LIBRARY_VERSION+",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=pos&mt1=0&mt2=300&mg1=example&eor=1", url);
+
+    }
+
     public void testMediaTrackingSeek() {
         tpMedia.add(auto_tracked_values);
         tpMedia.add(Parameter.MEDIA_ACTION, "seek");

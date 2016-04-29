@@ -136,33 +136,6 @@ public class CDBActivityTest extends Activity {
         Log.d(getLocalClassName(), text);
     }
 
-    static class URLParsel
-    {
-        final private Map<String, String> mMap = new HashMap<String, String>();
-        public static String URLKEY = "MAIN_URL_KEY";
-
-        public void parseURL(String url)
-        {
-            Pattern pattern = Pattern.compile("([^?&]+)");
-            Matcher matcher = pattern.matcher(url);
-
-            matcher.find();
-            mMap.put(URLKEY, matcher.group());
-            while (matcher.find())
-            {
-                final String parValue[] = matcher.group().split("=");
-
-                mMap.put(parValue[0], parValue[1]);
-            }
-        }
-
-        public String getValue(String key)
-        {
-            return  mMap.get(key);
-        }
-    }
-
-
     String[] mParametersName = {
             //0, 1, 2, 3, 4, 5
             "email1", "email2", "email3", "email4", "emailmd", "emailsha",

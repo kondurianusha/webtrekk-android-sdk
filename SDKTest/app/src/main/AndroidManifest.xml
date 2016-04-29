@@ -71,6 +71,10 @@
         <activity
             android:name=".NoAutoTrackActivity">
         </activity>
+        <activity
+            android:name=".ThrowExceptionActivity">
+
+        </activity>
         <service android:name=".LoadOSService"/>
         <receiver
             android:name="com.webtrekk.webtrekksdk.WebtrekkGcmReceiver"

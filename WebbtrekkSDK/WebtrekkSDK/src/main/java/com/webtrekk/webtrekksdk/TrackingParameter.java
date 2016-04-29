@@ -328,6 +328,10 @@ public class TrackingParameter {
         /**
          * unclear / TODO: remove and use as custom trackingParameter
          */
+        /**
+        @deprecated
+         you should use {@link com.webtrekk.webtrekksdk.Webtrekk#setCustomPageName(String)} instead
+         */
         ACTIVITY_NAME("aname"),
         INSTALL_REFERRER_PARAMS_MC("wt_mc"), // for the referrer tracking
         INSTALL_REFERRER_KEYWORD("wt_kw"), // for the referrer tracking

@@ -351,20 +351,6 @@ public class TrackingRequestTests extends AndroidTestCase {
         assertTrue(url, url.contains("X-WT-UA"));
     }
 
-    public void testActivityNameOverride() {
-        Webtrekk wt = new Webtrekk();
-        wt.setCurrentActivityName("autotrackname");
-        wt.setContext(getContext());
-        wt.setTrackingConfiguration(trackingConfiguration);
-        wt.initWebtrekkParameter();
-        TrackingParameter tp = new TrackingParameter();
-        tp.add(Parameter.ACTION_NAME, "customname");
-        TrackingRequest tr = wt.createTrackingRequest(tp);
-        assertTrue(tr.mTrackingParameter.getDefaultParameter().containsKey(Parameter.ACTION_NAME));
-        String url = tr.getUrlString();
-        assertTrue(url, url.contains("customname"));
-    }
-
     public void testPageURLTest() {
         Webtrekk wt = new Webtrekk();
 

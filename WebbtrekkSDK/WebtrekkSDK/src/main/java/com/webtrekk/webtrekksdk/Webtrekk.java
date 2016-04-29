@@ -90,6 +90,7 @@ public class Webtrekk {
     private TrackedActivityLifecycleCallbacks callbacks;
     private volatile Campaign mCampaign;
     private WebtrekkPushNotification mPushNotification;
+    private String mCustomPageName;
 
 
     /**
@@ -581,8 +582,23 @@ public class Webtrekk {
         return this.currentActivityName;
     }
 
+    /**
+     * @deprecated
+     * Don't call this function. If you need override page name call {@link Webtrekk#setCustomPageName(String)}} instead
+     * @param currentActivityName
+     */
     public void setCurrentActivityName(String currentActivityName) {
         this.currentActivityName = currentActivityName;
+    }
+
+    /**
+     * set custom page name. This name overrides page name that either provided by activity name or
+     *set in <mappingname> tag in configuration xml. name is cleaned on next activity start.
+     * @param pageName
+     */
+    public void setCustomPageName(String pageName)
+    {
+        mCustomPageName = pageName;
     }
 
     /**
@@ -717,6 +733,8 @@ public class Webtrekk {
         // action params are a special case, no other params but the ones given as parameter in the code
         if(tp.containsKey(Parameter.ACTION_NAME)) {
             //when its an action only resolution and depth are neccesary
+            applyActivityConfiguration(trackingParameter);
+            overrideCustomPageName(trackingParameter);
             trackingParameter.add(Parameter.SCREEN_RESOLUTION, webtrekkParameter.get(Parameter.SCREEN_RESOLUTION));
             trackingParameter.add(Parameter.SCREEN_DEPTH, webtrekkParameter.get(Parameter.SCREEN_DEPTH));
             trackingParameter.add(Parameter.USERAGENT, webtrekkParameter.get(Parameter.USERAGENT));
@@ -763,6 +781,16 @@ public class Webtrekk {
         trackingParameter.add(tp);
 
         //forth add the local ones which each activity has defined in its xml configuration, they will override the ones above
+        applyActivityConfiguration(trackingParameter);
+        overrideCustomPageName(trackingParameter);
+
+        return new TrackingRequest(trackingParameter, trackingConfiguration);
+
+    }
+
+
+    private void applyActivityConfiguration(TrackingParameter trackingParameter)
+    {
         //TODO: make this better code, basicly check that the activity has params configured
         if(trackingConfiguration.getActivityConfigurations()!= null && trackingConfiguration.getActivityConfigurations().containsKey(currentActivityName)){
             ActivityConfiguration activityConfiguration = trackingConfiguration.getActivityConfigurations().get(currentActivityName);
@@ -785,10 +813,14 @@ public class Webtrekk {
                 }
             }
         }
-
-        return new TrackingRequest(trackingParameter, trackingConfiguration);
-
     }
+
+    private void overrideCustomPageName(TrackingParameter trackingParameter)
+    {
+        if (mCustomPageName != null)
+            trackingParameter.add(Parameter.ACTIVITY_NAME, mCustomPageName);
+    }
+
 
     /**
      * Stores the generated URLS of the requests in the local RequestUrlStore until they are send
@@ -857,10 +889,7 @@ public class Webtrekk {
     }
 
     /**
-     * this developer has to call this function each time a new activity starts, except when he uses auto tracking
-     * best place to call this is during the activitys onStart method, it also allows overriding the
-     * current activity name, which gets tracked
-     *
+     * this function is be called automatically by activity flow listener
      * @param activityName a string containing the name of the activity
      */
     void startActivity(String activityName, boolean isRecreationStart) {
@@ -869,10 +898,12 @@ public class Webtrekk {
         }
 
         //reset page URL if activity is changed
-        if (!isRecreationStart)
+        if (!isRecreationStart) {
             resetPageURLTrack();
+            currentActivityName = activityName;
+            mCustomPageName = null;
+        }
 
-        currentActivityName = activityName;
         if(mActivityCount == 1 && !isRecreationStart) {
             onFirstActivityStart();
         }
@@ -895,7 +926,7 @@ public class Webtrekk {
     }
 
     /**
-     * this has to be called in every Activitys onStop method, that way the SDk can track the current
+     * this function is be called automatically by activity flow listener
      * open activities and knows when to exit
      */
     void stopActivity() {

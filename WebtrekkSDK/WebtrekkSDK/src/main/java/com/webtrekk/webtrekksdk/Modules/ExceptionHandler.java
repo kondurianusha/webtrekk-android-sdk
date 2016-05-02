@@ -152,7 +152,7 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler
 
         if (loadFile.exists())
         {
-            dumpFile();
+            //dumpFile();
             BufferedReader br = null;
             try {
                 br = new BufferedReader(new FileReader(fileName));

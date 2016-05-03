@@ -42,6 +42,15 @@
         <activity
             android:name=".ShopExampleActivity"
             android:label="@string/title_activity_shop_example" >
+<!--
+            <a href="intent://webtrekk.com/eveID/MediaCode#Intent;scheme=http;package=com.Webtrekk.SDKTest;end">Open your Activity directly (just open your Activity, without a choosing dialog). </a>
+-->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" android:host="webtrekk.com"/>
+            </intent-filter>
         </activity>
         <activity
             android:name=".MediaActivity"

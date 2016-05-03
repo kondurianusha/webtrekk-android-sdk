@@ -54,6 +54,7 @@ public class Webtrekk {
     private TrackedActivityLifecycleCallbacks callbacks;
     private WebtrekkPushNotification mPushNotification;
     final private ExceptionHandler mExceptionHandler = new ExceptionHandler();
+    private boolean mIsInitialized;
 
 
     /**
@@ -127,7 +128,7 @@ public class Webtrekk {
         if (c == null) {
             throw new IllegalArgumentException("no valid mContext");
         }
-        if (mContext != null) {
+        if (mIsInitialized) {
             //this can also occur on screen orientation changes
             //TODO: recheck desired behaviour
             return;
@@ -148,7 +149,17 @@ public class Webtrekk {
         WebtrekkLogging.log("requestUrlStore created: max requests - " + trackingConfiguration.getMaxRequests());
 
         WebtrekkLogging.log("tracking initialized");
+        mIsInitialized = true;
 
+    }
+
+    /**
+     * returns if initWebtrekk was called successfully for this object
+     * @return true if initialization was called and false otherwise.
+     */
+    public boolean isInitialized()
+    {
+        return mIsInitialized;
     }
 
     final void initTrackingConfiguration(int configResourceID) {

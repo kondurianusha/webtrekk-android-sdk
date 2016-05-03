@@ -122,19 +122,29 @@ public class TrackingConfigurationDownloadTask extends AsyncTask<String, Void, T
      * @throws java.io.IOException
      */
     String stringFromStream(InputStream inputStream) throws java.io.IOException {
-        String encoding = "UTF-8";
-        StringBuilder builder = new StringBuilder();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, encoding));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            builder.append(line);
+        final String encoding = "UTF-8";
+        final long maxSize = 1024*1024;
+        final StringBuilder builder = new StringBuilder();
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, encoding));
+
+        try {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+
+                if (builder.length() > maxSize) {
+                    WebtrekkLogging.log("Error load remote configuration xml. Exceeded size (>=" + maxSize + ")");
+                    return null;
+                }
+            }
+        }finally {
+            reader.close();
         }
-        reader.close();
+
         return builder.toString();
     }
 
     public String getXmlFromUrl(String url) throws IOException {
-        String xml = null;
         // defaultHttpClient
         HttpURLConnection urlConnection;
         InputStream is = null;
@@ -161,9 +171,6 @@ public class TrackingConfigurationDownloadTask extends AsyncTask<String, Void, T
                 is.close();
             }
         }
-        // return XML
-        return xml;
+        return null;
     }
-
-
 }

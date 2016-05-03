@@ -2,6 +2,7 @@ package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +14,7 @@ import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.OutputStream;
 import java.net.URLDecoder;
+import java.util.List;
 
 
 public class ShopExampleActivity extends Activity {
@@ -25,7 +27,14 @@ public class ShopExampleActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop_example);
 
+        Uri data = getIntent().getData();
+        List<String> params = data.getPathSegments();
+        String everID = params.get(0); // "eveID"
+        String mediaCode = params.get(1); // "MediaCode"
+
         webtrekk = Webtrekk.getInstance();
+        webtrekk.setEverId(everID);
+        webtrekk.setMediaCode(mediaCode);
         tp = new TrackingParameter();
     }
 

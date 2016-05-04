@@ -665,13 +665,19 @@ public class Webtrekk {
 
     /**
      * set EverId. This ever ID will be used for all tracking request until application reinstall.
-     * @param everId
+     * @param everId - 19 digits string value
      */
     public void setEverId(String everId)
     {
         if (mContext == null)
         {
             WebtrekkLogging.log("Can't set ever id. Please initialize SDK first.");
+            return;
+        }
+
+        if (!everId.matches("\\d{19}"))
+        {
+            WebtrekkLogging.log("Incorrect everID should have 19 digits");
             return;
         }
 

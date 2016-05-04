@@ -6,6 +6,7 @@ import android.provider.Settings;
 
 import com.webtrekk.webtrekksdk.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter;
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.util.Random;
@@ -32,10 +33,17 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoA
 
     public void testOverrideEverID()
     {
-        String oldEverID = mWebtrekk.getEverId();
-        final String newEverID = "NewEverID"+ UUID.randomUUID().toString();
+        everIDtest("123456789012345678", false);
+        everIDtest("12345678901324567890", false);
+        everIDtest("1234567890123465789", true);
+        everIDtest(HelperFunctions.generateEverid(), true);
+    }
 
-        mWebtrekk.setEverId(newEverID);
+    private void everIDtest(String everID, boolean isShouldSet)
+    {
+        String oldEverID = mWebtrekk.getEverId();
+
+        mWebtrekk.setEverId(everID);
 
         initWaitingForTrack(new Runnable() {
             @Override
@@ -46,9 +54,13 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoA
 
         String URL = waitForTrackedURL();
 
-        assertTrue(URL.contains(newEverID));
-        assertFalse(URL.contains(oldEverID));
-
+        if (isShouldSet) {
+            assertTrue(URL.contains(everID));
+            assertFalse(URL.contains(oldEverID));
+        }else {
+            assertFalse(URL.contains(everID));
+            assertTrue(URL.contains(oldEverID));
+        }
         // check for event tracking
         initWaitingForTrack(new Runnable() {
             @Override
@@ -61,9 +73,13 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoA
 
         URL = waitForTrackedURL();
 
-        assertTrue(URL.contains(newEverID));
-        assertFalse(URL.contains(oldEverID));
-
+        if (isShouldSet) {
+            assertTrue(URL.contains(everID));
+            assertFalse(URL.contains(oldEverID));
+        }else {
+            assertFalse(URL.contains(everID));
+            assertTrue(URL.contains(oldEverID));
+        }
     }
 
     public void testMediaCodeSet()

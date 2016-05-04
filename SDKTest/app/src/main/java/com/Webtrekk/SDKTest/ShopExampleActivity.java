@@ -27,14 +27,15 @@ public class ShopExampleActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop_example);
 
-        Uri data = getIntent().getData();
-        List<String> params = data.getPathSegments();
-        String everID = params.get(0); // "eveID"
-        String mediaCode = params.get(1); // "MediaCode"
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            String everID = bundle.getString("everID"); // "everID"
+            String mediaCode = bundle.getString("mediaCode"); // "MediaCode"
 
-        webtrekk = Webtrekk.getInstance();
-        webtrekk.setEverId(everID);
-        webtrekk.setMediaCode(mediaCode);
+            webtrekk = Webtrekk.getInstance();
+            webtrekk.setEverId(everID);
+            webtrekk.setMediaCode(mediaCode);
+        }
         tp = new TrackingParameter();
     }
 

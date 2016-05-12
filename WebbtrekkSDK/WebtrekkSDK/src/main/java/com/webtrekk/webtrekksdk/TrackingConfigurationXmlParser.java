@@ -517,7 +517,7 @@ class TrackingConfigurationXmlParser {
                             constTp.add(p, value);
                         } else {
                             // else its a mapped value which will be replaced at runtime
-                            tp.add(p, value);
+                            tp.add(p, key);
                         }
                     }
 

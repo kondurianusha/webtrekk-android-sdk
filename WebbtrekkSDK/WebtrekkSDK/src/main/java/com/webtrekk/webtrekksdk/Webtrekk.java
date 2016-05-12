@@ -37,8 +37,8 @@ public class Webtrekk {
     public static final String PREFERENCE_KEY_SAMPLING = "sampling";
     public static final String PREFERENCE_KEY_INSTALLATION_FLAG = "InstallationFlag";
     public static final String PREFERENCE_KEY_CONFIGURATION = "webtrekkTrackingConfiguration";
-    public static final String TRACKING_LIBRARY_VERSION = "404";
-    public static final String TRACKING_LIBRARY_VERSION_UA = "4.0.4";
+    public static final String TRACKING_LIBRARY_VERSION = "405";
+    public static final String TRACKING_LIBRARY_VERSION_UA = "4.0.5";
     private static final String TEST_ULR = "com.webtrekk.webtrekksdk.TEST_URL";
 
 
@@ -803,8 +803,7 @@ public class Webtrekk {
                     //now map the string values from the xml/code tracking parameters to the custom values defined by webtrekk or the customer
                     if(mCustomParameter!= null) {
                         // first map the global tracking parameter
-                        mappedTrackingParameter.applyMapping(mCustomParameter);
-                        trackingParameter.add(mappedTrackingParameter);
+                        trackingParameter.add(mappedTrackingParameter.applyMapping(mCustomParameter));
                     }
                 }
                 // override the activityname if a mapping name is given

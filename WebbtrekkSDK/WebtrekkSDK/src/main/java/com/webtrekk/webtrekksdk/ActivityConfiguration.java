@@ -73,12 +73,12 @@ class ActivityConfiguration {
 
     public void setOverridenPageURL(String url)
     {
-        mActivityTrackingParameter.getDefaultParameter().put(TrackingParameter.Parameter.PAGE_URL, url);
+        mConstActivityTrackingParameter.getDefaultParameter().put(TrackingParameter.Parameter.PAGE_URL, url);
     }
 
     public void resetOverridenPageURL()
     {
-        mActivityTrackingParameter.getDefaultParameter().remove(TrackingParameter.Parameter.PAGE_URL);
+        mConstActivityTrackingParameter.getDefaultParameter().remove(TrackingParameter.Parameter.PAGE_URL);
     }
 
 

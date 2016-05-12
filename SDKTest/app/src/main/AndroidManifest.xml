@@ -82,7 +82,9 @@
         </activity>
         <activity
             android:name=".ThrowExceptionActivity">
-
+        </activity>
+        <activity
+            android:name=".TagIntegrationActivity">
         </activity>
         <service android:name=".LoadOSService"/>
         <receiver

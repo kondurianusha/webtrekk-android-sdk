@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.test.suitebuilder.annotation.Suppress;
 
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 /**
@@ -59,22 +60,16 @@ public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
 
     public void testTagIntegration()
     {
-        configTest(R.raw.webtrekk_config_tag_integration_test, "ThisIsLocalConfig", false);
+        configTest(R.raw.webtrekk_config_remote_test_tag_integration, "ThisIsLocalConfig", false);
 
     }
     private void configTest(int config, String textToCheck, boolean isForExistence)
     {
-        if (mWebtrekk.isInitialized())
-            return;
+        assertFalse(mWebtrekk.isInitialized());
         SharedPreferences sharedPrefs = HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext());
         sharedPrefs.edit().remove(Webtrekk.PREFERENCE_KEY_CONFIGURATION).apply();
 
         mWebtrekk.initWebtrekk(getActivity().getApplication(), config);
-
-        Intent newActivityIntent = new Intent(getActivity(), EmptyActivity.class);
-        newActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Activity newActivity = getInstrumentation().startActivitySync(newActivityIntent);
-
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
@@ -84,6 +79,7 @@ public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
         initWaitingForTrack(new Runnable() {
             @Override
             public void run() {
+                callStartActivity("com.Webtrekk.SDKTest.EmptyActivity", mWebtrekk);
                 mWebtrekk.track();
             }
         });
@@ -94,8 +90,5 @@ public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
           assertTrue(URL.contains(textToCheck));
         else
           assertFalse(URL.contains(textToCheck));
-
-
-        newActivity.finish();
     }
 }

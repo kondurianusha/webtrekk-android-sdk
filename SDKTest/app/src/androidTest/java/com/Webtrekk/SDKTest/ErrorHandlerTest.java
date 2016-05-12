@@ -54,6 +54,7 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActi
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        ActivityInstrumentationTestCase2Base.refreshWTInstance();
         URLReceiverRegister();
         mWebtrekk = Webtrekk.getInstance();
     }

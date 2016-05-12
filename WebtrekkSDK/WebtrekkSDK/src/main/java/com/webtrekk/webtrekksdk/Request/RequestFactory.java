@@ -513,8 +513,7 @@ public class RequestFactory {
                     //now map the string values from the xml/code tracking parameters to the custom values defined by webtrekk or the customer
                     if(mCustomParameter!= null) {
                         // first map the global tracking parameter
-                        mappedTrackingParameter.applyMapping(mCustomParameter);
-                        trackingParameter.add(mappedTrackingParameter);
+                        trackingParameter.add(mappedTrackingParameter.applyMapping(mCustomParameter));
                     }
                 }
                 // override the activityname if a mapping name is given

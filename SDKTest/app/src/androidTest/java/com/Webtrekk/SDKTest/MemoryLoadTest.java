@@ -62,7 +62,6 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<NoAutoT
 
     public void testLoadCPU()
     {
-
         Intent intent = new Intent(getActivity(), LoadOSService.class);
         intent.putExtra(LoadOSService.MODE, LoadOSService.Mode.LOAD_CPU.ordinal());
 
@@ -72,6 +71,7 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<NoAutoT
 
             @Override
             public void run() {
+                callStartActivity("com.Webtrekk.SDKTest.EmptyActivity", mWebtrekk);
                 mWebtrekk.track();
             }
         };

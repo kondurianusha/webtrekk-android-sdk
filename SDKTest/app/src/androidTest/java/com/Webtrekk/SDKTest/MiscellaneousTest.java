@@ -3,6 +3,7 @@ package com.Webtrekk.SDKTest;
 import android.app.Activity;
 import android.content.Intent;
 import android.provider.Settings;
+import android.test.suitebuilder.annotation.Suppress;
 
 import com.webtrekk.webtrekksdk.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter;
@@ -15,6 +16,7 @@ import java.util.UUID;
 /**
  * Created by vartbaronov on 26.04.16.
  */
+@Suppress
 public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoAutoTrackActivity> {
     private Webtrekk mWebtrekk;
     private final long oneMeg = 1024 * 1024;

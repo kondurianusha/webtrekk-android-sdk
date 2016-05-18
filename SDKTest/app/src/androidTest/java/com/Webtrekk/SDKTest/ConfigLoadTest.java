@@ -13,6 +13,7 @@ import com.webtrekk.webtrekksdk.Webtrekk;
 /**
  * Created by vartbaronov on 02.05.16.
  */
+@Suppress
 public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
     Webtrekk mWebtrekk;
 

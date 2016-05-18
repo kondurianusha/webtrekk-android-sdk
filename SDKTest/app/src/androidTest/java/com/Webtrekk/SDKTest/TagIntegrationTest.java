@@ -2,6 +2,7 @@ package com.Webtrekk.SDKTest;
 
 import android.content.Intent;
 import android.nfc.Tag;
+import android.test.suitebuilder.annotation.Suppress;
 
 import com.webtrekk.webtrekksdk.Webtrekk;
 
@@ -11,6 +12,7 @@ import java.lang.reflect.Field;
 /**
  * Created by vartbaronov on 11.05.16.
  */
+@Suppress
 public class TagIntegrationTest extends ActivityInstrumentationTestCase2Base<TagIntegrationActivity> {
     private Webtrekk mWebtrekk;
 

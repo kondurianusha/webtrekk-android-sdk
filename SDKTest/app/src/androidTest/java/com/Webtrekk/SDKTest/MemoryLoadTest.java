@@ -8,6 +8,7 @@ import com.webtrekk.webtrekksdk.Webtrekk;
 /**
  * Created by vartbaronov on 22.04.16.
  */
+@Suppress
 public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<NoAutoTrackActivity>  {
     private Webtrekk mWebtrekk;
     private final long oneMeg = 1024*1024;

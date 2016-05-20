@@ -157,4 +157,9 @@
 
         </activityTrackingParameter>
     </activity>
+    <activity>
+    <classname type="text">test.myapplication.OtherActivity</classname>
+        <autoTracked type="text">true</autoTracked>
+        <mappingname type="text">Startseite</mappingname>
+    </activity>
 </webtrekkConfiguration>

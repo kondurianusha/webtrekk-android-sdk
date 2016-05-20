@@ -13,13 +13,14 @@ import java.net.UnknownHostException;
 /**
  * this class sends the requests to the server
  * it handles just the networking tasks
+ * @hide
  */
 public class RequestProcessor implements Runnable {
 
     public static final int NETWORK_CONNECTION_TIMEOUT = 60 * 1000;  // 1 minute
     static final int NETWORK_READ_TIMEOUT = 60 * 1000;  // 1 minute
 
-    private final RequestUrlStore requestUrlStore;
+    private final RequestUrlStore mRequestUrlStore;
 
     public interface ProcessOutputCallback
     {
@@ -27,7 +28,7 @@ public class RequestProcessor implements Runnable {
     }
 
     public RequestProcessor(RequestUrlStore requestUrlStore) {
-        this.requestUrlStore = requestUrlStore;
+        mRequestUrlStore = requestUrlStore;
     }
 
     /**
@@ -114,29 +115,32 @@ public class RequestProcessor implements Runnable {
 
     @Override
     public void run() {
-        while (requestUrlStore.size() > 0) {
-            String urlString = requestUrlStore.get(0);
+        while (mRequestUrlStore.size() > 0) {
+            String urlString = mRequestUrlStore.peekLast();
             URL url = getUrl(urlString);
             if (url == null) {
-                WebtrekkLogging.log("Removing invalid URL '" + urlString + "' from queue. remaining: " + requestUrlStore.size());
-                this.requestUrlStore.remove(0);
+                WebtrekkLogging.log("Removing invalid URL '" + urlString + "' from queue. remaining: " + mRequestUrlStore.size());
+                mRequestUrlStore.removeLastURL();
                 continue;
             }
 
-            int statusCode = sendRequest(url, null);
-            if (statusCode >= 200 && statusCode <= 299) {
-                WebtrekkLogging.log("completed request. Status code:"+statusCode);
-                //successful send, remove url from store
-                this.requestUrlStore.remove(0);
-            } else if(statusCode == 0) {
-                // client side networking errors, just break and try again with next onSendintervalOver
-                break;
-            } else {
-                WebtrekkLogging.log("received status " + statusCode);
-                // all error codes above 400 will be removed, the 300 redirects should not occur
-                // if there are redirects on serverside this has to be changed
-                WebtrekkLogging.log("removing URL from queue because status code cannot be handled: ");
-                this.requestUrlStore.remove(0);
+            synchronized (mRequestUrlStore)
+            {
+                int statusCode = sendRequest(url, null);
+                if (statusCode >= 200 && statusCode <= 299) {
+                    WebtrekkLogging.log("completed request. Status code:"+statusCode);
+                    //successful send, remove url from store
+                    mRequestUrlStore.removeLastURL();
+                } else if(statusCode == 0) {
+                    // client side networking errors, just break and try again with next onSendintervalOver
+                    break;
+                } else {
+                    WebtrekkLogging.log("received status " + statusCode);
+                    // all error codes above 400 will be removed, the 300 redirects should not occur
+                    // if there are redirects on serverside this has to be changed
+                    WebtrekkLogging.log("removing URL from queue because status code cannot be handled: ");
+                    mRequestUrlStore.removeLastURL();
+            }
             }
         }
     }

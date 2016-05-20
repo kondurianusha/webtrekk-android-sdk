@@ -12,6 +12,10 @@
     <!--for mixpanel only-->
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
     <application
         android:name=".MyApplication"
         android:hardwareAccelerated="true"
@@ -78,10 +82,10 @@
             android:name=".EmptyActivity">
         </activity>
         <activity
-            android:name=".NoAutoTrackActivity">
+            android:name=".ThrowExceptionActivity">
         </activity>
         <activity
-            android:name=".ThrowExceptionActivity">
+            android:name=".SuspendActivity" android:launchMode="singleTop">
         </activity>
         <activity
             android:name=".TagIntegrationActivity">

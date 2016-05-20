@@ -14,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -21,8 +22,7 @@ import java.util.List;
  * it gets instantiated only once by the main webtrekk class
  */
 
-public class RequestUrlStore {
-    private ArrayList<String> requestList;
+public class RequestUrlStore extends LinkedList<String> {
     private int maximumRequests;
     private File requestStoreFile;
 
@@ -40,7 +40,7 @@ public class RequestUrlStore {
             throw new IllegalArgumentException("maximum requests must be greater than 0");
         }
         this.maximumRequests = maximumRequests;
-        requestList = new ArrayList<String>();
+        //requestList = new ArrayList<String>();
         // if the system is running low on storage, this file might be removed and the requests are lost
         // TODO: there are cleaner apps which delete cache files, this could be avoided when using the internal storage instead of cache
         requestStoreFile = new File(context.getCacheDir(), "wt-tracking-requests");
@@ -51,32 +51,16 @@ public class RequestUrlStore {
      *
      * @param requestUrl string representation of a tracking request
      */
-    public void add(String requestUrl) {
+    synchronized public void addURL(String requestUrl) {
         // if the maximumRequest number  is reached drop the oldest request
-        synchronized (requestList) {
-            if (size() >= maximumRequests) {
-                remove(0);
+      if (size() >= maximumRequests) {
+                removeLast();
             }
-        requestList.add(requestUrl);
-        }
+        addFirst(requestUrl);
     }
 
-    public String get(int index) {
-        return requestList.get(index);
-    }
-
-    public void remove(int index) {
-        synchronized (requestList) {
-            requestList.remove(index);
-        }
-    }
-
-    public int size() {
-        return requestList.size();
-    }
-
-    public void clear() {
-        requestList.clear();
+    synchronized public void removeLastURL() {
+            removeLast();
     }
 
     /**
@@ -92,7 +76,7 @@ public class RequestUrlStore {
             try {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    requestList.add(line);
+                    addURL(line);
                 }
             } finally {
                 reader.close();
@@ -114,18 +98,19 @@ public class RequestUrlStore {
         }
 
         // save remaining requests to the backup file
-        WebtrekkLogging.log("saveBackup: Saving backup of " + this.requestList.size() + " URLs.");
+        WebtrekkLogging.log("saveBackup: Saving backup of " + size() + " URLs.");
 
         try {
-            PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(requestStoreFile), "UTF-8")));
+            PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(requestStoreFile, true), "UTF-8")));
             try {
-                for (String url : this.requestList) {
+                for (String url : this) {
                     writer.println(url);
                 }
             }
             finally {
                 writer.close();
             }
+            clear();
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
@@ -153,13 +138,6 @@ public class RequestUrlStore {
 
     }
 
-    /**
-     * for unit testing only
-     * @return
-     */
-    List<String> getRequestList() {
-        return requestList;
-    }
     /**
      * for unit testing only
      * @return

@@ -33,7 +33,6 @@ public class RequestFactory {
     public static final String PREFERENCE_KEY_OPTED_OUT = "optedOut";
     public static final String PREFERENCE_KEY_IS_SAMPLING = "issampling";
     public static final String PREFERENCE_KEY_SAMPLING = "sampling";
-    private static final String TEST_ULR = "com.webtrekk.webtrekksdk.TEST_URL";
 
     private Context mContext;
     private TrackingConfiguration mTrackingConfiguration;
@@ -200,14 +199,19 @@ public class RequestFactory {
         if(mInternalParameter == null) {
             mInternalParameter = new TrackingParameter();
         }
-        // first initalization of the webtrekk instance, so set fns to 1
-        mInternalParameter.add(Parameter.FORCE_NEW_SESSION, "1");
+        forceNewSession();
         // if the app is started for the first time, the param "one" is 1 otherwise its always 0
         if(isFirstStart) {
             mInternalParameter.add(Parameter.APP_FIRST_START, "1");
         } else {
             mInternalParameter.add(Parameter.APP_FIRST_START, "0");
         }
+    }
+
+    public void forceNewSession()
+    {
+        // first initalization of the webtrekk instance, so set fns to 1
+        mInternalParameter.add(Parameter.FORCE_NEW_SESSION, "1");
     }
 
     /**
@@ -408,20 +412,30 @@ public class RequestFactory {
 
     public void onFirstStart()
     {
-        mRequestUrlStore.loadRequestsFromFile();
-        // remove the old backupfile after the requests are loaded into memory/requestUrlStore
-        mRequestUrlStore.deleteRequestsFile();
+        restore();
 
         //restart referrer getting if applicaiton was paused and resumed back
         if (Campaign.getFirstStartInitiated(mContext, false) && mCampaign == null)
             startAdvertizingThread(true);
     }
 
-    public void onLastStop()
+    public void stop()
     {
-        mRequestUrlStore.saveRequestsToFile();
+        flash();
         if (mCampaign != null)
             mCampaign.interrupt();
+    }
+
+    public void restore()
+    {
+        mRequestUrlStore.loadRequestsFromFile();
+        // remove the old backupfile after the requests are loaded into memory/requestUrlStore
+        mRequestUrlStore.deleteRequestsFile();
+    }
+
+    public void flash()
+    {
+        mRequestUrlStore.saveRequestsToFile();
     }
 
     /**
@@ -549,9 +563,7 @@ public class RequestFactory {
         if(!mIsOptout && !mIsSampling) {
             String urlString = request.getUrlString();
             WebtrekkLogging.log("adding url: " + urlString);
-            if (mTrackingConfiguration.isTestMode())
-                sendURLStringForTest(urlString);
-            mRequestUrlStore.add(request.getUrlString());
+            mRequestUrlStore.addURL(request.getUrlString());
         }
 
         // execute the after_request plugin functions
@@ -564,15 +576,6 @@ public class RequestFactory {
         mInternalParameter.add(Parameter.FORCE_NEW_SESSION, "0");
         mInternalParameter.add(Parameter.APP_FIRST_START, "0");
         mAutoCustomParameter.put("appUpdated", "0");
-    }
-
-    private void sendURLStringForTest(String url)
-    {
-        Intent intent = new Intent(TEST_ULR);
-
-        intent.putExtra("URL", url);
-
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     /**

@@ -12,7 +12,6 @@ import java.lang.reflect.Field;
 /**
  * Created by vartbaronov on 11.05.16.
  */
-@Suppress
 public class TagIntegrationTest extends ActivityInstrumentationTestCase2Base<TagIntegrationActivity> {
     private Webtrekk mWebtrekk;
 
@@ -25,6 +24,14 @@ public class TagIntegrationTest extends ActivityInstrumentationTestCase2Base<Tag
     protected void setUp() throws Exception {
         super.setUp();
         mWebtrekk = Webtrekk.getInstance();
+        getActivity();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        finishActivitySync(getActivity());
+        setActivity(null);
+        super.tearDown();
     }
 
     public void testTagIntegration()

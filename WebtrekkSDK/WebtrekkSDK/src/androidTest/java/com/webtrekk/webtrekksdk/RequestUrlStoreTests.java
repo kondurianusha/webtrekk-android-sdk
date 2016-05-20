@@ -33,7 +33,6 @@ public class RequestUrlStoreTests extends AndroidTestCase {
 
         requestUrlStore = new RequestUrlStore(getContext(), 100);
 
-        assertNotNull(requestUrlStore.getRequestList());
         assertNotNull(requestUrlStore.getRequestStoreFile());
 
     }
@@ -41,14 +40,14 @@ public class RequestUrlStoreTests extends AndroidTestCase {
     public void testAdd() {
         requestUrlStore = new RequestUrlStore(getContext(), 100);
         for(int i = 1; i<101; i++) {
-            requestUrlStore.add("url-" + i);
+            requestUrlStore.addURL("url-" + i);
         }
         assertEquals(100, requestUrlStore.size());
         // make sure the oldest requests gets dropped when more than maxrequest urls are added
-        requestUrlStore.add("url-101");
+        requestUrlStore.addURL("url-101");
         assertEquals(100, requestUrlStore.size());
         // the first is now url-2, url-1 got dropped
-        assertEquals("url-2", requestUrlStore.get(0));
+        assertEquals("url-2", requestUrlStore.peekLast());
 
     }
 
@@ -57,7 +56,7 @@ public class RequestUrlStoreTests extends AndroidTestCase {
         requestUrlStore = new RequestUrlStore(getContext(), 100);
         for(int i = 1; i<101; i++) {
             //test all valid url characters here to make sure there are no encoding problems
-            requestUrlStore.add("url-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=-" + i);
+            requestUrlStore.addURL("url-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=-" + i);
         }
 
         requestUrlStore.saveRequestsToFile();
@@ -73,7 +72,7 @@ public class RequestUrlStoreTests extends AndroidTestCase {
         requestUrlStore = new RequestUrlStore(getContext(), 100);
         for(int i = 1; i<101; i++) {
             //test all valid url characters here to make sure there are no encoding problems
-            requestUrlStore.add("url-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=-" + i);
+            requestUrlStore.addURL("url-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=-" + i);
         }
 
         requestUrlStore.saveRequestsToFile();

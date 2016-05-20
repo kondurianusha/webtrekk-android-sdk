@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.test.suitebuilder.annotation.Suppress;
 
+import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
@@ -13,10 +14,8 @@ import com.webtrekk.webtrekksdk.Webtrekk;
 /**
  * Created by vartbaronov on 02.05.16.
  */
-@Suppress
 public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
     Webtrekk mWebtrekk;
-
 
     public ConfigLoadTest(){
         super(EmptyActivity.class);
@@ -27,6 +26,17 @@ public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
     protected void setUp() throws Exception {
         super.setUp();
         mWebtrekk = Webtrekk.getInstance();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
+    //create to emulate fail for Jenkin test
+    public void testFail()
+    {
+        if (mIsExternalCall)
+            assertFalse(true);
     }
 
     public void testConfigOK()
@@ -70,9 +80,10 @@ public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
         SharedPreferences sharedPrefs = HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext());
         sharedPrefs.edit().remove(Webtrekk.PREFERENCE_KEY_CONFIGURATION).apply();
 
-        mWebtrekk.initWebtrekk(getActivity().getApplication(), config);
+        mWebtrekk.initWebtrekk(mApplication, config);
+        Activity activity = getActivity();
         try {
-            Thread.sleep(5000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -80,16 +91,17 @@ public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
         initWaitingForTrack(new Runnable() {
             @Override
             public void run() {
-                callStartActivity("com.Webtrekk.SDKTest.EmptyActivity", mWebtrekk);
                 mWebtrekk.track();
             }
         });
-
         // Assert is inside call below
         String URL = waitForTrackedURL();
         if (isForExistence)
           assertTrue(URL.contains(textToCheck));
         else
           assertFalse(URL.contains(textToCheck));
+
+        finishActivitySync(getActivity());
+        setActivity(null);
     }
 }

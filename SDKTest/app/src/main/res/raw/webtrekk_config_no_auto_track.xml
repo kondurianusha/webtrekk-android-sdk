@@ -14,7 +14,7 @@
     <!--trackDomain type="text">http://tracker-int-01.webtrekk.net</trackDomain-->
 
     <!--the webtrekk trackDomain where the requests are send -->
-    <trackDomain type="text">http://q3.webtrekk.net</trackDomain>
+    <trackDomain type="text">http://localhost:8080</trackDomain>
 
     <!--customers trackid-->
     <trackId type="text">123451234512345</trackId>
@@ -27,7 +27,7 @@
     <!-- measure only a subset of the users -->
     <sampling type="text">0</sampling>
     <!-- interval between the requests are send in seconds -->
-    <sendDelay type="text">30</sendDelay>
+    <sendDelay type="text">1</sendDelay>
     <!--maximum amoount of requests to store when the user is offline -->
     <maxRequests type="number">100</maxRequests>
 
@@ -181,6 +181,10 @@
 
     <activity>
         <classname type="text">com.Webtrekk.SDKTest.PageExampleActivity</classname>
+        <mappingname type="text">Seite</mappingname>
+    </activity>
+    <activity>
+        <classname type="text">com.Webtrekk.SDKTest.EmptyActivity</classname>
         <mappingname type="text">Seite</mappingname>
         <activityTrackingParameter>
             <parameter id="PAGE_URL">http://www.yandex.ru</parameter>

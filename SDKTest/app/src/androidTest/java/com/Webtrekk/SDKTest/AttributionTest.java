@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.suitebuilder.annotation.Suppress;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
@@ -14,6 +15,7 @@ import android.webkit.WebViewClient;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -22,7 +24,7 @@ import java.io.IOException;
 /**
  * Created by vartbaronov on 01.04.16.
  */
-public class AttributionTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<MainActivity> {
 
     volatile String mAdvID;
     private Context mContext;
@@ -37,25 +39,24 @@ public class AttributionTest extends ActivityInstrumentationTestCase2<MainActivi
 
 
     @Override
-
     protected void setUp()throws Exception{
         super.setUp();
     }
 
-    public void doTestAttributionRunLinkWithAdID()
+    public void testAttributionRunLinkWithAdID()
     {
         launchClickID("http://appinstall.webtrekk.net/appinstall/v1/redirect?mc="+MEDIA_CODE+"&trackid=&as1=market%3A//details%3Fid%3Dcom.Webtrekk.SDKTest&aid=", true);
     }
 
 
-    public void doTestAttributionRunLinkWithoutAdID()
+    public void testAttributionRunLinkWithoutAdID()
     {
         launchClickID("http://appinstall.webtrekk.net/appinstall/v1/redirect?mc="+MEDIA_CODE+"&trackid=&as1=market%3A//details%3Fid%3Dcom.Webtrekk.SDKTest", false);
     }
 
     private String[] getFileList(final String contains)
     {
-        return getActivity().getFilesDir().list(new FilenameFilter() {
+        return getInstrumentation().getTargetContext().getFilesDir().list(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String filename) {
                 return filename.contains(contains);
@@ -71,8 +72,11 @@ public class AttributionTest extends ActivityInstrumentationTestCase2<MainActivi
 
     private void launchClickID(String url, boolean useAdvID)
     {
+        if (!mIsExternalCall)
+            return;
 
-        String trackID = getActivity().getWebtrekk().getTrackId();
+        getActivity();
+        String trackID = Webtrekk.getInstance().getTrackId();
         url = url.replace("&trackid=", "&trackid="+trackID);
 
         if (useAdvID) {
@@ -102,7 +106,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2<MainActivi
 
                                              @Override
                                              public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                                 CDBUnitTest.URLParsel parcel = new CDBUnitTest.URLParsel();
+                                                 URLParsel parcel = new URLParsel();
 
                                                  parcel.parseURL(url);
                                                  String clickID = parcel.getValue("referrer").split("%3D")[1];
@@ -136,12 +140,17 @@ public class AttributionTest extends ActivityInstrumentationTestCase2<MainActivi
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        finishActivitySync(getActivity());
+        setActivity(null);
     }
 
     public void testAdID()
     {
+        if (!mIsExternalCall)
+            return;
         Object notifier = new Object();
-        mContext = getActivity();
+        mContext = getInstrumentation().getTargetContext();
 
         new Thread(new AdvIDReader(notifier)).start();
 
@@ -158,7 +167,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2<MainActivi
         assertNotNull(mAdvID);
 
 
-        File file = new File(getActivity().getFilesDir(), mAdvID+".adv");
+        File file = new File(getInstrumentation().getTargetContext().getFilesDir(), mAdvID+".adv");
 
         try {
             file.createNewFile();
@@ -204,9 +213,14 @@ public class AttributionTest extends ActivityInstrumentationTestCase2<MainActivi
         }
     }
 
-    public void doFirstStart()
+    public void testFirstStart()
     {
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mSDKReceiver,
+        if (!mIsExternalCall)
+            return;
+
+        Webtrekk.getInstance().initWebtrekk(mApplication);
+
+        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).registerReceiver(mSDKReceiver,
                 new IntentFilter("com.Webtrekk.CampainMediaMessage"));
 
         synchronized (mWaiter) {
@@ -217,7 +231,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2<MainActivi
                     e.printStackTrace();
                 }
         }
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mSDKReceiver);
+        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).unregisterReceiver(mSDKReceiver);
     }
 
     private BroadcastReceiver mSDKReceiver = new BroadcastReceiver() {

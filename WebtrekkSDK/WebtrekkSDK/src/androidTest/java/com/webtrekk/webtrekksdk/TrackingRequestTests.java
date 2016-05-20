@@ -1,5 +1,6 @@
 package com.webtrekk.webtrekksdk;
 
+import android.app.Activity;
 import android.test.AndroidTestCase;
 
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
@@ -7,6 +8,8 @@ import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 
 import java.util.HashMap;
+
+import static org.mockito.Mockito.mock;
 
 public class TrackingRequestTests extends AndroidTestCase {
     private TrackingParameter tp_activity_start;
@@ -208,7 +211,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         webtrekk.getRequestFactory().startAdvertizingThread(false);
         webtrekk.setCustomParameter(new HashMap<String, String>());
         try {
-            Thread.sleep(10000);
+            Thread.sleep(4000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -365,32 +368,5 @@ public class TrackingRequestTests extends AndroidTestCase {
         assertTrue(tr.mTrackingParameter.getDefaultParameter().containsKey(Parameter.USERAGENT));
         String url = tr.getUrlString();
         assertTrue(url, url.contains("X-WT-UA"));
-    }
-
-    public void testPageURLTest() {
-        Webtrekk wt = new Webtrekk();
-
-        //test URL page in configuration xml
-        wt.initWebtrekk(getContext());
-        wt.increaseActivityCounter();
-        wt.startActivity("test.myapplication.MainActivity", false);
-
-        TrackingParameter tp = new TrackingParameter();
-        TrackingRequest tr = wt.getRequestFactory().createTrackingRequest(tp);
-        assertTrue(tr.mTrackingParameter.getDefaultParameter().containsKey(Parameter.PAGE_URL));
-        assertTrue(tr.mTrackingParameter.getDefaultParameter().get(Parameter.PAGE_URL).equals("http://www.yandex.ru"));
-
-        //test URL page override by function
-        assertTrue(wt.setPageURL("http://wwww.google.com"));
-
-        tr = wt.getRequestFactory().createTrackingRequest(tp = new TrackingParameter());
-        assertTrue(tr.mTrackingParameter.getDefaultParameter().containsKey(Parameter.PAGE_URL));
-        assertEquals(tr.mTrackingParameter.getDefaultParameter().get(Parameter.PAGE_URL), "http://wwww.google.com");
-
-        //test URL page after activity is changed
-        wt.increaseActivityCounter();
-        wt.startActivity("test.myapplication.MainActivity2", false);
-        tr = wt.getRequestFactory().createTrackingRequest(tp = new TrackingParameter());
-        assertFalse(tr.mTrackingParameter.getDefaultParameter().containsKey(Parameter.PAGE_URL));
     }
 }

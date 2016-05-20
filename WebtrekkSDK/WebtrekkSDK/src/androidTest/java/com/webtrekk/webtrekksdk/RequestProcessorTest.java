@@ -37,92 +37,87 @@ public class RequestProcessorTest extends AndroidTestCase {
 
     public void testSingleValidUrlInStore() throws IOException {
         requestProcessor = spy(requestProcessor);
-        //requestUrlStore.add("http://nglab.org");
         when(requestUrlStore.size()).thenReturn(1).thenReturn(0);
         // test valid url first
-        when(requestUrlStore.get(0)).thenReturn("http://nglab.org");
+        when(requestUrlStore.peekLast()).thenReturn("http://nglab.org");
         HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
         when(mockHttpURLConnection.getResponseCode()).thenReturn(200);
         doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL) any());
         requestProcessor.run();
         // two times, first one returns the urlstring, second one is empty
-        verify(requestUrlStore, times(1)).get(anyInt());
+        verify(requestUrlStore, times(1)).peekLast();
         verify(mockHttpURLConnection, times(1)).connect();
         verify(mockHttpURLConnection, times(1)).getResponseCode();
-        verify(requestUrlStore, times(1)).remove(anyInt());
+        verify(requestUrlStore, times(1)).removeLastURL();
         verify(mockHttpURLConnection, times(1)).disconnect();
 
     }
 
     public void testMoreValidUrlInStore() throws IOException {
         requestProcessor = spy(requestProcessor);
-        //requestUrlStore.add("http://nglab.org");
         when(requestUrlStore.size()).thenReturn(2).thenReturn(1).thenReturn(0);
         // test valid url first
-        when(requestUrlStore.get(0)).thenReturn("http://nglab.org").thenReturn("http://nglab.org");
+        when(requestUrlStore.peekLast()).thenReturn("http://nglab.org").thenReturn("http://nglab.org");
         HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
         when(mockHttpURLConnection.getResponseCode()).thenReturn(200).thenReturn(200);
         doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL) any());
         requestProcessor.run();
         // two times, first one returns the urlstring, second one is empty
-        verify(requestUrlStore, times(2)).get(anyInt());
+        verify(requestUrlStore, times(2)).peekLast();
         verify(mockHttpURLConnection, times(2)).connect();
         verify(mockHttpURLConnection, times(2)).getResponseCode();
-        verify(requestUrlStore, times(2)).remove(anyInt());
+        verify(requestUrlStore, times(2)).removeLastURL();
         verify(mockHttpURLConnection, times(2)).disconnect();
     }
 
     public void testInvalidUrl() throws IOException {
         requestProcessor = spy(requestProcessor);
-        //requestUrlStore.add("http://nglab.org");
         when(requestUrlStore.size()).thenReturn(1).thenReturn(0);
         // test valid url first
-        when(requestUrlStore.get(0)).thenReturn("invalidurl");
+        when(requestUrlStore.peekLast()).thenReturn("invalidurl");
         HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
         when(mockHttpURLConnection.getResponseCode()).thenReturn(200);
         doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL) any());
         requestProcessor.run();
         // two times, first one returns the urlstring, second one is empty
-        verify(requestUrlStore, times(1)).get(anyInt());
+        verify(requestUrlStore, times(1)).peekLast();
         verify(mockHttpURLConnection, times(0)).connect();
         verify(mockHttpURLConnection, times(0)).getResponseCode();
-        verify(requestUrlStore, times(1)).remove(anyInt());
+        verify(requestUrlStore, times(1)).removeLastURL();
         verify(mockHttpURLConnection, times(0)).disconnect();
     }
 
     public void testClientSideError() throws IOException {
         requestProcessor = spy(requestProcessor);
-        //requestUrlStore.add("http://nglab.org");
         when(requestUrlStore.size()).thenReturn(1).thenReturn(0);
         // test valid url first
-        when(requestUrlStore.get(0)).thenReturn("http://nglab.org");
+        when(requestUrlStore.peekLast()).thenReturn("http://nglab.org");
         HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
         when(mockHttpURLConnection.getResponseCode()).thenReturn(0);
         doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL)any());
         requestProcessor.run();
         // two times, first one returns the urlstring, second one is empty
-        verify(requestUrlStore, times(1)).get(anyInt());
+        verify(requestUrlStore, times(1)).peekLast();
         verify(mockHttpURLConnection, times(1)).connect();
         verify(mockHttpURLConnection, times(1)).getResponseCode();
-        verify(requestUrlStore, times(0)).remove(anyInt());
+        verify(requestUrlStore, times(0)).removeLastURL();
         verify(mockHttpURLConnection, times(1)).disconnect();
     }
 
     public void testServerSideError() throws IOException {
         requestProcessor = spy(requestProcessor);
-        //requestUrlStore.add("http://nglab.org");
         when(requestUrlStore.size()).thenReturn(1).thenReturn(0);
         // test valid url first
-        when(requestUrlStore.get(0)).thenReturn("http://nglab.org");
+        when(requestUrlStore.peekLast()).thenReturn("http://nglab.org");
         HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
         when(mockHttpURLConnection.getResponseCode()).thenReturn(-1);
         doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL) any());
         requestProcessor.run();
         // two times, first one returns the urlstring, second one is empty
-        verify(requestUrlStore, times(1)).get(anyInt());
+        verify(requestUrlStore, times(1)).peekLast();
         verify(mockHttpURLConnection, times(1)).connect();
         verify(mockHttpURLConnection, times(1)).getResponseCode();
-        verify(requestUrlStore, times(1)).remove(anyInt());
+        verify(requestUrlStore, times(1)).removeLastURL();
         verify(mockHttpURLConnection, times(1)).disconnect();
     }
 

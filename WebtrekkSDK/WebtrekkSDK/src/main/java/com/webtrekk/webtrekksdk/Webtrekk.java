@@ -15,11 +15,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import com.webtrekk.webtrekksdk.Modules.Campaign;
 import com.webtrekk.webtrekksdk.Modules.ExceptionHandler;
 import com.webtrekk.webtrekksdk.Request.RequestFactory;
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Utils.ApplicationTrackingStatus;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
@@ -41,8 +41,8 @@ public class Webtrekk {
     final private RequestFactory mRequestFactory = new RequestFactory();
     private TrackingConfiguration trackingConfiguration;
 
-    //determins the number of currently running activitys
-    private int mActivityCount;
+    //application status definishion
+    private ApplicationTrackingStatus mApplicationStatus;
 
     private ScheduledExecutorService timerService;
     private ScheduledFuture<?> timerFuture;
@@ -51,7 +51,7 @@ public class Webtrekk {
 
     private Context mContext;
 
-    private TrackedActivityLifecycleCallbacks callbacks;
+    private TrackedActivityLifecycleCallbacks mCallbacks;
     private WebtrekkPushNotification mPushNotification;
     final private ExceptionHandler mExceptionHandler = new ExceptionHandler();
     private boolean mIsInitialized;
@@ -280,10 +280,10 @@ public class Webtrekk {
 //                autoTrack = true;
 //            }
 //        }
-        if(callbacks == null) {
+        if(mCallbacks == null) {
             WebtrekkLogging.log("enabling callbacks");
-            callbacks = new TrackedActivityLifecycleCallbacks(this);
-            app.registerActivityLifecycleCallbacks(callbacks);
+            mCallbacks = new TrackedActivityLifecycleCallbacks(this);
+            app.registerActivityLifecycleCallbacks(mCallbacks);
         }
     }
 
@@ -398,7 +398,7 @@ public class Webtrekk {
             WebtrekkLogging.log("webtrekk has not been initialized");
             return;
         }
-        if (mActivityCount == 0) {
+        if (mApplicationStatus.getCurrentStatus() == ApplicationTrackingStatus.STATUS.NO_ACTIVITY_IS_RUNNING) {
             WebtrekkLogging.log("no running activity, call startActivity first");
             return;
         }
@@ -482,28 +482,37 @@ public class Webtrekk {
 
     /**
      * this function is be called automatically by activity flow listener
-     * @param activityName a string containing the name of the activity
-     */
-    void startActivity(String activityName, boolean isRecreationStart) {
+     * @hide
+     * */
+    void startActivity() {
         if (mRequestFactory.getRequestUrlStore() == null || trackingConfiguration == null) {
             throw new IllegalStateException("webtrekk has not been initialized");
         }
 
         //reset page URL if activity is changed
-        if (!isRecreationStart) {
+        if (!mApplicationStatus.isRecreationInProgress()) {
             resetPageURLTrack();
-            mRequestFactory.setCurrentActivityName(activityName);
+            mRequestFactory.setCurrentActivityName(mApplicationStatus.getCurrentActivityName());
         }
 
-        if(mActivityCount == 1 && !isRecreationStart) {
+        if(mApplicationStatus.getCurrentStatus() == ApplicationTrackingStatus.STATUS.FIRST_ACTIVITY_STARTED) {
             onFirstActivityStart();
         }
+
+        // track only if it isn't in backgound and session timeout isn't passed
+        if (mApplicationStatus.getCurrentStatus() == ApplicationTrackingStatus.STATUS.RETURNINIG_FROM_BACKGROUND){
+            if (mApplicationStatus.inactivityApplicaitonTime() > trackingConfiguration.getResendOnStartEventTime())
+                mRequestFactory.forceNewSession();
+             mRequestFactory.restore();
+        }
+
+        autoTrackActivity();
     }
 
     /**
      * this method gets called when the first activity of the application has started
      * it loads the old requests from the backupfile and trys to send them
-     *
+     *@hide
      */
     private void onFirstActivityStart() {
         mRequestFactory.onFirstStart();
@@ -513,6 +522,7 @@ public class Webtrekk {
     /**
      * this function is be called automatically by activity flow listener
      * open activities and knows when to exit
+     * @hide
      */
     void stopActivity() {
         if (mRequestFactory.getRequestUrlStore() == null || trackingConfiguration == null) {
@@ -521,28 +531,45 @@ public class Webtrekk {
 
         //always clear the current activities custom parameter
         mRequestFactory.clearCustomParameters();
-        if(mActivityCount == 0) {
-            onLastActivityStop();
+
+        switch (mApplicationStatus.getCurrentStatus())
+        {
+            case SHUT_DOWNING:
+                stop();
+                break;
+            case GOING_TO_BACKGROUND:
+                flash();
+                break;
         }
     }
 
     /**
-     * this method gets called when the last activtiy closes, it trys so send the remaining requests
-     * and store the rest if sending fails
+     * @hide
+     * Is called when activity is destroyed to double check that queries are saved and threads are stopped
+     * as in some cases stop isn't called during application showt down.
      */
-    private void onLastActivityStop() {
-        onSendIntervalOver();
-        mRequestFactory.onLastStop();
+    void destroy()
+    {
+        if(mApplicationStatus.getCurrentStatus() == ApplicationTrackingStatus.STATUS.SHUT_DOWNING) {
+            stop();
+        }
     }
 
-    void decreaseActivityCounter()
-    {
-        mActivityCount--;
+    /**
+     * this method gets called when application is going to be closed
+     * it stores all requests to file and stop threads.
+     * @hide
+     */
+    void stop() {
+        mRequestFactory.stop();
     }
 
-    void increaseActivityCounter()
-    {
-        mActivityCount++;
+    /**
+     * this method gets called when application is going to background
+     * it stores all requests to file.
+     */
+    private void flash() {
+        mRequestFactory.flash();
     }
 
     /**
@@ -550,7 +577,7 @@ public class Webtrekk {
      * new thread
      */
     void onSendIntervalOver() {
-        WebtrekkLogging.log("onSendIntervalOver: activity count: " + mActivityCount + " request urls: " + mRequestFactory.getRequestUrlStore().size());
+        WebtrekkLogging.log("onSendIntervalOver: activity count: " + mApplicationStatus.getCurrentActivitiesCount() + " request urls: " + mRequestFactory.getRequestUrlStore().size());
         if(mRequestFactory.getRequestUrlStore().size() > 0  && (requestProcessorFuture == null || requestProcessorFuture.isDone())) {
             if (executorService == null) {
                 executorService = Executors.newSingleThreadExecutor();
@@ -700,12 +727,17 @@ public class Webtrekk {
         HelperFunctions.setDeepLinkMediaCode(mContext, mediaCode);
     }
 
+    void setApplicationStatus(ApplicationTrackingStatus applicationStatus) {
+        mApplicationStatus = applicationStatus;
+    }
+
     /**
      * for unit testing only
+     * @hide
      * @return
      */
     int getActivityCount() {
-        return mActivityCount;
+        return mApplicationStatus.getCurrentActivitiesCount();
     }
     /**
      * for unit testing only

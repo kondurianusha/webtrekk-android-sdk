@@ -8,14 +8,13 @@ import com.webtrekk.webtrekksdk.Webtrekk;
 /**
  * Created by vartbaronov on 22.04.16.
  */
-@Suppress
-public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<NoAutoTrackActivity>  {
+public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<EmptyActivity>  {
     private Webtrekk mWebtrekk;
     private final long oneMeg = 1024*1024;
 
 
     public MemoryLoadTest() {
-        super(NoAutoTrackActivity.class);
+        super(EmptyActivity.class);
     }
 
     @Override
@@ -24,8 +23,8 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<NoAutoT
         super.setUp();
 
         mWebtrekk = Webtrekk.getInstance();
-        mWebtrekk.initWebtrekk(getActivity());
-
+        mWebtrekk.initWebtrekk(mApplication);
+        getActivity();
 /*
         ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
         ActivityManager activityManager = (ActivityManager)getActivity().getSystemService(getActivity().ACTIVITY_SERVICE);
@@ -39,6 +38,14 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<NoAutoT
         Log.d(getClass().getName(),"current threshold value:"+mi.threshold/oneMeg);
 */
     }
+
+    @Override
+    public void tearDown() throws Exception {
+        finishActivitySync(getActivity());
+        setActivity(null);
+        super.tearDown();
+    }
+
     @Suppress
     public void testLoadMemory()
     {
@@ -63,16 +70,15 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<NoAutoT
 
     public void testLoadCPU()
     {
-        Intent intent = new Intent(getActivity(), LoadOSService.class);
+        Intent intent = new Intent(getInstrumentation().getTargetContext(), LoadOSService.class);
         intent.putExtra(LoadOSService.MODE, LoadOSService.Mode.LOAD_CPU.ordinal());
 
-        getActivity().startService(intent);
+        getInstrumentation().getTargetContext().startService(intent);
 
         Runnable runnableTrackOnly = new Runnable(){
 
             @Override
             public void run() {
-                callStartActivity("com.Webtrekk.SDKTest.EmptyActivity", mWebtrekk);
                 mWebtrekk.track();
             }
         };
@@ -87,6 +93,6 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<NoAutoT
             }
         }
 
-        getActivity().stopService(intent);
+        getInstrumentation().getTargetContext().stopService(intent);
     }
 }

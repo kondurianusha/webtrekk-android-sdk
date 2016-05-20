@@ -93,24 +93,4 @@ public class SuspendTest extends ActivityInstrumentationTestCase2Base<SuspendAct
         mWaitMilliseconds = 20000;
         waitForTrackedURLs();
     }
-
-    public void testAfterGoBackground()
-    {
-        if (!mIsExternalCall)
-            return;
-
-        int messageReceived = getMessageReceivedNumber(HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext()));
-
-        WebtrekkLogging.log("Backgroud test. Wait for message number:"+ (MESSAGES_NUMBER - messageReceived));
-
-        initWaitingForTrack(new Runnable() {
-                                @Override
-                                public void run() {
-
-                                }
-                            }, MESSAGES_NUMBER - messageReceived);
-
-        mWaitMilliseconds = 20000;
-        waitForTrackedURLs();
-    }
 }

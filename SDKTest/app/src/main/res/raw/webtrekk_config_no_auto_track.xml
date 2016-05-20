@@ -108,6 +108,8 @@
         </sessionParameter>
         <ecomParameter>
             <parameter id="1">test_ecomparam1</parameter>
+            <parameter id="100" key="advertiserId"/>
+            <parameter id="200" key="advertisingOptOut"/>
         </ecomParameter>
         <userCategories>
             <parameter key="1">test_usercategory1</parameter>

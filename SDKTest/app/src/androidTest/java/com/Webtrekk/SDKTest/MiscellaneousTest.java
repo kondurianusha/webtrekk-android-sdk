@@ -9,6 +9,8 @@ import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
+import java.util.HashMap;
+
 /**
  * Created by vartbaronov on 26.04.16.
  */
@@ -251,6 +253,24 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         parcel.parseURL(URL);
         assertEquals(valueToTest, parcel.getValue("pu"));
+    }
+
+    public void testAutoAdvertiserId() {
+        //test URL page in configuration xml
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.track();
+            }
+        });
+
+        String URL = waitForTrackedURL();
+
+        URLParsel parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+        assertFalse(parcel.getValue("cb100").isEmpty());
+        assertEquals("false", parcel.getValue("cb200"));
     }
 
 

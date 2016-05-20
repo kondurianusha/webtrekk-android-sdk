@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.suitebuilder.annotation.Suppress;
 import android.util.Log;
 
 import com.webtrekk.webtrekksdk.Webtrekk;
@@ -19,97 +20,37 @@ import java.util.regex.Pattern;
 /**
  * Created by vartbaronov on 31.03.16.
  */
-public class CDBUnitTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class CDBUnitTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
 
-    volatile private String mSendedURL;
-    volatile private int mTestCycleID;
-    private boolean mIsWaitForResult;
+    private int mTestCycleID;
 
     public CDBUnitTest() {
-        super(MainActivity.class);
+        super(EmptyActivity.class);
     }
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
-
-        URLReceiverRegister();
     }
 
     @Override
-    protected void tearDown() throws Exception {
-        URLReceiverUnRegister();
+    public void tearDown() throws Exception {
         super.tearDown();
     }
 
     public void testCDB()
     {
-        mTestCycleID = 0;
-        doCDBTest();
-    }
-
-    private BroadcastReceiver mURLReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (mIsWaitForResult) {
-                mSendedURL = intent.getStringExtra("URL");
-                processResult();
-                if (++mTestCycleID < mCycleTestArr.length) {
-                    doCDBTest();
-                } else
-                    addTextToConsole("End of test\n");
-            }
+        for (mTestCycleID = 0; mTestCycleID < 9; mTestCycleID++) {
+            doCDBTest();
+            String url = waitForTrackedURL();
+            processResult(url);
         }
-    };
-
-    /**
-     * This is just for testing. To receive Campain installation data
-     */
-    private void URLReceiverRegister()
-    {
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mURLReceiver,
-                new IntentFilter("com.webtrekk.webtrekksdk.TEST_URL"));
-    }
-
-    /**
-     * This is just for testing. To receive Campain installation data
-     */
-    private void URLReceiverUnRegister()
-    {
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mURLReceiver);
     }
 
     private void addTextToConsole(String text)
     {
         Log.d("CDB Unit test", text);
     }
-
-    static class URLParsel
-    {
-        final private Map<String, String> mMap = new HashMap<String, String>();
-        public static String URLKEY = "MAIN_URL_KEY";
-
-        public void parseURL(String url)
-        {
-            Pattern pattern = Pattern.compile("([^?&]+)");
-            Matcher matcher = pattern.matcher(url);
-
-            matcher.find();
-            mMap.put(URLKEY, matcher.group());
-            while (matcher.find())
-            {
-                final String parValue[] = matcher.group().split("=");
-
-                mMap.put(parValue[0], parValue[1]);
-            }
-        }
-
-        public String getValue(String key)
-        {
-            return  mMap.get(key);
-        }
-    }
-
 
     final String[] mParametersName = {
             //0, 1, 2, 3, 4, 5
@@ -196,74 +137,104 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2<MainActivity> 
     private void doCDBTest()
     {
 
-        Webtrekk webtrekk = getActivity().getWebtrekk();
+        final Webtrekk webtrekk = Webtrekk.getInstance();
 
         if (mTestCycleID == 0)
             addTextToConsole("Start CDB test.........................\n");
 
         addTextToConsole("Start test cycle "+mTestCycleID+"..............................\n");
-
-        mSendedURL = null;
+        webtrekk.initWebtrekk(mApplication);
+        Runnable runnalble = null;
 
         switch (mTestCycleID)
         {
             case 0:
-                webtrekk.track(new WebtrekkUserParameters().
-                        setEmail(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
-                        setPhone(mParametersValue[mCycleTestArr[mTestCycleID][1]]).
-                        setAddress(mParametersValue[mCycleTestArr[mTestCycleID][2]]).
-                        setAndroidId(mParametersValue[mCycleTestArr[mTestCycleID][3]]).
-                        setiOSId(mParametersValue[mCycleTestArr[mTestCycleID][4]]).
-                        setWindowsId(mParametersValue[mCycleTestArr[mTestCycleID][5]]).
-                        setFacebookID(mParametersValue[mCycleTestArr[mTestCycleID][6]]).
-                        setTwitterID(mParametersValue[mCycleTestArr[mTestCycleID][7]]).
-                        setGooglePlusID(mParametersValue[mCycleTestArr[mTestCycleID][8]]).
-                        setLiknedInID(mParametersValue[mCycleTestArr[mTestCycleID][9]]).
-                        setCustom(1, mParametersValue[mCycleTestArr[mTestCycleID][10]]));
+                runnalble = new Runnable() {
+                    @Override
+                    public void run() {
+                        webtrekk.track(new WebtrekkUserParameters().
+                                setEmail(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
+                                setPhone(mParametersValue[mCycleTestArr[mTestCycleID][1]]).
+                                setAddress(mParametersValue[mCycleTestArr[mTestCycleID][2]]).
+                                setAndroidId(mParametersValue[mCycleTestArr[mTestCycleID][3]]).
+                                setiOSId(mParametersValue[mCycleTestArr[mTestCycleID][4]]).
+                                setWindowsId(mParametersValue[mCycleTestArr[mTestCycleID][5]]).
+                                setFacebookID(mParametersValue[mCycleTestArr[mTestCycleID][6]]).
+                                setTwitterID(mParametersValue[mCycleTestArr[mTestCycleID][7]]).
+                                setGooglePlusID(mParametersValue[mCycleTestArr[mTestCycleID][8]]).
+                                setLiknedInID(mParametersValue[mCycleTestArr[mTestCycleID][9]]).
+                                setCustom(1, mParametersValue[mCycleTestArr[mTestCycleID][10]]));
+                    }
+                };
                 break;
             case 1:
             case 2:
             case 3:
-                webtrekk.track(new WebtrekkUserParameters().
-                        setEmail(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
-                        setPhone(mParametersValue[mCycleTestArr[mTestCycleID][1]]).
-                        setAddress(mParametersValue[mCycleTestArr[mTestCycleID][2]]));
+                runnalble = new Runnable() {
+                    @Override
+                    public void run() {
+                        webtrekk.track(new WebtrekkUserParameters().
+                                setEmail(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
+                                setPhone(mParametersValue[mCycleTestArr[mTestCycleID][1]]).
+                                setAddress(mParametersValue[mCycleTestArr[mTestCycleID][2]]));
+                    }
+                };
                 break;
             case 4:
-                webtrekk.track(new WebtrekkUserParameters().
-                        setEmailMD5(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
-                        setEmailSHA256(mParametersValue[mCycleTestArr[mTestCycleID][1]]).
-                        setPhone(mParametersValue[mCycleTestArr[mTestCycleID][2]]).
-                        setAddress(mParametersValue[mCycleTestArr[mTestCycleID][3]]));
+                runnalble = new Runnable() {
+                    @Override
+                    public void run() {
+                        webtrekk.track(new WebtrekkUserParameters().
+                                setEmailMD5(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
+                                setEmailSHA256(mParametersValue[mCycleTestArr[mTestCycleID][1]]).
+                                setPhone(mParametersValue[mCycleTestArr[mTestCycleID][2]]).
+                                setAddress(mParametersValue[mCycleTestArr[mTestCycleID][3]]));
+                    }
+                };
                 break;
             case 5:
-                webtrekk.track(new WebtrekkUserParameters().
-                        setPhoneMD5(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
-                        setPhoneSHA256(mParametersValue[mCycleTestArr[mTestCycleID][1]]).
-                        setAddress(mParametersValue[mCycleTestArr[mTestCycleID][2]]));
+                runnalble = new Runnable() {
+                    @Override
+                    public void run() {
+                        webtrekk.track(new WebtrekkUserParameters().
+                                setPhoneMD5(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
+                                setPhoneSHA256(mParametersValue[mCycleTestArr[mTestCycleID][1]]).
+                                setAddress(mParametersValue[mCycleTestArr[mTestCycleID][2]]));
+                    }
+                };
                 break;
             case 6:
             case 7:
-                webtrekk.track(new WebtrekkUserParameters().
-                        setAddress(mParametersValue[mCycleTestArr[mTestCycleID][0]]));
+                runnalble = new Runnable() {
+                    @Override
+                    public void run() {
+                        webtrekk.track(new WebtrekkUserParameters().
+                                setAddress(mParametersValue[mCycleTestArr[mTestCycleID][0]]));
+                    }
+                };
                 break;
             case 8:
-                webtrekk.track(new WebtrekkUserParameters().
-                        setAddressMD5(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
-                        setAddressSHA256(mParametersValue[mCycleTestArr[mTestCycleID][1]]));
+                runnalble = new Runnable() {
+                    @Override
+                    public void run() {
+                        webtrekk.track(new WebtrekkUserParameters().
+                                setAddressMD5(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
+                                setAddressSHA256(mParametersValue[mCycleTestArr[mTestCycleID][1]]));
+                    }
+                };
                 break;
         }
 
-        addTextToConsole("Wait for result....\n");
-        mIsWaitForResult = true;
+        initWaitingForTrack(runnalble);
 
+        addTextToConsole("Wait for result....\n");
     }
 
-    private void processResult()
+    private void processResult(String result)
     {
         URLParsel parcel = new URLParsel();
 
-        parcel.parseURL(mSendedURL);
+        parcel.parseURL(result);
 
         for (int value: mCycleTestArr[mTestCycleID])
         {
@@ -291,8 +262,6 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2<MainActivity> 
                 parcel.getValue(mdKey), mdValue);
             }
         }
-
-        mIsWaitForResult = false;
     }
 
 }

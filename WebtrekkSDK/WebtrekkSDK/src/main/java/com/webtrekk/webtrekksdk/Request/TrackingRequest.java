@@ -109,7 +109,8 @@ public class TrackingRequest {
     {
         if (!map.isEmpty()) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                url.append(sufix + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
+                if (entry.getValue() != null)
+                   url.append(sufix + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
             }
         }
     }

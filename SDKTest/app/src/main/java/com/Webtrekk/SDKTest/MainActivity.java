@@ -15,19 +15,34 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
 import com.webtrekk.webtrekksdk.Webtrekk;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
+import java.io.IOException;
 
 
 public class MainActivity extends Activity {
     private Webtrekk webtrekk;
+    private HttpServer mHttpServer;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        try {
+            mHttpServer = new HttpServer();
+            mHttpServer.setContext(getApplicationContext());
+            mHttpServer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         setContentView(R.layout.activity_main);
+
 
         mediaCodeReceiverRegister();
 
@@ -47,8 +62,9 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
+        mHttpServer.stop();
     }
 
 

@@ -4,8 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.InstrumentationTestRunner;
 
 import com.webtrekk.webtrekksdk.Modules.ExceptionHandler;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
@@ -17,93 +19,44 @@ import java.util.List;
 /**
  * Created by vartbaronov on 14.04.16.
  */
-public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActivity> {
+public class ErrorHandlerTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
 
     Webtrekk mWebtrekk;
-    volatile List<String> mSendedURLArray = new ArrayList<String>();
-    volatile boolean mStringReceived;
-    final Object mSynchronize = new Object();
-    int mStringNumbersToWait = 1;
-
-    private BroadcastReceiver mURLReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            mSendedURLArray.add(intent.getStringExtra("URL"));
-
-            if (mStringNumbersToWait == mSendedURLArray.size()) {
-                mStringReceived = true;
-                synchronized (mSynchronize) {
-                    mSynchronize.notifyAll();
-                }
-            }
-            }
-    };
-
 
     public ErrorHandlerTest(){
         super(EmptyActivity.class);
+        mIsErrorHandlerTest = true;
     }
-
-    private void URLReceiverRegister()
-        {
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mURLReceiver,
-                new IntentFilter("com.webtrekk.webtrekksdk.TEST_URL"));
-        }
-
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        ActivityInstrumentationTestCase2Base.refreshWTInstance();
-        URLReceiverRegister();
         mWebtrekk = Webtrekk.getInstance();
     }
 
     @Override
     public void tearDown() throws Exception {
-        URLReceiverUnRegister();
         super.tearDown();
     }
 
-    private void URLReceiverUnRegister()
-    {
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mURLReceiver);
-    }
-
-
     public void testCatchedError()
     {
+        deleteErrorHandlerFile(mApplication);
+        mWebtrekk.initWebtrekk(mApplication);
 
-        mSendedURLArray.clear();
-        mStringReceived = false;
-        mStringNumbersToWait = 1;
-
-        new Thread(new Runnable() {
+        initWaitingForTrack(new Runnable() {
             @Override
             public void run() {
                 String s = null;
-                mWebtrekk.initWebtrekk(getActivity().getApplication());
-
                 try {
                     s.length();
                 } catch (NullPointerException e) {
                     mWebtrekk.trackException(e);
                 }
             }
-        }).start();
+        });
 
-        synchronized (mSynchronize) {
-            while (!mStringReceived) {
-                try {
-                    mSynchronize.wait(10000);
-                } catch (InterruptedException e) {
-                    assertTrue(false);
-                }
-                assertTrue(mStringReceived);
-            }
-        }
-
-        String URL = mSendedURLArray.get(0);
+        String URL = waitForTrackedURL();
 
         URLParsel parcel = new URLParsel();
         parcel.parseURL(URL);
@@ -113,37 +66,22 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActi
         assertEquals(parcel.getValue("ck910"), "2");
         assertEquals(parcel.getValue("ck911"), "java.lang.NullPointerException");
         assertEquals(parcel.getValue("ck912"), "Attempt+to+invoke+virtual+method+%27int+java.lang.String.length%28%29%27+on+a+null+object+reference");
-        assertEquals(getNormString(parcel.getValue("ck914")), "com.Webtrekk.SDKTest.ErrorHandlerTest%242.run%28ErrorHandlerTest.java%3A%29%7Cjava.lang.Thread.run%28Thread.java%29");
+        assertEquals(getNormString(parcel.getValue("ck914")), "com.Webtrekk.SDKTest.ErrorHandlerTest%241.run%28ErrorHandlerTest.java%3A%29%7Cjava.lang.Thread.run%28Thread.java%29");
     }
 
     public void testInfoError()
     {
-
-        mSendedURLArray.clear();
-        mStringReceived = false;
-        mStringNumbersToWait = 1;
-
-        new Thread(new Runnable() {
+        deleteErrorHandlerFile(mApplication);
+        mWebtrekk.initWebtrekk(mApplication);
+        initWaitingForTrack(new Runnable() {
             @Override
             public void run() {
-                mWebtrekk.initWebtrekk(getActivity().getApplication());
 
                 mWebtrekk.trackException("nameEx", "messsage Ex");
             }
-        }).start();
+        });
 
-        synchronized (mSynchronize) {
-            while (!mStringReceived) {
-                try {
-                    mSynchronize.wait(10000);
-                } catch (InterruptedException e) {
-                    assertTrue(false);
-                }
-                assertTrue(mStringReceived);
-            }
-        }
-
-        String URL = mSendedURLArray.get(0);
+        String URL = waitForTrackedURL();
         URL = URL.substring(URL.indexOf("ct=webtrekk_ignore"), URL.length());
         assertEquals(URL, "ct=webtrekk_ignore&ck910=3&ck911=nameEx&ck912=messsage+Ex&eor=1");
         assertTrue(URL.contains("ct=webtrekk_ignore"));
@@ -161,33 +99,26 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2<EmptyActi
 
     private void internalTestFatalComplete(int errorNumbers)
     {
-        mSendedURLArray.clear();
-        mStringReceived = false;
         mStringNumbersToWait = errorNumbers;
 
-        if (Thread.getDefaultUncaughtExceptionHandler() instanceof ExceptionHandler)
+        if (!mIsExternalCall)
             return;
 
-        mWebtrekk.initWebtrekk(getActivity().getApplication());
-
-        synchronized (mSynchronize) {
-            while (!mStringReceived) {
-                try {
-                    mSynchronize.wait(10000);
-                } catch (InterruptedException e) {
-                    assertTrue(false);
-                }
-                assertTrue(mStringReceived);
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.initWebtrekk(mApplication);
             }
-        }
+        }, errorNumbers);
 
-        assertEquals(mSendedURLArray.size(), errorNumbers);
+        List<String> URL = waitForTrackedURLs();
+        assertEquals(URL.size(), errorNumbers);
 
 
-        for (int i = 0 ; i < mSendedURLArray.size(); i++)
+        for (int i = 0 ; i < URL.size(); i++)
         {
             URLParsel parcel = new URLParsel();
-            parcel.parseURL(mSendedURLArray.get(i));
+            parcel.parseURL(URL.get(i));
 
             assertEquals(parcel.getValue("ct"), "webtrekk_ignore");
             assertTrue(HelperFunctions.urlDecode(parcel.getValue("ck911")).length() <= 255);

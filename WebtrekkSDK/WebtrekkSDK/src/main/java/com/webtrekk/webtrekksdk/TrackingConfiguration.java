@@ -78,7 +78,7 @@ public class TrackingConfiguration {
     public boolean validateConfiguration() {
         //TODO: implement validation rules
         boolean valid = true;
-        if(sendDelay < 10) {
+        if(sendDelay < 10 && !mTestMode) {
             WebtrekkLogging.log("invalid sendDelay Value");
             valid = false;
         }

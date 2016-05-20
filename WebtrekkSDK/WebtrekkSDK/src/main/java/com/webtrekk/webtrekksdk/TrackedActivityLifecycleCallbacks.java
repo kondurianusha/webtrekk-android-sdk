@@ -4,78 +4,55 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+import com.webtrekk.webtrekksdk.Utils.ApplicationTrackingStatus;
 
 /**
  * this class provides global functions to override the activitylivecycle callbacks
  * it calls the original function but also sends a track request before
+ * @hide
  */
 class TrackedActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
-    private Webtrekk webtrekk;
+    final private Webtrekk mWebtrekk;
+    private final ApplicationTrackingStatus mApplicationStatus = new ApplicationTrackingStatus();
     // timestamp when the last request was send, this is usefull for resending onStart track events
-    long lastRequestTimestamp;
-    boolean isPaused;
-    boolean mIsRecreationStart;
 
     public TrackedActivityLifecycleCallbacks(Webtrekk webtrekk) {
-        this.webtrekk = webtrekk;
-        isPaused = false;
+        mWebtrekk = webtrekk;
+        mWebtrekk.setApplicationStatus(mApplicationStatus);
     }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            webtrekk.increaseActivityCounter();
-        }else
-            mIsRecreationStart = true;
+        mApplicationStatus.onActivityCreated(activity, savedInstanceState);
     }
 
     @Override
     public void onActivityDestroyed(Activity activity) {
+        mApplicationStatus.onActivityDestroyed(activity);
+        mWebtrekk.destroy();
     }
     @Override
     public void onActivityPaused(Activity activity) {
-        WebtrekkLogging.log("Tracking Activity Paused: " + activity.getClass().getName());
-        // this means the application is no longer in the foreground so save timestamp when this happened
-        lastRequestTimestamp = System.currentTimeMillis();
-        isPaused = true;
+        mApplicationStatus.onActivityPaused(activity);
     }
     @Override
     public void onActivityResumed(Activity activity) {
-        WebtrekkLogging.log("Tracking Activity Resumed: " + activity.getClass().getName());
-        if(isPaused) {
-            if((System.currentTimeMillis() - lastRequestTimestamp)/1000 > webtrekk.getTrackingConfiguration().getResendOnStartEventTime()) {
-                // in this case more than resendOnStartEventTime seconds have passed since the last request, so send the onStart Event again
-                webtrekk.autoTrackActivity();
-            }
-            isPaused = false;
-        }
+        mApplicationStatus.onActivityResumed(activity);
     }
     @Override
     public void onActivitySaveInstanceState (Activity activity, Bundle outState) {
+        mApplicationStatus.onActivitySaveInstanceState(activity, outState);
     }
     @Override
     public void onActivityStarted(Activity activity) {
-        WebtrekkLogging.log("Tracking Activity started: " + activity.getClass().getName());
-
-        //Increaase activity counter for first activity
-        if (webtrekk.getActivityCount() == 0)
-            webtrekk.increaseActivityCounter();
-
-        webtrekk.startActivity(activity.getClass().getName(), mIsRecreationStart);
-        //reset recreation start
-        mIsRecreationStart = false;
-        webtrekk.autoTrackActivity();
+        mApplicationStatus.onActivityStarted(activity);
+        mWebtrekk.startActivity();
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
-        WebtrekkLogging.log("Tracking Activity stopped: " + activity.getClass().getName());
-
-        if (activity.isFinishing())
-            webtrekk.decreaseActivityCounter();
-
-        webtrekk.stopActivity();
+        mApplicationStatus.onActivityStopped(activity);
+        mWebtrekk.stopActivity();
     }
 }

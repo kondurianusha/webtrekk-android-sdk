@@ -11,12 +11,12 @@ adb install app/build/outputs/apk/app-debug-androidTest-unaligned.apk
  if  [ "${1}" = "yes" ];
     then
       echo "set advID"
-      adb shell am instrument -w -e class com.Webtrekk.SDKTest.AttributionTest#testAdID com.Webtrekk.SDKTest.test/android.test.InstrumentationTestRunner
+      adb shell am instrument -w -e external yes -e class com.Webtrekk.SDKTest.AttributionTest#testAdID com.Webtrekk.SDKTest.test/android.test.InstrumentationTestRunner
       echo "Do redirect request and set clickID with advID"
-      adb shell am instrument -w -e class com.Webtrekk.SDKTest.AttributionTest#doTestAttributionRunLinkWithAdID com.Webtrekk.SDKTest.test/android.test.InstrumentationTestRunner
+      adb shell am instrument -w -e external yes -e class com.Webtrekk.SDKTest.AttributionTest#testAttributionRunLinkWithAdID com.Webtrekk.SDKTest.test/android.test.InstrumentationTestRunner
     else
       echo "Do redirect request and set clickID without advID"
-      adb shell am instrument -w -e class com.Webtrekk.SDKTest.AttributionTest#doTestAttributionRunLinkWithoutAdID com.Webtrekk.SDKTest.test/android.test.InstrumentationTestRunner
+      adb shell am instrument -w -e external yes -e class com.Webtrekk.SDKTest.AttributionTest#testAttributionRunLinkWithoutAdID com.Webtrekk.SDKTest.test/android.test.InstrumentationTestRunner
   fi
 
 clickIDPath="$(adb shell ls /data/data/com.Webtrekk.SDKTest/files/*.clk)"
@@ -26,7 +26,7 @@ clickID="${clickIDFileName%.*}"
 echo "ClickID is ${clickID}"
 
 echo "do first start"
-adb shell am instrument -w -e class com.Webtrekk.SDKTest.AttributionTest#doFirstStart com.Webtrekk.SDKTest.test/android.test.InstrumentationTestRunner &
+adb shell am instrument -w -e external yes -e class com.Webtrekk.SDKTest.AttributionTest#testFirstStart com.Webtrekk.SDKTest.test/android.test.InstrumentationTestRunner &
 cmd_pid=$!
 sleep 15
 

@@ -1,6 +1,8 @@
 package com.Webtrekk.SDKTest;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.suitebuilder.annotation.Suppress;
 
+import com.webtrekk.webtrekksdk.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 import com.Webtrekk.SDKTest.MainActivity;
@@ -8,7 +10,7 @@ import com.Webtrekk.SDKTest.MainActivity;
 /**
  * Created by user on 09/11/15.
  */
-public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class MainActivityTest extends ActivityInstrumentationTestCase2BaseMain<MainActivity> {
     private MainActivity mMainActivity;
     private Webtrekk wt;
 
@@ -22,6 +24,15 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
         mMainActivity = getActivity();
         wt = mMainActivity.getWebtrekk();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        finishActivitySync(getActivity());
+        setActivity(null);
+        RequestUrlStore request = new RequestUrlStore(getInstrumentation().getTargetContext(), 10);
+        request.deleteRequestsFile();
+        super.tearDown();
     }
 
     public void testPreconditions() {
@@ -43,11 +54,11 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
      */
     public void testAllValuesOverrideWithApplicationConfig() {
 
-        assertTrue(wt.getTrackDomain().contains("://q3.webtrekk.net"));
+        assertTrue(wt.getTrackDomain().contains("://localhost:8080"));
         assertEquals(wt.getVersion(), 1);
         assertEquals(wt.getTrackId(), "123451234512345");
         assertEquals(wt.getSampling(), 0);
-        assertEquals(wt.getSendDelay(), 30);
+        assertEquals(wt.getSendDelay(), 1);
         //assertEquals(wt.getResendOnStartEventTime(), 303);
         assertEquals(wt.getMaxRequests(), 100);
         assertEquals(wt.getTrackingConfigurationUrl(), "https://d1r27qvpjiaqj3.cloudfront.net/238713152098253/34629.xml");
@@ -70,4 +81,5 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     public void testEmptyValuesInApplicationConfig() {
         assertEquals(wt.getResendOnStartEventTime(), 30);
     }
+
 }

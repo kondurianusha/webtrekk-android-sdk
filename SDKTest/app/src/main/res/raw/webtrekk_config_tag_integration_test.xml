@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <webtrekkConfiguration>
     <version>2</version>
-    <trackId>123451234512345</trackId>
     <testMode>true</testMode>
-    <trackDomain>http://q3.webtrekk.net</trackDomain>
+    <trackId>123451234512345</trackId>
+    <trackDomain>http://localhost:8080</trackDomain>
     <sampling>0</sampling>
-    <sendDelay>300</sendDelay>
+    <sendDelay>1</sendDelay>
     <maxRequests>5000</maxRequests>
     <resendOnStartEventTime>30</resendOnStartEventTime>
-    <autoTracked>false</autoTracked>
+    <autoTracked>true</autoTracked>
     <autoTrackAppUpdate>true</autoTrackAppUpdate>
     <autoTrackAdvertiserId>true</autoTrackAdvertiserId>
     <autoTrackAppVersionName>true</autoTrackAppVersionName>
@@ -44,7 +44,7 @@
     <activity>
         <classname type="text">com.Webtrekk.SDKTest.TagIntegrationActivity</classname>
         <mappingname type="text">TestActivity</mappingname>
-        <autoTracked>true</autoTracked>
+        <autoTracked>false</autoTracked>
         <activityTrackingParameter>
             <parameter id="PRODUCT_COST" key="AT1"/>
             <pageParameter>

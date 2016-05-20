@@ -2,35 +2,38 @@ package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.provider.Settings;
-import android.test.suitebuilder.annotation.Suppress;
 
-import com.webtrekk.webtrekksdk.TrackingConfiguration;
+import com.webtrekk.webtrekksdk.Request.TrackingRequest;
+import com.webtrekk.webtrekksdk.RequestUrlStore;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-import java.util.Random;
-import java.util.UUID;
-
 /**
  * Created by vartbaronov on 26.04.16.
  */
-@Suppress
-public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoAutoTrackActivity> {
+public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
     private Webtrekk mWebtrekk;
     private final long oneMeg = 1024 * 1024;
 
 
     public MiscellaneousTest() {
-        super(NoAutoTrackActivity.class);
+        super(EmptyActivity.class);
     }
 
     @Override
     protected void setUp() throws Exception {
-
         super.setUp();
         mWebtrekk = Webtrekk.getInstance();
+        mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
+        getActivity();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        finishActivitySync(getActivity());
+        setActivity(null);
+        super.tearDown();
     }
 
     public void testOverrideEverID()
@@ -140,7 +143,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoA
 
         String URL = waitForTrackedURL();
 
-        assertTrue(URL.contains(NoAutoTrackActivity.class.getName()));
+        assertTrue(URL.contains("Seite"));
         assertFalse(URL.contains(customPageName));
 
         //next track - no media code
@@ -154,10 +157,10 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoA
 
         URL = waitForTrackedURL();
 
-        assertFalse(URL.contains(NoAutoTrackActivity.class.getName()));
+        assertFalse(URL.contains("Seite"));
         assertTrue(URL.contains(customPageName));
 
-        Intent newActivityIntent = new Intent(getActivity(), NoAutoTrackActivity.class);
+        Intent newActivityIntent = new Intent(getActivity(), EmptyActivity.class);
         newActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         Activity newActivity = getInstrumentation().startActivitySync(newActivityIntent);
 
@@ -171,9 +174,9 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoA
 
         URL = waitForTrackedURL();
 
-        assertTrue(URL.contains(NoAutoTrackActivity.class.getName()));
+        assertTrue(URL.contains("Seite"));
         assertFalse(URL.contains(customPageName));
-        newActivity.finish();
+        finishActivitySync(newActivity);
     }
 
     public void testDifferentParameterTrack()
@@ -211,6 +214,43 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<NoA
         assertEquals(parcel.getValue("cd"), customerID);
         assertEquals(parcel.getValue("uc1"), cat1);
         assertEquals(parcel.getValue("uc2"), cat2);
+    }
+
+    public void testPageURL()
+    {
+        internalTestPU(HelperFunctions.urlEncode("http://www.yandex.ru"));
+
+        String google = HelperFunctions.urlEncode("http://wwww.google.com");
+
+        assertTrue(Webtrekk.getInstance().setPageURL("http://wwww.google.com"));
+
+        internalTestPU(google);
+
+        Intent newActivityIntent = new Intent(getInstrumentation().getTargetContext(), PageExampleActivity.class);
+        newActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Activity newActivity = getInstrumentation().startActivitySync(newActivityIntent);
+
+        internalTestPU(null);
+
+        finishActivitySync(newActivity);
+    }
+
+    private void internalTestPU(String valueToTest)
+    {
+        //test URL page in configuration xml
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.track();
+            }
+        });
+
+        String URL = waitForTrackedURL();
+
+        URLParsel parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+        assertEquals(valueToTest, parcel.getValue("pu"));
     }
 
 

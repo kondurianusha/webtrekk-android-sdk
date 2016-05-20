@@ -232,7 +232,7 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
             android.util.Log.d("WebtrekkSDK", "parsing error", e);
         }
         assertNotNull(config.getActivityConfigurations());
-        assertEquals(1, config.getActivityConfigurations().size());
+        assertEquals(2, config.getActivityConfigurations().size());
         assertTrue(config.getActivityConfigurations().containsKey("test.myapplication.MainActivity"));
         ActivityConfiguration act = config.getActivityConfigurations().get("test.myapplication.MainActivity");
         assertNotNull(act);

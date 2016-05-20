@@ -16,12 +16,11 @@ bash testIntallAttribution.sh yes
 #do test without AdvID
 bash testIntallAttribution.sh
 
-#do config load tests
-bash confLoadTest.sh
-
 #do errorHandlingTest
 bash errorHandlingTest.sh
 
+#do suspendTest
+bash suspendTest.sh
 
  #extract logs
 cd ..

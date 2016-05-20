@@ -1,5 +1,6 @@
 package com.webtrekk.webtrekksdk;
 
+import android.app.Activity;
 import android.test.AndroidTestCase;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -58,15 +59,17 @@ public class IntegrationTests extends AndroidTestCase {
         String url = tr.getUrlString();
         assertTrue(url, url.contains("ba=test_product"));
         // now call track method
-        webtrekk.increaseActivityCounter();
-        webtrekk.startActivity("test", false);
-        webtrekk.track();
+        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        Activity activity = new Activity();
+
+        lifecycleCallbacks.onActivityCreated(activity, null);
+        lifecycleCallbacks.onActivityStarted(activity);
         //make sure the tracking request is created correct and the url is on the requesturlstore
         assertEquals(1, webtrekk.getRequestFactory().getRequestUrlStore().size());
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("ba=test_product"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekLast().contains("ba=test_product"));
 
         // make sure the custom ecom parameter is available
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0), webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("cb1=test_ecomparam1"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekLast(), webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("cb1=test_ecomparam1"));
     }
 
     /**
@@ -101,14 +104,16 @@ public class IntegrationTests extends AndroidTestCase {
         assertTrue(url, url.contains("cb1=dynamic-value"));
 
         // now call track method
-        webtrekk.increaseActivityCounter();
-        webtrekk.startActivity("test",false);
-        webtrekk.track();
+        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        Activity activity = new Activity();
+
+        lifecycleCallbacks.onActivityCreated(activity, null);
+        lifecycleCallbacks.onActivityStarted(activity);
         //make sure the tracking request is created correct and the url is on the requesturlstore
         assertEquals(1, webtrekk.getRequestFactory().getRequestUrlStore().size());
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0), webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("cb1=dynamic-value"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekLast(), webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("cb1=dynamic-value"));
         // assert that the constant param is also set
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("ba=test_product"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekLast().contains("ba=test_product"));
         webtrekk.stopTracking();
 
     }

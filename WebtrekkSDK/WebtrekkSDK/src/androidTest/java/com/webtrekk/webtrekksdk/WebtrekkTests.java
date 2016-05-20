@@ -54,6 +54,7 @@ public class WebtrekkTests extends AndroidTestCase {
         }
 
         webtrekk.initWebtrekk(getContext());
+        TrackedActivityLifecycleCallbacks callbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
         assertNotNull(webtrekk.getTrackingConfiguration());
         assertNotNull(webtrekk.getRequestFactory().getPlugins());
         assertNotNull(webtrekk.getContext());
@@ -153,11 +154,14 @@ public class WebtrekkTests extends AndroidTestCase {
 //        } catch (IllegalStateException e) {
 //
 //        }
-        webtrekk.increaseActivityCounter();
-        webtrekk.startActivity("test", false);
-        webtrekk.track();
+        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+
+        class TestActivity extends Activity{};
+        TestActivity activity = new TestActivity();
+        lifecycleCallbacks.onActivityCreated(activity, null);
+        lifecycleCallbacks.onActivityStarted(activity);
         assertEquals(1, webtrekk.getRequestFactory().getRequestUrlStore().size());
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("test,"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekLast().contains("TestActivity,"));
     }
 
 
@@ -192,6 +196,7 @@ public class WebtrekkTests extends AndroidTestCase {
 
     public void testOnSendIntervalOver() {
         webtrekk.initWebtrekk(getContext());
+        TrackedActivityLifecycleCallbacks callbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
         RequestUrlStore requestUrlStore = mock(RequestUrlStore.class);
         webtrekk.getRequestFactory().setRequestUrlStore(requestUrlStore);
         webtrekk.onSendIntervalOver();
@@ -246,14 +251,19 @@ public class WebtrekkTests extends AndroidTestCase {
         // make shure fns gets send once and only once when a new session starts
         webtrekk.initWebtrekk(getContext());
         SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-        webtrekk.increaseActivityCounter();
-        webtrekk.startActivity("testact", false);
-        webtrekk.track();
+        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+
+        class SecondActivity extends Activity {};
+        Activity activity = new Activity();
+        SecondActivity secondActivity = new SecondActivity();
+
+        lifecycleCallbacks.onActivityCreated(activity, null);
+        lifecycleCallbacks.onActivityStarted(activity);
         //assertEquals(webtrekk.getRequestUrlStore().get(0), "test");
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("&fns=1"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekFirst().contains("&fns=1"));
         webtrekk.track();
         assertEquals(webtrekk.getRequestFactory().getInternalParameter().getDefaultParameter().get(Parameter.FORCE_NEW_SESSION), "0");
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(1).contains("&fns=0"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekFirst().contains("&fns=0"));
     }
 
     public void testFirstParameter() {
@@ -261,15 +271,17 @@ public class WebtrekkTests extends AndroidTestCase {
         SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
         preferences.edit().remove(Webtrekk.PREFERENCE_KEY_EVER_ID).commit();
         webtrekk.initWebtrekk(getContext());
-        webtrekk.increaseActivityCounter();
-        webtrekk.startActivity("testact", false);
-        webtrekk.track();
+        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        Activity activity = new Activity();
+
+        lifecycleCallbacks.onActivityCreated(activity, null);
+        lifecycleCallbacks.onActivityStarted(activity);
         //assertEquals(webtrekk.getRequestUrlStore().get(0), "test");
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("&one=1"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekFirst().contains("&one=1"));
 
         //webtrekk.initInternalParameter();
         webtrekk.track();
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().get(1).contains("&one=0"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekFirst().contains("&one=0"));
         assertEquals(webtrekk.getRequestFactory().getInternalParameter().getDefaultParameter().get(Parameter.APP_FIRST_START), "0");
     }
 
@@ -279,8 +291,11 @@ public class WebtrekkTests extends AndroidTestCase {
         SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
         preferences.edit().remove(Webtrekk.PREFERENCE_APP_VERSIONCODE).commit();
         assertEquals(preferences.getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, -1), -1);
-        webtrekk.increaseActivityCounter();
-        webtrekk.startActivity("testact", false);
+        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        Activity activity = new Activity();
+
+        lifecycleCallbacks.onActivityCreated(activity, null);
+        lifecycleCallbacks.onActivityStarted(activity);
         webtrekk.track();
         assertEquals(HelperFunctions.getAppVersionCode(getContext()), 0);
         assertEquals(webtrekk.getRequestFactory().getAutoCustomParameter().get("appUpdated"), "0");
@@ -308,8 +323,11 @@ public class WebtrekkTests extends AndroidTestCase {
         TrackingParameter tp = new TrackingParameter();
         webtrekk.setGlobalTrackingParameter(globalTp);
         TrackingRequest tr = webtrekk.getRequestFactory().createTrackingRequest(tp);
-        webtrekk.increaseActivityCounter();
-        webtrekk.startActivity("testact",false);
+        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        Activity activity = new Activity();
+
+        lifecycleCallbacks.onActivityCreated(activity, null);
+        lifecycleCallbacks.onActivityStarted(activity);
         //verify override
         assertEquals(webtrekk.getRequestFactory().getGlobalTrackingParameter().getDefaultParameter().get(Parameter.ACTIVITY_NAME), "testtestact");
 

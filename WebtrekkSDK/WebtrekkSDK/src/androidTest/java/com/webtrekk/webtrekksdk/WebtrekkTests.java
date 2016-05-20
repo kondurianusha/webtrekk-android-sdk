@@ -35,6 +35,8 @@ public class WebtrekkTests extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        RequestUrlStore request = new RequestUrlStore(getContext(), 10);
+        request.deleteRequestsFile();
         super.tearDown();
     }
 
@@ -302,18 +304,6 @@ public class WebtrekkTests extends AndroidTestCase {
 
         assertEquals(HelperFunctions.updated(getContext(), 5), true);
         assertEquals(preferences.getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, 0), 5);
-    }
-    // only test this on a real device or seperatly install playtore lib on the emulator device!
-    @Suppress
-    public void testInitAdvertiserId() {
-        webtrekk.initWebtrekk(getContext());
-        assertTrue(webtrekk.getTrackingConfiguration().isAutoTrackAdvertiserId());
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        assertNotNull(webtrekk.getCustomParameter().get("advertiserId"));
     }
 
     public void testCreateTrackingRequest() {

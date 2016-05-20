@@ -205,28 +205,6 @@ public class TrackingRequestTests extends AndroidTestCase {
         assertTrue(url2, url2.contains("cb100=1"));
     }
 
-    public void testAutoAdvertiserId() {
-        trackingConfiguration.setAutoTrackAdvertiserId(true);
-        assertTrue(webtrekk.getTrackingConfiguration().isAutoTrackAdvertiserId());
-        webtrekk.getRequestFactory().startAdvertizingThread(false);
-        webtrekk.setCustomParameter(new HashMap<String, String>());
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        TrackingParameter tp = new TrackingParameter();
-        tp.add(Parameter.ECOM, "100", "advertiserId");
-        tp.add(Parameter.ECOM, "200", "advertisingOptOut");
-        webtrekk.setGlobalTrackingParameter(tp);
-        TrackingRequest tr = webtrekk.getRequestFactory().createTrackingRequest(new TrackingParameter());
-        String url = tr.getUrlString();
-        assertTrue(url, url.contains("cb100="));
-        assertNotNull(webtrekk.getRequestFactory().getAutoCustomParameter().get("advertiserId"));
-        assertTrue(webtrekk.getRequestFactory().getAutoCustomParameter().get("advertiserId").length() > 10);
-        assertTrue(url, url.contains("cb200=false"));
-    }
-
     public void testAutoTrackAppVersion() {
         webtrekk.setCustomParameter(new HashMap<String, String>());
 

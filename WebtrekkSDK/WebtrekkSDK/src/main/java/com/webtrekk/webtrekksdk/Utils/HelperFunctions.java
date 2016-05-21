@@ -232,7 +232,7 @@ final public class HelperFunctions {
                 return account.name;
             }
         }
-        WebtrekkLogging.log("could not get valid Account Email, check Permissions. Account:"+ Arrays.toString(acc));
+        WebtrekkLogging.log("could not get valid Account Email, check Permissions. Account:"+ Arrays.toString(accManager.getAccounts()));
         return "";
     }
 

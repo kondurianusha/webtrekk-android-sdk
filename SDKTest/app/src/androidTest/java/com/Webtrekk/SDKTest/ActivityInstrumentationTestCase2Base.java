@@ -135,12 +135,5 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
                 assertEquals(mStringNumbersToWait, mSentURLArray.size());
             }
         }
-
-        //wait while response is proceded completely
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

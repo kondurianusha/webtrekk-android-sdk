@@ -39,6 +39,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -231,7 +232,7 @@ final public class HelperFunctions {
                 return account.name;
             }
         }
-        WebtrekkLogging.log("could not get valid Account Email, check Permissions");
+        WebtrekkLogging.log("could not get valid Account Email, check Permissions. Account:"+ Arrays.toString(acc));
         return "";
     }
 

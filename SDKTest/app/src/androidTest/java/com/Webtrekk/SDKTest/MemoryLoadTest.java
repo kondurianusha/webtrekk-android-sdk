@@ -23,7 +23,7 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
         super.setUp();
 
         mWebtrekk = Webtrekk.getInstance();
-        mWebtrekk.initWebtrekk(mApplication);
+        mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
         getActivity();
 /*
         ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();

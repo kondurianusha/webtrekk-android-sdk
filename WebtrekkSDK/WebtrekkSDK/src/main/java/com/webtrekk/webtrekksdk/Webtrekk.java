@@ -577,7 +577,8 @@ public class Webtrekk {
      * new thread
      */
     void onSendIntervalOver() {
-        WebtrekkLogging.log("onSendIntervalOver: activity count: " + mApplicationStatus.getCurrentActivitiesCount() + " request urls: " + mRequestFactory.getRequestUrlStore().size());
+        WebtrekkLogging.log("onSendIntervalOver: activity count: " + mApplicationStatus.getCurrentActivitiesCount() + " request urls: " + mRequestFactory.getRequestUrlStore().size()
+                + " thread done:"+(requestProcessorFuture == null ? "null":requestProcessorFuture.isDone()));
         if(mRequestFactory.getRequestUrlStore().size() > 0  && (requestProcessorFuture == null || requestProcessorFuture.isDone())) {
             if (executorService == null) {
                 executorService = Executors.newSingleThreadExecutor();

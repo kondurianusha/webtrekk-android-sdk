@@ -79,7 +79,7 @@ public class TrackingRequest {
 
         for (Parameter key:keys)
         {
-            if(trackingParameter.containsKey(key)) {
+            if(trackingParameter.containsKey(key) && tp.get(key) != null && !tp.get(key).isEmpty()) {
                 url.append((isAmp ? "&" : "") + key.toString() + "=" + HelperFunctions.urlEncode(tp.get(key)));
 
                 if (!isAmp)
@@ -109,7 +109,7 @@ public class TrackingRequest {
     {
         if (!map.isEmpty()) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                if (entry.getValue() != null)
+                if (entry.getValue() != null && !entry.getValue().isEmpty())
                    url.append(sufix + entry.getKey().toString() + "=" + HelperFunctions.urlEncode(entry.getValue()));
             }
         }

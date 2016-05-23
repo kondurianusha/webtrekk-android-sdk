@@ -529,9 +529,6 @@ public class Webtrekk {
             throw new IllegalStateException("webtrekk has not been initialized");
         }
 
-        //always clear the current activities custom parameter
-        mRequestFactory.clearCustomParameters();
-
         switch (mApplicationStatus.getCurrentStatus())
         {
             case SHUT_DOWNING:

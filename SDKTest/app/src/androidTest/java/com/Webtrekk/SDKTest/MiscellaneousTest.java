@@ -208,7 +208,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         URLParsel parcel = new URLParsel();
 
-        parcel.parseURL(URL);
+        assertTrue(parcel.parseURL(URL));
 
         assertEquals(parcel.getValue("cs1"), s1);
         assertEquals(parcel.getValue("cs2"), s2);
@@ -251,7 +251,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         URLParsel parcel = new URLParsel();
 
-        parcel.parseURL(URL);
+        assertTrue(parcel.parseURL(URL));
         assertEquals(valueToTest, parcel.getValue("pu"));
     }
 
@@ -268,9 +268,48 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         URLParsel parcel = new URLParsel();
 
-        parcel.parseURL(URL);
+        assertTrue(parcel.parseURL(URL));
         assertFalse(parcel.getValue("cb100").isEmpty());
         assertEquals("false", parcel.getValue("cb200"));
+    }
+
+    public void testCustomValueIsSaved()
+    {
+        customValueIsSavedTestInternal();
+
+        Intent newActivityIntent = new Intent(getInstrumentation().getTargetContext(), PageExampleActivity.class);
+        newActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Activity newActivity = getInstrumentation().startActivitySync(newActivityIntent);
+
+        //no any new activity start is influence on custom parameters
+        customValueIsSavedTestInternal();
+
+        finishActivitySync(newActivity);
+
+
+    }
+
+
+    private void customValueIsSavedTestInternal()
+    {
+        Webtrekk.getInstance().getCustomParameter().put("testCustomParameter", "customValue");
+
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.track();
+            }
+        });
+
+
+        String URL = waitForTrackedURL();
+
+        URLParsel parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertEquals("customValue", parcel.getValue("cp113"));
+        assertEquals("customValue", parcel.getValue("cr"));
     }
 
 

@@ -121,11 +121,6 @@ public class RequestFactory {
         mIsSampling = isSampling;
     }
 
-    public void clearCustomParameters()
-    {
-        mCustomParameter.clear();
-    }
-
     public void setCustomParameter(Map<String, String> customParameter) {
         mCustomParameter = customParameter;
     }

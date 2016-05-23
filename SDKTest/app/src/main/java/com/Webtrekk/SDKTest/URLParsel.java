@@ -1,5 +1,7 @@
 package com.Webtrekk.SDKTest;
 
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -13,7 +15,7 @@ public class URLParsel
     final private Map<String, String> mMap = new HashMap<String, String>();
     public static String URLKEY = "MAIN_URL_KEY";
 
-    public void parseURL(String url)
+    public boolean parseURL(String url)
     {
         Pattern pattern = Pattern.compile("([^?&]+)");
         Matcher matcher = pattern.matcher(url);
@@ -24,8 +26,16 @@ public class URLParsel
         {
             final String parValue[] = matcher.group().split("=");
 
-            mMap.put(parValue[0], parValue[1]);
+            if (parValue.length == 2)
+               mMap.put(parValue[0], parValue[1]);
+            else
+            {
+                WebtrekkLogging.log("key:"+parValue[0]+" don't have value");
+                return false;
+            }
         }
+
+        return true;
     }
 
     public String getValue(String key)

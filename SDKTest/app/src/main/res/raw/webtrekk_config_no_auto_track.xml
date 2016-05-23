@@ -82,6 +82,7 @@
         <!--define global tracking parameter which are send with every request, the key has to match a valid parameter name!
         entries made here are available as default parameters in the trackingparameter instance -->
         <parameter id="PRODUCT">test_product</parameter>
+        <parameter id="CURRENCY" key="testCustomParameter"/>
 
 
         <!--define the global page parameter, the key is the index,  -->
@@ -99,6 +100,7 @@
             <parameter id="11" key="playstoreFamilyname"></parameter>
             <parameter id="12" key="advertiserId"></parameter>
             <parameter id="13" key="advertisingOptOut"></parameter>
+            <parameter id = "113" key ="testCustomParameter"/>
 
             <parameter id="20">test_pageparam2</parameter>
             <parameter id="21">test_pageparam3</parameter>

@@ -289,7 +289,6 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
     }
 
-
     private void customValueIsSavedTestInternal()
     {
         Webtrekk.getInstance().getCustomParameter().put("testCustomParameter", "customValue");
@@ -310,6 +309,24 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         assertEquals("customValue", parcel.getValue("cp113"));
         assertEquals("customValue", parcel.getValue("cr"));
+    }
+
+    public void testGoogleEmail()
+    {
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.track();
+            }
+        });
+
+        String URL = waitForTrackedURL();
+
+        URLParsel parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertFalse(parcel.getValue("cp9").isEmpty());
     }
 
 

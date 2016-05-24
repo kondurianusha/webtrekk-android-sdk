@@ -457,7 +457,7 @@ public class Webtrekk {
 
         TrackingRequest request = new TrackingRequest(trackingParameter, trackingConfiguration, TrackingRequest.RequestType.CDB);
         mRequestFactory.addRequest(request);
-        WebtrekkLogging.log("CDB request is sent to buffer");
+        WebtrekkLogging.log("CDB request is sent");
         WebtrekkUserParameters.updateCDBRequestDate(mContext);
     }
 

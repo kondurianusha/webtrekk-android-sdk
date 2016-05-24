@@ -14,6 +14,7 @@ import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -31,7 +32,7 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
     protected final Object mSynchronize = new Object();
     protected long mWaitMilliseconds = 12000;
     protected HttpServer mHttpServer;
-    int mStringNumbersToWait = 1;
+    long mStringNumbersToWait = 1;
     volatile private boolean mWaitWhileTimoutFinished;
 
 
@@ -77,7 +78,6 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
             mHttpServer.setContext(mApplication);
             mHttpServer.start();
         }
-
     }
 
     @Override
@@ -97,15 +97,17 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
         initWaitingForTrack(process, 1);
     }
 
-    protected void initWaitingForTrack(Runnable process, int UrlCount)
+    protected void initWaitingForTrack(Runnable process, long UrlCount)
     {
         mStringNumbersToWait = UrlCount;
         mSentURLArray.clear();;
         mStringReceived = false;
 
-        synchronized (Webtrekk.getInstance()) {
+        if (process != null) {
+            synchronized (Webtrekk.getInstance()) {
 
-            new Thread(process).start();
+                new Thread(process).start();
+            }
         }
     }
 

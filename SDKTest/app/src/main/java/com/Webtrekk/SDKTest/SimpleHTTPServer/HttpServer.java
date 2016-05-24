@@ -2,9 +2,11 @@ package com.Webtrekk.SDKTest.SimpleHTTPServer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 import java.io.ByteArrayInputStream;
@@ -17,7 +19,7 @@ public class HttpServer extends NanoHTTPD {
     private final static int PORT = 8080;
     private static final String TEST_ULR = "com.webtrekk.webtrekksdk.TEST_URL";
     private Context mContext;
-    static private String ACTIVITIES_COUNT_VALUE = "com.webtrekk.webtrekksdk.Test.RequestCount";
+    static private String REQUEST_COUNT_VALUE = "com.webtrekk.webtrekksdk.Test.RequestCount";
     volatile private long mDelayInReceive;
 
     public HttpServer() throws IOException {
@@ -42,6 +44,7 @@ public class HttpServer extends NanoHTTPD {
         Response response = new Response(Response.Status.OK, "image/gif;charset=UTF-8", null, 0);
         response.closeConnection(true);
 
+        incrementRequestNumber();
         if (mDelayInReceive > 0)
         {
             try {
@@ -53,7 +56,6 @@ public class HttpServer extends NanoHTTPD {
 
         return response;
     }
-
 
     private void sendURLStringForTest(String url)
     {
@@ -70,9 +72,31 @@ public class HttpServer extends NanoHTTPD {
             WebtrekkLogging.log("Error increment request number");
             return;
         }
-
-
-
     }
 
+    public long getCurrentRequestNumber()
+    {
+        if (mContext == null)
+        {
+            WebtrekkLogging.log("Error. Context is null. No operation with context for HTTP serer");
+            return -1;
+        }
+
+        SharedPreferences pref = HelperFunctions.getWebTrekkSharedPreference(mContext);
+
+        return pref.getLong(REQUEST_COUNT_VALUE, 0);
+    }
+
+    public void incrementRequestNumber()
+    {
+        if (mContext == null)
+        {
+            WebtrekkLogging.log("Error. Context is null. No operation with context for HTTP serer");
+            return;
+        }
+
+        SharedPreferences pref = HelperFunctions.getWebTrekkSharedPreference(mContext);
+
+        pref.edit().putLong(REQUEST_COUNT_VALUE, pref.getLong(REQUEST_COUNT_VALUE, 0)+1).apply();
+    }
 }

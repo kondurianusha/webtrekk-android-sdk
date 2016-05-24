@@ -4,12 +4,14 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.InstrumentationTestRunner;
 
 import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
@@ -27,6 +29,7 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
     protected boolean mIsErrorHandlerTest;
     protected boolean mIsExternalCall;
     static private String IS_EXTERNAL = "external";
+    protected boolean mIsCDBTestRequest;
 
     public ActivityInstrumentationTestCase2BaseMain(Class<T> activityClass) {
         super(activityClass);
@@ -44,6 +47,8 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         mApplication = (Application)getInstrumentation().getTargetContext().getApplicationContext();
         if (!mIsErrorHandlerTest)
             deleteErrorHandlerFile(mApplication);
+        if (!mIsCDBTestRequest)
+            deleteCDBRepeatRequestInfo();
 
         Bundle arguments = ((InstrumentationTestRunner)getInstrumentation()).getArguments();
         if (arguments.size() > 0)
@@ -127,5 +132,14 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         while (!activity.isDestroyed())
             getInstrumentation().waitForIdleSync();
     }
+
+    private void deleteCDBRepeatRequestInfo()
+    {
+        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext());
+
+        if (preferences.contains("LAST_CBD_REQUEST_DATE"))
+            preferences.edit().remove("LAST_CBD_REQUEST_DATE").apply();
+    }
+
 
 }

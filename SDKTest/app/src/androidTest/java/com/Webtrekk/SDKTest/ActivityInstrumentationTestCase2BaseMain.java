@@ -129,8 +129,16 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     protected void finishActivitySync(Activity activity)
     {   activity.finish();
-        while (!activity.isDestroyed())
+        //give activity one minute to finish
+        long currentTime = System.currentTimeMillis();
+        boolean finishTimeout = false;
+        while (!activity.isDestroyed() && !finishTimeout) {
             getInstrumentation().waitForIdleSync();
+            finishTimeout = (System.currentTimeMillis() - currentTime) > 60000;
+        }
+
+        if (finishTimeout)
+            WebtrekkLogging.log("finishActivitySync: finished by timout");
     }
 
     private void deleteCDBRepeatRequestInfo()

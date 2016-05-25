@@ -39,7 +39,7 @@ public class HttpServer extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         String requestURL = "http://"+session.getRemoteHostName()+session.getUri()+"?"+session.getQueryParameterString();
-        WebtrekkLogging.log("receive request:" + requestURL);
+        WebtrekkLogging.log("receive request("+getCurrentRequestNumber()+"):" + requestURL);
         sendURLStringForTest(requestURL);
         Response response = new Response(Response.Status.OK, "image/gif;charset=UTF-8", null, 0);
         response.closeConnection(true);

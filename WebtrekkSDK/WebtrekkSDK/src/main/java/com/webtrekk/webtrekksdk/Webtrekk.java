@@ -35,8 +35,8 @@ public class Webtrekk {
     public static final String PREFERENCE_APP_VERSIONCODE = "appVersion";
     public static final String PREFERENCE_KEY_INSTALLATION_FLAG = "InstallationFlag";
     public static final String PREFERENCE_KEY_CONFIGURATION = "webtrekkTrackingConfiguration";
-    public static final String TRACKING_LIBRARY_VERSION = "404";
-    public static final String TRACKING_LIBRARY_VERSION_UA = "4.0.4";
+    public static final String TRACKING_LIBRARY_VERSION = "406";
+    public static final String TRACKING_LIBRARY_VERSION_UA = "4.0.6";
 
     final private RequestFactory mRequestFactory = new RequestFactory();
     private TrackingConfiguration trackingConfiguration;

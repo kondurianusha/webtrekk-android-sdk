@@ -90,6 +90,9 @@
         <activity
             android:name=".TagIntegrationActivity">
         </activity>
+        <activity
+            android:name=".OldWebtrekkActivity">
+        </activity>
         <service android:name=".LoadOSService"/>
         <receiver
             android:name="com.webtrekk.webtrekksdk.WebtrekkGcmReceiver"

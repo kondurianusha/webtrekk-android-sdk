@@ -319,13 +319,21 @@ final public class HelperFunctions {
      * @return
      */
     public static boolean updated(Context context, int currentVersion) {
-        int stored_version = getWebTrekkSharedPreference(context).getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, -1);
-        if (currentVersion > stored_version) {
-            // update the stored version
+        //process old style of version as well. It has string value. If it is string - consider it as old one.
+        Object storedVersionObj = getWebTrekkSharedPreference(context).getAll().get(Webtrekk.PREFERENCE_APP_VERSIONCODE);
+        boolean isOldSettingVersion = storedVersionObj instanceof String;
+        boolean isUpdated;
+
+        if (!isOldSettingVersion) {
+            int stored_version = (Integer) storedVersionObj;
+            isUpdated = currentVersion > stored_version;
+        }else
+           isUpdated = true;
+
+        if (isUpdated)
             setAppVersionCode(currentVersion, context);
-            return true;
-        }
-        return false;
+
+        return isUpdated;
     }
 
     /**

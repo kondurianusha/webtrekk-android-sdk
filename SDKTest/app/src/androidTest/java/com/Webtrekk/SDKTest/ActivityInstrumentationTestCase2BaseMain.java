@@ -3,6 +3,7 @@ package com.Webtrekk.SDKTest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
+import android.app.Instrumentation;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -126,14 +127,19 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     protected void finishActivitySync(Activity activity)
+    {
+        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, getInstrumentation());
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    static public void finishActivitySync(Activity activity, Instrumentation instrumentation)
     {   activity.finish();
         //give activity one minute to finish
         long currentTime = System.currentTimeMillis();
         boolean finishTimeout = false;
         while (!activity.isDestroyed() && !finishTimeout) {
-            getInstrumentation().waitForIdleSync();
+            instrumentation.waitForIdleSync();
             finishTimeout = (System.currentTimeMillis() - currentTime) > 60000;
         }
 

@@ -72,18 +72,12 @@ public class RequestProcessor implements Runnable {
             connection.setReadTimeout(NETWORK_READ_TIMEOUT);
             connection.setUseCaches(false);
             connection.connect();
+            int statusCode = connection.getResponseCode();
 
-            try {
-                int statusCode = connection.getResponseCode();
+            if (processOutput != null)
+                processOutput.process(statusCode, connection);
 
-                if (processOutput != null)
-                    processOutput.process(statusCode, connection);
-
-                return statusCode;
-            } catch (Exception e) {
-                WebtrekkLogging.log("unknown exception: ", e);
-            }
-
+            return statusCode;
 
         } catch (EOFException e) {
             WebtrekkLogging.log("RequestProcessor: EOF > Will retry later.", e);

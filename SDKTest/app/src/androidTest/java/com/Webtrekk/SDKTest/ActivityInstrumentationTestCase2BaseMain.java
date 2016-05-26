@@ -145,7 +145,7 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         }
 
         if (finishTimeout)
-            WebtrekkLogging.log("finishActivitySync: finished by timout. Hash:"+activityHash);
+            WebtrekkLogging.log("finishActivitySync: finished by timeout. Hash:"+activityHash);
     }
 
     private void deleteCDBRepeatRequestInfo()

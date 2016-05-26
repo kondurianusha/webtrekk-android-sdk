@@ -190,7 +190,9 @@ public abstract class NanoHTTPD {
                 TempFileManager tempFileManager = NanoHTTPD.this.tempFileManagerFactory.create();
                 HTTPSession session = new HTTPSession(tempFileManager, this.inputStream, outputStream, this.acceptSocket.getInetAddress());
                 while (!this.acceptSocket.isClosed()) {
-                    session.execute();
+                    synchronized (mStopSync) {
+                        session.execute();
+                    }
                 }
             } catch (Exception e) {
                 // When the socket is closed by the client,
@@ -844,7 +846,7 @@ public abstract class NanoHTTPD {
         }
 
         @Override
-        synchronized public void execute() throws IOException {
+        public void execute() throws IOException {
             Response r = null;
             try {
                 // Read the first 8192 bytes.
@@ -1933,6 +1935,8 @@ public abstract class NanoHTTPD {
 
     private Thread myThread;
 
+    private final Object mStopSync = new Object();
+
     /**
      * Pluggable strategy for asynchronously executing requests.
      */
@@ -2277,14 +2281,16 @@ public abstract class NanoHTTPD {
      * Stop the server.
      */
     public void stop() {
-        try {
-            safeClose(this.myServerSocket);
-            this.asyncRunner.closeAll();
-            if (this.myThread != null) {
-                this.myThread.join();
+        synchronized (mStopSync) {
+            try {
+                safeClose(this.myServerSocket);
+                this.asyncRunner.closeAll();
+                if (this.myThread != null) {
+                    this.myThread.join();
+                }
+            } catch (Exception e) {
+                NanoHTTPD.LOG.log(Level.SEVERE, "Could not stop all connections", e);
             }
-        } catch (Exception e) {
-            NanoHTTPD.LOG.log(Level.SEVERE, "Could not stop all connections", e);
         }
     }
 

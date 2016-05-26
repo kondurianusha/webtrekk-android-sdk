@@ -84,8 +84,8 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
         };
 
         for (int i = 0 ; i < 10; i++) {
-            initWaitingForTrack(runnableTrackOnly);
-            waitForTrackedURL();
+            initWaitingForTrack(runnableTrackOnly, 1);
+            waitForTrackedURLs();
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

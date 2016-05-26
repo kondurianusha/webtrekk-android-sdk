@@ -57,16 +57,6 @@ public class HttpServer extends NanoHTTPD {
         return response;
     }
 
-    @Override
-    public void start() throws IOException {
-        super.start();
-    }
-
-    @Override
-    synchronized public void stop() {
-        super.stop();
-    }
-
     private void sendURLStringForTest(String url)
     {
         Intent intent = new Intent(TEST_ULR);

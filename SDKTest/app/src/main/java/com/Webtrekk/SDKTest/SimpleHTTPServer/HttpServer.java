@@ -21,6 +21,7 @@ public class HttpServer extends NanoHTTPD {
     private Context mContext;
     static private String REQUEST_COUNT_VALUE = "com.webtrekk.webtrekksdk.Test.RequestCount";
     volatile private long mDelayInReceive;
+    volatile private boolean mStoped;
 
     public HttpServer() throws IOException {
         super(PORT);
@@ -38,6 +39,8 @@ public class HttpServer extends NanoHTTPD {
 
     @Override
     synchronized public Response serve(IHTTPSession session) {
+        if (mStoped)
+            return null;
         String requestURL = "http://"+session.getRemoteHostName()+session.getUri()+"?"+session.getQueryParameterString();
         WebtrekkLogging.log("receive request("+getCurrentRequestNumber()+"):" + requestURL);
         sendURLStringForTest(requestURL);
@@ -58,8 +61,15 @@ public class HttpServer extends NanoHTTPD {
     }
 
     @Override
+    public void start() throws IOException {
+        super.start();
+        mStoped = false;
+    }
+
+    @Override
     synchronized public void stop() {
         super.stop();
+        mStoped = true;
     }
 
     private void sendURLStringForTest(String url)

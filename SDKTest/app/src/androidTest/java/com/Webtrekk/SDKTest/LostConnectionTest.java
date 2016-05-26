@@ -60,7 +60,7 @@ public class LostConnectionTest  extends ActivityInstrumentationTestCase2Base<Em
 
         //wait sometime
         try {
-            Thread.sleep(1000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             WebtrekkLogging.log("Sleep interruction");
         }
@@ -74,7 +74,7 @@ public class LostConnectionTest  extends ActivityInstrumentationTestCase2Base<Em
             WebtrekkLogging.log("testLostConnection. Can't start server one more time");
         }
 
-        mWaitMilliseconds = 12000;
+        mWaitMilliseconds = 70000;
         waitForTrackedURLs();
     }
 }

@@ -844,7 +844,7 @@ public abstract class NanoHTTPD {
         }
 
         @Override
-        public void execute() throws IOException {
+        synchronized public void execute() throws IOException {
             Response r = null;
             try {
                 // Read the first 8192 bytes.

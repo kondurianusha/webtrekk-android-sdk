@@ -1,5 +1,7 @@
 package com.Webtrekk.SDKTest;
 
+import android.test.suitebuilder.annotation.Suppress;
+
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
@@ -28,9 +30,9 @@ public class LostConnectionTest  extends ActivityInstrumentationTestCase2Base<Em
 
     @Override
     public void tearDown() throws Exception {
-        super.tearDown();
         finishActivitySync(getActivity());
         setActivity(null);
+        super.tearDown();
     }
 
     public void testLostConnection()

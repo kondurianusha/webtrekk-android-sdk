@@ -87,33 +87,42 @@ public class TrackingParameter {
     //TODO: maybe make the index to int, in case this is really always a number
 
     public TrackingParameter add(Parameter key, String index, String value) {
+
+        String valueToAdd = null;
+        if (value != null && value.length() > 255)
+        {
+            WebtrekkLogging.log("Parameter is more then 255 length. Truncate");
+            valueToAdd = value.substring(0, 255);
+        }else
+            valueToAdd = value;
+
         switch(key) {
             case ACTION:
-                this.actionParameter.put(index, value);
+                this.actionParameter.put(index, valueToAdd);
                 break;
             case PAGE:
-                this.pageParameter.put(index, value);
+                this.pageParameter.put(index, valueToAdd);
                 break;
             case SESSION:
-                this.sessionParameter.put(index, value);
+                this.sessionParameter.put(index, valueToAdd);
                 break;
             case ECOM:
-                this.ecomParameter.put(index, value);
+                this.ecomParameter.put(index, valueToAdd);
                 break;
             case AD:
-                this.adParameter.put(index, value);
+                this.adParameter.put(index, valueToAdd);
                 break;
             case USER_CAT:
-                this.userCategories.put(index, value);
+                this.userCategories.put(index, valueToAdd);
                 break;
             case PAGE_CAT:
-                this.pageCategories.put(index, value);
+                this.pageCategories.put(index, valueToAdd);
                 break;
             case PRODUCT_CAT:
-                this.productCategories.put(index, value);
+                this.productCategories.put(index, valueToAdd);
                 break;
             case MEDIA_CAT:
-                this.mediaCategories.put(index, value);
+                this.mediaCategories.put(index, valueToAdd);
                 break;
             default:
                 WebtrekkLogging.log( "invalid trackingparam type");

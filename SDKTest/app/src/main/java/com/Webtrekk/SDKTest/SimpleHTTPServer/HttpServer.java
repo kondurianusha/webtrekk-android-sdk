@@ -37,7 +37,7 @@ public class HttpServer extends NanoHTTPD {
     }
 
     @Override
-    public Response serve(IHTTPSession session) {
+    synchronized public Response serve(IHTTPSession session) {
         String requestURL = "http://"+session.getRemoteHostName()+session.getUri()+"?"+session.getQueryParameterString();
         WebtrekkLogging.log("receive request("+getCurrentRequestNumber()+"):" + requestURL);
         sendURLStringForTest(requestURL);
@@ -55,6 +55,11 @@ public class HttpServer extends NanoHTTPD {
         }
 
         return response;
+    }
+
+    @Override
+    synchronized public void stop() {
+        super.stop();
     }
 
     private void sendURLStringForTest(String url)

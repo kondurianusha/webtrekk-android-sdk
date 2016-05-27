@@ -355,7 +355,7 @@ public class Webtrekk {
      * this functionality is for future release only
      * @return WebtrekkPushNotification object
      */
-    public WebtrekkPushNotification getPushNotification()
+    WebtrekkPushNotification getPushNotification()
     {
         return null;
 /*

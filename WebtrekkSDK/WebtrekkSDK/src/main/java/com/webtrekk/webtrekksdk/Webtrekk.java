@@ -588,8 +588,10 @@ public class Webtrekk {
 
     private void stopSendURLProcess()
     {
-        if (requestProcessorFuture != null && !requestProcessorFuture.isDone())
+        if (requestProcessorFuture != null && !requestProcessorFuture.isDone()) {
             requestProcessorFuture.cancel(true);
+            WebtrekkLogging.log("Processing URL is canceled");
+        }
     }
 
     void setContext(Context context) {

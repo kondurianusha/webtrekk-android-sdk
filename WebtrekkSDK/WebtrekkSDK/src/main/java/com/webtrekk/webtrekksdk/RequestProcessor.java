@@ -141,5 +141,6 @@ public class RequestProcessor implements Runnable {
             }
             }
         }
+        WebtrekkLogging.log("Processing URL task is finished");
     }
 }

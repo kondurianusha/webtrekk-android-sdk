@@ -110,6 +110,10 @@ public class RequestProcessor implements Runnable {
     @Override
     public void run() {
         while (mRequestUrlStore.size() > 0) {
+
+            if (Thread.interrupted())
+                break;
+
             String urlString = mRequestUrlStore.peekLast();
             URL url = getUrl(urlString);
             if (url == null) {

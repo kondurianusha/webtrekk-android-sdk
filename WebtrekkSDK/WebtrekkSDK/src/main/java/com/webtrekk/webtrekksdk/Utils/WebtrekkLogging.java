@@ -6,7 +6,7 @@ package com.webtrekk.webtrekksdk.Utils;
  */
 public class WebtrekkLogging {
     public static final String logTag = "WebtrekkSDK";
-    public static boolean isLogging = true;
+    volatile public static boolean isLogging = true;
 
     public static void log(String message) {
         if(isLogging) {
@@ -20,7 +20,7 @@ public class WebtrekkLogging {
         }
     }
 
-    public static synchronized boolean isLogging() {
+    public static boolean isLogging() {
         return isLogging;
     }
 
@@ -29,7 +29,7 @@ public class WebtrekkLogging {
      *
      * @param isLogging
      */
-    public static synchronized void setIsLogging(boolean isLogging) {
+    public static void setIsLogging(boolean isLogging) {
         WebtrekkLogging.isLogging = isLogging;
     }
 }

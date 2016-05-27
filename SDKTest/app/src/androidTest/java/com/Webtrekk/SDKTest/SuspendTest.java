@@ -24,25 +24,6 @@ public class SuspendTest extends ActivityInstrumentationTestCase2Base<SuspendAct
         super(SuspendActivity.class);
     }
 
-    protected void onReceiveURLProcess(String url)
-    {
-        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext());
-        int messageReceived = getMessageReceivedNumber(preferences)+1;
-        WebtrekkLogging.log("Background test. Receive message number:"+messageReceived);
-        setMessageReceivedNumber(preferences, messageReceived);
-    }
-
-    private void setMessageReceivedNumber(SharedPreferences preference, int messagesReceived)
-    {
-        preference.edit().putInt(SUSPEND_TEST_RECEIVED_MESSAGE, messagesReceived).commit();
-    }
-
-    private int getMessageReceivedNumber(SharedPreferences preferences)
-    {
-        return preferences.getInt(SUSPEND_TEST_RECEIVED_MESSAGE, 0);
-    }
-
-
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -56,7 +37,7 @@ public class SuspendTest extends ActivityInstrumentationTestCase2Base<SuspendAct
 
         RequestUrlStore store = new RequestUrlStore(getInstrumentation().getTargetContext(), 10);
         store.deleteRequestsFile();
-        setMessageReceivedNumber(HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext()), 0);
+        long currentMessageNumber = mHttpServer.getCurrentRequestNumber();
 
         getActivity();
         mHttpServer.setDelay(100);
@@ -79,7 +60,7 @@ public class SuspendTest extends ActivityInstrumentationTestCase2Base<SuspendAct
             e.printStackTrace();
         }
 
-        int messageReceived = getMessageReceivedNumber(HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext()));
+        long messageReceived = mHttpServer.getCurrentRequestNumber() - currentMessageNumber;
 
         WebtrekkLogging.log("Backgroud test. Wait for message number:"+(MESSAGES_NUMBER - messageReceived));
         mHttpServer.setDelay(0);

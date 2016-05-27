@@ -566,6 +566,7 @@ public class Webtrekk {
      * it stores all requests to file.
      */
     private void flash() {
+        stopSendURLProcess();
         mRequestFactory.flash();
     }
 
@@ -582,6 +583,12 @@ public class Webtrekk {
             }
             requestProcessorFuture = executorService.submit(new RequestProcessor(mRequestFactory.getRequestUrlStore()));
         }
+    }
+
+    private void stopSendURLProcess()
+    {
+        if (requestProcessorFuture == null || requestProcessorFuture.isDone())
+            requestProcessorFuture.cancel(true);
     }
 
     void setContext(Context context) {

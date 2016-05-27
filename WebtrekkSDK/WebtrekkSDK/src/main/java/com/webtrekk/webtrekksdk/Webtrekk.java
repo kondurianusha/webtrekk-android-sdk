@@ -296,7 +296,7 @@ public class Webtrekk {
         if(mRequestFactory.getRequestUrlStore() != null) {
             mRequestFactory.getRequestUrlStore().clear();
         }
-        timerFuture.cancel(true);
+        stopSendURLProcess();
     }
 
     /**
@@ -590,6 +590,13 @@ public class Webtrekk {
     {
         if (requestProcessorFuture != null && !requestProcessorFuture.isDone()) {
             requestProcessorFuture.cancel(true);
+            executorService.shutdownNow();
+            try {
+                executorService.awaitTermination(2, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+                WebtrekkLogging.log("Can't terminate sending process");
+            }
+            executorService = null;
             WebtrekkLogging.log("Processing URL is canceled");
         }
     }

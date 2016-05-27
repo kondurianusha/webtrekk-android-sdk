@@ -113,18 +113,23 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
 
     protected String waitForTrackedURL()
     {
-        processWaitForURL();
-        return mSentURLArray.get(0);
+        return waitForTrackedURL(false);
+    }
+
+    protected String waitForTrackedURL(boolean isNoTrackCheck)
+    {
+        processWaitForURL(isNoTrackCheck);
+        return isNoTrackCheck ? null : mSentURLArray.get(0);
     }
 
     protected List<String> waitForTrackedURLs()
     {
         mWaitWhileTimoutFinished = true;
-        processWaitForURL();
+        processWaitForURL(false);
         return mSentURLArray;
     }
 
-    private void processWaitForURL()
+    private void processWaitForURL(boolean isNoTrackCheck)
     {
         synchronized (mSynchronize) {
             while (!mStringReceived) {
@@ -133,8 +138,13 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
                 } catch (InterruptedException e) {
                     assertTrue(false);
                 }
-                assertTrue(mStringReceived);
-                assertEquals(mStringNumbersToWait, mSentURLArray.size());
+                if (!isNoTrackCheck) {
+                    assertTrue(mStringReceived);
+                    assertEquals(mStringNumbersToWait, mSentURLArray.size());
+                }else {
+                    assertFalse(mStringReceived);
+                    break;
+                }
             }
         }
     }

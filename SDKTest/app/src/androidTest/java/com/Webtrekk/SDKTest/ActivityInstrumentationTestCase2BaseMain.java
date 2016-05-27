@@ -141,11 +141,12 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         int activityHash = activity.hashCode();
         while (!activity.isDestroyed() && !finishTimeout) {
             instrumentation.waitForIdleSync();
-            finishTimeout = (System.currentTimeMillis() - currentTime) > 60000;
+            finishTimeout = (System.currentTimeMillis() - currentTime) > 140000;
         }
 
-        if (finishTimeout)
-            WebtrekkLogging.log("finishActivitySync: finished by timeout. Hash:"+activityHash);
+        if (finishTimeout) {
+            WebtrekkLogging.log("finishActivitySync: finished by timeout. Hash:" + activityHash);
+        }
     }
 
     private void deleteCDBRepeatRequestInfo()

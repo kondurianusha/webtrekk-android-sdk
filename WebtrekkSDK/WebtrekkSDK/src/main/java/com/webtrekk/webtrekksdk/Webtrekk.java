@@ -558,6 +558,7 @@ public class Webtrekk {
      * @hide
      */
     void stop() {
+        stopSendURLProcess();
         mRequestFactory.stop();
     }
 
@@ -587,7 +588,7 @@ public class Webtrekk {
 
     private void stopSendURLProcess()
     {
-        if (requestProcessorFuture == null || requestProcessorFuture.isDone())
+        if (requestProcessorFuture != null && !requestProcessorFuture.isDone())
             requestProcessorFuture.cancel(true);
     }
 

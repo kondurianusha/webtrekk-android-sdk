@@ -9,9 +9,12 @@ import android.test.suitebuilder.annotation.Suppress;
 import static org.mockito.Mockito.*;
 
 import com.webtrekk.webtrekksdk.Request.RequestFactory;
+import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Configuration.ActivityConfiguration;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 
 import java.util.HashMap;
 

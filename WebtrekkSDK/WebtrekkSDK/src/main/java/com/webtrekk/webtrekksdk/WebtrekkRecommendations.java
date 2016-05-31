@@ -7,6 +7,7 @@ import android.os.Message;
 import android.util.JsonReader;
 
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 import java.io.IOException;

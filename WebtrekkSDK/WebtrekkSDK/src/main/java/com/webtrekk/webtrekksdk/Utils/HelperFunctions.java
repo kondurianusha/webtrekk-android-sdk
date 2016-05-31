@@ -22,7 +22,7 @@ import android.view.WindowManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.webtrekk.webtrekksdk.RequestProcessor;
+import com.webtrekk.webtrekksdk.Request.RequestProcessor;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.BufferedReader;

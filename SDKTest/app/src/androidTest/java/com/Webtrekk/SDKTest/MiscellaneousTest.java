@@ -3,13 +3,9 @@ package com.Webtrekk.SDKTest;
 import android.app.Activity;
 import android.content.Intent;
 
-import com.webtrekk.webtrekksdk.Request.TrackingRequest;
-import com.webtrekk.webtrekksdk.RequestUrlStore;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
-
-import java.util.HashMap;
 
 /**
  * Created by vartbaronov on 26.04.16.

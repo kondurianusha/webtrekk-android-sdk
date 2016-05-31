@@ -6,6 +6,7 @@ import android.test.InstrumentationTestCase;
 import android.util.Log;
 
 import com.webtrekk.webtrekksdk.Utils.AsyncTest;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfigurationDownloadTask;
 
 import static org.mockito.Mockito.*;
 

@@ -1,16 +1,13 @@
 package com.webtrekk.webtrekksdk.Request;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.content.LocalBroadcastManager;
 
-import com.webtrekk.webtrekksdk.ActivityConfiguration;
+import com.webtrekk.webtrekksdk.Configuration.ActivityConfiguration;
 import com.webtrekk.webtrekksdk.Modules.Campaign;
 import com.webtrekk.webtrekksdk.HelloWorldPlugin;
 import com.webtrekk.webtrekksdk.Plugin;
-import com.webtrekk.webtrekksdk.RequestUrlStore;
-import com.webtrekk.webtrekksdk.TrackingConfiguration;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;

@@ -11,7 +11,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.webtrekk.webtrekksdk.ReferrerReceiver;
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
-import com.webtrekk.webtrekksdk.RequestProcessor;
+import com.webtrekk.webtrekksdk.Request.RequestProcessor;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;

@@ -9,6 +9,8 @@ import java.io.IOException;
 
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfigurationXmlParser;
 
 /**
  * Created by user on 16/12/15.

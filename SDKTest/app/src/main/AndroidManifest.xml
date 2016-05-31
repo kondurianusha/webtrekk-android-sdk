@@ -96,6 +96,9 @@
         <activity
             android:name=".TransparentActivity" android:theme="@style/Theme.Transparent">
         </activity>
+        <activity
+            android:name=".RecommendationActivity">
+        </activity>
         <service android:name=".LoadOSService"/>
         <receiver
             android:name="com.webtrekk.webtrekksdk.WebtrekkGcmReceiver"

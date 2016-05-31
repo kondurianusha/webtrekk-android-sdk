@@ -661,6 +661,18 @@ public class Webtrekk {
     }
 
     /**
+     * Retruns recommmendation object that can be used to query recommendation(s)
+     * Each time method returns new instance of recomendation object that is initialized accounding to
+     * configuration xml. Using WebtrekkRecommendations object you can have independed several recomendation
+     * request.
+     * @return WebtrekkRecommendations object
+     */
+    public WebtrekkRecommendations getRecommendations()
+    {
+        return new WebtrekkRecommendations(trackingConfiguration, mContext);
+    }
+
+    /**
      * allows to set global tracking parameter which will be added to all requests
      * @return
      */

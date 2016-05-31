@@ -1,0 +1,397 @@
+package com.webtrekk.webtrekksdk;
+
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.util.JsonReader;
+
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by vartbaronov on 30.05.16.
+ * Class to query recommendations
+ */
+public class WebtrekkRecommendations {
+
+    public static class RecommendationProduct
+    {
+        private final String mId;
+        private final String mTitle;
+        final private Map<String, RecommendationValue> mValues;
+
+        RecommendationProduct(String id, String title, Map<String, RecommendationValue> values)
+        {
+            mId = id;
+            mTitle = title;
+            mValues = values;
+        }
+
+        /**
+         *
+         * @return
+         */
+        public String getId()
+        {
+            return mId;
+        }
+
+        /**
+         * returns recommendation Title
+         * @return
+         */
+        public String getTitle()
+        {
+            return mTitle;
+        }
+
+        /**
+         * returns recommendation value based on key
+         * @param key
+         * @return
+         */
+        public String getValue(String key)
+        {
+            return mValues.get(key).getValue();
+        }
+
+        /**
+         * get the type for this value for now type can be text, pictureURL, url
+         * @param key
+         * @return
+         */
+        public String getValueType(String key)
+        {
+            return mValues.get(key).getType();
+        }
+
+        /**
+         * get list of all possible values. It includes value and value type in RecommendationValue
+         * @return
+         */
+        public Map<String, RecommendationValue> getValues()
+        {
+            return mValues;
+        }
+    }
+
+    public static class RecommendationValue
+    {
+        final private String mType;
+        final private String mValue;
+
+        public RecommendationValue(String type, String value)
+        {
+            mType = type;
+            mValue = value;
+        }
+
+        public String getType() {
+            return mType;
+        }
+
+        public String getValue() {
+            return mValue;
+        }
+    }
+
+    public enum QueryRecommendationResult
+    {
+        RECEIVED_OK,
+        NO_PLACEMENT_ID_FOUND,
+        ACCOUNT_ID_NOT_FOUND,
+        RECOMENDATION_API_DEACITVATED,
+        NO_CONNECTION,
+        INCORRECT_URL_FORMAT,
+        INCORRECT_RESPONSE
+    }
+
+    /**
+     * This call back interface should be ovverided to provide request feedback
+     */
+    public interface RecommendationCallback
+    {
+        void onReceiveRecommendations(List<RecommendationProduct> products, QueryRecommendationResult result);
+    }
+
+    private Map<String, String> mRequestParameters = new HashMap<String, String>();
+    private RecommendationCallback mCallback;
+    private String mRecomendationURL;
+    private String mProductID;
+    private String mProductCat;
+    private final String USER_ID_PAR_NAME = "userId";
+    private final String PRODUCT_ID_PAR_NAME = "product";
+    private final String PRODUCT_CAT_PAR_NAME = "productCat";
+    final private TrackingConfiguration mConfiguration;
+    final private Context mContext;
+    private RecommendationCallThread mThread;
+
+
+    /**
+     * @hide
+     * @param configuration
+     * @param context
+     */
+    WebtrekkRecommendations(TrackingConfiguration configuration, Context context)
+    {
+        mConfiguration = configuration;
+        mContext = context;
+    }
+
+    /**
+     * returns recommendation URL configured for this produce. List of recommendations are defined in
+     * <recommendations> tag in config XML. Recommendation are returned as URL String based on provided key value,
+     * @return
+     */
+    public String getConfiguredRecommendationURL(String key)
+    {
+        return mConfiguration.getRecommendationConfiguration().get(key);
+    }
+
+    /**
+     * Init query for recommendation. Need call {@link #call()} to complete query.
+     * @return
+     */
+    public WebtrekkRecommendations queryRecommendation(RecommendationCallback callback, String recommendationName)
+    {
+        mCallback = callback;
+
+        if (mCallback == null)
+        {
+            WebtrekkLogging.log("call back is zero. Can't provide recommendation for this request");
+            return null;
+        }
+
+        mRecomendationURL = getConfiguredRecommendationURL(recommendationName);
+
+        if (mRecomendationURL == null)
+        {
+            WebtrekkLogging.log("There is no recommendation found. Please check your configuration xml");
+            return null;
+        }
+
+        mProductID= null;
+        mProductCat = null;
+
+        return this;
+    }
+
+    /**
+     * Set product ID for request recommendation call. If product ID null it will be ignored
+     * @param productID
+     * @return
+     */
+    public WebtrekkRecommendations setProductId(String productID)
+    {
+        mProductID = productID;
+        return this;
+    }
+
+    /**
+     * Set product category for request recommendation call. if product cat null it will be ignored.
+     * @param productCat
+     * @return
+     */
+    public WebtrekkRecommendations setProductCat(String productCat)
+    {
+        mProductCat = productCat;
+        return this;
+    }
+
+    /**
+     * Call recommendation. Result will be provided in callback that was provided in queryRecommendation
+     */
+    public void call()
+    {
+        boolean isUIThread = Looper.getMainLooper().getThread() == Thread.currentThread();
+        Handler handler;
+
+        if (isUIThread)
+        {
+            handler = new Handler() {
+                @Override
+                public void handleMessage(Message inputMessage) {
+                    if (inputMessage.what == 1)
+                       mCallback.onReceiveRecommendations(mThread.getProductList(), mThread.getQueryResult());
+                }
+            };
+        }else
+            handler = null;
+
+        mThread = new RecommendationCallThread(mCallback, getRequestURL(), handler);
+        mThread.start();
+    }
+
+    private String getRequestURL()
+    {
+        final String keys[] = {USER_ID_PAR_NAME, PRODUCT_ID_PAR_NAME, PRODUCT_CAT_PAR_NAME};
+        final String values[] = {HelperFunctions.getEverId(mContext), mProductID, mProductCat};
+
+        String addString = "";
+
+        for (int i = 0; i < keys.length ; i++)
+        {
+            if (values[i] != null)
+              addString += "&" + keys[i] + "=" + HelperFunctions.urlEncode(values[i]);
+        }
+
+        return mRecomendationURL + addString;
+    }
+
+
+    private static class RecommendationCallThread extends Thread
+    {
+
+        final private RecommendationCallback mCallback;
+        final private String mUrl;
+        private List<RecommendationProduct> mRequestResults = null;
+        volatile private QueryRecommendationResult mQueryResult;
+        final private Handler mHandler;
+
+        public RecommendationCallThread(RecommendationCallback callback, String url, Handler handler )
+        {
+            mCallback = callback;
+            mUrl = url;
+            mHandler = handler;
+        }
+
+        @Override
+        public void run()
+        {
+            JsonReader reader = null;
+            HttpURLConnection connection = null;
+            try {
+                URL url = new URL(mUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                WebtrekkLogging.log("Sending recommendation request: "+mUrl);
+                int resp = connection.getResponseCode();
+
+                if (resp == 200)
+                {
+                    reader = new JsonReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+                    if (processResponseMain(reader))
+                       mQueryResult = QueryRecommendationResult.RECEIVED_OK;
+                }else if (resp == 400) {
+                    mQueryResult = QueryRecommendationResult.NO_PLACEMENT_ID_FOUND;
+                }else if (resp == 401) {
+                    mQueryResult = QueryRecommendationResult.ACCOUNT_ID_NOT_FOUND;
+                }else if (resp == 403)
+                    mQueryResult = QueryRecommendationResult.RECOMENDATION_API_DEACITVATED;
+                else if (resp == 404)
+                    mQueryResult = QueryRecommendationResult.INCORRECT_URL_FORMAT;
+                else
+                    mQueryResult = QueryRecommendationResult.INCORRECT_RESPONSE;
+
+                if (mHandler == null)
+                {
+                    mCallback.onReceiveRecommendations(mRequestResults, mQueryResult);
+                }else
+                    mHandler.sendEmptyMessage(1);
+
+            } catch (MalformedURLException e) {
+                mQueryResult = QueryRecommendationResult.NO_PLACEMENT_ID_FOUND;
+                WebtrekkLogging.log("Incorrect recommendation URL. Check your configuration xml." + e);
+            } catch (IOException e) {
+                mQueryResult = QueryRecommendationResult.NO_CONNECTION;
+                WebtrekkLogging.log("Can't connect to reco server:"+e);
+            }finally {
+                try {
+                    if (reader != null)
+                        reader.close();
+                    if (connection != null)
+                        connection.disconnect();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+            }
+        }
+
+        synchronized public List<RecommendationProduct> getProductList()
+        {
+            return mRequestResults;
+        }
+
+        public QueryRecommendationResult getQueryResult()
+        {
+            return mQueryResult;
+        }
+
+
+        private boolean processResponseMain(JsonReader reader) {
+            try {
+                mRequestResults = new ArrayList<RecommendationProduct>();
+                reader.beginArray();
+                while (reader.hasNext())
+                {
+                    reader.beginObject();
+                    if (reader.nextName().equals("reco"))
+                    {
+                        processResponseRecoItem(reader, mRequestResults);
+                    }else
+                        reader.skipValue();
+                    reader.endObject();
+                }
+                reader.endArray();
+            } catch (IOException e) {
+                mQueryResult = QueryRecommendationResult.INCORRECT_RESPONSE;
+                WebtrekkLogging.log("Incorrect response structure:"+e);
+                mRequestResults = null;
+                return false;
+            }
+            return true;
+        }
+
+        private void processResponseRecoItem(JsonReader reader, List<RecommendationProduct> recommendations) throws IOException {
+
+            String title = null, id = null;
+            Map<String, RecommendationValue> recommendationValues = new HashMap<String, RecommendationValue>();
+
+            reader.beginArray();//begin array of one recommendation
+            while (reader.hasNext())
+            {
+
+                String value = null, identifier = null, type = null;
+
+                reader.beginObject(); //read recommendation item
+                while (reader.hasNext()) {
+                    String name = reader.nextName();
+                    if (name.equals("value"))
+                        value = reader.nextString();
+                    else if (name.equals("identifier"))
+                        identifier = reader.nextString();
+                    else if (name.equals("type"))
+                        type = reader.nextString();
+                    else
+                        reader.skipValue();
+                }
+                reader.endObject();
+
+                if (identifier.equals("id"))
+                    id = value;
+                else if(identifier.equals("campaignTitle"))
+                    title = value;
+                else
+                   recommendationValues.put(identifier, new RecommendationValue(type, value));
+            }
+            reader.endArray();
+            if (id != null)
+                recommendations.add(new RecommendationProduct(id, title, recommendationValues));
+            else
+            {
+                WebtrekkLogging.log("Incorrect recommendation. Lack of id. Title:"+title);
+            }
+        }
+    }
+}

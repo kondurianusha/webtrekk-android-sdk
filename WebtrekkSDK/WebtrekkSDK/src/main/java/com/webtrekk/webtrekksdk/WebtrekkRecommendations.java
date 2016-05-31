@@ -21,7 +21,7 @@ import java.util.Map;
 
 /**
  * Created by vartbaronov on 30.05.16.
- * Class to query recommendations
+ * Class to query recommendations from server
  */
 public class WebtrekkRecommendations {
 
@@ -189,6 +189,8 @@ public class WebtrekkRecommendations {
 
     /**
      * Set product ID for request recommendation call. If product ID null it will be ignored
+     * Need call {@link #call()} to complete query.
+     * This value is optional
      * @param productID
      * @return
      */
@@ -199,7 +201,9 @@ public class WebtrekkRecommendations {
     }
 
     /**
-     * Set product category for request recommendation call. if product cat null it will be ignored.
+     * Set product category for request recommendation call. if productCat null it will be ignored.
+     * Need call {@link #call()} to complete query.
+     * This value is optional
      * @param productCat
      * @return
      */
@@ -210,7 +214,7 @@ public class WebtrekkRecommendations {
     }
 
     /**
-     * Call recommendation. Result will be provided in callback that was provided in queryRecommendation
+     * Call recommendation. Result will be provided in callback that was set in queryRecommendation
      */
     public void call()
     {
@@ -233,6 +237,10 @@ public class WebtrekkRecommendations {
         mThread.start();
     }
 
+    /**
+     * @hide
+     * @return
+     */
     private String getRequestURL()
     {
         final String keys[] = {USER_ID_PAR_NAME, PRODUCT_ID_PAR_NAME, PRODUCT_CAT_PAR_NAME};
@@ -250,6 +258,9 @@ public class WebtrekkRecommendations {
     }
 
 
+    /**
+     * @hide
+     */
     private static class RecommendationCallThread extends Thread
     {
 

@@ -661,9 +661,9 @@ public class Webtrekk {
     }
 
     /**
-     * Retruns recommmendation object that can be used to query recommendation(s)
-     * Each time method returns new instance of recomendation object that is initialized accounding to
-     * configuration xml. Using WebtrekkRecommendations object you can have independed several recomendation
+     * Retruns recommendation object that can be used to query recommendation(s)
+     * Each time method returns new instance of recommendation object that is initialized accornding to
+     * configuration xml. Using WebtrekkRecommendations object you can have independed several recommendation
      * request.
      * @return WebtrekkRecommendations object
      */

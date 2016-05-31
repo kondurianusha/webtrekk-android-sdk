@@ -4,7 +4,10 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Configuration.ActivityConfiguration;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfigurationXmlParser;
 
 import org.xmlpull.v1.XmlPullParserException;
 

@@ -1,12 +1,14 @@
-package com.webtrekk.webtrekksdk;
+package com.webtrekk.webtrekksdk.Configuration;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
+import com.webtrekk.webtrekksdk.Request.RequestProcessor;
 import com.webtrekk.webtrekksdk.Utils.AsyncTest;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+import com.webtrekk.webtrekksdk.Webtrekk;
 
 import org.xmlpull.v1.XmlPullParserException;
 

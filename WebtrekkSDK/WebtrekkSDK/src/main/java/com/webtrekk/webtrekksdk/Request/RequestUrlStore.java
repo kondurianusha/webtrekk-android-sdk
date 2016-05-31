@@ -1,4 +1,4 @@
-package com.webtrekk.webtrekksdk;
+package com.webtrekk.webtrekksdk.Request;
 
 import android.content.Context;
 
@@ -142,7 +142,7 @@ public class RequestUrlStore extends LinkedList<String> {
      * for unit testing only
      * @return
      */
-    File getRequestStoreFile() {
+    public File getRequestStoreFile() {
         return requestStoreFile;
     }
 }

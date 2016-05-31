@@ -1,5 +1,6 @@
-package com.webtrekk.webtrekksdk;
+package com.webtrekk.webtrekksdk.Configuration;
 
+import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 import java.net.MalformedURLException;

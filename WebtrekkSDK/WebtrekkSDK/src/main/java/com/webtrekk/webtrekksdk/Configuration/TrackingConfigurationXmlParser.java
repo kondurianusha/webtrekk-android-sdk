@@ -1,4 +1,4 @@
-package com.webtrekk.webtrekksdk;
+package com.webtrekk.webtrekksdk.Configuration;
 
 import android.util.Xml;
 
@@ -10,6 +10,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
@@ -17,7 +18,7 @@ import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 /**
  * parses the xml for the tracking configuration
  */
-class TrackingConfigurationXmlParser {
+public class TrackingConfigurationXmlParser {
     private static final String ns = null;
 
     /**

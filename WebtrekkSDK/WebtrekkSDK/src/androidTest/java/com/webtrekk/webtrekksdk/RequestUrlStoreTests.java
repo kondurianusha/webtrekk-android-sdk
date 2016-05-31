@@ -2,6 +2,8 @@ package com.webtrekk.webtrekksdk;
 
 import android.test.AndroidTestCase;
 
+import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
+
 
 public class RequestUrlStoreTests extends AndroidTestCase {
 

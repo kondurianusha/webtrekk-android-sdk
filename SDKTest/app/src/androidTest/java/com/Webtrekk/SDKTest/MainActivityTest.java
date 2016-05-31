@@ -1,11 +1,7 @@
 package com.Webtrekk.SDKTest;
-import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.Suppress;
 
-import com.webtrekk.webtrekksdk.RequestUrlStore;
+import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Webtrekk;
-
-import com.Webtrekk.SDKTest.MainActivity;
 
 /**
  * Created by user on 09/11/15.

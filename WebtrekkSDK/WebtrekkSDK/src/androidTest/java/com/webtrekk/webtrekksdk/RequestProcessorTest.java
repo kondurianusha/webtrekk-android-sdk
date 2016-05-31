@@ -2,6 +2,9 @@ package com.webtrekk.webtrekksdk;
 
 import android.test.AndroidTestCase;
 
+import com.webtrekk.webtrekksdk.Request.RequestProcessor;
+import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;

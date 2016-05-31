@@ -4,11 +4,10 @@ import android.content.Context;
 
 import com.webtrekk.webtrekksdk.Request.RequestFactory;
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
-import com.webtrekk.webtrekksdk.TrackingConfiguration;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
-import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;

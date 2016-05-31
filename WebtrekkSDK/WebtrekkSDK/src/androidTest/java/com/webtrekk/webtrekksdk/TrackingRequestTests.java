@@ -1,11 +1,11 @@
 package com.webtrekk.webtrekksdk;
 
-import android.app.Activity;
 import android.test.AndroidTestCase;
 
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 
 import java.util.HashMap;
 

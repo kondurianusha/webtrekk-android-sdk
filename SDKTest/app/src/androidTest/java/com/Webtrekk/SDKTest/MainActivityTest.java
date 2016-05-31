@@ -54,7 +54,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2BaseMain<M
      */
     public void testAllValuesOverrideWithApplicationConfig() {
 
-        assertTrue(wt.getTrackDomain().contains("://localhost:8080"));
+        assertTrue(wt.getTrackDomain().contains("://q3.webtrekk.net"));
         assertEquals(wt.getVersion(), 1);
         assertEquals(wt.getTrackId(), "123451234512345");
         assertEquals(wt.getSampling(), 0);

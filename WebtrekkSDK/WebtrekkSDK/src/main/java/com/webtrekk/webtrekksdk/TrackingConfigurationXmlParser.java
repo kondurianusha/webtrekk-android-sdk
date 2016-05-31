@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 /**
@@ -442,6 +443,11 @@ class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.END_TAG, ns, "activity");
                 WebtrekkLogging.log("activity read from xml: "+ act.getClassName());
 
+            } else if (name.equals("recommendations")) {
+                parser.require(XmlPullParser.START_TAG, ns, "recommendations");
+                Map<String, String> recConfig = readRecommendationConfig(parser);
+                config.setRecommendationConfiguration(recConfig);
+                parser.require(XmlPullParser.END_TAG, ns, "recommendations");
             } else {
                 WebtrekkLogging.log("unknown xml tag: " + name);
                 skip(parser);
@@ -691,5 +697,30 @@ class TrackingConfigurationXmlParser {
     }
 
 
+    private Map<String, String> readRecommendationConfig(XmlPullParser parser) throws XmlPullParserException, IOException {
+
+        Map<String, String> retValue = new HashMap<String, String>();
+        while (parser.next() != XmlPullParser.END_TAG) {
+
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+
+            String name = parser.getName();
+            if (name.equals("recommendation"))
+            {
+                parser.require(XmlPullParser.START_TAG, ns, "recommendation");
+                String recName = parser.getAttributeValue(ns, "name");
+                String value = readText(parser);
+
+                if (recName == null || value == null || !HelperFunctions.testIsValidURL(value)) {
+                    WebtrekkLogging.log("invalid parameter configuration while reading recommendation value, missing name or value or value URL incorrect");
+                } else {
+                    retValue.put(recName, value);
+                }
+            }
+        }
+        return retValue;
+    }
 }
 

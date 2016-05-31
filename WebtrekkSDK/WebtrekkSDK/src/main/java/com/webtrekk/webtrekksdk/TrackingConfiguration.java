@@ -64,6 +64,7 @@ public class TrackingConfiguration {
 
     // the customParameter map from the xml configuration
     private Map<String, String> customParameter;
+    private Map<String, String> mRecommendationConfiguration;
 
     public TrackingConfiguration() {
         activityConfigurations = new HashMap<String, ActivityConfiguration>();
@@ -365,5 +366,13 @@ public class TrackingConfiguration {
 
     public void setConstGlobalTrackingParameter(TrackingParameter constGlobalTrackingParameter) {
         this.constGlobalTrackingParameter = constGlobalTrackingParameter;
+    }
+
+    public Map<String, String> getRecommendationConfiguration() {
+        return mRecommendationConfiguration;
+    }
+
+    public void setRecommendationConfiguration(Map<String, String> recommendationConfiguration) {
+        mRecommendationConfiguration = recommendationConfiguration;
     }
 }

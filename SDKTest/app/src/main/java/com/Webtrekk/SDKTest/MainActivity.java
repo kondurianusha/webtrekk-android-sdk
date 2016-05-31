@@ -26,9 +26,6 @@ public class MainActivity extends Activity {
     private Webtrekk webtrekk;
     private HttpServer mHttpServer;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +44,7 @@ public class MainActivity extends Activity {
         mediaCodeReceiverRegister();
 
         webtrekk = Webtrekk.getInstance();
-        webtrekk.initWebtrekk(getApplication());
+        webtrekk.initWebtrekk(getApplication(), R.raw.webtrekk_config_normal_track);
 
         webtrekk.getCustomParameter().put("own_para", "my-value");
 
@@ -162,6 +159,14 @@ public class MainActivity extends Activity {
     public void pushTest(View view)
     {
         Intent intent = new Intent(this, PushNotificationActivity.class);
+        startActivity(intent);
+    }
+
+    public void recommendationTest(View view)
+    {
+        Intent intent = new Intent(this, RecommendationActivity.class);
+        intent.putExtra(RecommendationActivity.RECOMMENDATION_NAME, "complexReco");
+        intent.putExtra(RecommendationActivity.RECOMMENDATION_PRODUCT_ID, "085cc2g007");
         startActivity(intent);
     }
 

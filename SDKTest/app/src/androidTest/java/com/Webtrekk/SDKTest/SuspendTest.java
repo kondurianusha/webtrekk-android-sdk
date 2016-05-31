@@ -1,12 +1,6 @@
 package com.Webtrekk.SDKTest;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-
-import com.webtrekk.webtrekksdk.RequestUrlStore;
-import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 

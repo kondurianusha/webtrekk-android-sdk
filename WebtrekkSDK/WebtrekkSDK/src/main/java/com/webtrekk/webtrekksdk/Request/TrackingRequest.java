@@ -4,7 +4,7 @@ package com.webtrekk.webtrekksdk.Request;
 import java.util.Map;
 import java.util.SortedMap;
 
-import com.webtrekk.webtrekksdk.TrackingConfiguration;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;

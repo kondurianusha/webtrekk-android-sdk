@@ -17,10 +17,15 @@ import java.util.concurrent.TimeUnit;
 
 import com.webtrekk.webtrekksdk.Modules.ExceptionHandler;
 import com.webtrekk.webtrekksdk.Request.RequestFactory;
+import com.webtrekk.webtrekksdk.Request.RequestProcessor;
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Configuration.ActivityConfiguration;
 import com.webtrekk.webtrekksdk.Utils.ApplicationTrackingStatus;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfigurationDownloadTask;
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfigurationXmlParser;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 /**
@@ -789,18 +794,18 @@ public class Webtrekk {
     }
 
     /**
-     * for unittesting only
+     * @hide
      * @return
      */
-    TrackingConfiguration getTrackingConfiguration() {
+    public TrackingConfiguration getTrackingConfiguration() {
         return trackingConfiguration;
     }
 
     /**
-     * for unit testing only
+     * @hide
      * @param trackingConfiguration
      */
-    void setTrackingConfiguration(TrackingConfiguration trackingConfiguration) {
+    public void setTrackingConfiguration(TrackingConfiguration trackingConfiguration) {
         this.trackingConfiguration = trackingConfiguration;
         mRequestFactory.setTrackingConfiguration(trackingConfiguration);
     }

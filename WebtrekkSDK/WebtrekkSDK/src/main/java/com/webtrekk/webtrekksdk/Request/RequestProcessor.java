@@ -1,5 +1,6 @@
-package com.webtrekk.webtrekksdk;
+package com.webtrekk.webtrekksdk.Request;
 
+import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 import java.io.EOFException;

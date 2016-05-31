@@ -29,9 +29,9 @@ public class WebtrekkRecommendations {
     {
         private final String mId;
         private final String mTitle;
-        final private Map<String, RecommendationValue> mValues;
+        final private Map<String, RecommendationProductValue> mValues;
 
-        RecommendationProduct(String id, String title, Map<String, RecommendationValue> values)
+        RecommendationProduct(String id, String title, Map<String, RecommendationProductValue> values)
         {
             mId = id;
             mTitle = title;
@@ -77,30 +77,38 @@ public class WebtrekkRecommendations {
         }
 
         /**
-         * get list of all possible values. It includes value and value type in RecommendationValue
+         * get list of all possible values. It includes value and value type in RecommendationProductValue
          * @return
          */
-        public Map<String, RecommendationValue> getValues()
+        public Map<String, RecommendationProductValue> getValues()
         {
             return mValues;
         }
     }
 
-    public static class RecommendationValue
+    public static class RecommendationProductValue
     {
         final private String mType;
         final private String mValue;
 
-        public RecommendationValue(String type, String value)
+        RecommendationProductValue(String type, String value)
         {
             mType = type;
             mValue = value;
         }
 
+        /**
+         * return type of recommendation value
+         * @return
+         */
         public String getType() {
             return mType;
         }
 
+        /**
+         * return recommendation value
+         * @return
+         */
         public String getValue() {
             return mValue;
         }
@@ -367,7 +375,7 @@ public class WebtrekkRecommendations {
         private void processResponseRecoItem(JsonReader reader, List<RecommendationProduct> recommendations) throws IOException {
 
             String title = null, id = null;
-            Map<String, RecommendationValue> recommendationValues = new HashMap<String, RecommendationValue>();
+            Map<String, RecommendationProductValue> recommendationValues = new HashMap<String, RecommendationProductValue>();
 
             reader.beginArray();//begin array of one recommendation
             while (reader.hasNext())
@@ -394,7 +402,7 @@ public class WebtrekkRecommendations {
                 else if(identifier.equals("campaignTitle"))
                     title = value;
                 else
-                   recommendationValues.put(identifier, new RecommendationValue(type, value));
+                   recommendationValues.put(identifier, new RecommendationProductValue(type, value));
             }
             reader.endArray();
             if (id != null)

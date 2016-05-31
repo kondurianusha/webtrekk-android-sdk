@@ -39,7 +39,7 @@ public class WebtrekkRecommendations {
         }
 
         /**
-         *
+         *returns the id of product
          * @return
          */
         public String getId()
@@ -57,7 +57,7 @@ public class WebtrekkRecommendations {
         }
 
         /**
-         * returns recommendation value based on key
+         * returns recommendation product value based on key
          * @param key
          * @return
          */
@@ -67,7 +67,7 @@ public class WebtrekkRecommendations {
         }
 
         /**
-         * get the type for this value for now type can be text, pictureURL, url
+         * get the type for this product value based on key for now type can be text, pictureURL, url
          * @param key
          * @return
          */

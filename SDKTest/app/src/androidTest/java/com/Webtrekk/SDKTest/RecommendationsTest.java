@@ -60,13 +60,16 @@ public class RecommendationsTest extends ActivityInstrumentationTestCase2Base<Re
         while (!activity.isRequestFinished()) {
             getInstrumentation().waitForIdleSync();
         }
+
         //Check results
         assertEquals(WebtrekkRecommendations.QueryRecommendationResult.RECEIVED_OK, getActivity().getLastResult());
+
         if (countCheck > 0)
           assertTrue(getActivity().getRecommendationCount() >= countCheck);
         else
           assertEquals(0, getActivity().getRecommendationCount());
         assertTrue(getActivity().isUsedUIThread());
+
         finishActivitySync(activity);
     }
 
@@ -85,7 +88,7 @@ public class RecommendationsTest extends ActivityInstrumentationTestCase2Base<Re
             public void onReceiveRecommendations(List<WebtrekkRecommendations.RecommendationProduct> products, WebtrekkRecommendations.QueryRecommendationResult result) {
                 assertFalse(currentThreadID == Thread.currentThread().getId());
             }
-        }, "paramTest").setProductId("productIDTest").setProductCat("productCatTest").call();
+        }, "paramTest").setProductId("productIDTest")/*.setProductCat("productCatTest")*/.call();
 
         String url = waitForTrackedURL();
 
@@ -94,7 +97,7 @@ public class RecommendationsTest extends ActivityInstrumentationTestCase2Base<Re
         parcel.parseURL(url);
 
         assertEquals("productIDTest", parcel.getValue("product"));
-        assertEquals("productCatTest", parcel.getValue("productCat"));
+        //assertEquals("productCatTest", parcel.getValue("productCat"));
         assertEquals(HelperFunctions.getEverId(getInstrumentation().getTargetContext()), parcel.getValue("userId"));
     }
 }

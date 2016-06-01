@@ -216,11 +216,13 @@ public class WebtrekkRecommendations {
      * @param productCat
      * @return
      */
+/* comment out need development on server side first
     public WebtrekkRecommendations setProductCat(String productCat)
     {
         mProductCat = productCat;
         return this;
     }
+*/
 
     /**
      * Call recommendation. Result will be provided in callback that was set in queryRecommendation

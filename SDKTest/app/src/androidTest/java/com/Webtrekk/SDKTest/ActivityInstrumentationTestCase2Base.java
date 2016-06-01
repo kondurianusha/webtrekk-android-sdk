@@ -34,6 +34,8 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
     protected HttpServer mHttpServer;
     long mStringNumbersToWait = 1;
     volatile private boolean mWaitWhileTimoutFinished;
+    private long mStartMessageReceiveNumber;
+
 
 
     public ActivityInstrumentationTestCase2Base(Class<T> activityClass) {
@@ -148,4 +150,18 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
             }
         }
     }
+
+    protected void setStartMessageNumber()
+    {
+        mStartMessageReceiveNumber = mHttpServer.getCurrentRequestNumber();
+    }
+
+    protected void waitForMessages(long messageCount)
+    {
+        while((mHttpServer.getCurrentRequestNumber() - mStartMessageReceiveNumber) != messageCount)
+        {
+            getInstrumentation().waitForIdleSync();
+        }
+    }
+
 }

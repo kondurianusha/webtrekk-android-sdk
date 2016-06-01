@@ -20,6 +20,7 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by vartbaronov on 17.05.16.
@@ -65,6 +66,7 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         Thread.setDefaultUncaughtExceptionHandler(mOldHandler);
         unregisterCallback();
         getInstrumentation().waitForIdleSync();
+        stopSendThread();
         super.tearDown();
     }
 
@@ -129,11 +131,16 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
 
     protected void finishActivitySync(Activity activity)
     {
-        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, getInstrumentation());
+        finishActivitySync(activity, getInstrumentation(), true);
+    }
+
+    protected void finishActivitySync(Activity activity, boolean killApplication)
+    {
+        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, getInstrumentation(), killApplication);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    static public void finishActivitySync(Activity activity, Instrumentation instrumentation)
+    static public void finishActivitySync(Activity activity, Instrumentation instrumentation, boolean killApplication)
     {   activity.finish();
         //give activity one minute to finish
         long currentTime = System.currentTimeMillis();
@@ -146,6 +153,8 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
 
         if (finishTimeout) {
             WebtrekkLogging.log("finishActivitySync: finished by timeout. Hash:" + activityHash);
+            if (killApplication)
+                System.exit(0);
         }
     }
 
@@ -155,6 +164,32 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
 
         if (preferences.contains("LAST_CBD_REQUEST_DATE"))
             preferences.edit().remove("LAST_CBD_REQUEST_DATE").apply();
+    }
+
+    private void stopSendThread()
+    {
+        if (mApplication == null)
+        {
+            WebtrekkLogging.log("Error unregister callback. Application reference is null");
+            return;
+        }
+
+        if (!Webtrekk.getInstance().isInitialized())
+        {
+            WebtrekkLogging.log("Error unregister callback. Webtrekk isn't initialized");
+            return;
+        }
+        Webtrekk webtrekk = Webtrekk.getInstance();
+        try {
+            Field callbackField = Webtrekk.class.getDeclaredField("mTimerService");
+            callbackField.setAccessible(true);
+            ScheduledExecutorService threadService = (ScheduledExecutorService) callbackField.get(webtrekk);
+            threadService.shutdownNow();
+        } catch (NoSuchFieldException e) {
+            WebtrekkLogging.log("Can't remove activity callback");
+        } catch (IllegalAccessException e) {
+            WebtrekkLogging.log("Can't remove activity callback");
+        }
     }
 
 

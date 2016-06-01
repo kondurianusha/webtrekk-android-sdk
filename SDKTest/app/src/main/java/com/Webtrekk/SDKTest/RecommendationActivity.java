@@ -90,7 +90,7 @@ public class RecommendationActivity extends Activity {
                 mUsedUIThread = Looper.getMainLooper().getThread() == Thread.currentThread();
                 mRequestFinished = true;
             }
-        }, recommendationName).setProductId(productID).setProductCat(productCat).call();
+        }, recommendationName).setProductId(productID)/*.setProductCat(productCat)*/.call();
     }
 
     public WebtrekkRecommendations.QueryRecommendationResult getLastResult()

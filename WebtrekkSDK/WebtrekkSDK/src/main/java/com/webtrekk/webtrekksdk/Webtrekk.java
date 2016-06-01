@@ -49,7 +49,7 @@ public class Webtrekk {
     //application status definishion
     private ApplicationTrackingStatus mApplicationStatus;
 
-    private ScheduledExecutorService timerService;
+    private ScheduledExecutorService mTimerService;
     private ScheduledFuture<?> timerFuture;
     private ExecutorService executorService;
     private Future<?> requestProcessorFuture;
@@ -259,8 +259,8 @@ public class Webtrekk {
      */
     void initTimerService() {
         // start the timer service
-        timerService = Executors.newSingleThreadScheduledExecutor();
-        timerFuture = timerService.scheduleWithFixedDelay(new Runnable() {
+        mTimerService = Executors.newSingleThreadScheduledExecutor();
+        timerFuture = mTimerService.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
                 onSendIntervalOver();
@@ -776,7 +776,7 @@ public class Webtrekk {
      * @return
      */
     ScheduledExecutorService getTimerService() {
-        return timerService;
+        return mTimerService;
     }
     /**
      * for unit testing only

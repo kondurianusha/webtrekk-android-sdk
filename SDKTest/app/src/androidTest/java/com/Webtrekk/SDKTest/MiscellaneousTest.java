@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 /**
@@ -281,8 +282,6 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         customValueIsSavedTestInternal();
 
         finishActivitySync(newActivity);
-
-
     }
 
     private void customValueIsSavedTestInternal()
@@ -324,6 +323,4 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         assertFalse(parcel.getValue("cp9").isEmpty());
     }
-
-
 }

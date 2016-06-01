@@ -37,7 +37,7 @@ public class AaOldLibraryRunTest extends ActivityInstrumentationTestCase2<OldWeb
     public void testOldSDK()
     {
         getActivity();
-        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(getActivity(), getInstrumentation());
+        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(getActivity(), getInstrumentation(), true);
     }
 
 }

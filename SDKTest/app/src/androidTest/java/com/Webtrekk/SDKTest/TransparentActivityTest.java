@@ -43,7 +43,7 @@ public class TransparentActivityTest extends ActivityInstrumentationTestCase2Bas
         waitForTrackedURL();
 
         initWaitingForTrack(null);
-        finishActivitySync(newActivity);
+        finishActivitySync(newActivity, false);
 
         waitForTrackedURL(true);
 

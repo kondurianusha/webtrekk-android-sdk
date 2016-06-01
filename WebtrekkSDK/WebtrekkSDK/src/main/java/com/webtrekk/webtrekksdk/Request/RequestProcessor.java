@@ -85,6 +85,7 @@ public class RequestProcessor implements Runnable {
             return 0;
         } catch (SocketTimeoutException e) {
             WebtrekkLogging.log("RequestProcessor: SocketTimeout > Will retry later.", e);
+            return 0;
         } catch (SocketException e) {
             WebtrekkLogging.log("RequestProcessor: Socket Exception.", e);
             return 0;
@@ -112,6 +113,7 @@ public class RequestProcessor implements Runnable {
     public void run() {
         while (mRequestUrlStore.size() > 0) {
 
+            Thread.yield();
             if (Thread.interrupted())
                 break;
 

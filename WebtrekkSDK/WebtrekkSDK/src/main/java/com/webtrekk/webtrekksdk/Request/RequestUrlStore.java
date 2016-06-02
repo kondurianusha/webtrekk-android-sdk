@@ -51,7 +51,7 @@ public class RequestUrlStore extends LinkedList<String> {
      *
      * @param requestUrl string representation of a tracking request
      */
-    synchronized public void addURL(String requestUrl) {
+    public void addURL(String requestUrl) {
         // if the maximumRequest number  is reached drop the oldest request
       if (size() >= maximumRequests) {
                 removeLast();
@@ -59,14 +59,14 @@ public class RequestUrlStore extends LinkedList<String> {
         addFirst(requestUrl);
     }
 
-    synchronized public void removeLastURL() {
+    public void removeLastURL() {
             removeLast();
     }
 
     /**
      * loads the requests from the cache file if present
      */
-    public void loadRequestsFromFile() {
+    synchronized public void loadRequestsFromFile() {
         if (requestStoreFile == null || !requestStoreFile.exists()) {
             return;
         }
@@ -91,7 +91,7 @@ public class RequestUrlStore extends LinkedList<String> {
      * saves the requests from the store to the request file if they could not be send
      * in case all requests are send, the old cache file gets deleted
      */
-    public void saveRequestsToFile() {
+    synchronized public void saveRequestsToFile() {
         if (requestStoreFile == null) {
             // no valid filehandle
             return;

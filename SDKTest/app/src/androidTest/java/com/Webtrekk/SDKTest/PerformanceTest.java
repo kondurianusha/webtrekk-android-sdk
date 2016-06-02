@@ -1,5 +1,7 @@
 package com.Webtrekk.SDKTest;
 
+import android.test.suitebuilder.annotation.Suppress;
+
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
@@ -30,7 +32,7 @@ public class PerformanceTest extends ActivityInstrumentationTestCase2Base<EmptyA
 
 
     //works in reality only on real HW
-    public void testPerformance()
+    public void testTimePerformance()
     {
         final int numberOfTest = 1000;
         long timeDifSum = 0;
@@ -42,7 +44,7 @@ public class PerformanceTest extends ActivityInstrumentationTestCase2Base<EmptyA
             long before = System.currentTimeMillis();
             mWebtrekk.track();
             long timeOfTrack = System.currentTimeMillis() - before;
-            WebtrekkLogging.log("time of track:"+timeOfTrack);
+            WebtrekkLogging.log("time of track("+i+"):"+timeOfTrack);
             timeDifSum += timeOfTrack;
         }
 
@@ -53,5 +55,19 @@ public class PerformanceTest extends ActivityInstrumentationTestCase2Base<EmptyA
         waitForMessages(numberOfTest);
 
         assertTrue("Performance test is shown:"+result + " milliseconds per call", result < 10);
+    }
+
+    @Suppress
+    public void testMessageNumberPerformance() {
+        final int numberOfTest = 100000;
+
+        setStartMessageNumber();
+
+        for (int i = 0; i < numberOfTest; i++) {
+            mWebtrekk.track();
+            WebtrekkLogging.log("track:" + i);
+        }
+
+        waitForMessages(numberOfTest);
     }
 }

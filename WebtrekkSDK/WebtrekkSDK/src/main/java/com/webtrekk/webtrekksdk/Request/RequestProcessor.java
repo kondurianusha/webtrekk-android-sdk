@@ -111,7 +111,6 @@ public class RequestProcessor implements Runnable {
 
     @Override
     public void run() {
-        synchronized (mRequestUrlStore) {
             while (mRequestUrlStore.size() > 0) {
 
                 Thread.yield();
@@ -126,7 +125,9 @@ public class RequestProcessor implements Runnable {
                     continue;
                 }
 
-                int statusCode = sendRequest(url, null);
+                synchronized (mRequestUrlStore) {
+
+                    int statusCode = sendRequest(url, null);
                 if (statusCode >= 200 && statusCode <= 299) {
                     WebtrekkLogging.log("completed request. Status code:" + statusCode);
                     //successful send, remove url from store

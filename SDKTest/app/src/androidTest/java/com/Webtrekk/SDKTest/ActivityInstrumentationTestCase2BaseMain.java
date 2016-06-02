@@ -32,7 +32,6 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
     protected boolean mIsExternalCall;
     static private String IS_EXTERNAL = "external";
     protected boolean mIsCDBTestRequest;
-    private boolean mApplicationShouldBeKilled;
 
     public ActivityInstrumentationTestCase2BaseMain(Class<T> activityClass) {
         super(activityClass);
@@ -68,12 +67,7 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         unregisterCallback();
         getInstrumentation().waitForIdleSync();
         stopSendThread();
-        boolean toKill = mApplicationShouldBeKilled;
         super.tearDown();
-
-        if (toKill)
-            System.exit(1);
-
     }
 
     protected void deleteErrorHandlerFile(Context context)
@@ -142,11 +136,11 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
 
     protected void finishActivitySync(Activity activity, boolean killApplication)
     {
-        mApplicationShouldBeKilled = ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, getInstrumentation(), killApplication);
+        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, getInstrumentation(), killApplication);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    static public boolean finishActivitySync(Activity activity, Instrumentation instrumentation, boolean killApplication)
+    static public void finishActivitySync(Activity activity, Instrumentation instrumentation, boolean killApplication)
     {   activity.finish();
         //give activity one minute to finish
         long currentTime = System.currentTimeMillis();
@@ -159,9 +153,7 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
 
         if (finishTimeout) {
             WebtrekkLogging.log("finishActivitySync: finished by timeout. Hash:" + activityHash);
-            return false;
         }
-        return true;
     }
 
     private void deleteCDBRepeatRequestInfo()

@@ -297,7 +297,7 @@ public class Webtrekk {
      * this method immediately stops tracking, for example when a user opted out
      * tracking will be in invalid state, until init is called again
      */
-    public synchronized  void stopTracking() {
+    public void stopTracking() {
         if(mRequestFactory.getRequestUrlStore() != null) {
             mRequestFactory.getRequestUrlStore().clear();
         }

@@ -67,6 +67,7 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         unregisterCallback();
         getInstrumentation().waitForIdleSync();
         stopSendThread();
+        unregisterActivityEventCallback();
         super.tearDown();
     }
 
@@ -153,17 +154,6 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
 
         if (finishTimeout) {
             WebtrekkLogging.log("finishActivitySync: finished by timeout. Hash:" + activityHash);
-            if (unregisterCallback)
-                unreginsterActivityEventCallback(instrumentation);
-
-/*
-            if (isActivityResumed(activity))
-               instrumentation.callActivityOnPause(activity);
-            if (!isActivityStopped(activity))
-                instrumentation.callActivityOnStop(activity);
-            if (!activity.isDestroyed())
-                instrumentation.callActivityOnDestroy(activity);
-*/
         }
     }
 
@@ -204,15 +194,14 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         return (Boolean)returnHiddenField(activity, "mResumed");
     }
 
-    static private void unreginsterActivityEventCallback(Instrumentation instrumentation)
+    private void unregisterActivityEventCallback()
     {
         Webtrekk webtrekk = Webtrekk.getInstance();
 
         Application.ActivityLifecycleCallbacks callbacks = (Application.ActivityLifecycleCallbacks)returnHiddenField(webtrekk, "mCallbacks");
         if (callbacks != null)
         {
-            Application app = (Application)instrumentation.getTargetContext();
-            app.unregisterActivityLifecycleCallbacks(callbacks);
+            mApplication.unregisterActivityLifecycleCallbacks(callbacks);
         }
     }
 

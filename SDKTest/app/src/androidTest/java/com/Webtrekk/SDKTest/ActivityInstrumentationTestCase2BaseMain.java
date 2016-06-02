@@ -72,7 +72,7 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         super.tearDown();
 
         if (toKill)
-            System.exit(0);
+            System.exit(1);
 
     }
 

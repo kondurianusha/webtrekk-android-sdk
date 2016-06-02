@@ -111,28 +111,27 @@ public class RequestProcessor implements Runnable {
 
     @Override
     public void run() {
-        while (mRequestUrlStore.size() > 0) {
+        synchronized (mRequestUrlStore) {
+            while (mRequestUrlStore.size() > 0) {
 
-            Thread.yield();
-            if (Thread.interrupted())
-                break;
+                Thread.yield();
+                if (Thread.interrupted())
+                    break;
 
-            String urlString = mRequestUrlStore.peekLast();
-            URL url = getUrl(urlString);
-            if (url == null) {
-                WebtrekkLogging.log("Removing invalid URL '" + urlString + "' from queue. remaining: " + mRequestUrlStore.size());
-                mRequestUrlStore.removeLastURL();
-                continue;
-            }
+                String urlString = mRequestUrlStore.peekLast();
+                URL url = getUrl(urlString);
+                if (url == null) {
+                    WebtrekkLogging.log("Removing invalid URL '" + urlString + "' from queue. remaining: " + mRequestUrlStore.size());
+                    mRequestUrlStore.removeLastURL();
+                    continue;
+                }
 
-            synchronized (mRequestUrlStore)
-            {
                 int statusCode = sendRequest(url, null);
                 if (statusCode >= 200 && statusCode <= 299) {
-                    WebtrekkLogging.log("completed request. Status code:"+statusCode);
+                    WebtrekkLogging.log("completed request. Status code:" + statusCode);
                     //successful send, remove url from store
                     mRequestUrlStore.removeLastURL();
-                } else if(statusCode == 0) {
+                } else if (statusCode == 0) {
                     // client side networking errors, just break and try again with next onSendintervalOver
                     break;
                 } else {
@@ -141,7 +140,7 @@ public class RequestProcessor implements Runnable {
                     // if there are redirects on serverside this has to be changed
                     WebtrekkLogging.log("removing URL from queue because status code cannot be handled: ");
                     mRequestUrlStore.removeLastURL();
-            }
+                }
             }
         }
         WebtrekkLogging.log("Processing URL task is finished");

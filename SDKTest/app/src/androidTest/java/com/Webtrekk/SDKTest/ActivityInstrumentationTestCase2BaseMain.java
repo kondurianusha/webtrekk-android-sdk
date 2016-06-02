@@ -134,13 +134,13 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         finishActivitySync(activity, getInstrumentation(), true);
     }
 
-    protected void finishActivitySync(Activity activity, boolean killApplication)
+    protected void finishActivitySync(Activity activity, boolean unregisterCallback)
     {
-        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, getInstrumentation(), killApplication);
+        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, getInstrumentation(), unregisterCallback);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    static public void finishActivitySync(Activity activity, Instrumentation instrumentation, boolean killApplication)
+    static public void finishActivitySync(Activity activity, Instrumentation instrumentation, boolean unregisterCallback)
     {   activity.finish();
         //give activity one minute to finish
         long currentTime = System.currentTimeMillis();
@@ -153,6 +153,17 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
 
         if (finishTimeout) {
             WebtrekkLogging.log("finishActivitySync: finished by timeout. Hash:" + activityHash);
+            if (unregisterCallback)
+                unreginsterActivityEventCallback(instrumentation);
+
+/*
+            if (isActivityResumed(activity))
+               instrumentation.callActivityOnPause(activity);
+            if (!isActivityStopped(activity))
+                instrumentation.callActivityOnStop(activity);
+            if (!activity.isDestroyed())
+                instrumentation.callActivityOnDestroy(activity);
+*/
         }
     }
 
@@ -178,16 +189,47 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
             return;
         }
         Webtrekk webtrekk = Webtrekk.getInstance();
+
+        ScheduledExecutorService threadService = (ScheduledExecutorService)returnHiddenField(webtrekk, "mTimerService");
+        threadService.shutdownNow();
+    }
+
+    static private boolean isActivityStopped(Activity activity)
+    {
+        return (Boolean)returnHiddenField(activity, "mStopped");
+    }
+
+    static private boolean isActivityResumed(Activity activity)
+    {
+        return (Boolean)returnHiddenField(activity, "mResumed");
+    }
+
+    static private void unreginsterActivityEventCallback(Instrumentation instrumentation)
+    {
+        Webtrekk webtrekk = Webtrekk.getInstance();
+
+        Application.ActivityLifecycleCallbacks callbacks = (Application.ActivityLifecycleCallbacks)returnHiddenField(webtrekk, "mCallbacks");
+        if (callbacks != null)
+        {
+            Application app = (Application)instrumentation.getTargetContext();
+            app.unregisterActivityLifecycleCallbacks(callbacks);
+        }
+    }
+
+    static private Object returnHiddenField(Object object, String fieldName)
+    {
+        Object result = null;
         try {
-            Field callbackField = Webtrekk.class.getDeclaredField("mTimerService");
+            Field callbackField = object.getClass().getDeclaredField(fieldName);
             callbackField.setAccessible(true);
-            ScheduledExecutorService threadService = (ScheduledExecutorService) callbackField.get(webtrekk);
-            threadService.shutdownNow();
+            result = callbackField.get(object);
         } catch (NoSuchFieldException e) {
             WebtrekkLogging.log("Can't remove activity callback");
         } catch (IllegalAccessException e) {
             WebtrekkLogging.log("Can't remove activity callback");
         }
+
+        return result;
     }
 
 

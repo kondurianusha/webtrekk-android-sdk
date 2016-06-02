@@ -117,7 +117,7 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
       WebtrekkLogging.log("Tracking Activity Paused: " + getActivityName(activity));
 
         WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " instance hash:" + activity.hashCode() + " Previous Activity:"+mPreviousActivityName);
-        if (activity.isFinishing() && mCurrentActivityName.equals(getActivityName(activity))) {
+        if (activity.isFinishing() && mCurrentActivityName != null && mCurrentActivityName.equals(getActivityName(activity))) {
             mCurrentActivityName = mPreviousActivityName;
             mCurrentActivityInstance = null;
             mPreviousActivityName = null;

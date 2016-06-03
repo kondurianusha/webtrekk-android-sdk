@@ -32,7 +32,7 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
     protected final Object mSynchronize = new Object();
     protected long mWaitMilliseconds = 12000;
     protected HttpServer mHttpServer;
-    long mStringNumbersToWait = 1;
+    volatile long mStringNumbersToWait = 1;
     volatile private boolean mWaitWhileTimoutFinished;
     private long mStartMessageReceiveNumber;
 

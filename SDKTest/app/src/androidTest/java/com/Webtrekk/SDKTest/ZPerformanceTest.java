@@ -2,16 +2,21 @@ package com.Webtrekk.SDKTest;
 
 import android.test.suitebuilder.annotation.Suppress;
 
+import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Created by vartbaronov on 01.06.16.
+ * Name it with Z to call it at last.
  */
-public class PerformanceTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
     private Webtrekk mWebtrekk;
 
-    public PerformanceTest() {
+    public ZPerformanceTest() {
         super(EmptyActivity.class);
     }
 
@@ -69,5 +74,31 @@ public class PerformanceTest extends ActivityInstrumentationTestCase2Base<EmptyA
         }
 
         waitForMessages(numberOfTest);
+    }
+
+    public void testSavingToFlashByTimeout()
+    {
+        RequestUrlStore urlStore = new RequestUrlStore(getInstrumentation().getTargetContext());
+
+        File file = urlStore.getRequestStoreFile();
+        long length = file.length();
+        mHttpServer.stop();
+        mWebtrekk.track();
+
+        // sleep for a while to make saving happends
+        try {
+            Thread.sleep(95000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        assertTrue(file.length() > length);
+        try {
+            mHttpServer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        waitForTrackedURLs();
     }
 }

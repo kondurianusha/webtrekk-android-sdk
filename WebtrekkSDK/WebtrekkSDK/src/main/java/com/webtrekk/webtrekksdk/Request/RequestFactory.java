@@ -654,7 +654,7 @@ public class RequestFactory {
 
     private void flashByTimeout()
     {
-        if (mRequestProcessorFuture == null)
+        if (mFlashTimerFuture == null)
             return;
         if ((System.currentTimeMillis() - mLastTrackTime) > 60000 && mRequestProcessorFuture.isDone())
             flash();

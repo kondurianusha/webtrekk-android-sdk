@@ -20,6 +20,7 @@ public class PerformanceTest extends ActivityInstrumentationTestCase2Base<EmptyA
         super.setUp();
         mWebtrekk = Webtrekk.getInstance();
         mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_performance_test);
+        mHttpServer.resetRequestNumber();
         getActivity();
     }
 
@@ -57,15 +58,14 @@ public class PerformanceTest extends ActivityInstrumentationTestCase2Base<EmptyA
         assertTrue("Performance test is shown:"+result + " milliseconds per call", result < 10);
     }
 
-    @Suppress
     public void testMessageNumberPerformance() {
-        final int numberOfTest = 100000;
+        final int numberOfTest = 50000;
 
         setStartMessageNumber();
 
         for (int i = 0; i < numberOfTest; i++) {
-            mWebtrekk.track();
             WebtrekkLogging.log("track:" + i);
+            mWebtrekk.track();
         }
 
         waitForMessages(numberOfTest);

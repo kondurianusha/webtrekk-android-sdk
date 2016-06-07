@@ -26,7 +26,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2BaseMain<M
     public void tearDown() throws Exception {
         finishActivitySync(getActivity());
         setActivity(null);
-        RequestUrlStore request = new RequestUrlStore(getInstrumentation().getTargetContext(), 10);
+        RequestUrlStore request = new RequestUrlStore(getInstrumentation().getTargetContext());
         request.deleteRequestsFile();
         super.tearDown();
     }

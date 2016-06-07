@@ -99,4 +99,17 @@ public class HttpServer extends NanoHTTPD {
 
         pref.edit().putLong(REQUEST_COUNT_VALUE, pref.getLong(REQUEST_COUNT_VALUE, 0)+1).apply();
     }
+
+    public void resetRequestNumber()
+    {
+        if (mContext == null)
+        {
+            WebtrekkLogging.log("Error. Context is null. No operation with context for HTTP serer");
+            return;
+        }
+
+        SharedPreferences pref = HelperFunctions.getWebTrekkSharedPreference(mContext);
+
+        pref.edit().putLong(REQUEST_COUNT_VALUE, 0).apply();
+    }
 }

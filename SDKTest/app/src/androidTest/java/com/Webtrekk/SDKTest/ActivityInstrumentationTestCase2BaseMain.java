@@ -12,6 +12,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.InstrumentationTestRunner;
 
 import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
+import com.webtrekk.webtrekksdk.Request.RequestFactory;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
@@ -180,8 +181,11 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         }
         Webtrekk webtrekk = Webtrekk.getInstance();
 
-        ScheduledExecutorService threadService = (ScheduledExecutorService)returnHiddenField(webtrekk, "mTimerService");
-        threadService.shutdownNow();
+        RequestFactory requestFactory = (RequestFactory)returnHiddenField(webtrekk, "mRequestFactory");
+        ScheduledExecutorService threadService1 = (ScheduledExecutorService)returnHiddenField(requestFactory, "mURLSendTimerService");
+        ScheduledExecutorService threadService2 = (ScheduledExecutorService)returnHiddenField(requestFactory, "mFlashTimerService");
+        threadService1.shutdownNow();
+        threadService2.shutdownNow();
     }
 
     static private boolean isActivityStopped(Activity activity)

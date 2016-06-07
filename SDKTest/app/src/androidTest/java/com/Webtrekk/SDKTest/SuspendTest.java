@@ -29,7 +29,7 @@ public class SuspendTest extends ActivityInstrumentationTestCase2Base<SuspendAct
         if (!mIsExternalCall)
             return;
 
-        RequestUrlStore store = new RequestUrlStore(getInstrumentation().getTargetContext(), 10);
+        RequestUrlStore store = new RequestUrlStore(getInstrumentation().getTargetContext());
         store.deleteRequestsFile();
         long currentMessageNumber = mHttpServer.getCurrentRequestNumber();
 

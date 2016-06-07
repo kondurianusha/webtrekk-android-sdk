@@ -67,7 +67,6 @@ public class RequestUrlStore {
             protected void entryRemoved(boolean evicted, Integer key, final String oldValue, String newValue) {
                 if (evicted && oldValue != null)
                 {
-                    WebtrekkLogging.log("Remove id:"+key+" from Lru cash with size:"+sizeOf(key, oldValue));
                     saveURLsToFile(new SaveURLAction(){
 
                         @Override
@@ -80,10 +79,6 @@ public class RequestUrlStore {
                 }
             }
         };
-    }
-
-    //do basic initialization
-    final private void init(Context context, long flashPeriod){
     }
 
     private void initFileAttributes() {
@@ -208,7 +203,7 @@ public class RequestUrlStore {
 
     private boolean isURLFileExists()
     {
-        return requestStoreFile != null && requestStoreFile.exists();
+        return requestStoreFile.exists();
     }
 
 

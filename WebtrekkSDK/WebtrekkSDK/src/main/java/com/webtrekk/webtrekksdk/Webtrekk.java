@@ -49,11 +49,6 @@ public class Webtrekk {
     //application status definishion
     private ApplicationTrackingStatus mApplicationStatus;
 
-    private ScheduledExecutorService mTimerService;
-    private ScheduledFuture<?> timerFuture;
-    private ExecutorService executorService;
-    private Future<?> requestProcessorFuture;
-
     private Context mContext;
 
     private TrackedActivityLifecycleCallbacks mCallbacks;
@@ -145,7 +140,6 @@ public class Webtrekk {
 
         initTrackingConfiguration(configResourceID);
         mRequestFactory.init(mContext, trackingConfiguration, this);
-        initTimerService();
         //TODO: make sure this can not break
         //Application act = (Application) mContext.getApplicationContext();
         mExceptionHandler.init(mRequestFactory, mContext);
@@ -254,22 +248,6 @@ public class Webtrekk {
     }
 
     /**
-     * starts the timer service, it executes after initial send delay for the first time, and then
-     * every sendDelay seconds, it processes the stored requests in a separate thread
-     */
-    void initTimerService() {
-        // start the timer service
-        mTimerService = Executors.newSingleThreadScheduledExecutor();
-        timerFuture = mTimerService.scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                onSendIntervalOver();
-            }
-        }, trackingConfiguration.getSendDelay(), trackingConfiguration.getSendDelay(), TimeUnit.SECONDS);
-        WebtrekkLogging.log("timer service started");
-    }
-
-    /**
      * this functions enables the automatic activity tracking in case its enabled in the configuration
      * @param app application object of the tracked app, can either be a custom one or required by getApplication()
      */
@@ -299,9 +277,9 @@ public class Webtrekk {
      */
     public void stopTracking() {
         if(mRequestFactory.getRequestUrlStore() != null) {
-            mRequestFactory.getRequestUrlStore().clear();
+            mRequestFactory.stopSendURLProcess();
+            mRequestFactory.getRequestUrlStore().clearAllTrackingData();
         }
-        stopSendURLProcess();
     }
 
     /**
@@ -436,6 +414,7 @@ public class Webtrekk {
 
         TrackingRequest request = mRequestFactory.createTrackingRequest(tp);
         mRequestFactory.addRequest(request);
+        mRequestFactory.setLasTrackTime(System.currentTimeMillis());
     }
 
     /**
@@ -521,7 +500,7 @@ public class Webtrekk {
      */
     private void onFirstActivityStart() {
         mRequestFactory.onFirstStart();
-        onSendIntervalOver();
+        mRequestFactory.onSendIntervalOver();
     }
 
     /**
@@ -563,7 +542,6 @@ public class Webtrekk {
      * @hide
      */
     void stop() {
-        stopSendURLProcess();
         mRequestFactory.stop();
     }
 
@@ -572,38 +550,7 @@ public class Webtrekk {
      * it stores all requests to file.
      */
     private void flash() {
-        stopSendURLProcess();
         mRequestFactory.flash();
-    }
-
-    /**
-     * this method gets called whenever the send delay is over, it executes the requesthandler in a
-     * new thread
-     */
-    void onSendIntervalOver() {
-        WebtrekkLogging.log("onSendIntervalOver: activity count: " + mApplicationStatus.getCurrentActivitiesCount() + " request urls: " + mRequestFactory.getRequestUrlStore().size()
-                + " thread done:"+(requestProcessorFuture == null ? "null":requestProcessorFuture.isDone()));
-        if(mRequestFactory.getRequestUrlStore().size() > 0  && (requestProcessorFuture == null || requestProcessorFuture.isDone())) {
-            if (executorService == null) {
-                executorService = Executors.newSingleThreadExecutor();
-            }
-            requestProcessorFuture = executorService.submit(new RequestProcessor(mRequestFactory.getRequestUrlStore()));
-        }
-    }
-
-    private void stopSendURLProcess()
-    {
-        if (requestProcessorFuture != null && !requestProcessorFuture.isDone()) {
-            requestProcessorFuture.cancel(true);
-            executorService.shutdownNow();
-            try {
-                executorService.awaitTermination(2, TimeUnit.MINUTES);
-            } catch (InterruptedException e) {
-                WebtrekkLogging.log("Can't terminate sending process");
-            }
-            executorService = null;
-            WebtrekkLogging.log("Processing URL is canceled");
-        }
     }
 
     void setContext(Context context) {
@@ -761,6 +708,7 @@ public class Webtrekk {
 
     void setApplicationStatus(ApplicationTrackingStatus applicationStatus) {
         mApplicationStatus = applicationStatus;
+        mRequestFactory.setApplicationStatus(applicationStatus);
     }
 
     /**
@@ -770,27 +718,6 @@ public class Webtrekk {
      */
     int getActivityCount() {
         return mApplicationStatus.getCurrentActivitiesCount();
-    }
-    /**
-     * for unit testing only
-     * @return
-     */
-    ScheduledExecutorService getTimerService() {
-        return mTimerService;
-    }
-    /**
-     * for unit testing only
-     * @return
-     */
-    public ExecutorService getExecutorService() {
-        return executorService;
-    }
-    /**
-     * for unit testing only
-     * @return
-     */
-    public Future<?> getRequestProcessorFuture() {
-        return requestProcessorFuture;
     }
 
     /**

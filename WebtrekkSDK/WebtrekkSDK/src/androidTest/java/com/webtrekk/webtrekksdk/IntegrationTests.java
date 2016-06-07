@@ -68,10 +68,10 @@ public class IntegrationTests extends AndroidTestCase {
         lifecycleCallbacks.onActivityStarted(activity);
         //make sure the tracking request is created correct and the url is on the requesturlstore
         assertEquals(1, webtrekk.getRequestFactory().getRequestUrlStore().size());
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekLast().contains("ba=test_product"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("ba=test_product"));
 
         // make sure the custom ecom parameter is available
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekLast(), webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("cb1=test_ecomparam1"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek(), webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("cb1=test_ecomparam1"));
     }
 
     /**
@@ -81,7 +81,7 @@ public class IntegrationTests extends AndroidTestCase {
     public void testGlobalMappedParameter(){
         TrackingConfiguration config = null;
         // clear request store before
-        webtrekk.getRequestFactory().getRequestUrlStore().clear();
+        webtrekk.getRequestFactory().getRequestUrlStore().clearAllTrackingData();
 
         String configString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><webtrekkConfiguration><globalTrackingParameter><parameter id=\"PRODUCT\">test_product</parameter><ecomParameter><parameter id=\"1\" key=\"example-key\"></parameter></ecomParameter></globalTrackingParameter></webtrekkConfiguration>";
         try {
@@ -113,9 +113,9 @@ public class IntegrationTests extends AndroidTestCase {
         lifecycleCallbacks.onActivityStarted(activity);
         //make sure the tracking request is created correct and the url is on the requesturlstore
         assertEquals(1, webtrekk.getRequestFactory().getRequestUrlStore().size());
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekLast(), webtrekk.getRequestFactory().getRequestUrlStore().get(0).contains("cb1=dynamic-value"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek(), webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("cb1=dynamic-value"));
         // assert that the constant param is also set
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekLast().contains("ba=test_product"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("ba=test_product"));
         webtrekk.stopTracking();
 
     }

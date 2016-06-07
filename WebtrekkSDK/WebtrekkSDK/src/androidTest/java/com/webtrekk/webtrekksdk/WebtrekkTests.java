@@ -38,7 +38,7 @@ public class WebtrekkTests extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        RequestUrlStore request = new RequestUrlStore(getContext(), 10);
+        RequestUrlStore request = new RequestUrlStore(getContext());
         request.deleteRequestsFile();
         super.tearDown();
     }
@@ -65,7 +65,6 @@ public class WebtrekkTests extends AndroidTestCase {
         assertNotNull(webtrekk.getContext());
         assertNotNull(webtrekk.getRequestFactory().getRequestUrlStore());
         assertNotNull(webtrekk.getRequestFactory().getWebtrekkParameter());
-        assertNotNull(webtrekk.getTimerService());
         assertEquals(0, webtrekk.getActivityCount());
         // make shure it fails when init is called twice
 //        try {
@@ -166,7 +165,7 @@ public class WebtrekkTests extends AndroidTestCase {
         lifecycleCallbacks.onActivityCreated(activity, null);
         lifecycleCallbacks.onActivityStarted(activity);
         assertEquals(1, webtrekk.getRequestFactory().getRequestUrlStore().size());
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekLast().contains("TestActivity,"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("TestActivity,"));
     }
 
 
@@ -204,14 +203,10 @@ public class WebtrekkTests extends AndroidTestCase {
         TrackedActivityLifecycleCallbacks callbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
         RequestUrlStore requestUrlStore = mock(RequestUrlStore.class);
         webtrekk.getRequestFactory().setRequestUrlStore(requestUrlStore);
-        webtrekk.onSendIntervalOver();
-        assertNull(webtrekk.getExecutorService());
-        assertNull(webtrekk.getRequestProcessorFuture());
+        webtrekk.getRequestFactory().onSendIntervalOver();
 
         when(requestUrlStore.size()).thenReturn(5).thenReturn(4).thenReturn(3).thenReturn(2).thenReturn(1).thenReturn(0);
-        webtrekk.onSendIntervalOver();
-        assertNotNull(webtrekk.getExecutorService());
-        assertNotNull(webtrekk.getRequestProcessorFuture());
+        webtrekk.getRequestFactory().onSendIntervalOver();
     }
 
     public void testSetOptOut() {
@@ -265,10 +260,11 @@ public class WebtrekkTests extends AndroidTestCase {
         lifecycleCallbacks.onActivityCreated(activity, null);
         lifecycleCallbacks.onActivityStarted(activity);
         //assertEquals(webtrekk.getRequestUrlStore().get(0), "test");
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekFirst().contains("&fns=1"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("&fns=1"));
         webtrekk.track();
         assertEquals(webtrekk.getRequestFactory().getInternalParameter().getDefaultParameter().get(Parameter.FORCE_NEW_SESSION), "0");
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekFirst().contains("&fns=0"));
+        webtrekk.getRequestFactory().getRequestUrlStore().removeLastURL();
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("&fns=0"));
     }
 
     public void testFirstParameter() {
@@ -282,12 +278,13 @@ public class WebtrekkTests extends AndroidTestCase {
         lifecycleCallbacks.onActivityCreated(activity, null);
         lifecycleCallbacks.onActivityStarted(activity);
         //assertEquals(webtrekk.getRequestUrlStore().get(0), "test");
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekFirst().contains("&one=1"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("&one=1"));
 
         //webtrekk.initInternalParameter();
         webtrekk.track();
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peekFirst().contains("&one=0"));
         assertEquals(webtrekk.getRequestFactory().getInternalParameter().getDefaultParameter().get(Parameter.APP_FIRST_START), "0");
+        webtrekk.getRequestFactory().getRequestUrlStore().removeLastURL();
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("&one=0"));
     }
 
     public void testUpdated() {

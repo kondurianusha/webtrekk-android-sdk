@@ -10,6 +10,7 @@ import com.webtrekk.webtrekksdk.Plugin;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Utils.ApplicationTrackingStatus;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
@@ -17,6 +18,12 @@ import com.webtrekk.webtrekksdk.Webtrekk;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by vartbaronov on 11.04.16.
@@ -69,6 +76,15 @@ public class RequestFactory {
     private RequestUrlStore mRequestUrlStore;
     private String mCustomPageName;
 
+    private ScheduledExecutorService mURLSendTimerService;
+    private ScheduledFuture<?> mURLSendTimerFuture;
+    private ExecutorService mExecutorService;
+    private Future<?> mRequestProcessorFuture;
+    private ApplicationTrackingStatus mApplicationStatus;
+
+    volatile private long mLastTrackTime;
+    private ScheduledExecutorService mFlashTimerService;
+    private ScheduledFuture<?> mFlashTimerFuture;
 
 
     public void init(Context context, TrackingConfiguration trackingConfiguration, Webtrekk wt)
@@ -89,8 +105,10 @@ public class RequestFactory {
         initWebtrekkParameter();
         initAutoCustomParameter();
         initPlugins(wt);
+        initURLSendTimerService();
+        initFlashTimerService();
 
-        mRequestUrlStore = new RequestUrlStore(mContext, trackingConfiguration.getMaxRequests());
+        mRequestUrlStore = new RequestUrlStore(mContext);
         mConstGlobalTrackingParameter = new TrackingParameter();
         mGlobalTrackingParameter = new TrackingParameter();
 
@@ -420,14 +438,15 @@ public class RequestFactory {
 
     public void restore()
     {
-        mRequestUrlStore.loadRequestsFromFile();
+        mRequestUrlStore.reset();
         // remove the old backupfile after the requests are loaded into memory/requestUrlStore
-        mRequestUrlStore.deleteRequestsFile();
+        //mRequestUrlStore.deleteRequestsFile();
     }
 
     public void flash()
     {
-        mRequestUrlStore.saveRequestsToFile();
+        stopSendURLProcess();
+        mRequestUrlStore.flash();
     }
 
     /**
@@ -588,4 +607,82 @@ public class RequestFactory {
         }
     }
 
+
+    /**
+     * starts the timer service, it executes after initial send delay for the first time, and then
+     * every sendDelay seconds, it processes the stored requests in a separate thread
+     */
+    void initURLSendTimerService() {
+        // start the timer service
+        mURLSendTimerService = Executors.newSingleThreadScheduledExecutor();
+        mURLSendTimerFuture = mURLSendTimerService.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                onSendIntervalOver();
+            }
+        }, mTrackingConfiguration.getSendDelay(), mTrackingConfiguration.getSendDelay(), TimeUnit.SECONDS);
+        WebtrekkLogging.log("timer service started");
+    }
+
+    /**
+     * Init service that do flash by 1 min timeout
+     */
+    private void initFlashTimerService() {
+        mFlashTimerService = Executors.newSingleThreadScheduledExecutor();
+        mFlashTimerFuture = mURLSendTimerService.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                flashByTimeout();
+            }
+        }, 30, 30, TimeUnit.SECONDS);
+    }
+
+    /**
+     * this method gets called whenever the send delay is over, it executes the requesthandler in a
+     * new thread
+     */
+    public void onSendIntervalOver() {
+        WebtrekkLogging.log("onSendIntervalOver: activity count: " + mApplicationStatus.getCurrentActivitiesCount() + " request urls: " + mRequestUrlStore.size()
+                + " thread done:"+(mRequestProcessorFuture == null ? "null": mRequestProcessorFuture.isDone()));
+        if(mRequestUrlStore.size() > 0  && (mRequestProcessorFuture == null || mRequestProcessorFuture.isDone())) {
+            if (mExecutorService == null) {
+                mExecutorService = Executors.newSingleThreadExecutor();
+            }
+            mRequestProcessorFuture = mExecutorService.submit(new RequestProcessor(mRequestUrlStore));
+        }
+    }
+
+    private void flashByTimeout()
+    {
+        if (mRequestProcessorFuture == null)
+            return;
+        if ((System.currentTimeMillis() - mLastTrackTime) > 60000 && mRequestProcessorFuture.isDone())
+            flash();
+    }
+
+    public void stopSendURLProcess()
+    {
+        if (mRequestProcessorFuture != null && !mRequestProcessorFuture.isDone()) {
+            mRequestProcessorFuture.cancel(true);
+            mExecutorService.shutdownNow();
+            try {
+                mExecutorService.awaitTermination(2, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+                WebtrekkLogging.log("Can't terminate sending process");
+            }
+            mExecutorService = null;
+            WebtrekkLogging.log("Processing URL is canceled");
+        }
+    }
+
+    /**
+     * @param applicationStatus
+     */
+    public void setApplicationStatus(ApplicationTrackingStatus applicationStatus) {
+        mApplicationStatus = applicationStatus;
+    }
+
+    public void setLasTrackTime(long lasTrackTime) {
+        mLastTrackTime = lasTrackTime;
+    }
 }

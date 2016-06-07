@@ -42,13 +42,13 @@ public class RequestProcessorTest extends AndroidTestCase {
         requestProcessor = spy(requestProcessor);
         when(requestUrlStore.size()).thenReturn(1).thenReturn(0);
         // test valid url first
-        when(requestUrlStore.peekLast()).thenReturn("http://nglab.org");
+        when(requestUrlStore.peek()).thenReturn("http://nglab.org");
         HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
         when(mockHttpURLConnection.getResponseCode()).thenReturn(200);
         doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL) any());
         requestProcessor.run();
         // two times, first one returns the urlstring, second one is empty
-        verify(requestUrlStore, times(1)).peekLast();
+        verify(requestUrlStore, times(1)).peek();
         verify(mockHttpURLConnection, times(1)).connect();
         verify(mockHttpURLConnection, times(1)).getResponseCode();
         verify(requestUrlStore, times(1)).removeLastURL();
@@ -60,13 +60,13 @@ public class RequestProcessorTest extends AndroidTestCase {
         requestProcessor = spy(requestProcessor);
         when(requestUrlStore.size()).thenReturn(2).thenReturn(1).thenReturn(0);
         // test valid url first
-        when(requestUrlStore.peekLast()).thenReturn("http://nglab.org").thenReturn("http://nglab.org");
+        when(requestUrlStore.peek()).thenReturn("http://nglab.org").thenReturn("http://nglab.org");
         HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
         when(mockHttpURLConnection.getResponseCode()).thenReturn(200).thenReturn(200);
         doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL) any());
         requestProcessor.run();
         // two times, first one returns the urlstring, second one is empty
-        verify(requestUrlStore, times(2)).peekLast();
+        verify(requestUrlStore, times(2)).peek();
         verify(mockHttpURLConnection, times(2)).connect();
         verify(mockHttpURLConnection, times(2)).getResponseCode();
         verify(requestUrlStore, times(2)).removeLastURL();
@@ -77,13 +77,13 @@ public class RequestProcessorTest extends AndroidTestCase {
         requestProcessor = spy(requestProcessor);
         when(requestUrlStore.size()).thenReturn(1).thenReturn(0);
         // test valid url first
-        when(requestUrlStore.peekLast()).thenReturn("invalidurl");
+        when(requestUrlStore.peek()).thenReturn("invalidurl");
         HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
         when(mockHttpURLConnection.getResponseCode()).thenReturn(200);
         doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL) any());
         requestProcessor.run();
         // two times, first one returns the urlstring, second one is empty
-        verify(requestUrlStore, times(1)).peekLast();
+        verify(requestUrlStore, times(1)).peek();
         verify(mockHttpURLConnection, times(0)).connect();
         verify(mockHttpURLConnection, times(0)).getResponseCode();
         verify(requestUrlStore, times(1)).removeLastURL();
@@ -94,13 +94,13 @@ public class RequestProcessorTest extends AndroidTestCase {
         requestProcessor = spy(requestProcessor);
         when(requestUrlStore.size()).thenReturn(1).thenReturn(0);
         // test valid url first
-        when(requestUrlStore.peekLast()).thenReturn("http://nglab.org");
+        when(requestUrlStore.peek()).thenReturn("http://nglab.org");
         HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
         when(mockHttpURLConnection.getResponseCode()).thenReturn(0);
         doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL)any());
         requestProcessor.run();
         // two times, first one returns the urlstring, second one is empty
-        verify(requestUrlStore, times(1)).peekLast();
+        verify(requestUrlStore, times(1)).peek();
         verify(mockHttpURLConnection, times(1)).connect();
         verify(mockHttpURLConnection, times(1)).getResponseCode();
         verify(requestUrlStore, times(0)).removeLastURL();
@@ -111,13 +111,13 @@ public class RequestProcessorTest extends AndroidTestCase {
         requestProcessor = spy(requestProcessor);
         when(requestUrlStore.size()).thenReturn(1).thenReturn(0);
         // test valid url first
-        when(requestUrlStore.peekLast()).thenReturn("http://nglab.org");
+        when(requestUrlStore.peek()).thenReturn("http://nglab.org");
         HttpURLConnection mockHttpURLConnection = mock(HttpURLConnection.class);
         when(mockHttpURLConnection.getResponseCode()).thenReturn(-1);
         doReturn(mockHttpURLConnection).when(requestProcessor).getUrlConnection((URL) any());
         requestProcessor.run();
         // two times, first one returns the urlstring, second one is empty
-        verify(requestUrlStore, times(1)).peekLast();
+        verify(requestUrlStore, times(1)).peek();
         verify(mockHttpURLConnection, times(1)).connect();
         verify(mockHttpURLConnection, times(1)).getResponseCode();
         verify(requestUrlStore, times(1)).removeLastURL();

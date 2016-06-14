@@ -6,10 +6,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
@@ -162,6 +165,12 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
         {
             getInstrumentation().waitForIdleSync();
         }
+    }
+
+    protected void cleanConfigPreference()
+    {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getInstrumentation().getTargetContext());
+        sharedPrefs.edit().remove(Webtrekk.PREFERENCE_KEY_CONFIGURATION).apply();
     }
 
 }

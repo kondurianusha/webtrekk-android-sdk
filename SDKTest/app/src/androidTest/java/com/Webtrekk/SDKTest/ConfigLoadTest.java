@@ -77,8 +77,8 @@ public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
     private void configTest(int config, String textToCheck, boolean isForExistence)
     {
         assertFalse(mWebtrekk.isInitialized());
-        SharedPreferences sharedPrefs = HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext());
-        sharedPrefs.edit().remove(Webtrekk.PREFERENCE_KEY_CONFIGURATION).apply();
+
+        cleanConfigPreference();
 
         mWebtrekk.initWebtrekk(mApplication, config);
         Activity activity = getActivity();

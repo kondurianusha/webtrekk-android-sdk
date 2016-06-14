@@ -29,7 +29,7 @@ public class RecommendationsTest extends ActivityInstrumentationTestCase2Base<Re
 
     public void testComplexRecommendations()
     {
-        recommendTest("simpleReco", "085cc2g007", null);
+        recommendTest("complexReco", "085cc2g007", null);
     }
 
     public void testSimpleRecommendations()

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <webtrekkConfiguration>
-    <version>2</version>
-    <testMode>true</testMode>
+    <version>9</version>
     <trackId>123451234512345</trackId>
     <trackDomain>http://localhost:8080</trackDomain>
     <sampling>0</sampling>
-    <sendDelay>1</sendDelay>
+    <sendDelay>10</sendDelay>
     <maxRequests>5000</maxRequests>
     <resendOnStartEventTime>30</resendOnStartEventTime>
     <autoTracked>true</autoTracked>
@@ -21,18 +20,15 @@
     <autoTrackAdvertisementOptOut>true</autoTrackAdvertisementOptOut>
     <autoTrackPlaystoreUsername>false</autoTrackPlaystoreUsername>
     <autoTrackPlaystoreMail>false</autoTrackPlaystoreMail>
-    <enableRemoteConfiguration>false</enableRemoteConfiguration>
+    <enableRemoteConfiguration>true</enableRemoteConfiguration>
     <trackingConfigurationUrl>https://d1r27qvpjiaqj3.cloudfront.net/1111111111111111/35711.xml</trackingConfigurationUrl>
     <globalTrackingParameter>
+        <parameter id="INTERN_SEARCH" key="asdf"/>
         <parameter id="CUSTOMER_ID" key="AT1"/>
         <pageParameter>
             <parameter id="4" key="AT1"/>
             <parameter id="3">ATS1</parameter>
         </pageParameter>
-        <pageCategories>
-            <parameter id="1" key="AT1"/>
-            <parameter id="2">ATS1</parameter>
-        </pageCategories>
         <sessionParameter>
             <parameter id="5">ATS1</parameter>
             <parameter id="6" key="AT1"/>

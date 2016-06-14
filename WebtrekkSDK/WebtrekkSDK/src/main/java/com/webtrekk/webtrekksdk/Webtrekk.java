@@ -470,7 +470,8 @@ public class Webtrekk {
      * */
     void startActivity() {
         if (mRequestFactory.getRequestUrlStore() == null || trackingConfiguration == null) {
-            throw new IllegalStateException("webtrekk has not been initialized");
+            WebtrekkLogging.log("webtrekk has not been initialized");
+            return;
         }
 
         //reset page URL if activity is changed

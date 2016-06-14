@@ -127,18 +127,15 @@ public class RequestProcessor implements Runnable {
 
 
             final int statusCode = sendRequest(url, null);
-            if (statusCode >= 200 && statusCode <= 299) {
-                WebtrekkLogging.log("completed request. Status code:" + statusCode);
+            WebtrekkLogging.log("received status " + statusCode);
+            if (statusCode >= 200 && statusCode < 400) {
                 //successful send, remove url from store
                 mRequestUrlStore.removeLastURL();
-            } else if (statusCode == 0) {
-                // client side networking errors, just break and try again with next onSendintervalOver
+            } else if (statusCode >= 500 && statusCode < 600) {
+                //try to send later
                 break;
-            } else {
-                WebtrekkLogging.log("received status " + statusCode);
-                // all error codes above 400 will be removed, the 300 redirects should not occur
-                // if there are redirects on serverside this has to be changed
-                WebtrekkLogging.log("removing URL from queue because status code cannot be handled: ");
+            } else{ //400-499 case
+                WebtrekkLogging.log("removing URL from queue as status code is between 400 and 499 or unexpected.");
                 mRequestUrlStore.removeLastURL();
             }
         }

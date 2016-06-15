@@ -82,16 +82,16 @@ public class RequestProcessor implements Runnable {
 
         } catch (EOFException e) {
             WebtrekkLogging.log("RequestProcessor: EOF > Will retry later.", e);
-            return 0;
+            return 500;
         } catch (SocketTimeoutException e) {
             WebtrekkLogging.log("RequestProcessor: SocketTimeout > Will retry later.", e);
-            return 0;
+            return 500;
         } catch (SocketException e) {
             WebtrekkLogging.log("RequestProcessor: Socket Exception.", e);
-            return 0;
+            return 500;
         }  catch (UnknownHostException e) {
             WebtrekkLogging.log("RequestProcessor: UnknownHost > Will retry later.", e);
-            return 0;
+            return 500;
         } catch (IOException e) {
             WebtrekkLogging.log("io exception: can not connect to host", e);
             WebtrekkLogging.log("RequestProcessor: IO > Removing URL from queue because exception cannot be handled.", e);

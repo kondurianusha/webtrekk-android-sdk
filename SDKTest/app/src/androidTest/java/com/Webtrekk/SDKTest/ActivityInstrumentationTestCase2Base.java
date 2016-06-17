@@ -143,14 +143,13 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
                 } catch (InterruptedException e) {
                     assertTrue(false);
                 }
+            }
                 if (!isNoTrackCheck) {
                     assertTrue(mStringReceived);
                     assertEquals(mStringNumbersToWait, mSentURLArray.size());
                 }else {
                     assertFalse(mStringReceived);
-                    break;
                 }
-            }
         }
     }
 

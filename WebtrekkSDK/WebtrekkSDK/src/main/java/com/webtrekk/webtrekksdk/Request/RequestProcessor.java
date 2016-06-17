@@ -101,7 +101,7 @@ public class RequestProcessor implements Runnable {
             // IllegalStateException by setrequestproperty in case the connectin is already established
             // NPE
         } finally {
-            if (connection != null && connection instanceof HttpURLConnection) {
+            if (connection != null) {
                 connection.disconnect();
             }
         }

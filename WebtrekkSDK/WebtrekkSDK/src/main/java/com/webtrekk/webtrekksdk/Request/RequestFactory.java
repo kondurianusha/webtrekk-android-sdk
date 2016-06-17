@@ -469,7 +469,7 @@ public class RequestFactory {
         // action params are a special case, no other params but the ones given as parameter in the code
         if(tp.containsKey(Parameter.ACTION_NAME)) {
             //when its an action only resolution and depth are neccesary
-            applyActivityConfiguration(trackingParameter);
+            applyActivityConfiguration(trackingParameter, true);
             overrideCustomPageName(trackingParameter);
             trackingParameter.add(Parameter.SCREEN_RESOLUTION, mWebtrekkParameter.get(Parameter.SCREEN_RESOLUTION));
             trackingParameter.add(Parameter.SCREEN_DEPTH, mWebtrekkParameter.get(Parameter.SCREEN_DEPTH));
@@ -517,24 +517,23 @@ public class RequestFactory {
         trackingParameter.add(tp);
 
         //forth add the local ones which each activity has defined in its xml configuration, they will override the ones above
-        applyActivityConfiguration(trackingParameter);
+        applyActivityConfiguration(trackingParameter, false);
         overrideCustomPageName(trackingParameter);
 
         return new TrackingRequest(trackingParameter, mTrackingConfiguration);
 
     }
 
-    private void applyActivityConfiguration(TrackingParameter trackingParameter)
+    private void applyActivityConfiguration(TrackingParameter trackingParameter, boolean onlyNameApply)
     {
-        //TODO: make this better code, basicly check that the activity has params configured
         if(mTrackingConfiguration.getActivityConfigurations()!= null && mTrackingConfiguration.getActivityConfigurations().containsKey(mCurrentActivityName)){
             ActivityConfiguration activityConfiguration = mTrackingConfiguration.getActivityConfigurations().get(mCurrentActivityName);
             if(activityConfiguration != null) {
-                if(activityConfiguration.getConstActivityTrackingParameter() != null) {
+                if(activityConfiguration.getConstActivityTrackingParameter() != null && !onlyNameApply) {
                     trackingParameter.add(activityConfiguration.getConstActivityTrackingParameter());
                 }
                 TrackingParameter mappedTrackingParameter = activityConfiguration.getActivityTrackingParameter();
-                if( mappedTrackingParameter != null) {
+                if( mappedTrackingParameter != null && !onlyNameApply) {
                     //now map the string values from the xml/code tracking parameters to the custom values defined by webtrekk or the customer
                     if(mCustomParameter!= null) {
                         // first map the global tracking parameter

@@ -323,4 +323,42 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         assertFalse(parcel.getValue("cp9").isEmpty());
     }
+
+    public void testActionPageNamePriority()
+    {
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                TrackingParameter pt = new TrackingParameter();
+                pt.add(TrackingParameter.Parameter.ACTION_NAME, "test");
+                mWebtrekk.track(pt);
+            }
+        });
+
+        String URL = waitForTrackedURL();
+
+        URLParsel parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertTrue(parcel.getValue("p").contains("Seite"));
+
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                TrackingParameter pt = new TrackingParameter();
+                pt.add(TrackingParameter.Parameter.ACTION_NAME, "test");
+                mWebtrekk.setCustomPageName("CustomPage");
+                mWebtrekk.track(pt);
+            }
+        });
+
+        URL = waitForTrackedURL();
+
+        parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertTrue(parcel.getValue("p").contains("CustomPage"));
+    }
 }

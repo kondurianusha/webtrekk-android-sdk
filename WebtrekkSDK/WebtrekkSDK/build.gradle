@@ -56,11 +56,11 @@ publishing {
             //artifact javadocJar
             artifact sourcesJar
             artifact (releaseFile){
-                classifier ""
+                classifier null
                 extension "aar"
             }
             artifact (pomeFile){
-                classifier ""
+                classifier null
                 extension "pom"
             }
         }

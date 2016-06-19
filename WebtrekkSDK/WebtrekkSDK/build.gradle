@@ -8,7 +8,7 @@ apply plugin: 'findbugs'
 def siteUrl = 'www.webtrekk.com'      // Homepage URL of the library
 def gitUrl = 'http://stash.webtrekk.com/scm/pixlib/sdk-android-v2.git'   // Git repository URL
 group = "com.webtrekk.webtrekksdk"                                        // Maven Group ID for the artifact
-version = "4.0.9"//$version_ext
+version = "9.9.10"//$version_ext
 
 
 
@@ -37,7 +37,7 @@ task versionDef(){
     {
         version = versionExt
     } else
-        version = "9.9.9"
+        version = "9.9.10"
 }
 
 task sourcesJar(type: Jar) {
@@ -51,7 +51,7 @@ def pomeFile = file("$project.buildDir/poms/pom-default.xml")
 publishing {
     publications {
         WebtrekkPublication(MavenPublication) {
-            //from components.
+            version version
 
             //artifact javadocJar
             artifact sourcesJar
@@ -168,25 +168,32 @@ artifacts {
     archives sourcesJar
 }
 
-def Properties properties = new Properties()
-def File localPropFile = project.rootProject.file('local.properties')
-println("localProp"+localPropFile)
-if (localPropFile.exists()) {
-    properties.load(localPropFile.newDataInputStream())
-}else
-{
-    properties.setProperty("bintray.user", bintrayUserEx)
-    properties.setProperty("bintray.apikey", bintrayApiKeyrEx)
-    properties.setProperty("bintray.gpg.password", bintrayGpgPasswordEx)
-}
-
 bintray {
+
+    def Properties properties = new Properties()
+    def File localPropFile = project.rootProject.file('local.properties')
+    println("localProp"+localPropFile)
+    if (localPropFile.exists()) {
+        properties.load(localPropFile.newDataInputStream())
+    }else
+    {
+        if (parent.hasProperty("bintrayUserEx")) {
+            properties.setProperty("bintray.user", bintrayUserEx)
+        }
+        if (parent.hasProperty("bintrayApiKeyrEx")) {
+        properties.setProperty("bintray.apikey", bintrayApiKeyrEx)
+        }
+            if (parent.hasProperty("bintrayGpgPasswordEx")) {
+        properties.setProperty("bintray.gpg.password", bintrayGpgPasswordEx)
+            }
+    }
+
     user = properties.getProperty("bintray.user")
-    if (user == null) {
+    if (user == null && parent.hasProperty("bintrayUserEx")) {
         user = bintrayUserEx
     }
     key = properties.getProperty("bintray.apikey")
-    if (key == null){
+    if (key == null && parent.hasProperty("bintrayApiKeyrEx")){
       keay = bintrayApiKeyrEx
     }
 
@@ -204,7 +211,7 @@ bintray {
             gpg {
                 sign = true //Determines whether to GPG sign the files. The default is false
                 passphrase = properties.getProperty("bintray.gpg.password")
-                if (passphrase == null){
+                if (passphrase == null && parent.hasProperty("bintrayGpgPasswordEx")){
                     passphrase = bintrayGpgPasswordEx
                 }
                 //Optional. The passphrase for GPG signing'

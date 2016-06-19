@@ -170,7 +170,8 @@ artifacts {
 
 def Properties properties = new Properties()
 def File localPropFile = project.rootProject.file('local.properties')
-if (localPropFile != null) {
+println("localProp"+localPropFile)
+if (localPropFile.exists()) {
     properties.load(localPropFile.newDataInputStream())
 }
 

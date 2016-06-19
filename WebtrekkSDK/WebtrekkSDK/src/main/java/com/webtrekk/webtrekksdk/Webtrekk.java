@@ -40,8 +40,8 @@ public class Webtrekk {
     public static final String PREFERENCE_APP_VERSIONCODE = "appVersion";
     public static final String PREFERENCE_KEY_INSTALLATION_FLAG = "InstallationFlag";
     public static final String PREFERENCE_KEY_CONFIGURATION = "webtrekkTrackingConfiguration";
-    public static final String TRACKING_LIBRARY_VERSION = "410";
-    public static final String TRACKING_LIBRARY_VERSION_UA = "4.1.0";
+    public static String TRACKING_LIBRARY_VERSION_UA;
+    public static String TRACKING_LIBRARY_VERSION;
 
     final private RequestFactory mRequestFactory = new RequestFactory();
     private TrackingConfiguration trackingConfiguration;
@@ -101,6 +101,7 @@ public class Webtrekk {
         if (app == null) {
             throw new IllegalArgumentException("no valid app");
         }
+        initVersions(app.getApplicationContext());
         initAutoTracking(app);
         initWebtrekk(app.getApplicationContext(), configResourceID);
     }
@@ -736,6 +737,16 @@ public class Webtrekk {
     public void setTrackingConfiguration(TrackingConfiguration trackingConfiguration) {
         this.trackingConfiguration = trackingConfiguration;
         mRequestFactory.setTrackingConfiguration(trackingConfiguration);
+    }
+
+    /**
+     * @hide
+     * @param context
+     */
+    private void initVersions(Context context)
+    {
+        TRACKING_LIBRARY_VERSION_UA = context.getResources().getString(R.string.version_name);
+        TRACKING_LIBRARY_VERSION = TRACKING_LIBRARY_VERSION_UA.replaceAll(".","");
     }
 
     /**

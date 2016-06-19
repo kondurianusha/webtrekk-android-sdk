@@ -1,6 +1,16 @@
 apply plugin: 'com.android.library'
-
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 apply plugin: 'findbugs'
+
+
+def siteUrl = 'www.webtrekk.com'      // Homepage URL of the library
+def gitUrl = 'http://stash.webtrekk.com/scm/pixlib/sdk-android-v2.git'   // Git repository URL
+group = "com.webtrekk.webtrekksdk"                                        // Maven Group ID for the artifact
+version = "4.0.9"//$version_ext
+
+
 
 task findbugs(type: FindBugs) {
     ignoreFailures = false
@@ -22,6 +32,42 @@ task findbugs(type: FindBugs) {
     }
 }
 
+task versionDef(){
+    if (parent.hasProperty("versionExt"))
+    {
+        version = versionExt
+    } else
+        version = "9.9.9"
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+def releaseFile = file("$project.buildDir/outputs/aar/WebtrekkSDK-library-release.aar")
+def pomeFile = file("$project.buildDir/poms/pom-default.xml")
+
+publishing {
+    publications {
+        WebtrekkPublication(MavenPublication) {
+            //from components.
+
+            //artifact javadocJar
+            artifact sourcesJar
+            artifact (releaseFile){
+                classifier ""
+                extension "aar"
+            }
+            artifact (pomeFile){
+                classifier ""
+                extension "pom"
+            }
+        }
+    }
+}
+
+
 android {
     compileSdkVersion 14
     buildToolsVersion "21.1.2"
@@ -31,9 +77,14 @@ android {
         targetSdkVersion 22
     }
     buildTypes {
+        println("current version in gradle:"+version)
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue "string", "version_name", version
+        }
+        debug {
+            resValue "string", "version_name", version
         }
     }
 
@@ -45,6 +96,7 @@ android {
     }
 }
 
+
 task checkstyle(type: Checkstyle) {
     configFile file("${project.rootDir}/config/quality/checkstyle/checkstyle.xml") // Where my checkstyle config is...
     configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/config/quality/checkstyle/suppressions.xml").absolutePath // Where is my suppressions file for checkstyle is...
@@ -52,6 +104,51 @@ task checkstyle(type: Checkstyle) {
     include '**/*.java'
     exclude '**/gen/**'
     classpath = files()
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+install {
+    repositories.mavenInstaller {
+
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                // Add your description here
+                name 'Webtrekk Android SDK Library'
+                url siteUrl
+
+                // Set your license
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'https://opensource.org/licenses/mit-license.php'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'vartbaronov'
+                        name 'Arsen Vartbaronov'
+                        email 'arsen.vartbaronov@webtrekk.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -63,4 +160,37 @@ dependencies {
     androidTestCompile 'org.mockito:mockito-core:1.9.5'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+}
+
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    publications = ['WebtrekkPublication']
+    pkg {
+        repo = "maven"
+        name = "webtrekk-sdk"
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["MIT"]
+        publish = true
+        publicDownloadNumbers = true
+        version {
+            desc = "Webtrekk Android SDK Library"
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+                passphrase = properties.getProperty("bintray.gpg.password")
+                //Optional. The passphrase for GPG signing'
+            }
+        }
+    }
 }

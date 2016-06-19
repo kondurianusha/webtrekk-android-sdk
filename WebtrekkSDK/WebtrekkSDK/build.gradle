@@ -173,11 +173,22 @@ def File localPropFile = project.rootProject.file('local.properties')
 println("localProp"+localPropFile)
 if (localPropFile.exists()) {
     properties.load(localPropFile.newDataInputStream())
+}else
+{
+    properties.setProperty("bintray.user", bintrayUserEx)
+    properties.setProperty("bintray.apikey", bintrayApiKeyrEx)
+    properties.setProperty("bintray.gpg.password", bintrayGpgPasswordEx)
 }
 
 bintray {
     user = properties.getProperty("bintray.user")
+    if (user == null) {
+        user = bintrayUserEx
+    }
     key = properties.getProperty("bintray.apikey")
+    if (key == null){
+      keay = bintrayApiKeyrEx
+    }
 
     publications = ['WebtrekkPublication']
     pkg {
@@ -193,6 +204,9 @@ bintray {
             gpg {
                 sign = true //Determines whether to GPG sign the files. The default is false
                 passphrase = properties.getProperty("bintray.gpg.password")
+                if (passphrase == null){
+                    passphrase = bintrayGpgPasswordEx
+                }
                 //Optional. The passphrase for GPG signing'
             }
         }

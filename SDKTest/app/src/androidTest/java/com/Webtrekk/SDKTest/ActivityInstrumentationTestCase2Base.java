@@ -140,6 +140,8 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
             while (!mStringReceived) {
                 try {
                     mSynchronize.wait(mWaitMilliseconds);
+                    if (isNoTrackCheck)
+                        break;
                 } catch (InterruptedException e) {
                     assertTrue(false);
                 }

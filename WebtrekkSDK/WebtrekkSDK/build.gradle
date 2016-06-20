@@ -8,9 +8,13 @@ apply plugin: 'findbugs'
 def siteUrl = 'www.webtrekk.com'      // Homepage URL of the library
 def gitUrl = 'http://stash.webtrekk.com/scm/pixlib/sdk-android-v2.git'   // Git repository URL
 group = "com.webtrekk.webtrekksdk"                                        // Maven Group ID for the artifact
-version = "9.9.10"//$version_ext
 
-
+def projectName = 'Webtrekk Android SDK Library'
+def licenceName = 'MIT License'
+def licenceURL = 'https://opensource.org/licenses/mit-license.php'
+def devName = 'Arsen Vartbaronov'
+def devEmail = 'arsen.vartbaronov@webtrekk.com'
+def devID = 'vartbaronov'
 
 task findbugs(type: FindBugs) {
     ignoreFailures = false
@@ -37,7 +41,7 @@ task versionDef(){
     {
         version = versionExt
     } else
-        version = "9.9.10"
+        version = "9.9.9"
 }
 
 task sourcesJar(type: Jar) {
@@ -47,27 +51,38 @@ task sourcesJar(type: Jar) {
 
 def releaseFile = file("$project.buildDir/outputs/aar/WebtrekkSDK-library-release.aar")
 def pomeFile = file("$project.buildDir/poms/pom-default.xml")
-
 publishing {
     publications {
         WebtrekkPublication(MavenPublication) {
-            version version
 
-            //artifact javadocJar
-            artifact sourcesJar
-            artifact (releaseFile){
-                classifier null
-                extension "aar"
-            }
-            artifact (pomeFile){
-                classifier null
-                extension "pom"
+            // get created xml from install task
+                def parsedProjectXml = new XmlParser().parse(pomeFile)
+                def scmNode = parsedProjectXml.scm
+                def licenceNode = parsedProjectXml.licenses
+                def developersNode = parsedProjectXml.developers
+                def dependencyNode = parsedProjectXml.dependencies
+                def nameNode = parsedProjectXml.name
+                def urlNode = parsedProjectXml.url
+
+                //assert scmNode instanceof groovy.util.Node
+                pom.withXml {
+                    asNode().append(nameNode)
+                    asNode().append(urlNode)
+                    asNode().append(licenceNode)
+                    asNode().append(developersNode)
+                    asNode().append(scmNode)
+                    asNode().append(dependencyNode)
+                }
+            artifacts {
+                artifact sourcesJar
+                artifact(releaseFile) {
+                    classifier null
+                    extension "aar"
+                }
             }
         }
     }
 }
-
-
 android {
     compileSdkVersion 14
     buildToolsVersion "21.1.2"
@@ -124,21 +139,21 @@ install {
             project {
                 packaging 'aar'
                 // Add your description here
-                name 'Webtrekk Android SDK Library'
+                name projectName
                 url siteUrl
 
                 // Set your license
                 licenses {
                     license {
-                        name 'MIT License'
-                        url 'https://opensource.org/licenses/mit-license.php'
+                        name licenceName
+                        url licenceURL
                     }
                 }
                 developers {
                     developer {
-                        id 'vartbaronov'
-                        name 'Arsen Vartbaronov'
-                        email 'arsen.vartbaronov@webtrekk.com'
+                        id devID
+                        name devName
+                        email devEmail
                     }
                 }
                 scm {
@@ -172,7 +187,6 @@ bintray {
 
     def Properties properties = new Properties()
     def File localPropFile = project.rootProject.file('local.properties')
-    println("localProp"+localPropFile)
     if (localPropFile.exists()) {
         properties.load(localPropFile.newDataInputStream())
     }else
@@ -218,4 +232,7 @@ bintray {
             }
         }
     }
+
+bintrayUpload.dependsOn install
+install.dependsOn assembleRelease
 }

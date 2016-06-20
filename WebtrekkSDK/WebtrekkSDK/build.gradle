@@ -181,7 +181,7 @@ dependencies {
 
 
 artifacts {
-    archives javadocJar
+    //archives javadocJar
     archives sourcesJar
 }
 

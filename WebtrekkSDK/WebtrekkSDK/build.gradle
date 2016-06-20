@@ -56,6 +56,7 @@ publishing {
         WebtrekkPublication(MavenPublication) {
 
             // get created xml from install task
+            if (pomeFile.exists()) {
                 def parsedProjectXml = new XmlParser().parse(pomeFile)
                 def scmNode = parsedProjectXml.scm
                 def licenceNode = parsedProjectXml.licenses
@@ -73,6 +74,7 @@ publishing {
                     asNode().append(scmNode)
                     asNode().append(dependencyNode)
                 }
+            }
             artifacts {
                 artifact sourcesJar
                 artifact(releaseFile) {

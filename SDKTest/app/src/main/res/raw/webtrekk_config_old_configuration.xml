@@ -3,7 +3,6 @@
     <!--the version number for this configuration file -->
     <version>1</version>
     <testMode>true</testMode>
-
     <!--the webtrekk trackDomain where the requests are send  for appinstall-->
 <!--
     <trackDomain type="text">http://appinstall-qa-01.nbg.webtrekk.com</trackDomain>
@@ -23,12 +22,19 @@
     <trackId type="text">238713152098253</trackId>
 -->
 
+    <!-- reccommendations list with names -->
+    <recommendations>
+        <recommendation name="complexReco">http://reco.webtrekk.com/dmp/recos/v1/?accountId=238713152098253&amp;placementId=39876</recommendation>
+        <recommendation name="simpleReco">http://reco.webtrekk.com/dmp/recos/v1/?accountId=238713152098253&amp;placementId=39879</recommendation>
+    </recommendations>
+
+
     <!-- measure only a subset of the users -->
     <sampling type="text">0</sampling>
     <!-- interval between the requests are send in seconds -->
-    <sendDelay type="text">10</sendDelay>
+    <sendDelay type="text">1</sendDelay>
     <!--maximum amoount of requests to store when the user is offline -->
-    <maxRequests type="number">1000</maxRequests>
+    <maxRequests type="number">100</maxRequests>
 
     <!--optional settings -->
     <!--automaticly track activities onStart method -->
@@ -132,13 +138,13 @@
 
 
     <!--activity configurations -->
-    <screen>
-        <classname type="text">com.Webtrekk.SDKTest.MainActivity</classname>
+    <activity>
+        <classname type="text">com.Webtrekk.SDKTest.EmptyActivity</classname>
         <mappingname type="text">Startseite</mappingname>
-        <autoTracked type="text">true</autoTracked>
+        <autoTracked type="text">false</autoTracked>
 
         <!--activity tracking parameter -->
-        <screenTrackingParameter>
+        <activityTrackingParameter>
             <!--define global tracking parameter which are send with every request, the key has to match a valid parameter name!
             entries made here are available as default parameters in the trackingparameter instance -->
             <parameter id="CURRENCY">EUR</parameter>
@@ -175,14 +181,14 @@
                 <parameter id="2">test_mediacategory2</parameter>
             </mediaCategories>
 
-        </screenTrackingParameter>
-    </screen>
+        </activityTrackingParameter>
+    </activity>
 
-    <screen>
+    <activity>
         <classname type="text">com.Webtrekk.SDKTest.PageExampleActivity</classname>
         <mappingname type="text">Seite</mappingname>
-        <screenTrackingParameter>
+        <activityTrackingParameter>
             <parameter id="PAGE_URL">http://www.yandex.ru</parameter>
-        </screenTrackingParameter>
-    </screen>
+        </activityTrackingParameter>
+    </activity>
 </webtrekkConfiguration>

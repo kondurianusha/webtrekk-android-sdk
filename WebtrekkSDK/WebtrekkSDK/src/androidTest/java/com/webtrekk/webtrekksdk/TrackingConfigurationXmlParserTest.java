@@ -24,11 +24,11 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
             "<trackid type=\"text\">111111111111\n" +
             "\n" +
             "\n" +
-            "    <activity>\n" +
+            "    <screen>\n" +
             "        <classname type=\"text\">MainActivity</classname>\n" +
             "        <mappingname type=\"text\">Startseite</mappingname>\n" +
             "        <autotrack type=\"text\">true</autotrack>\n" +
-            "    </activity>\n" +
+            "    </screen>\n" +
             "\n" +
             "    <plugin>\n" +
             "        <name>HelloWorldPlugin</name>\n" +

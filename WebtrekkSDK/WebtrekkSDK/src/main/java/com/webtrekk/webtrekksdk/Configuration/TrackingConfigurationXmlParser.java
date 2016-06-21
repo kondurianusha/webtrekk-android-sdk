@@ -437,11 +437,11 @@ public class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.END_TAG, ns, "globalTrackingParameter");
                 WebtrekkLogging.log("globalTrackingParameter read from xml");
 
-            } else if (name.equals("activity")) {
-                parser.require(XmlPullParser.START_TAG, ns, "activity");
+            } else if (name.equals("activity") || name.equals("screen")) {
+                parser.require(XmlPullParser.START_TAG, ns, name);
                 ActivityConfiguration act = readActivityConfiguration(parser, config.isAutoTracked());
                 config.getActivityConfigurations().put(act.getClassName(), act);
-                parser.require(XmlPullParser.END_TAG, ns, "activity");
+                parser.require(XmlPullParser.END_TAG, ns, name);
                 WebtrekkLogging.log("activity read from xml: "+ act.getClassName());
 
             } else if (name.equals("recommendations")) {
@@ -501,14 +501,14 @@ public class TrackingConfigurationXmlParser {
                     isAutoTrack = false;
                 }
 
-            } else if (name.equals("activityTrackingParameter")) {
-                parser.require(XmlPullParser.START_TAG, ns, "activityTrackingParameter");
+            } else if (name.equals("activityTrackingParameter") || name.equals("screenTrackingParameter")) {
+                parser.require(XmlPullParser.START_TAG, ns, name);
                 TrackingParameter tp = new TrackingParameter();
                 TrackingParameter constTp = new TrackingParameter();
                 setTrackingParameterFromXml(parser, tp, constTp);
                 activityConfiguration.setActivityTrackingParameter(tp);
                 activityConfiguration.setConstActivityTrackingParameter(constTp);
-                parser.require(XmlPullParser.END_TAG, ns, "activityTrackingParameter");
+                parser.require(XmlPullParser.END_TAG, ns, name);
             } else {
                 WebtrekkLogging.log("activity: unknown xml tag: " + name);
                 skip(parser);

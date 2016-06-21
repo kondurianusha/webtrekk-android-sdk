@@ -37,11 +37,11 @@
             <parameter id="7" key="AT1"/>
         </userCategories>
     </globalTrackingParameter>
-    <activity>
+    <screen>
         <classname type="text">com.Webtrekk.SDKTest.TagIntegrationActivity</classname>
         <mappingname type="text">TestActivity</mappingname>
         <autoTracked>false</autoTracked>
-        <activityTrackingParameter>
+        <screenTrackingParameter>
             <parameter id="PRODUCT_COST" key="AT1"/>
             <pageParameter>
                 <parameter id="8" key="AT1"/>
@@ -51,6 +51,6 @@
                 <parameter id="10" key="AT1"/>
                 <parameter id="11">ATS1</parameter>
             </pageCategories>
-        </activityTrackingParameter>
-    </activity>
+        </screenTrackingParameter>
+    </screen>
 </webtrekkConfiguration>

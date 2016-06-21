@@ -136,13 +136,13 @@
 
 
     <!--activity configurations -->
-    <activity>
+    <screen>
         <classname type="text">com.Webtrekk.SDKTest.MainActivity</classname>
         <mappingname type="text">Startseite</mappingname>
         <autoTracked type="text">true</autoTracked>
 
         <!--activity tracking parameter -->
-        <activityTrackingParameter>
+        <screenTrackingParameter>
             <!--define global tracking parameter which are send with every request, the key has to match a valid parameter name!
             entries made here are available as default parameters in the trackingparameter instance -->
             <parameter id="CURRENCY">EUR</parameter>
@@ -179,21 +179,21 @@
                 <parameter id="2">test_mediacategory2</parameter>
             </mediaCategories>
 
-        </activityTrackingParameter>
-    </activity>
+        </screenTrackingParameter>
+    </screen>
 
-    <activity>
+    <screen>
         <classname type="text">com.Webtrekk.SDKTest.PageExampleActivity</classname>
         <mappingname type="text">Seite</mappingname>
-        <activityTrackingParameter>
+        <screenTrackingParameter>
             <parameter id="PAGE_URL">http://www.yandex.ru</parameter>
-        </activityTrackingParameter>
-    </activity>
-    <activity>
+        </screenTrackingParameter>
+    </screen>
+    <screen>
         <classname type="text">com.Webtrekk.SDKTest.EmptyActivity</classname>
         <mappingname type="text">ThisIsLocalConfig</mappingname>
-        <activityTrackingParameter>
+        <screenTrackingParameter>
             <parameter id="PAGE_URL">http://www.yandex.ru</parameter>
-        </activityTrackingParameter>
-    </activity>
+        </screenTrackingParameter>
+    </screen>
 </webtrekkConfiguration>

@@ -112,12 +112,12 @@
 
 
     <!--activity configurations -->
-    <activity>
+    <screen>
         <classname type="text">test.myapplication.MainActivity</classname>
         <mappingname type="text">Startseite</mappingname>
         <autoTracked type="text">true</autoTracked>
         <!--activity tracking parameter -->
-        <activityTrackingParameter>
+        <screenTrackingParameter>
             <!--define global tracking parameter which are send with every request, the key has to match a valid parameter name!
             entries made here are available as default parameters in the trackingparameter instance -->
             <parameter id="PRODUCT">test_product</parameter>
@@ -155,11 +155,11 @@
                 <parameter id="1" key="mediacategory_from_app"></parameter>
             </mediaCategories>
 
-        </activityTrackingParameter>
-    </activity>
-    <activity>
+        </screenTrackingParameter>
+    </screen>
+    <screen>
     <classname type="text">test.myapplication.OtherActivity</classname>
         <autoTracked type="text">true</autoTracked>
         <mappingname type="text">Startseite</mappingname>
-    </activity>
+    </screen>
 </webtrekkConfiguration>

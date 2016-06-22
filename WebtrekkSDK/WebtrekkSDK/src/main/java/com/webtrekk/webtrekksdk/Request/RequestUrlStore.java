@@ -187,8 +187,13 @@ public class RequestUrlStore {
                 if (mLoaddedIDs.size() > 0)
                     WebtrekkLogging.log("Something wrong with logic. mLoaddedIDs should be zero if url isn't found");
                 if (isURLFileExists()) {
-                    loadRequestsFromFile(mReadGroupSize, mIDs.get(id), id);
-                    url = mLoaddedIDs.get(id);
+                    if (loadRequestsFromFile(mReadGroupSize, mIDs.get(id), id))
+                       url = mLoaddedIDs.get(id);
+                    else // file is corrupted or missed
+                    {
+                        deleteAllCashedIDs();
+                        return mURLCash.get(mIDs.firstKey());
+                    }
 
                 } else
                     WebtrekkLogging.log("NO url in cash, but file doesn't exists as well. Some issue here");
@@ -224,19 +229,21 @@ public class RequestUrlStore {
     }
 
     public void removeLastURL() {
-         int key = mIDs.firstKey();
-         if (mLoaddedIDs.remove(key) == null)
-           mURLCash.remove(key);
-         mIDs.remove(key);
+        removeKey(mIDs.firstKey());
+    }
+
+    private void removeKey(int key)
+    {
+        if (mLoaddedIDs.remove(key) == null)
+            mURLCash.remove(key);
+        mIDs.remove(key);
+
     }
 
     /**
      * loads the requests from the cache file if present
      */
-    private void loadRequestsFromFile(int numbersToLoad, long startOffset, int firstID) {
-        if (!isURLFileExists()) {
-            return;
-        }
+    private boolean loadRequestsFromFile(int numbersToLoad, long startOffset, int firstID) {
 
         int id = firstID;
         long offset = startOffset < 0 ? 0 : startOffset;
@@ -265,6 +272,25 @@ public class RequestUrlStore {
 
         } catch (Exception e) {
             WebtrekkLogging.log("cannot load backup file '" + requestStoreFile.getAbsolutePath() + "'", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void deleteAllCashedIDs()
+    {
+        while(true)
+        {
+            int id = mIDs.firstKey();
+            String url = mURLCash.get(id);
+            if (url == null) {
+                url = mLoaddedIDs.get(id);
+                if (url == null)
+                    removeKey(id);
+            }else
+                break;
+
         }
     }
 

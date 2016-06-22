@@ -49,6 +49,7 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
 
         for (int i = 0; i<numberOfTest; i++)
         {
+            Thread.yield();
             long before = System.currentTimeMillis();
             mWebtrekk.track();
             long timeOfTrack = System.currentTimeMillis() - before;

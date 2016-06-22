@@ -7,6 +7,8 @@ import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -64,7 +66,7 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
     }
 
     public void testMessageNumberPerformance() {
-        final int numberOfTest = 50000;
+        final int numberOfTest = 5000;
 
         setStartMessageNumber();
 
@@ -100,5 +102,23 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
         }
 
         waitForTrackedURLs();
+    }
+
+    public void testFileCorruption()
+    {
+        RequestUrlStore urlStore = new RequestUrlStore(getInstrumentation().getTargetContext());
+        final File file = urlStore.getRequestStoreFile();
+
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 30; i++) {
+                    mWebtrekk.track();
+                }
+                file.setReadable(false, false);
+            }
+        }, 20);
+        waitForTrackedURLs();
+        file.setReadable(true, false);
     }
 }

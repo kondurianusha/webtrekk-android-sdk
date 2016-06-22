@@ -25,8 +25,8 @@ dependencies {
     debugCompile project(path: ':WebtrekkSDK', configuration: 'libraryDebug')
     releaseCompile project(path: ':WebtrekkSDK', configuration: 'libraryRelease')
     //compile 'com.android.support:support-v4:23.0.0'
-    //compile(name:'WebtrekkSDK-library-debug', ext:'aar')
     compile 'com.mixpanel.android:mixpanel-android:4.8.0'
+    //compile 'com.webtrekk.webtrekksdk:WebtrekkSDK:4.0.99'
 }
 
 repositories{

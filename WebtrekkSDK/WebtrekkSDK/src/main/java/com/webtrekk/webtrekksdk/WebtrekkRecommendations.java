@@ -313,8 +313,10 @@ public class WebtrekkRecommendations {
                     mQueryResult = QueryRecommendationResult.RECOMENDATION_API_DEACITVATED;
                 else if (resp == 404)
                     mQueryResult = QueryRecommendationResult.INCORRECT_URL_FORMAT;
-                else
+                else {
                     mQueryResult = QueryRecommendationResult.INCORRECT_RESPONSE;
+                    WebtrekkLogging.log("Recommendation request Incorrect Response:"+resp);
+                }
 
                 if (mHandler == null)
                 {

@@ -620,9 +620,9 @@ public class Webtrekk {
     }
 
     /**
-     * Manual send tracks to server from tracks queue. Is done in separate thread and can be called from UI thread.
-     * It must be called when <sendDelay> is zero, otherwise no message is send to server.
-     * @return true if sending is called and false if previous send procedure hasn't called yet or nothing to send
+     * Send manual tracks to server from tracks queue. Is done in separate thread and can be called from UI thread.
+     * It must be called when <sendDelay> is zero, otherwise no message is sent to server.
+     * @return true if sending is called and false if previous send procedure hasn't called or nothing to send
      *              or manual send mode is off (<sendDelay> not zero).
      */
     public boolean send() {

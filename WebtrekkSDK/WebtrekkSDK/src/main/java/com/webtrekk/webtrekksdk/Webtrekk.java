@@ -8,16 +8,9 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import com.webtrekk.webtrekksdk.Modules.ExceptionHandler;
 import com.webtrekk.webtrekksdk.Request.RequestFactory;
-import com.webtrekk.webtrekksdk.Request.RequestProcessor;
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Configuration.ActivityConfiguration;
@@ -552,7 +545,7 @@ public class Webtrekk {
      * it stores all requests to file.
      */
     private void flash() {
-        mRequestFactory.flash();
+        mRequestFactory.flush();
     }
 
     void setContext(Context context) {
@@ -624,6 +617,21 @@ public class Webtrekk {
     public WebtrekkRecommendations getRecommendations()
     {
         return new WebtrekkRecommendations(trackingConfiguration, mContext);
+    }
+
+    /**
+     * Manual send tracks to server from tracks queue. Is done in separate thread and can be called from UI thread.
+     * It must be called when <sendDelay> is zero, otherwise no message is send to server.
+     * @return true if sending is called and false if previous send procedure hasn't called yet or nothing to send
+     *              or manual send mode is off (<sendDelay> not zero).
+     */
+    public boolean send() {
+        if (mRequestFactory.getTrackingConfiguration().getSendDelay() == 0) {
+            return mRequestFactory.onSendIntervalOver();
+        }else {
+            WebtrekkLogging.log("Custom url send mode isn't switched on. Send isn't available. For custom send mode set <sendDelay> to zero ");
+            return false;
+        }
     }
 
     /**

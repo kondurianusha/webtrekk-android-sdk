@@ -133,8 +133,8 @@ public class RequestUrlStore {
         }
     }
 
-    // flash to file all data, clear cash.
-    public void flash()
+    // flush to file all data, clear cash.
+    public void flush()
     {
         WebtrekkLogging.log("Flash items to memory. Size:"+size());
         if (size() > 0) {

@@ -431,7 +431,7 @@ public class RequestFactory {
 
     public void stop()
     {
-        flash();
+        flush();
         if (mCampaign != null)
             mCampaign.interrupt();
     }
@@ -443,10 +443,10 @@ public class RequestFactory {
         //mRequestUrlStore.deleteRequestsFile();
     }
 
-    public void flash()
+    public void flush()
     {
         stopSendURLProcess();
-        mRequestUrlStore.flash();
+        mRequestUrlStore.flush();
     }
 
     /**
@@ -612,21 +612,25 @@ public class RequestFactory {
      * every sendDelay seconds, it processes the stored requests in a separate thread
      */
     void initURLSendTimerService() {
-        // start the timer service
-        mURLSendTimerService = Executors.newSingleThreadScheduledExecutor();
-        mURLSendTimerFuture = mURLSendTimerService.scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                onSendIntervalOver();
-            }
-        }, mTrackingConfiguration.getSendDelay(), mTrackingConfiguration.getSendDelay(), TimeUnit.SECONDS);
-        WebtrekkLogging.log("timer service started");
+        if (mTrackingConfiguration.getSendDelay() > 0) {
+            // start the timer service
+            mURLSendTimerService = Executors.newSingleThreadScheduledExecutor();
+            mURLSendTimerFuture = mURLSendTimerService.scheduleWithFixedDelay(new Runnable() {
+                @Override
+                public void run() {
+                    onSendIntervalOver();
+                }
+            }, mTrackingConfiguration.getSendDelay(), mTrackingConfiguration.getSendDelay(), TimeUnit.SECONDS);
+            WebtrekkLogging.log("timer service started");
+        }
     }
 
     /**
-     * Init service that do flash by 1 min timeout
+     * Init service that do flush by 1 min timeout
      */
     private void initFlashTimerService() {
+        if (mURLSendTimerService == null)
+            mURLSendTimerService = Executors.newSingleThreadScheduledExecutor();
         mFlashTimerService = Executors.newSingleThreadScheduledExecutor();
         mFlashTimerFuture = mURLSendTimerService.scheduleWithFixedDelay(new Runnable() {
             @Override
@@ -639,8 +643,9 @@ public class RequestFactory {
     /**
      * this method gets called whenever the send delay is over, it executes the requesthandler in a
      * new thread
+     * @return true if send is done and false if previous send is still in progress or there is no message to send
      */
-    public void onSendIntervalOver() {
+    public boolean onSendIntervalOver() {
         WebtrekkLogging.log("onSendIntervalOver: activity count: " + mApplicationStatus.getCurrentActivitiesCount() + " request urls: " + mRequestUrlStore.size()
                 + " thread done:"+(mRequestProcessorFuture == null ? "null": mRequestProcessorFuture.isDone()));
         if(mRequestUrlStore.size() > 0  && (mRequestProcessorFuture == null || mRequestProcessorFuture.isDone())) {
@@ -648,7 +653,9 @@ public class RequestFactory {
                 mExecutorService = Executors.newSingleThreadExecutor();
             }
             mRequestProcessorFuture = mExecutorService.submit(new RequestProcessor(mRequestUrlStore));
-        }
+            return true;
+        }else
+            return false;
     }
 
     private void flashByTimeout()
@@ -656,7 +663,7 @@ public class RequestFactory {
         if (mFlashTimerFuture == null)
             return;
         if ((System.currentTimeMillis() - mLastTrackTime) > 60000 && mRequestProcessorFuture.isDone())
-            flash();
+            flush();
     }
 
     public void stopSendURLProcess()

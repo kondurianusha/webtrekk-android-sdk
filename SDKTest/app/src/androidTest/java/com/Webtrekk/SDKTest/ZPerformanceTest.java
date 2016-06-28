@@ -67,7 +67,7 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
     }
 
     public void testMessageNumberPerformance() {
-        final int numberOfTest = 5000;
+        final int numberOfTest = 20000;
 
         setStartMessageNumber();
 

@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 
 import com.webtrekk.webtrekksdk.Configuration.ActivityConfiguration;
 import com.webtrekk.webtrekksdk.Modules.Campaign;
-import com.webtrekk.webtrekksdk.HelloWorldPlugin;
-import com.webtrekk.webtrekksdk.Plugin;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
@@ -70,9 +68,6 @@ public class RequestFactory {
     // same as the globalTrackingParameter but will not be replaced, fixed values can be added from code or xml
     private TrackingParameter mConstGlobalTrackingParameter;
 
-    // the available plugins
-    private ArrayList<Plugin> mPlugins;
-
     private RequestUrlStore mRequestUrlStore;
     private String mCustomPageName;
 
@@ -104,7 +99,6 @@ public class RequestFactory {
         initInternalParameter(isFirstStart);
         initWebtrekkParameter();
         initAutoCustomParameter();
-        initPlugins(wt);
         initURLSendTimerService();
         initFlashTimerService();
 
@@ -169,10 +163,6 @@ public class RequestFactory {
         mCustomPageName = customPageName;
     }
 
-    public ArrayList<Plugin> getPlugins() {
-        return mPlugins;
-    }
-
     public RequestUrlStore getRequestUrlStore() {
         return mRequestUrlStore;
     }
@@ -222,20 +212,6 @@ public class RequestFactory {
     {
         // first initalization of the webtrekk instance, so set fns to 1
         mInternalParameter.add(Parameter.FORCE_NEW_SESSION, "1");
-    }
-
-    /**
-     * load the enabled plugins, this will decided by hand during compile time of the lib to improve performance
-     * each customer can that way have a lib with all the features/plugins he needs
-     * he has to enable the plugin in the xml to load it here, therefore each plugin needs a unique name
-     */
-    void initPlugins(Webtrekk wt) {
-        mPlugins = new ArrayList<Plugin>();
-        if(mTrackingConfiguration.isEnablePluginHelloWorld()){
-            mPlugins.add(new HelloWorldPlugin(wt));
-            WebtrekkLogging.log("loaded plugin: HelloWorldPlugin");
-        }
-        WebtrekkLogging.log("all plugins loaded");
     }
 
     /**
@@ -556,8 +532,7 @@ public class RequestFactory {
 
     /**
      * Stores the generated URLS of the requests in the local RequestUrlStore until they are send
-     * by the timer function. It is also responsible for executing the plugins before and after the request
-     * the plugins will be always executed no matter if the user opted out or not
+     * by the timer function.
      *
      * @param request the Tracking Request
      */
@@ -565,20 +540,11 @@ public class RequestFactory {
 
         processMediaCode(request);
 
-        // execute the before plugin functions
-        for(Plugin p: mPlugins){
-            p.before_request(request);
-        }
         // only track when not opted out, but always execute the plugins
         if(!mIsOptout && !mIsSampling) {
             String urlString = request.getUrlString();
             WebtrekkLogging.log("adding url: " + urlString);
             mRequestUrlStore.addURL(request.getUrlString());
-        }
-
-        // execute the after_request plugin functions
-        for(Plugin p: mPlugins){
-            p.after_request(request);
         }
 
         // after the url is created reset the internal parameters to zero

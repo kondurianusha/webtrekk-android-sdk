@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 
+import com.webtrekk.webtrekksdk.Modules.WebtrekkPushNotification;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 /**

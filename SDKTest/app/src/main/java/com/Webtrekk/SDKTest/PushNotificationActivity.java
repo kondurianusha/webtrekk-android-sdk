@@ -14,12 +14,9 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.webtrekk.webtrekksdk.Webtrekk;
-import com.webtrekk.webtrekksdk.WebtrekkPushNotification;
+import com.webtrekk.webtrekksdk.Modules.WebtrekkPushNotification;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
@@ -116,7 +113,7 @@ public class PushNotificationActivity extends Activity {
     private void tokenReceiverRegister()
     {
         LocalBroadcastManager.getInstance(this).registerReceiver(mTokenReceiver,
-                new IntentFilter("com.webtrekk.webtrekksdk.WebtrekkPushNotification.Push"));
+                new IntentFilter("com.webtrekk.webtrekksdk.Modules.WebtrekkPushNotification.Push"));
     }
 
     /**

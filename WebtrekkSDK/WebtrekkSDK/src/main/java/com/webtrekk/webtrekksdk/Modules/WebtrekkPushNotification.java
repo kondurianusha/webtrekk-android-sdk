@@ -1,4 +1,4 @@
-package com.webtrekk.webtrekksdk;
+package com.webtrekk.webtrekksdk.Modules;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,8 +16,10 @@ import android.widget.RemoteViews;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.webtrekk.webtrekksdk.R;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +45,7 @@ public class WebtrekkPushNotification {
     private final Context mContext;
     private final Boolean mIsTestMode;
     private boolean mIsNotificationStarted;
-    static final String TEST_MODE_KEY = "WebtrekkTestMode";
+    public static final String TEST_MODE_KEY = "WebtrekkTestMode";
     static final String WEBTREKK_PUSH_MESSAGE_RECEIVE_MESSAGE_NOTIFICATION = "WEBTREKK_PUSH_MESSAGE_RECEIVE_MESSAGE_NOTIFICATION";
     PushNotificationMessageCallback mCallback;
 
@@ -62,7 +64,7 @@ public class WebtrekkPushNotification {
         }
     };
 
-    WebtrekkPushNotification(Context context, boolean isTestMode)
+    public WebtrekkPushNotification(Context context, boolean isTestMode)
     {
         mContext = context;
         mIsTestMode = isTestMode;
@@ -84,7 +86,7 @@ public class WebtrekkPushNotification {
 
     /**
      * Start to receive push notification message. use callback to receive message.
-     * See {@link com.webtrekk.webtrekksdk.WebtrekkPushNotification.PushNotificationMessageCallback} for detalis
+     * See {@link WebtrekkPushNotification.PushNotificationMessageCallback} for detalis
      * You should always call stop after that. Please don't call start twice.
      * @param callback callback to receive push message.
      * @return return true if notification has been started.
@@ -137,7 +139,7 @@ public class WebtrekkPushNotification {
     }
 
 
-    void getTokkenRequest(Context context)
+    public void getTokkenRequest(Context context)
     {
         try {
             InstanceID instanceID = InstanceID.getInstance(context);
@@ -172,7 +174,7 @@ public class WebtrekkPushNotification {
      * @param context
      */
     private void sendTestMessage(String token, Context context) {
-        Intent intent = new Intent("com.webtrekk.webtrekksdk.WebtrekkPushNotification.Push");
+        Intent intent = new Intent("com.webtrekk.webtrekksdk.Modules.WebtrekkPushNotification.Push");
 
         intent.putExtra("token", token);
 
@@ -196,7 +198,7 @@ public class WebtrekkPushNotification {
      * @param intent
      */
 
-    void processReceivedData(final Intent intent)
+    public void processReceivedData(final Intent intent)
     {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
             @Override

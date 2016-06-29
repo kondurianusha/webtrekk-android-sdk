@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.webtrekk.webtrekksdk.Modules.ExceptionHandler;
+import com.webtrekk.webtrekksdk.Modules.WebtrekkPushNotification;
 import com.webtrekk.webtrekksdk.Request.RequestFactory;
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;

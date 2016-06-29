@@ -61,7 +61,6 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initWebtrekk(getContext());
         TrackedActivityLifecycleCallbacks callbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
         assertNotNull(webtrekk.getTrackingConfiguration());
-        assertNotNull(webtrekk.getRequestFactory().getPlugins());
         assertNotNull(webtrekk.getContext());
         assertNotNull(webtrekk.getRequestFactory().getRequestUrlStore());
         assertNotNull(webtrekk.getRequestFactory().getWebtrekkParameter());
@@ -87,15 +86,6 @@ public class WebtrekkTests extends AndroidTestCase {
         assertEquals(webtrekk.getTrackingConfiguration().getVersion(), 3);
 
     }
-    @Suppress
-    public void testInitPlugins() {
-        webtrekk.setContext(getContext());
-        webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
-        webtrekk.getRequestFactory().init(mContext, webtrekk.getTrackingConfiguration(), webtrekk);
-        assertNotNull(webtrekk.getRequestFactory().getPlugins());
-        assertEquals(1, webtrekk.getRequestFactory().getPlugins().size());
-    }
-
     public void testInitWebtrekkParameter() {
         // make sure the default params have valid values
         webtrekk.setContext(getContext());
@@ -103,7 +93,6 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.getRequestFactory().init(mContext, webtrekk.getTrackingConfiguration(), webtrekk);
         assertEquals(6, webtrekk.getRequestFactory().getWebtrekkParameter().size());
         assertTrue(webtrekk.getRequestFactory().getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library " + Webtrekk.TRACKING_LIBRARY_VERSION_UA + "(Android;"));
-
     }
 
     public void testUpdateDynamicParameter() {

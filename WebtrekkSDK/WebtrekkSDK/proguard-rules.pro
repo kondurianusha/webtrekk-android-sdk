@@ -24,7 +24,7 @@
 -keep public class com.webtrekk.webtrekksdk.WebtrekkApplication {
     public <methods>;
 }
--keep public class com.webtrekk.webtrekksdk.WebtrekkPushNotification {
+-keep public class com.webtrekk.webtrekksdk.Modules.WebtrekkPushNotification {
     public <methods>;
 }
 -keep public enum com.webtrekk.webtrekksdk.TrackingParameter$** {

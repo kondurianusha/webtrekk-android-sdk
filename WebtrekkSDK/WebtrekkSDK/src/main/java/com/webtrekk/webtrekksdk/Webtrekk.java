@@ -34,8 +34,8 @@ public class Webtrekk {
     public static final String PREFERENCE_APP_VERSIONCODE = "appVersion";
     public static final String PREFERENCE_KEY_INSTALLATION_FLAG = "InstallationFlag";
     public static final String PREFERENCE_KEY_CONFIGURATION = "webtrekkTrackingConfiguration";
-    public static String TRACKING_LIBRARY_VERSION_UA;
-    public static String TRACKING_LIBRARY_VERSION;
+    public static String mTrackingLibraryVersionUI;
+    public static String mTrackingLibraryVersion;
 
     final private RequestFactory mRequestFactory = new RequestFactory();
     private TrackingConfiguration trackingConfiguration;
@@ -754,8 +754,8 @@ public class Webtrekk {
      */
     private void initVersions(Context context)
     {
-        TRACKING_LIBRARY_VERSION_UA = context.getResources().getString(R.string.version_name);
-        TRACKING_LIBRARY_VERSION = TRACKING_LIBRARY_VERSION_UA.replaceAll(".","");
+        mTrackingLibraryVersionUI = context.getResources().getString(R.string.version_name);
+        mTrackingLibraryVersion = mTrackingLibraryVersionUI.replaceAll("\\D","");
     }
 
     /**

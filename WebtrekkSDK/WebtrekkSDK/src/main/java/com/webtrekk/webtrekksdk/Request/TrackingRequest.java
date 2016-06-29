@@ -144,7 +144,7 @@ public class TrackingRequest {
         public String getPValue(TrackingParameter trackingParameter) {
             SortedMap<Parameter, String> tp = trackingParameter.getDefaultParameter();
 
-            return "p=" + Webtrekk.TRACKING_LIBRARY_VERSION + ",0";
+            return "p=" + Webtrekk.mTrackingLibraryVersion + ",0";
         }
 
         /**
@@ -196,7 +196,7 @@ public class TrackingRequest {
             SortedMap<Parameter, String> tp = trackingParameter.getDefaultParameter();
 
 
-            return "p=" + Webtrekk.TRACKING_LIBRARY_VERSION + "," +
+            return "p=" + Webtrekk.mTrackingLibraryVersion + "," +
                     HelperFunctions.urlEncode(tp.get(Parameter.ACTIVITY_NAME)) + ",0,"+
                     tp.get(Parameter.SCREEN_RESOLUTION) + ","+
                     tp.get(Parameter.SCREEN_DEPTH) + ",0,"+
@@ -287,7 +287,7 @@ public class TrackingRequest {
         public String getPValue(TrackingParameter trackingParameter) {
             SortedMap<Parameter, String> tp = trackingParameter.getDefaultParameter();
 
-            return "p=" + Webtrekk.TRACKING_LIBRARY_VERSION + ",,0,,,0,"+
+            return "p=" + Webtrekk.mTrackingLibraryVersion + ",,0,,,0,"+
                     tp.get(Parameter.TIMESTAMP) + ",0,0,0";
         }
 

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.Suppress;
 
 import static org.mockito.Mockito.*;
 
@@ -92,7 +91,7 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
         webtrekk.getRequestFactory().init(mContext, webtrekk.getTrackingConfiguration(), webtrekk);
         assertEquals(6, webtrekk.getRequestFactory().getWebtrekkParameter().size());
-        assertTrue(webtrekk.getRequestFactory().getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library " + Webtrekk.TRACKING_LIBRARY_VERSION_UA + "(Android;"));
+        assertTrue(webtrekk.getRequestFactory().getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library " + Webtrekk.mTrackingLibraryVersionUI + "(Android;"));
     }
 
     public void testUpdateDynamicParameter() {

@@ -76,7 +76,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         tr_astart = new TrackingRequest(tp_activity_start, trackingConfiguration);
 
         String url = tr_astart.getUrlString();
-        assertTrue(url.contains("p="+Webtrekk.TRACKING_LIBRARY_VERSION));
+        assertTrue(url.contains("p="+Webtrekk.mTrackingLibraryVersion));
     }
 
     public void testGetUrlStringStandard() {
@@ -85,7 +85,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         tr_astart = new TrackingRequest(tp_activity_start, trackingConfiguration);
 
         String url = tr_astart.getUrlString();
-        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.TRACKING_LIBRARY_VERSION+",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&eor=1", url);
+        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.mTrackingLibraryVersion +",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&eor=1", url);
     }
 
     public void testGetUrlStringActionButton() {
@@ -97,7 +97,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         tr_action = new TrackingRequest(tp_action_user_button, trackingConfiguration);
 
         String url = tr_action.getUrlString();
-        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.TRACKING_LIBRARY_VERSION+",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&ct=Save+Button&eor=1", url);
+        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.mTrackingLibraryVersion +",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&ct=Save+Button&eor=1", url);
 
     }
 
@@ -114,7 +114,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         tr_conversion = new TrackingRequest(tp_conversion, trackingConfiguration);
 
         String url = tr_conversion.getUrlString();
-        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.TRACKING_LIBRARY_VERSION+",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&ov=129%2C95&oi=12345&ba=FREE+4.0+FLYKNIT&cb1=XXL&cb2=Black&cb3=paypal&eor=1", url);
+        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.mTrackingLibraryVersion +",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&ov=129%2C95&oi=12345&ba=FREE+4.0+FLYKNIT&cb1=XXL&cb2=Black&cb3=paypal&eor=1", url);
 
     }
 
@@ -127,7 +127,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         tp_activity_start.add(globalTrackingParameter);
 
         String url = tr_astart.getUrlString();
-        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.TRACKING_LIBRARY_VERSION+",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&cb1=GLOBALTEST&eor=1", url);
+        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.mTrackingLibraryVersion +",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&cb1=GLOBALTEST&eor=1", url);
 
     }
 
@@ -138,7 +138,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         TrackingRequest tm = new TrackingRequest(tpMedia, trackingConfiguration);
 
         String url = tm.getUrlString();
-        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.TRACKING_LIBRARY_VERSION+",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=start&mt1=0&mt2=300&mg1=example&eor=1", url);
+        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.mTrackingLibraryVersion +",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=start&mt1=0&mt2=300&mg1=example&eor=1", url);
 
     }
     public void testMediaTrackingPause() {
@@ -148,7 +148,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         TrackingRequest tm = new TrackingRequest(tpMedia, trackingConfiguration);
 
         String url = tm.getUrlString();
-        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.TRACKING_LIBRARY_VERSION+",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=pause&mt1=0&mt2=300&mg1=example&eor=1", url);
+        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.mTrackingLibraryVersion +",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=pause&mt1=0&mt2=300&mg1=example&eor=1", url);
 
     }
 
@@ -159,7 +159,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         TrackingRequest tm = new TrackingRequest(tpMedia, trackingConfiguration);
 
         String url = tm.getUrlString();
-        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.TRACKING_LIBRARY_VERSION+",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=pos&mt1=0&mt2=300&mg1=example&eor=1", url);
+        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.mTrackingLibraryVersion +",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=pos&mt1=0&mt2=300&mg1=example&eor=1", url);
 
     }
 
@@ -170,7 +170,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         TrackingRequest tm = new TrackingRequest(tpMedia, trackingConfiguration);
 
         String url = tm.getUrlString();
-        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.TRACKING_LIBRARY_VERSION+",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=seek&mt1=0&mt2=300&mg1=example&eor=1", url);
+        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.mTrackingLibraryVersion +",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=seek&mt1=0&mt2=300&mg1=example&eor=1", url);
 
     }
     public void testMediaTrackingStop() {
@@ -180,7 +180,7 @@ public class TrackingRequestTests extends AndroidTestCase {
         TrackingRequest tm = new TrackingRequest(tpMedia, trackingConfiguration);
 
         String url = tm.getUrlString();
-        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.TRACKING_LIBRARY_VERSION+",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=stop&mt1=0&mt2=300&mg1=example&eor=1", url);
+        assertEquals("http://q3.webtrekk.net/1111111111/wt?p="+Webtrekk.mTrackingLibraryVersion +",StartActivity,0,1280x1024,32,0,1231233243245,0,0,0&eid=12345678901234&mi=foo.mp4&mk=stop&mt1=0&mt2=300&mg1=example&eor=1", url);
 
     }
 

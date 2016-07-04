@@ -14,11 +14,6 @@ import android.widget.TextView;
 import com.webtrekk.webtrekksdk.Webtrekk;
 import com.webtrekk.webtrekksdk.WebtrekkUserParameters;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Created by vartbaronov on 29.02.16.
  */
@@ -49,7 +44,7 @@ public class CDBActivityTest extends Activity {
                         setFacebookID(getTextFromID(R.id.cdb_facebook_id)).
                         setTwitterID(getTextFromID(R.id.cdb_twitter_id)).
                         setGooglePlusID(getTextFromID(R.id.cdb_google_plus_id)).
-                        setLiknedInID(getTextFromID(R.id.cdb_linkin_id)).
+                        setLinkedInID(getTextFromID(R.id.cdb_linkin_id)).
                         setCustom(Integer.valueOf(getTextFromID(R.id.cdb_custom_ind1)), getTextFromID(R.id.cdb_custom_value1)).
                         setCustom(Integer.valueOf(getTextFromID(R.id.cdb_custom_ind2)), getTextFromID(R.id.cdb_custom_value2)));
             }
@@ -243,7 +238,7 @@ public class CDBActivityTest extends Activity {
                         setFacebookID(mParametersValue[mCycleTestArr[mTestCycleID][6]]).
                         setTwitterID(mParametersValue[mCycleTestArr[mTestCycleID][7]]).
                         setGooglePlusID(mParametersValue[mCycleTestArr[mTestCycleID][8]]).
-                        setLiknedInID(mParametersValue[mCycleTestArr[mTestCycleID][9]]).
+                        setLinkedInID(mParametersValue[mCycleTestArr[mTestCycleID][9]]).
                         setCustom(1, mParametersValue[mCycleTestArr[mTestCycleID][10]]));
                 break;
             case 1:

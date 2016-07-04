@@ -210,7 +210,7 @@ public class WebtrekkUserParameters {
      * @param liknedInID
      * @return instance of to WebtrekkUserParameters
      */
-    public WebtrekkUserParameters setLiknedInID(String liknedInID)
+    public WebtrekkUserParameters setLinkedInID(String liknedInID)
     {
         mParameters.put(Parameter.CDB_LINKEDIN_ID, HelperFunctions.makeSha256(liknedInID.toLowerCase()));
         return this;

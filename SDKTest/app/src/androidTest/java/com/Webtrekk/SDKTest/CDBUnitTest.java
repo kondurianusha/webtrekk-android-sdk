@@ -1,21 +1,9 @@
 package com.Webtrekk.SDKTest;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
-import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.Suppress;
 import android.util.Log;
 
 import com.webtrekk.webtrekksdk.Webtrekk;
 import com.webtrekk.webtrekksdk.WebtrekkUserParameters;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by vartbaronov on 31.03.16.
@@ -162,7 +150,7 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2Base<EmptyActiv
                                 setFacebookID(mParametersValue[mCycleTestArr[mTestCycleID][6]]).
                                 setTwitterID(mParametersValue[mCycleTestArr[mTestCycleID][7]]).
                                 setGooglePlusID(mParametersValue[mCycleTestArr[mTestCycleID][8]]).
-                                setLiknedInID(mParametersValue[mCycleTestArr[mTestCycleID][9]]).
+                                setLinkedInID(mParametersValue[mCycleTestArr[mTestCycleID][9]]).
                                 setCustom(1, mParametersValue[mCycleTestArr[mTestCycleID][10]]));
                     }
                 };

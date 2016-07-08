@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <webtrekkConfiguration>
-    <version>9</version>
+    <version>1</version>
     <trackId>123451234512345</trackId>
     <trackDomain>http://localhost:8080</trackDomain>
     <sampling>0</sampling>
@@ -21,7 +21,7 @@
     <autoTrackPlaystoreUsername>false</autoTrackPlaystoreUsername>
     <autoTrackPlaystoreMail>false</autoTrackPlaystoreMail>
     <enableRemoteConfiguration>true</enableRemoteConfiguration>
-    <trackingConfigurationUrl>https://d1r27qvpjiaqj3.cloudfront.net/1111111111111111/35711.xml</trackingConfigurationUrl>
+    <trackingConfigurationUrl>https://d1r27qvpjiaqj3.cloudfront.net/1111111111111111/36704.xml</trackingConfigurationUrl>
     <globalTrackingParameter>
         <parameter id="INTERN_SEARCH" key="asdf"/>
         <parameter id="CUSTOMER_ID" key="AT1"/>

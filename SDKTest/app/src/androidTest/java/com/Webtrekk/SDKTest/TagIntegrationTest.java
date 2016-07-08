@@ -68,7 +68,6 @@ public class TagIntegrationTest extends ActivityInstrumentationTestCase2Base<Tag
 
         assertEquals("ATS1", parcel.getValue("cg11"));
         assertEquals("AT1Value", parcel.getValue("cg10"));
-        assertEquals("ATS1", parcel.getValue("cg11"));
         assertEquals("ATS1", parcel.getValue("cp3"));
         assertEquals("AT1Value", parcel.getValue("cp4"));
         assertEquals("AT1Value", parcel.getValue("cp8"));

@@ -108,7 +108,7 @@ public class Webtrekk {
      * @param c
      *
      */
-    public void initWebtrekk(final Context c)
+    void initWebtrekk(final Context c)
     {
         initWebtrekk(c, R.raw.webtrekk_config);
     }

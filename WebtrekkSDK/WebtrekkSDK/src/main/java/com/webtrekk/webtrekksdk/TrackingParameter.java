@@ -268,7 +268,7 @@ public class TrackingParameter {
         GNAME("uc703"), // vorname
         SNAME("uc704"), // nachname
         PHONE("uc705"), // telefonnummer
-        GENDER("uc705"), //geschlecht
+        GENDER("uc706"), //geschlecht
         BIRTHDAY("uc707"), // geburtstag
         CITY("uc708"),
         COUNTRY("uc709"),

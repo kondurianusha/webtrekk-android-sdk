@@ -63,10 +63,6 @@ public class HelperFunctionsTest extends AndroidTestCase {
         assertTrue(HelperFunctions.getCountry().length() > 1);
     }
 
-    public void testGetgetUseragent() {
-        assertTrue(HelperFunctions.getUserAgent(), HelperFunctions.getUserAgent().contains("Tracking Library "+Webtrekk.mTrackingLibraryVersionUI +"(Android"));
-    }
-
     public void testIsSysAutorotate() {
         assertTrue(HelperFunctions.isSysAutoRotate(getContext()) == true || HelperFunctions.isSysAutoRotate(getContext()) == false);
     }

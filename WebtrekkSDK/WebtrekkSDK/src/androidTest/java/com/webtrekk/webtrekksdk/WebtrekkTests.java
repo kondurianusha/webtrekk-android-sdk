@@ -91,7 +91,6 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initTrackingConfiguration(R.raw.webtrekk_config);
         webtrekk.getRequestFactory().init(mContext, webtrekk.getTrackingConfiguration(), webtrekk);
         assertEquals(6, webtrekk.getRequestFactory().getWebtrekkParameter().size());
-        assertTrue(webtrekk.getRequestFactory().getWebtrekkParameter().get(TrackingParameter.Parameter.USERAGENT).contains("Tracking Library " + Webtrekk.mTrackingLibraryVersionUI + "(Android;"));
     }
 
     public void testUpdateDynamicParameter() {

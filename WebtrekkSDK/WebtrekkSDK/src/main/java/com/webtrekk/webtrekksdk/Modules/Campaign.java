@@ -442,12 +442,16 @@ public class Campaign extends Thread
      */
     private void campaignNotificationMessage(String mediaCode, String advID)
     {
-        if (!mFirstStart)
-            return;
-        Intent intent = new Intent(CAMPAIN_MEDIA_CODE_DEFINED_MESSAGE);
+        try{
+            if (!mFirstStart)
+                return;
+            Intent intent = new Intent(CAMPAIN_MEDIA_CODE_DEFINED_MESSAGE);
 
-        intent.putExtra(MEDIA_CODE, mediaCode);
-        intent.putExtra(ADV_ID, advID);
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            intent.putExtra(MEDIA_CODE, mediaCode);
+            intent.putExtra(ADV_ID, advID);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        }catch (NoClassDefFoundError e){
+            WebtrekkLogging.log("Cann't broad cast campain message:"+e.getMessage());
+        }
     }
 }

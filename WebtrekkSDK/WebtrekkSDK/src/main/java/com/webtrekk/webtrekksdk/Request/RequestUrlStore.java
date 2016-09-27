@@ -12,11 +12,14 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -147,12 +150,15 @@ public class RequestUrlStore {
                         String url = mURLCash.get(id);
                         if (url != null) {
                             writer.println(url);
+                            mLatestSavedURLID = id;
                         }
                     }
                 }
             });
         }
         writeFileAttributes();
+        // for debug only uncomment
+        //dumpFile();
     }
 
     public void clearAllTrackingData()
@@ -240,6 +246,30 @@ public class RequestUrlStore {
 
     }
 
+    private void dumpFile()
+    {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(requestStoreFile), "UTF-8"));
+
+            WebtrekkLogging.log("Dump flushed file start ------------------------------------------------");
+            String line;
+            while ((line = reader.readLine()) != null){
+                WebtrekkLogging.log(line);
+            }
+            WebtrekkLogging.log("Dump flushed file end --------------------------------------------------");
+            WebtrekkLogging.log("IDS:" + Arrays.asList(mIDs).toString());
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     /**
      * loads the requests from the cache file if present
      */
@@ -258,7 +288,7 @@ public class RequestUrlStore {
                 mIDs.put(id, offset);
                 while ((line = reader.readLine()) != null && ind++ < numbersToLoad && mURLCash.get(id) == null) {
                     if (mIDs.get(id) == null)
-                        WebtrekkLogging.log("File is more then existed keys. Error. Key"+id+"offset:"+offset);
+                        WebtrekkLogging.log("File is more then existed keys. Error. Key:" + id + " offset:" + offset);
                     //put URL and increment id
                     mLoaddedIDs.put(id++, line);
                     offset += (line.length() + System.getProperty("line.separator").length());

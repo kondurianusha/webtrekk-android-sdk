@@ -14,8 +14,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Base64;
 import android.widget.RemoteViews;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
+//import com.google.android.gms.gcm.GoogleCloudMessaging;
+//import com.google.android.gms.iid.InstanceID;
 import com.webtrekk.webtrekksdk.R;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
@@ -93,6 +93,7 @@ public class WebtrekkPushNotification {
      */
     public boolean start(PushNotificationMessageCallback callback){
 
+/*
         if (!HelperFunctions.isGooglePlayAvailable(mContext))
         {
             WebtrekkLogging.log("Can't start push notification. Google Play isn't available on device");
@@ -117,16 +118,18 @@ public class WebtrekkPushNotification {
         mContext.sendBroadcast(intent);
 
         mIsNotificationStarted = true;
+*/
 
         return true;
     }
 
 
-    /**
-     * stop receive notification from server. Must be called after start.
-     */
+        /**
+         * stop receive notification from server. Must be called after start.
+         */
     public void stop()
     {
+/*
         unSubscribeOnMessageNotification();
         mCallback = null;
         AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
@@ -136,11 +139,13 @@ public class WebtrekkPushNotification {
             }
         });
         mIsNotificationStarted = false;
+*/
     }
 
 
     public void getTokkenRequest(Context context)
     {
+/*
         try {
             InstanceID instanceID = InstanceID.getInstance(context);
             // You should try to get token several times
@@ -153,10 +158,12 @@ public class WebtrekkPushNotification {
         } catch (IOException e) {
             WebtrekkLogging.log("Can't provide push notification. Token can't be created with exception:" + e.getMessage());
         }
+*/
     }
 
     void deleteToken()
     {
+/*
         try {
             InstanceID instanceID = InstanceID.getInstance(mContext);
             // You should try to delete token several times
@@ -166,7 +173,9 @@ public class WebtrekkPushNotification {
         } catch (IOException e) {
             WebtrekkLogging.log("Can't delete token. Token can't be deleted with exception:" + e.getMessage());
         }
+*/
     }
+
 
     /**
      * Send test messsage with token. It is just for test.

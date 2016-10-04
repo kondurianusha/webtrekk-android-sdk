@@ -170,8 +170,8 @@ install {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.android.gms:play-services-ads:8.1.0'
-    compile 'com.google.android.gms:play-services-gcm:8.1.0'
+    compile ('com.google.android.gms:play-services-ads:8.1.0')
+    //compile 'com.google.android.gms:play-services-gcm:8.1.0'
     // dexmaker is fixed to this mockito version, 1.10.19 has bugs like missing abstract method error
     //https://code.google.com/p/dexmaker/issues/detail?id=43
     androidTestCompile 'org.mockito:mockito-core:1.9.5'

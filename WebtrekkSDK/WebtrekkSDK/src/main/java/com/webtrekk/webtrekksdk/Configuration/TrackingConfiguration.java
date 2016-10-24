@@ -27,9 +27,6 @@ public class TrackingConfiguration {
     // activitylifycycle callbacks for automated activity tracking
     private boolean autoTracked = true;
 
-    //special test mode
-    private boolean mTestMode;
-
     // auto tracking configuration
     private boolean autoTrackAppUpdate = true;
     private boolean autoTrackAdvertiserId = true;
@@ -80,7 +77,7 @@ public class TrackingConfiguration {
     public boolean validateConfiguration() {
         //TODO: implement validation rules
         boolean valid = true;
-        if(sendDelay < 10 && sendDelay != 0 && !mTestMode) {
+        if(sendDelay < 0) {
             WebtrekkLogging.log("invalid sendDelay Value");
             valid = false;
         }
@@ -197,14 +194,6 @@ public class TrackingConfiguration {
 
     public void setIsAutoTracking(boolean isAutoTracking) {
         this.autoTracked = isAutoTracking;
-    }
-
-    public void setTestMode(boolean value){
-        mTestMode = value;
-    }
-
-    public boolean isTestMode(){
-        return mTestMode;
     }
 
     public boolean isErrorLogEnable() {return mErrorLogEnable;}

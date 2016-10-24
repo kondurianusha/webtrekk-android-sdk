@@ -79,7 +79,7 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
     public void testSendDelayUseDefault(){
         TrackingConfiguration config = null;
 
-        String configString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><webtrekkConfiguration><sendDelay type=\"text\">1</sendDelay></webtrekkConfiguration>";
+        String configString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><webtrekkConfiguration><sendDelay type=\"text\">-1</sendDelay></webtrekkConfiguration>";
         try {
             config = trackingConfigurationXmlParser.parse(configString);
             assertNotNull(config);

@@ -2,8 +2,6 @@
 <webtrekkConfiguration>
     <!--the version number for this configuration file -->
     <version>1</version>
-    <testMode>true</testMode>
-
 
     <!--the webtrekk trackDomain where the requests are send  for appinstall-->
 <!--

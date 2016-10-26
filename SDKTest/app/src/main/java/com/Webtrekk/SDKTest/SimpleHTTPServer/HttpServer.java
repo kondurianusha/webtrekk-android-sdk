@@ -74,7 +74,7 @@ public class HttpServer extends NanoHTTPD {
         }
     }
 
-    public long getCurrentRequestNumber()
+    synchronized public long getCurrentRequestNumber()
     {
         if (mContext == null)
         {
@@ -87,7 +87,7 @@ public class HttpServer extends NanoHTTPD {
         return pref.getLong(REQUEST_COUNT_VALUE, 0);
     }
 
-    public void incrementRequestNumber()
+    synchronized public void incrementRequestNumber()
     {
         if (mContext == null)
         {

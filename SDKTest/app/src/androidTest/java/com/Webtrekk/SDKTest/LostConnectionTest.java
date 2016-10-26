@@ -51,14 +51,14 @@ public class LostConnectionTest  extends ActivityInstrumentationTestCase2Base<Em
 
         //Wait for some message starts to send.
         try {
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             WebtrekkLogging.log("Sleep interruction");
         }
 
-        WebtrekkLogging.log("Stop HTTP Server");
         //stop http server - emulator connection brakes
         mHttpServer.stop();
+        WebtrekkLogging.log("Stop HTTP Server");
 
         //wait sometime
         try {
@@ -67,14 +67,20 @@ public class LostConnectionTest  extends ActivityInstrumentationTestCase2Base<Em
             WebtrekkLogging.log("Sleep interruction");
         }
 
-        initWaitingForTrack (null, TRACKING_CALLS_STACK - (mHttpServer.getCurrentRequestNumber() - messageReeivedCounter));
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    WebtrekkLogging.log("Start HTTP Server");
+                    synchronized (mHttpServer) {
+                        mHttpServer.start();
+                    }
+                } catch (IOException e) {
+                    WebtrekkLogging.log("testLostConnection. Can't start server one more time");
+                }
+            }
+        }, TRACKING_CALLS_STACK - (mHttpServer.getCurrentRequestNumber() - messageReeivedCounter));
 
-        try {
-            mHttpServer.start();
-            WebtrekkLogging.log("Start HTTP Server");
-        } catch (IOException e) {
-            WebtrekkLogging.log("testLostConnection. Can't start server one more time");
-        }
 
         mWaitMilliseconds = 70000;
         waitForTrackedURLs();

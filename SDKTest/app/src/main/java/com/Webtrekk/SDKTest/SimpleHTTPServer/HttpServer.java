@@ -11,16 +11,23 @@ import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * Created by vartbaronov on 09.05.16.
  */
 public class HttpServer extends NanoHTTPD {
     private final static int PORT = 8080;
-    private static final String TEST_ULR = "com.webtrekk.webtrekksdk.TEST_URL";
     private Context mContext;
     static private String REQUEST_COUNT_VALUE = "com.webtrekk.webtrekksdk.Test.RequestCount";
     volatile private long mDelayInReceive;
+    private UrlNotifier mNotifier;
+
+
+    public interface UrlNotifier{
+        void received (String url);
+    }
 
     public HttpServer() throws IOException {
         super(PORT);
@@ -36,11 +43,16 @@ public class HttpServer extends NanoHTTPD {
         mDelayInReceive = delay;
     }
 
+    public void setNotifier(UrlNotifier notifier)
+    {
+        mNotifier = notifier;
+    }
+
     @Override
     public Response serve(IHTTPSession session) {
         String requestURL = "http://"+session.getRemoteHostName()+session.getUri()+"?"+session.getQueryParameterString();
         WebtrekkLogging.log("receive request("+getCurrentRequestNumber()+"):" + requestURL);
-        sendURLStringForTest(requestURL);
+        mNotifier.received(requestURL);
         Response response = new Response(Response.Status.OK, "image/gif;charset=UTF-8", null, 0);
         response.closeConnection(true);
 
@@ -55,23 +67,6 @@ public class HttpServer extends NanoHTTPD {
         }
 
         return response;
-    }
-
-    private void sendURLStringForTest(String url)
-    {
-        Intent intent = new Intent(TEST_ULR);
-
-        intent.putExtra("URL", url);
-
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-    }
-
-    private void incrementRequest()
-    {
-        if (mContext == null) {
-            WebtrekkLogging.log("Error increment request number");
-            return;
-        }
     }
 
     synchronized public long getCurrentRequestNumber()

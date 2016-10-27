@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.test.ActivityInstrumentationTestCase2;
@@ -24,13 +26,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Created by vartbaronov on 22.04.16.
  */
 public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> extends ActivityInstrumentationTestCase2BaseMain<T> {
 
-    private List<String> mSentURLArray = new ArrayList<String>();
+    private List<String> mSentURLArray = new Vector<String>();
     protected volatile boolean mStringReceived;
     protected final Object mSynchronize = new Object();
     protected long mWaitMilliseconds = 12000;
@@ -39,16 +42,13 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
     volatile private boolean mWaitWhileTimoutFinished;
     private long mStartMessageReceiveNumber;
 
-
-
     public ActivityInstrumentationTestCase2Base(Class<T> activityClass) {
         super(activityClass);
     }
 
-    private BroadcastReceiver mURLReceiver = new BroadcastReceiver() {
+    private HttpServer.UrlNotifier mURLReceiver = new HttpServer.UrlNotifier() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            String url = intent.getStringExtra("URL");
+        public void received(String url) {
             mSentURLArray.add(url);
             onReceiveURLProcess(url);
 
@@ -65,36 +65,25 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
 
     protected void onReceiveURLProcess(String url){};
 
-    protected void URLReceiverRegister(BroadcastReceiver URLReceiver)
-    {
-        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).registerReceiver(URLReceiver,
-                new IntentFilter("com.webtrekk.webtrekksdk.TEST_URL"));
-    }
-
-
     @Override
     protected void setUp() throws Exception {
 
         super.setUp();
         //refresh webtrekk instance
-        URLReceiverRegister(mURLReceiver);
+        //URLReceiverRegister(mURLReceiver);
         if (mHttpServer == null) {
             mHttpServer = new HttpServer();
             mHttpServer.setContext(mApplication);
+            mHttpServer.setNotifier(mURLReceiver);
             mHttpServer.start();
         }
     }
 
     @Override
     public void tearDown() throws Exception {
-        URLReceiverUnRegister(mURLReceiver);
+        //URLReceiverUnRegister(mURLReceiver);
         mHttpServer.stop();
         super.tearDown();
-    }
-
-    protected void URLReceiverUnRegister(BroadcastReceiver URLReceiver)
-    {
-        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).unregisterReceiver(URLReceiver);
     }
 
     protected void initWaitingForTrack(Runnable process)
@@ -123,6 +112,7 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
 
     protected String waitForTrackedURL(boolean isNoTrackCheck)
     {
+        mWaitWhileTimoutFinished = false;
         processWaitForURL(isNoTrackCheck);
         return isNoTrackCheck ? null : mSentURLArray.get(0);
     }

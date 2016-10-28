@@ -326,11 +326,7 @@ public class Campaign extends Thread
                             WebtrekkLogging.log("Media code is received:"+mediaCodeRaw);
                             String mediaRawArray[] = mediaCodeRaw.split("=");
 
-                            if (mediaRawArray.length == 2)
-                                mMediaCode = mediaRawArray[1];
-                            else
-                                WebtrekkLogging.log("Incorrect media code in response:"+mediaCodeRaw);
-
+                            mMediaCode = mediaCodeRaw.substring(mediaCodeRaw.indexOf("=")+1);
                         }else
                             WebtrekkLogging.log("Media code isn't defined from response.");
                     }else

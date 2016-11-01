@@ -75,10 +75,10 @@
     </customParameter>
 
     <recommendations>
-        <recommendation name="complexReco">http://reco.webtrekk.com/dmp/recos/v1/?accountId=238713152098253&amp;placementId=39876</recommendation>
-        <recommendation name="simpleReco">http://reco.webtrekk.com/dmp/recos/v1/?accountId=238713152098253&amp;placementId=39879</recommendation>
+        <recommendation name="complexReco">https://reco.webtrekk.com/dmp/recos/v1/?accountId=238713152098253&amp;placementId=39876</recommendation>
+        <recommendation name="simpleReco">https://reco.webtrekk.com/dmp/recos/v1/?accountId=238713152098253&amp;placementId=39879</recommendation>
         <recommendation name="paramTest">http://localhost:8080/dmp/recos/v1/?accountId=238713152098253&amp;placementId=39879</recommendation>
-        <recommendation name="emptyTest">http://reco.webtrekk.com/dmp/recos/v1/?accountId=238713152098253&amp;placementId=40056</recommendation>
+        <recommendation name="emptyTest">https://reco.webtrekk.com/dmp/recos/v1/?accountId=238713152098253&amp;placementId=40056</recommendation>
     </recommendations>
 
     <!--global tracking parameter -->

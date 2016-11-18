@@ -365,7 +365,7 @@ public class RequestFactory {
             }
 
 
-            if(mRequestUrlStore != null) {
+            if(mRequestUrlStore != null && mTrackingConfiguration.isAutoTrackRequestUrlStoreSize()) {
                 mAutoCustomParameter.put("requestUrlStoreSize", String.valueOf(mRequestUrlStore.size()));
             }
         }
@@ -474,12 +474,20 @@ public class RequestFactory {
         if(mConstGlobalTrackingParameter != null) {
             trackingParameter.add(mConstGlobalTrackingParameter);
         }
+
+        // apply autotracking parameters
+        if(mAutoCustomParameter!= null)
+        {
+            trackingParameter.add(mTrackingConfiguration.getAutoTrackedParameters(mAutoCustomParameter));
+        }
+
         //now map the string values from the code tracking parameters to the custom values defined by webtrekk or the customer
         if(mCustomParameter!= null && mGlobalTrackingParameter != null) {
             // first map the global tracking parameter
             TrackingParameter mappedTrackingParameter = mGlobalTrackingParameter.applyMapping(mCustomParameter);
             trackingParameter.add(mappedTrackingParameter);
         }
+
         // second add the globally configured const trackingparams from the xml which may override the ones above
         if(mTrackingConfiguration.getConstGlobalTrackingParameter() != null) {
             trackingParameter.add(mTrackingConfiguration.getConstGlobalTrackingParameter());

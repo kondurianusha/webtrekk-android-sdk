@@ -327,6 +327,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         assertEquals("customValue", parcel.getValue("cr"));
     }
 
+/*
     public void testGoogleEmail()
     {
         initWaitingForTrack(new Runnable() {
@@ -344,6 +345,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         assertFalse(parcel.getValue("cp9").isEmpty());
     }
+*/
 
     public void testActionPageNamePriority()
     {

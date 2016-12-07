@@ -1,18 +1,12 @@
 package com.Webtrekk.SDKTest.SimpleHTTPServer;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Vector;
 
 /**
  * Created by vartbaronov on 09.05.16.
@@ -21,8 +15,11 @@ public class HttpServer extends NanoHTTPD {
     private final static int PORT = 8080;
     private Context mContext;
     static private String REQUEST_COUNT_VALUE = "com.webtrekk.webtrekksdk.Test.RequestCount";
-    volatile private long mDelayInReceive;
+    volatile private long mDelayAfterReceive;
+    volatile private long mDelayBeforeReceive;
     private UrlNotifier mNotifier;
+    final private Object mDelayMonitor = new Object();
+    private boolean mIsDelay;
 
 
     public interface UrlNotifier{
@@ -40,7 +37,12 @@ public class HttpServer extends NanoHTTPD {
 
     public void setDelay(int delay)
     {
-        mDelayInReceive = delay;
+        mDelayAfterReceive = delay;
+    }
+
+    public void setBeforeDelay(int delay)
+    {
+        mDelayBeforeReceive = delay;
     }
 
     public void setNotifier(UrlNotifier notifier)
@@ -50,6 +52,21 @@ public class HttpServer extends NanoHTTPD {
 
     @Override
     public Response serve(IHTTPSession session) {
+
+        try {
+            if (mDelayBeforeReceive > 0)
+            {
+                mIsDelay = true;
+                synchronized (mDelayMonitor) {
+                    long currentStartTime = System.currentTimeMillis();
+                    while (mIsDelay && (currentStartTime + mDelayBeforeReceive) > System.currentTimeMillis()) {
+                        mDelayMonitor.wait(mDelayBeforeReceive);
+                    }
+                }
+            }
+        } catch (InterruptedException e) {
+        }
+
         String requestURL = "http://"+session.getRemoteHostName()+session.getUri()+"?"+session.getQueryParameterString();
         WebtrekkLogging.log("receive request("+getCurrentRequestNumber()+"):" + requestURL);
         mNotifier.received(requestURL);
@@ -57,13 +74,13 @@ public class HttpServer extends NanoHTTPD {
         response.closeConnection(true);
 
         incrementRequestNumber();
-        if (mDelayInReceive > 0)
-        {
-            try {
-                Thread.sleep(mDelayInReceive);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+
+        try {
+            if (mDelayAfterReceive > 0)
+            {
+                Thread.sleep(mDelayAfterReceive);
             }
+        } catch (InterruptedException e) {
         }
 
         return response;
@@ -106,5 +123,13 @@ public class HttpServer extends NanoHTTPD {
         SharedPreferences pref = HelperFunctions.getWebTrekkSharedPreference(mContext);
 
         pref.edit().putLong(REQUEST_COUNT_VALUE, 0).apply();
+    }
+
+    public void stopBeforeDelay(){
+
+        synchronized (mDelayMonitor) {
+            mIsDelay = false;
+            mDelayMonitor.notifyAll();
+        }
     }
 }

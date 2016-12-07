@@ -133,17 +133,19 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
 
     protected void finishActivitySync(Activity activity)
     {
-        finishActivitySync(activity, getInstrumentation(), true);
+        finishActivitySync(activity, getInstrumentation());
     }
 
-    protected void finishActivitySync(Activity activity, boolean unregisterCallback)
+    static public void finishActivitySync(Activity activity, Instrumentation instrumentation)
     {
-        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, getInstrumentation(), unregisterCallback);
+        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, instrumentation, true);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    static public void finishActivitySync(Activity activity, Instrumentation instrumentation, boolean unregisterCallback)
-    {   activity.finish();
+    static public void finishActivitySync(Activity activity, Instrumentation instrumentation, boolean doFinish)
+    {
+        if (doFinish)
+            activity.finish();
         //give activity one minute to finish
         long currentTime = System.currentTimeMillis();
         boolean finishTimeout = false;

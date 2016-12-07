@@ -5,6 +5,7 @@ import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -64,16 +65,23 @@ public class RequestProcessor implements Runnable {
      * @param url
      * @return statusCode, 0 for retry, -1 for remove, 200 for success
      */
-    public int sendRequest(URL url, ProcessOutputCallback processOutput) {
+    public int sendRequest(URL url, ProcessOutputCallback processOutput) throws InterruptedException {
         HttpURLConnection connection = null;
         try {
             connection = getUrlConnection(url);
+
+            if (Thread.interrupted())
+                throw new InterruptedException();
+
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(NETWORK_CONNECTION_TIMEOUT);
             connection.setReadTimeout(NETWORK_READ_TIMEOUT);
             connection.setUseCaches(false);
             connection.connect();
             int statusCode = connection.getResponseCode();
+
+            if (Thread.interrupted())
+                throw new InterruptedException();
 
             if (processOutput != null)
                 processOutput.process(statusCode, connection);
@@ -95,6 +103,8 @@ public class RequestProcessor implements Runnable {
         } catch (IOException e) {
             WebtrekkLogging.log("io exception: can not connect to host", e);
             WebtrekkLogging.log("RequestProcessor: IO > Removing URL from queue because exception cannot be handled.", e);
+        } catch (InterruptedException e) {
+            throw new InterruptedException();
         } catch (Exception e) {
             // we don't know how to resolve these - cannot retry
             WebtrekkLogging.log("RequestProcessor: Removing URL from queue because exception cannot be handled.", e);
@@ -126,17 +136,23 @@ public class RequestProcessor implements Runnable {
             }
 
 
-            final int statusCode = sendRequest(url, null);
-            WebtrekkLogging.log("received status " + statusCode);
-            if (statusCode >= 200 && statusCode < 400) {
-                //successful send, remove url from store
-                mRequestUrlStore.removeLastURL();
-            } else if (statusCode >= 500 && statusCode < 600) {
-                //try to send later
+            try {
+                final int statusCode;
+                statusCode = sendRequest(url, null);
+                WebtrekkLogging.log("received status " + statusCode);
+                if (statusCode >= 200 && statusCode < 400) {
+                    //successful send, remove url from store
+                    mRequestUrlStore.removeLastURL();
+                } else if (statusCode >= 500 && statusCode < 600) {
+                    //try to send later
+                    break;
+                } else{ //400-499 case
+                    WebtrekkLogging.log("removing URL from queue as status code is between 400 and 499 or unexpected.");
+                    mRequestUrlStore.removeLastURL();
+                }
+            } catch (InterruptedException e) {
+                // thread is interrupted exit from run loop
                 break;
-            } else{ //400-499 case
-                WebtrekkLogging.log("removing URL from queue as status code is between 400 and 499 or unexpected.");
-                mRequestUrlStore.removeLastURL();
             }
         }
 

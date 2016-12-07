@@ -349,6 +349,8 @@ public class Campaign extends Thread
 
         } catch (MalformedURLException e) {
             WebtrekkLogging.log("Error constructing INSTALL URL:" + e.getMessage());
+        } catch (InterruptedException e) {
+            WebtrekkLogging.log("Interruption exception error");
         }
 
         return  mMediaCode;

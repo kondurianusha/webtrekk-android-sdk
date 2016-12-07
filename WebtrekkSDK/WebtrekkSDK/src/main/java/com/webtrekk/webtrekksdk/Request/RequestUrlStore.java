@@ -6,7 +6,6 @@ import android.util.LruCache;
 
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
-import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -33,7 +32,7 @@ import java.util.TreeMap;
 
 public class RequestUrlStore {
     final private File requestStoreFile;
-    final private LruCache<Integer, String> mURLCash;
+    final private LruCache<Integer, String> mURLCache;
     //keys for current queu. Key can be point to not loaded URL
     final private SortedMap<Integer, Long> mIDs = Collections.synchronizedSortedMap(new TreeMap<Integer, Long>());
     final int mReadGroupSize = 200;
@@ -65,7 +64,7 @@ public class RequestUrlStore {
 
         final int maxSize = 20;
 
-        mURLCash = new LruCache<Integer, String>(maxSize){
+        mURLCache = new LruCache<Integer, String>(maxSize){
             @Override
             protected void entryRemoved(boolean evicted, Integer key, final String oldValue, String newValue) {
                 if (evicted && oldValue != null)
@@ -136,18 +135,18 @@ public class RequestUrlStore {
         }
     }
 
-    // flush to file all data, clear cash.
+    // flush to file all data, clear cache.
     public void flush()
     {
-        WebtrekkLogging.log("Flash items to memory. Size:"+size());
-        if (size() > 0) {
+        if (size() > 0 && mLatestSavedURLID < mIDs.lastKey()) {
+            WebtrekkLogging.log("Flush items to memory. Size:"+size() + " latest saved URL ID:"+ mLatestSavedURLID + " latest IDS:"+ mIDs.lastKey());
             saveURLsToFile(new SaveURLAction() {
                 @Override
                 public void onSave(PrintWriter writer) {
                     for (Integer id : mIDs.keySet()) {
                         if (id <= mLatestSavedURLID)
                             continue;
-                        String url = mURLCash.get(id);
+                        String url = mURLCache.get(id);
                         if (url != null) {
                             writer.println(url);
                             mLatestSavedURLID = id;
@@ -177,7 +176,7 @@ public class RequestUrlStore {
     {
         for (Integer id: mIDs.keySet())
         {
-            mURLCash.remove(id);
+            mURLCache.remove(id);
         }
     }
 
@@ -185,7 +184,7 @@ public class RequestUrlStore {
     public String peek()
     {
         int id = mIDs.firstKey();
-        String url = mURLCash.get(id);
+        String url = mURLCache.get(id);
         if (url == null) {
             url = mLoaddedIDs.get(id);
             if (url == null) {
@@ -198,11 +197,11 @@ public class RequestUrlStore {
                     else // file is corrupted or missed
                     {
                         deleteAllCashedIDs();
-                        return mURLCash.get(mIDs.firstKey());
+                        return mURLCache.get(mIDs.firstKey());
                     }
 
                 } else
-                    WebtrekkLogging.log("NO url in cash, but file doesn't exists as well. Some issue here");
+                    WebtrekkLogging.log("NO url in cache, but file doesn't exists as well. Some issue here");
             }
         }
 
@@ -218,14 +217,13 @@ public class RequestUrlStore {
     }
 
 
-
     /**
-     * adds a new url string to the store, drops old ones if the maximumrequest limit is hit
+     * adds a new url string to the store, drops old ones if the maximum request limit is exceeded
      *
      * @param requestUrl string representation of a tracking request
      */
     public void addURL(String requestUrl) {
-        mURLCash.put(mIndex, requestUrl);
+        mURLCache.put(mIndex, requestUrl);
         mIDs.put(mIndex++, -1l);
     }
 
@@ -241,9 +239,8 @@ public class RequestUrlStore {
     private void removeKey(int key)
     {
         if (mLoaddedIDs.remove(key) == null)
-            mURLCash.remove(key);
+            mURLCache.remove(key);
         mIDs.remove(key);
-
     }
 
     private void dumpFile()
@@ -286,7 +283,7 @@ public class RequestUrlStore {
                 int ind = 0;
                 //set offset for first id
                 mIDs.put(id, offset);
-                while ((line = reader.readLine()) != null && ind++ < numbersToLoad && mURLCash.get(id) == null) {
+                while ((line = reader.readLine()) != null && ind++ < numbersToLoad && mURLCache.get(id) == null) {
                     if (mIDs.get(id) == null)
                         WebtrekkLogging.log("File is more then existed keys. Error. Key:" + id + " offset:" + offset);
                     //put URL and increment id
@@ -313,7 +310,7 @@ public class RequestUrlStore {
         while(true)
         {
             int id = mIDs.firstKey();
-            String url = mURLCash.get(id);
+            String url = mURLCache.get(id);
             if (url == null) {
                 url = mLoaddedIDs.get(id);
                 if (url == null)

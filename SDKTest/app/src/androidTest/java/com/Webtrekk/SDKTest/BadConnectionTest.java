@@ -1,7 +1,5 @@
 package com.Webtrekk.SDKTest;
 
-import android.test.suitebuilder.annotation.Suppress;
-
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
@@ -10,13 +8,13 @@ import java.io.IOException;
 /**
  * Created by vartbaronov on 24.05.16.
  */
-public class LostConnectionTest  extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+public class BadConnectionTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
 
     private Webtrekk mWebtrekk;
     private static final int TRACKING_CALLS_STACK = 1000;
 
 
-    public LostConnectionTest() {
+    public BadConnectionTest() {
         super(EmptyActivity.class);
     }
 
@@ -84,5 +82,62 @@ public class LostConnectionTest  extends ActivityInstrumentationTestCase2Base<Em
 
         mWaitMilliseconds = 70000;
         waitForTrackedURLs();
+    }
+
+    public void testSlowConnection(){
+        final int delay = 30*1000;
+
+        // make significant delay in response
+        WebtrekkLogging.log("Setup HTTP request delay");
+        mHttpServer.setBeforeDelay(delay);
+
+        try {
+
+            // do some track
+            initWaitingForTrack(new Runnable() {
+                @Override
+                public void run() {
+                    mWebtrekk.track();
+                }
+            });
+
+            //Wait for 2 seconds to make SDK start to send message.
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                WebtrekkLogging.log("Sleep interruction");
+            }
+
+            //make sure you can close activity in less then 5 sec (stop is called)
+
+            EmptyActivity activity = (EmptyActivity) getActivity();
+
+            activity.finish();
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                WebtrekkLogging.log("Sleep interruction");
+            }
+
+            // check that activity is stopped if not this is ANR
+            assertTrue(activity.isStopped());
+
+            // wait for finishing activity
+            ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, getInstrumentation(), false);
+            setActivity(null);
+        }finally {
+            //change delay to zero and cancel current delay
+            WebtrekkLogging.log("Cancel HTTP request delay.");
+            mHttpServer.setBeforeDelay(0);
+            mHttpServer.stopBeforeDelay();
+        }
+
+        //start activity again
+        getActivity();
+
+        // receive tracks
+        waitForTrackedURLs();
+
     }
 }

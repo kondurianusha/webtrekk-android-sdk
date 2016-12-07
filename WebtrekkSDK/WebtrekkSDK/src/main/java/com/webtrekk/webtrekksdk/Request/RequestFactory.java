@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -624,7 +625,16 @@ public class RequestFactory {
                 + " thread done:"+(mRequestProcessorFuture == null ? "null": mRequestProcessorFuture.isDone()));
         if(mRequestUrlStore.size() > 0  && (mRequestProcessorFuture == null || mRequestProcessorFuture.isDone())) {
             if (mExecutorService == null) {
-                mExecutorService = Executors.newSingleThreadExecutor();
+                // use daemon thread.
+                mExecutorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
+
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        Thread t = Executors.defaultThreadFactory().newThread(r);
+                        t.setDaemon(true);
+                        return t;
+                    }
+                });
             }
             mRequestProcessorFuture = mExecutorService.submit(new RequestProcessor(mRequestUrlStore));
             return true;
@@ -646,7 +656,8 @@ public class RequestFactory {
             mRequestProcessorFuture.cancel(true);
             mExecutorService.shutdownNow();
             try {
-                mExecutorService.awaitTermination(2, TimeUnit.MINUTES);
+                // waiting for 4 seconds to avoid ANR
+                mExecutorService.awaitTermination(4, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 WebtrekkLogging.log("Can't terminate sending process");
             }

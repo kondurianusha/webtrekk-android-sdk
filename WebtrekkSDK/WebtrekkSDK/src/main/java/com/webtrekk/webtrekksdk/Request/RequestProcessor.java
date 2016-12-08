@@ -80,9 +80,6 @@ public class RequestProcessor implements Runnable {
             connection.connect();
             int statusCode = connection.getResponseCode();
 
-            if (Thread.interrupted())
-                throw new InterruptedException();
-
             if (processOutput != null)
                 processOutput.process(statusCode, connection);
 

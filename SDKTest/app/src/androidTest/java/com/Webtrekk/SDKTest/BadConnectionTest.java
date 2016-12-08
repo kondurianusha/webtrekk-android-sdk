@@ -114,7 +114,21 @@ public class BadConnectionTest extends ActivityInstrumentationTestCase2Base<Empt
 
             activity.finish();
 
+            // due to difference time when onStop start to process
+            // on a test server and a local machine at first wait while onStart is started
+            // to call
+
             try {
+                WebtrekkLogging.log("start to wait activity stop procedure");
+
+                // wait while on start is called
+                while (!activity.isStartedToStopping()) {
+                    Thread.yield();
+                }
+
+                WebtrekkLogging.log("on stoping is started");
+
+                // just wait 5 seconds to check ANR not happened
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 WebtrekkLogging.log("Sleep interruction");

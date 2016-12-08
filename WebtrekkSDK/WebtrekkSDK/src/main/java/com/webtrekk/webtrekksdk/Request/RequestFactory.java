@@ -657,9 +657,9 @@ public class RequestFactory {
             mExecutorService.shutdownNow();
             try {
                 // waiting for 4 seconds to avoid ANR
-                WebtrekkLogging.log("start to wait for URL Process to stop");
-                boolean isTerminated = mExecutorService.awaitTermination(3, TimeUnit.SECONDS);
-                WebtrekkLogging.log("end to wait for URL Process to stop. Process stopped result is:"+isTerminated);
+                WebtrekkLogging.log("Start waiting for send URL thread to stop");
+                boolean isTerminated = mExecutorService.awaitTermination(4, TimeUnit.SECONDS);
+                WebtrekkLogging.log("Stop to wait for send URL thread. Process stopped result is:"+isTerminated);
             } catch (InterruptedException e) {
                 WebtrekkLogging.log("Can't terminate sending process");
             }

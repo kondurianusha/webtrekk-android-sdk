@@ -11,17 +11,24 @@ public class EmptyActivity extends Activity {
         return mIsStopped;
     }
 
-    boolean mIsStopped;
+    public boolean isStartedToStopping() {
+        return mIsStartedToStopping;
+    }
+
+    volatile boolean mIsStopped;
+    volatile boolean mIsStartedToStopping;
 
 
     @Override
     protected void onStart() {
         super.onStart();
         mIsStopped = false;
+        mIsStartedToStopping = false;
     }
 
     @Override
     protected void onStop() {
+        mIsStartedToStopping = true;
         super.onStop();
         mIsStopped = true;
     }

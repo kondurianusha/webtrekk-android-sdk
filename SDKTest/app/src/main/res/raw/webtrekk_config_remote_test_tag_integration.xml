@@ -60,9 +60,9 @@
     <autoTrackRequestUrlStoreSize>true</autoTrackRequestUrlStoreSize>
 
     <!--enables the remote xml configuration -->
-    <enableRemoteConfiguration>false</enableRemoteConfiguration>
+    <enableRemoteConfiguration>true</enableRemoteConfiguration>
     <!--url of the remote configuration -->
-    <trackingConfigurationUrl>https://d1r27qvpjiaqj3.cloudfront.net/238713152098253/34629.xml</trackingConfigurationUrl>
+    <trackingConfigurationUrl>https://d1r27qvpjiaqj3.cloudfront.net/1111111111111111/36704.xml</trackingConfigurationUrl>
     <!--resend onStart time, this is the timeout for auto tracked sessions in case an activity was paused -->
     <resendOnStartEventTime>30</resendOnStartEventTime>
 

@@ -160,7 +160,7 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
 
     protected void cleanConfigPreference()
     {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getInstrumentation().getTargetContext());
+        SharedPreferences sharedPrefs = HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext());
         sharedPrefs.edit().remove(Webtrekk.PREFERENCE_KEY_CONFIGURATION).apply();
     }
 

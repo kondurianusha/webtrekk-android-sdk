@@ -45,7 +45,7 @@ public class TagIntegrationTest extends ActivityInstrumentationTestCase2Base<Tag
 
     public void testTagIntegration()
     {
-        while (!PreferenceManager.getDefaultSharedPreferences(getInstrumentation().getTargetContext()).
+        while (!HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext()).
                   contains(Webtrekk.PREFERENCE_KEY_CONFIGURATION))
         {
             getInstrumentation().waitForIdleSync();

@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 
 import com.webtrekk.webtrekksdk.Request.RequestProcessor;
 import com.webtrekk.webtrekksdk.Utils.AsyncTest;
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
@@ -94,7 +95,7 @@ public class TrackingConfigurationDownloadTask extends AsyncTask<String, Void, T
                     WebtrekkLogging.log("found a new version online, updating current version");
                     // either store it as xml on the internal storage or save it as xml string in the shared prefs
                     WebtrekkLogging.log("saving new trackingConfiguration to preferences");
-                    SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+                    SharedPreferences sharedPrefs = HelperFunctions.getWebTrekkSharedPreference(context);
                     sharedPrefs.edit().putString(Webtrekk.PREFERENCE_KEY_CONFIGURATION, trackingConfigurationString).commit();
 
                     //TODO: update the current configuration only if valid and newer

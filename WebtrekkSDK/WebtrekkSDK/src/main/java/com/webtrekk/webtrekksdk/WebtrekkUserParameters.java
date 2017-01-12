@@ -207,12 +207,12 @@ public class WebtrekkUserParameters {
     /**
      * Set LinkedIn ID
      * String will be normalized to lower case
-     * @param liknedInID
+     * @param linkedInID
      * @return instance of to WebtrekkUserParameters
      */
-    public WebtrekkUserParameters setLinkedInID(String liknedInID)
+    public WebtrekkUserParameters setLinkedInID(String linkedInID)
     {
-        mParameters.put(Parameter.CDB_LINKEDIN_ID, HelperFunctions.makeSha256(liknedInID.toLowerCase()));
+        mParameters.put(Parameter.CDB_LINKEDIN_ID, HelperFunctions.makeSha256(linkedInID.toLowerCase()));
         return this;
     }
 

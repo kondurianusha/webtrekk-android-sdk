@@ -9,11 +9,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.InstrumentationTestRunner;
 
+import com.mixpanel.android.util.StringUtils;
 import com.webtrekk.webtrekksdk.Modules.ExceptionHandler;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -85,6 +87,34 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2Base<Empty
         URL = URL.substring(URL.indexOf("ct=webtrekk_ignore"), URL.length());
         assertEquals(URL, "ct=webtrekk_ignore&ck910=3&ck911=nameEx&ck912=messsage+Ex&eor=1");
         assertTrue(URL.contains("ct=webtrekk_ignore"));
+    }
+
+    /**
+     * do unit taste for message more than 255 characters. As logic is the same and case happens rarely we can test only simple case only
+     */
+    public void testStringNormalization(){
+        deleteErrorHandlerFile(mApplication);
+        mWebtrekk.initWebtrekk(mApplication);
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                final char[] nameArr = new char[300];
+                final char[] messageArr = new char[300];
+
+                Arrays.fill(nameArr, 'n');
+                Arrays.fill(messageArr, 'm');
+
+                mWebtrekk.trackException(new String(nameArr), new String(messageArr));
+            }
+        });
+
+        String URL = waitForTrackedURL();
+
+        URLParsel parcel = new URLParsel();
+        parcel.parseURL(URL);
+
+        assertEquals(255, parcel.getValue("ck911").length());
+        assertEquals(255, parcel.getValue("ck912").length());
     }
 
     public void testFatalCompeteSimple()

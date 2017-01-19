@@ -8,6 +8,7 @@ import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
+import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -98,11 +99,6 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler
         if (!isLevelAllowed(Type.INFO))
             return;
 
-        if (name.length() > 255 || message.length() > 255) {
-            WebtrekkLogging.log("Can't track info exceptoin. Some of fileds more than 255 characters");
-            return;
-        }
-
         track(Type.INFO.ordinal(), name, message, null, null, null);
     }
 
@@ -126,19 +122,19 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler
         trackingParameter.add(Parameter.TIMESTAMP, String.valueOf(System.currentTimeMillis()));
         trackingParameter.add(Parameter.ACTION_NAME, "webtrekk_ignore");
         trackingParameter.add(Parameter.ACTION, "910", String.valueOf(type));
-        trackingParameter.add(Parameter.ACTION, "911", name);
+        trackingParameter.add(Parameter.ACTION, "911", normalizeField(name));
 
         if (message != null)
-           trackingParameter.add(Parameter.ACTION, "912", message);
+           trackingParameter.add(Parameter.ACTION, "912", normalizeField(message));
 
         if (causeMessage != null)
-            trackingParameter.add(Parameter.ACTION, "913", causeMessage);
+            trackingParameter.add(Parameter.ACTION, "913", normalizeField(causeMessage));
 
         if (stack != null)
-          trackingParameter.add(Parameter.ACTION, "914", stack);
+          trackingParameter.add(Parameter.ACTION, "914", normalizeField(stack));
 
         if (causeStack != null)
-          trackingParameter.add(Parameter.ACTION, "915", causeStack);
+          trackingParameter.add(Parameter.ACTION, "915", normalizeField(causeStack));
 
         TrackingRequest request = new TrackingRequest(trackingParameter, mRequestFactory.getTrackingConfiguration(), TrackingRequest.RequestType.ECXEPTION);
         mRequestFactory.addRequest(request);
@@ -271,6 +267,22 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler
     private String getFileName(boolean fileOnly)
     {
         return fileOnly ? "exception.txt" : mContext.getFilesDir().getPath() + File.separator+"exception.txt";
+    }
+
+    /**
+     * Normalize field and make it less then 255
+     * @param value
+     * @return
+     */
+    private String normalizeField(String value){
+
+        if (value.length() > 255){
+
+            WebtrekkLogging.log("string is more then 255 length during excception tracking. Normalize it by cutting to 255 length.");
+
+            return value.substring(0, 255);
+        }else
+            return value;
     }
 
     /**

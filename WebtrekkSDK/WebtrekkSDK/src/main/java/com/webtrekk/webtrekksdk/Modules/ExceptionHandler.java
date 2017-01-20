@@ -115,7 +115,7 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler
         TrackingParameter trackingParameter = new TrackingParameter();
 
         if (message == null || (type < 1 && type > 3) || name == null ) {
-            WebtrekkLogging.log("Exception track error. message or name or type isn't valid");
+            WebtrekkLogging.log("Exception track error: Message or Name or Type isn't valid. Please check that either Massage or Name isn't null and Type is valid.");
             return;
         }
 
@@ -275,6 +275,9 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler
      * @return
      */
     private String normalizeField(String value){
+
+        if (value == null)
+            return null;
 
         if (value.length() > 255){
 

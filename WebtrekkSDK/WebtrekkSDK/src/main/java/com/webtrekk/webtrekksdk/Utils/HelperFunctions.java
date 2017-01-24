@@ -270,6 +270,16 @@ final public class HelperFunctions {
         preferences.edit().putString(Webtrekk.PREFERENCE_KEY_EVER_ID, value).commit();
     }
 
+
+    public static long getAdClearId(Context context) {
+        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
+        if (!preferences.contains(AdClearIdUtil.PREFERENCE_KEY_ADCLEAR_ID)) {
+            preferences.edit().putLong(AdClearIdUtil.PREFERENCE_KEY_ADCLEAR_ID, new AdClearIdUtil().generateAdClearId()).commit();
+        }
+        return preferences.getLong(AdClearIdUtil.PREFERENCE_KEY_ADCLEAR_ID, 0);
+    }
+
+
     /**
      * returns the version of the application
      *

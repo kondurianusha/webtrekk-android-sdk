@@ -63,6 +63,7 @@ public class AutoTrackingParametersTest extends ActivityInstrumentationTestCase2
         assertTrue(parcel.getValue("cs816") != null && !parcel.getValue("cs816").isEmpty());
         assertTrue(parcel.getValue("cp783") != null && !parcel.getValue("cp783").isEmpty());
         assertTrue(parcel.getValue("cp784") != null && !parcel.getValue("cp784").isEmpty());
+        assertTrue(parcel.getValue("cs808") == null);
     }
 
     // test how overwriten works
@@ -98,5 +99,6 @@ public class AutoTrackingParametersTest extends ActivityInstrumentationTestCase2
         assertTrue(parcel.getValue("cs816") != null && !parcel.getValue("cs816").isEmpty());
         assertEquals(difPageValue, parcel.getValue("cp783"));
         assertTrue(parcel.getValue("cp784") != null && !parcel.getValue("cp784").isEmpty());
+        assertTrue(parcel.getValue("cs808") != null && !parcel.getValue("cs808").isEmpty());
     }
 }

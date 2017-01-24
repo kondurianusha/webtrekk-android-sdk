@@ -42,6 +42,8 @@
 
     <!--track if there was an application update -->
     <autoTrackAppUpdate>true</autoTrackAppUpdate>
+    <!--track the adClear id -->
+    <autoTrackAdClearId>true</autoTrackAdClearId>
     <!--track the advertiser id -->
     <autoTrackAdvertiserId>true</autoTrackAdvertiserId>
     <!--track the app versions name -->

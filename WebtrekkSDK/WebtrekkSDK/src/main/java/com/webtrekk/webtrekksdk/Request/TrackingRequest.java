@@ -170,7 +170,6 @@ public class TrackingRequest {
     }
 
 
-
     private class GeneralRequest implements URLFactory
     {
         // arrays of all keys for General request

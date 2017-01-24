@@ -60,6 +60,8 @@
     <autoTrackAdvertisementOptOut>true</autoTrackAdvertisementOptOut>
     <!--sends the size of the current locally stored urls in a custom parameter -->
     <autoTrackRequestUrlStoreSize>true</autoTrackRequestUrlStoreSize>
+    <!--track the AdClear id -->
+    <autoTrackAdClearId>true</autoTrackAdClearId>
 
     <!--enables the remote xml configuration -->
     <enableRemoteConfiguration>false</enableRemoteConfiguration>

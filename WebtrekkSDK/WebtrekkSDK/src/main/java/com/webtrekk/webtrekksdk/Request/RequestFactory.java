@@ -8,12 +8,12 @@ import com.webtrekk.webtrekksdk.Modules.Campaign;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
+import com.webtrekk.webtrekksdk.Utils.AdClearIdUtil;
 import com.webtrekk.webtrekksdk.Utils.ApplicationTrackingStatus;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -41,8 +41,8 @@ public class RequestFactory {
     private TrackingConfiguration mTrackingConfiguration;
     private volatile Campaign mCampaign;
 
-    //additional customer params, this is a global avaiable hashmap with key, values,
-    //before the requests are send the keys here are matched with the keys in the xml configurion or the global/
+    //additional customer params, this is a globally available HashMap
+    //before the requests are sent, the keys of this HashMap are matched with the keys in the xml configuration or the global/
     //local tracking params, and override them, so for example key = orientation, value = horizontal
     //in the xml configuraton then is the trackingparameter requests defined with ecomerce_parameter "1" and the key orientation
     // before the request url is generated this keys will be replaced with values from this map
@@ -256,8 +256,8 @@ public class RequestFactory {
     }
 
     /**
-     * collecting all data and set the appropiate parameter
-     * this functions inserts all data into the mWebtrekkParameter HashMap for which tracking is enabled in the xml
+     * collecting all data and set the appropriate parameter
+     * this function inserts all data into the mWebtrekkParameter HashMap for which tracking is enabled in the xml
      * customers can decide on their own based on their xml tracking config, which values they are interested in
      * this method initializes the mWebtrekkParameter hashmap, so all parameters for which an url is defined
      */
@@ -273,8 +273,7 @@ public class RequestFactory {
         mWebtrekkParameter.put(Parameter.DEV_LANG, HelperFunctions.getCountry());
 
 
-
-        // for comatilility reasons always add the sampling rate param to the url
+        // for compatibility reasons always add the sampling rate param to the url
         mWebtrekkParameter.put(Parameter.SAMPLING, "" + mTrackingConfiguration.getSampling());
 
         // always track the wt everid
@@ -288,13 +287,14 @@ public class RequestFactory {
     }
 
     /**
-     * this method initializes the custom parameter values which are predefined by webtrekk
-     * the customer can also add new ones as he likes, unknown entries will be ingored by the server
+     * this method initializes the custom parameter values which are predefined by Webtrekk
+     * the customer can also add new ones, unknown entries will be ignored by the server
      */
     public void initAutoCustomParameter() {
         if(mAutoCustomParameter == null) {
             mAutoCustomParameter = new HashMap<String, String>();
         }
+
         if(mCustomParameter == null) {
             mCustomParameter = new HashMap<String, String>();
         }
@@ -302,27 +302,31 @@ public class RequestFactory {
         if(mTrackingConfiguration.isAutoTrackAppVersionName()) {
             mAutoCustomParameter.put("appVersion", HelperFunctions.getAppVersionName(mContext));
         }
+
         if(mTrackingConfiguration.isAutoTrackAppVersionCode()) {
             mAutoCustomParameter.put("appVersionCode", String.valueOf(HelperFunctions.getAppVersionCode(mContext)));
-
         }
+
         if(mTrackingConfiguration.isAutoTrackPlaystoreUsername()) {
             Map<String, String> playstoreprofile = HelperFunctions.getUserProfile(mContext);
             mAutoCustomParameter.put("playstoreFamilyname", playstoreprofile.get("sname"));
             mAutoCustomParameter.put("playstoreGivenname", playstoreprofile.get("gname"));
-
         }
+
         if(mTrackingConfiguration.isAutoTrackPlaystoreMail()) {
             //Map<String, String> playstoreprofile = HelperFunctions.getUserProfile(mContext);
             //customParameter.put("playstoreMail", playstoreprofile.get("email"));
             mAutoCustomParameter.put("playstoreMail", HelperFunctions.getMailByAccountManager(mContext));
-
-
         }
+
         if (mTrackingConfiguration.isAutoTrackAppPreInstalled()) {
             mAutoCustomParameter.put("appPreinstalled", String.valueOf(HelperFunctions.isAppPreinstalled(mContext)));
-
         }
+
+        if(mTrackingConfiguration.isAutoTrackAdClearId()) {
+            mAutoCustomParameter.put("adClearId", String.valueOf(HelperFunctions.getAdClearId(mContext)));
+        }
+
         // if the app was updated, send out the update request once
 
         if(mTrackingConfiguration.isAutoTrackAppUpdate()) {
@@ -427,8 +431,8 @@ public class RequestFactory {
     }
 
     /**
-     * this method creates a trackingrequest object and applys the various overrides from the xml configuration
-     * this honours the hirarchy of overriding the values
+     * This method creates a TrackingRequest object and applies the various overrides from the xml
+     * configuration. While doing so, the hierarchy for overriding values is taken into account.
      *
      * @param tp
      * @return
@@ -445,7 +449,6 @@ public class RequestFactory {
 
         // action params are a special case, no other params but the ones given as parameter in the code
         if(tp.containsKey(Parameter.ACTION_NAME)) {
-            //when its an action only resolution and depth are neccesary
             applyActivityConfiguration(trackingParameter, true);
             overrideCustomPageName(trackingParameter);
             trackingParameter.add(Parameter.SCREEN_RESOLUTION, mWebtrekkParameter.get(Parameter.SCREEN_RESOLUTION));
@@ -455,6 +458,12 @@ public class RequestFactory {
             trackingParameter.add(Parameter.SAMPLING, mWebtrekkParameter.get(Parameter.SAMPLING));
             trackingParameter.add(Parameter.TIMEZONE, mWebtrekkParameter.get(Parameter.TIMEZONE));
             trackingParameter.add(Parameter.DEV_LANG, mWebtrekkParameter.get(Parameter.DEV_LANG));
+
+            // Also add the auto parameters that are defined to be send with action requests
+            if(mAutoCustomParameter!= null) {
+                trackingParameter.add(mTrackingConfiguration.getAutoTrackedParameters(mAutoCustomParameter, true));
+            }
+
             trackingParameter.add(tp);
             return new TrackingRequest(trackingParameter, mTrackingConfiguration);
         }
@@ -476,9 +485,8 @@ public class RequestFactory {
         }
 
         // apply autotracking parameters
-        if(mAutoCustomParameter!= null)
-        {
-            trackingParameter.add(mTrackingConfiguration.getAutoTrackedParameters(mAutoCustomParameter));
+        if(mAutoCustomParameter!= null) {
+            trackingParameter.add(mTrackingConfiguration.getAutoTrackedParameters(mAutoCustomParameter, false));
         }
 
         //now map the string values from the code tracking parameters to the custom values defined by webtrekk or the customer

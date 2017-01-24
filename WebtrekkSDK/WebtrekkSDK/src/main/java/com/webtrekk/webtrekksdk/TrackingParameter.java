@@ -234,7 +234,7 @@ public class TrackingParameter {
     }
 
     /**
-     * this enum contains all valid tracking parameter and their url string identifier
+     * this enum contains all valid tracking parameters and their url string identifier
      */
     public enum Parameter {
         /**

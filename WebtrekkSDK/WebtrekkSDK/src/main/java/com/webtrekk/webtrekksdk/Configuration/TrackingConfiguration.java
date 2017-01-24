@@ -30,14 +30,15 @@ public class TrackingConfiguration {
 
     // auto tracking configuration
     private boolean autoTrackAppUpdate = true;
+    private boolean autoTrackAdClearId;
     private boolean autoTrackAdvertiserId = true;
     private boolean autoTrackAppVersionName = true;
     private boolean autoTrackAppVersionCode = true;
     private boolean autoTrackAppPreInstalled = true;
-    private boolean autoTrackPlaystoreUsername = false;
-    private boolean autoTrackPlaystoreMail = false;
-    private boolean autoTrackPlaystoreGivenName = false;
-    private boolean autoTrackPlaystoreFamilyName = false;
+    private boolean autoTrackPlaystoreUsername;
+    private boolean autoTrackPlaystoreMail;
+    private boolean autoTrackPlaystoreGivenName;
+    private boolean autoTrackPlaystoreFamilyName;
     private boolean autoTrackApiLevel = true;
     private boolean autoTrackScreenorientation = true;
     private boolean autoTrackConnectionType = true;
@@ -45,12 +46,12 @@ public class TrackingConfiguration {
 
     // enabled plugins
     private boolean enablePluginHelloWorld;
-    private boolean enableRemoteConfiguration = false;
+    private boolean enableRemoteConfiguration;
     private String trackingConfigurationUrl;
     private boolean autoTrackRequestUrlStoreSize = true;
     //intervall when autotracked start activity is send again
     private int resendOnStartEventTime = 30;
-    private boolean mErrorLogEnable = false;
+    private boolean mErrorLogEnable;
     private int mErrorLogLevel = 3;
 
 
@@ -68,27 +69,29 @@ public class TrackingConfiguration {
 
     public enum AutoTrackedParameters{
 
-        screenOrientation("783", TrackingParameter.Parameter.PAGE),
-        requestUrlStoreSize("784", TrackingParameter.Parameter.PAGE),
-        appVersion("804", TrackingParameter.Parameter.SESSION),
-        appVersionCode("805", TrackingParameter.Parameter.SESSION),
-        connectionType("807", TrackingParameter.Parameter.SESSION),
-        advertiserId("809", TrackingParameter.Parameter.SESSION),
-        playstoreMail("810", TrackingParameter.Parameter.SESSION),
-        playstoreGivenname("811", TrackingParameter.Parameter.SESSION),
-        playstoreFamilyname("812", TrackingParameter.Parameter.SESSION),
-        advertisingOptOut("813", TrackingParameter.Parameter.SESSION),
-        apiLevel("814", TrackingParameter.Parameter.SESSION),
-        appUpdated("815", TrackingParameter.Parameter.SESSION),
-        appPreinstalled("816", TrackingParameter.Parameter.SESSION);
+        screenOrientation("783", TrackingParameter.Parameter.PAGE, false),
+        requestUrlStoreSize("784", TrackingParameter.Parameter.PAGE, false),
+        appVersion("804", TrackingParameter.Parameter.SESSION, false),
+        appVersionCode("805", TrackingParameter.Parameter.SESSION, false),
+        connectionType("807", TrackingParameter.Parameter.SESSION, false),
+        adClearId("808", TrackingParameter.Parameter.SESSION, true),
+        advertiserId("809", TrackingParameter.Parameter.SESSION, false),
+        playstoreMail("810", TrackingParameter.Parameter.SESSION, false),
+        playstoreGivenname("811", TrackingParameter.Parameter.SESSION, false),
+        playstoreFamilyname("812", TrackingParameter.Parameter.SESSION, false),
+        advertisingOptOut("813", TrackingParameter.Parameter.SESSION, false),
+        apiLevel("814", TrackingParameter.Parameter.SESSION, false),
+        appUpdated("815", TrackingParameter.Parameter.SESSION, false),
+        appPreinstalled("816", TrackingParameter.Parameter.SESSION, false);
 
         private final String mParValue;
         private final TrackingParameter.Parameter mParType;
+        private final boolean mAlsoSendWithActionRequests;
 
-        AutoTrackedParameters(String value, TrackingParameter.Parameter parType)
-        {
+        AutoTrackedParameters(String value, TrackingParameter.Parameter parType, boolean alsoSendWithActionRequests) {
             mParValue = value;
             mParType = parType;
+            mAlsoSendWithActionRequests = alsoSendWithActionRequests;
         }
 
         public String getValue(){
@@ -149,8 +152,7 @@ public class TrackingConfiguration {
         //try if autotrackedParametersOverrided. If yes - just inform
         checkParametersForAutoTrackOverride(globalTrackingParameter);
         checkParametersForAutoTrackOverride(constGlobalTrackingParameter);
-        for (ActivityConfiguration activityConf: activityConfigurations.values())
-        {
+        for (ActivityConfiguration activityConf: activityConfigurations.values()) {
             checkParametersForAutoTrackOverride(activityConf.getConstActivityTrackingParameter());
             checkParametersForAutoTrackOverride(activityConf.getActivityTrackingParameter());
         }
@@ -268,6 +270,14 @@ public class TrackingConfiguration {
 
     public void setAutoTrackAppUpdate(boolean autoTrackAppUpdate) {
         this.autoTrackAppUpdate = autoTrackAppUpdate;
+    }
+
+    public boolean isAutoTrackAdClearId() {
+        return autoTrackAdClearId;
+    }
+
+    public void setAutoTrackAdClearId(boolean autoTrackAdClearId) {
+        this.autoTrackAdClearId = autoTrackAdClearId;
     }
 
     public boolean isAutoTrackAdvertiserId() {
@@ -415,66 +425,71 @@ public class TrackingConfiguration {
     }
 
     // process custom Parameters
-    public TrackingParameter getAutoTrackedParameters(Map<String, String> autoParameters){
+    public TrackingParameter getAutoTrackedParameters(Map<String, String> autoParameters, boolean isActionRequest){
         TrackingParameter tp  = new TrackingParameter();
 
         if (autoTrackScreenorientation) {
-            addCustomParameter(tp, AutoTrackedParameters.screenOrientation, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.screenOrientation, autoParameters, isActionRequest);
         }
         if (autoTrackRequestUrlStoreSize) {
-            addCustomParameter(tp, AutoTrackedParameters.requestUrlStoreSize, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.requestUrlStoreSize, autoParameters, isActionRequest);
         }
         if (autoTrackAppVersionName) {
-            addCustomParameter(tp, AutoTrackedParameters.appVersion, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.appVersion, autoParameters, isActionRequest);
         }
         if (autoTrackAppVersionCode) {
-            addCustomParameter(tp, AutoTrackedParameters.appVersionCode, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.appVersionCode, autoParameters, isActionRequest);
         }
         if (autoTrackConnectionType) {
-            addCustomParameter(tp, AutoTrackedParameters.connectionType, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.connectionType, autoParameters, isActionRequest);
+        }
+        if (autoTrackAdClearId) {
+            addCustomParameter(tp, AutoTrackedParameters.adClearId, autoParameters, isActionRequest);
         }
         if (autoTrackAdvertiserId) {
-            addCustomParameter(tp, AutoTrackedParameters.advertiserId, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.advertiserId, autoParameters, isActionRequest);
         }
         if (autoTrackPlaystoreMail) {
-            addCustomParameter(tp, AutoTrackedParameters.playstoreMail, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.playstoreMail, autoParameters, isActionRequest);
         }
         if (autoTrackPlaystoreGivenName) {
-            addCustomParameter(tp, AutoTrackedParameters.playstoreGivenname, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.playstoreGivenname, autoParameters, isActionRequest);
         }
         if (autoTrackPlaystoreUsername) {
-            addCustomParameter(tp, AutoTrackedParameters.playstoreFamilyname, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.playstoreFamilyname, autoParameters, isActionRequest);
         }
         if (autoTrackAdvertismentOptOut) {
-            addCustomParameter(tp, AutoTrackedParameters.advertisingOptOut, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.advertisingOptOut, autoParameters, isActionRequest);
         }
         if (autoTrackApiLevel) {
-            addCustomParameter(tp, AutoTrackedParameters.apiLevel, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.apiLevel, autoParameters, isActionRequest);
         }
         if (autoTrackAppUpdate) {
-            addCustomParameter(tp, AutoTrackedParameters.appUpdated, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.appUpdated, autoParameters, isActionRequest);
         }
         if (autoTrackAppPreInstalled) {
-            addCustomParameter(tp, AutoTrackedParameters.appPreinstalled, autoParameters);
+            addCustomParameter(tp, AutoTrackedParameters.appPreinstalled, autoParameters, isActionRequest);
         }
         return tp;
     }
 
-    private void addCustomParameter(TrackingParameter parList, AutoTrackedParameters par, Map<String, String> autoParameters){
-        String parValue = autoParameters.get(par.name());
+    private void addCustomParameter(TrackingParameter parList, AutoTrackedParameters par, Map<String, String> autoParameters, boolean isActionRequest){
 
+        if (isActionRequest && !par.mAlsoSendWithActionRequests) {
+            return;
+        }
+
+        String parValue = autoParameters.get(par.name());
         if (parValue != null && !parValue.isEmpty()) {
             parList.add(par.getParType(), par.getValue(), parValue);
-        }else
-        {
+        } else {
             WebtrekkLogging.log("autotracking parameter " + par.name() + " isn't defined");
         }
     }
 
     public void checkParametersForAutoTrackOverride(TrackingParameter par)
     {
-        if (par != null)
-        {
+        if (par != null) {
             checkParametersArrayForAutoTrackOverride(par.getSessionParameter(), TrackingParameter.Parameter.SESSION);
             checkParametersArrayForAutoTrackOverride(par.getPageParameter(), TrackingParameter.Parameter.PAGE);
         }
@@ -527,6 +542,9 @@ public class TrackingConfiguration {
                 break;
             case connectionType:
                 retValue = autoTrackConnectionType;
+                break;
+            case adClearId:
+                retValue = autoTrackAdClearId;
                 break;
             case advertiserId:
                 retValue = autoTrackAdvertiserId;

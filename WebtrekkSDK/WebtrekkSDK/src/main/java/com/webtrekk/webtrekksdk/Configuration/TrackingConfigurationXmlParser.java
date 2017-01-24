@@ -170,6 +170,18 @@ public class TrackingConfigurationXmlParser {
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "autoTrackAppUpdate");
 
+            } else if (name.equals("autoTrackAdClearId")) {
+                parser.require(XmlPullParser.START_TAG, ns, "autoTrackAdClearId");
+
+                String value = readText(parser);
+                if (value.equals("true")) {
+                    config.setAutoTrackAdClearId(true);
+                } else if (value.equals("false")) {
+                    config.setAutoTrackAdClearId(false);
+                } else {
+                    WebtrekkLogging.log("invalid autoTrackAdClearId value, using default");
+                }
+                parser.require(XmlPullParser.END_TAG, ns, "autoTrackAdClearId");
 
             } else if (name.equals("autoTrackAdvertiserId")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackAdvertiserId");
@@ -183,7 +195,6 @@ public class TrackingConfigurationXmlParser {
                     WebtrekkLogging.log("invalid autoTrackAdvertiserId value, using default");
                 }
                 parser.require(XmlPullParser.END_TAG, ns, "autoTrackAdvertiserId");
-
 
             } else if (name.equals("autoTrackAppVersionName")) {
                 parser.require(XmlPullParser.START_TAG, ns, "autoTrackAppVersionName");

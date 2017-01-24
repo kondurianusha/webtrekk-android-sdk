@@ -190,7 +190,7 @@ public class Webtrekk {
             }
 
         try {
-            // parse default configuration without default, willl throw exceptions when its not valid
+            // parse default configuration without default, will throw exceptions when its not valid
             trackingConfiguration = new TrackingConfigurationXmlParser().parse(trackingConfigurationString);
         } catch (Exception e) {
             throw new IllegalStateException("invalid xml configuration file, invalid state: " + e.getMessage() + "\n"+trackingConfigurationString);
@@ -441,8 +441,8 @@ public class Webtrekk {
     }
 
     /**
-     * track exception that is catched by internal application handler.
-     * @param ex - catched exception
+     * track exception that is caught by internal application handler.
+     * @param ex - caught exception
      */
     public void trackException(Throwable ex)
     {
@@ -454,8 +454,7 @@ public class Webtrekk {
      * @param name max 255 characters
      * @param message max 255 characters
      */
-    public void trackException(String name, String message)
-    {
+    public void trackException(String name, String message) {
         mExceptionHandler.trackInfo(name, message);
     }
 
@@ -479,7 +478,7 @@ public class Webtrekk {
             onFirstActivityStart();
         }
 
-        // track only if it isn't in backgound and session timeout isn't passed
+        // track only if it isn't in background and session timeout isn't passed
         if (mApplicationStatus.getCurrentStatus() == ApplicationTrackingStatus.STATUS.RETURNINIG_FROM_BACKGROUND){
             if (mApplicationStatus.inactivityApplicaitonTime() > trackingConfiguration.getResendOnStartEventTime())
                 mRequestFactory.forceNewSession();
@@ -491,7 +490,7 @@ public class Webtrekk {
 
     /**
      * this method gets called when the first activity of the application has started
-     * it loads the old requests from the backupfile and trys to send them
+     * it loads the old requests from the backupfile and tries to send them
      *@hide
      */
     private void onFirstActivityStart() {

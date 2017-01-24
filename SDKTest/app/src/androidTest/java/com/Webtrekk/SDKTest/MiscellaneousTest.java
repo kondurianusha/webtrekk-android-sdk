@@ -2,18 +2,20 @@ package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
 import android.content.Intent;
-
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
-import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 /**
  * Created by vartbaronov on 26.04.16.
  */
 public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+
     private Webtrekk mWebtrekk;
-    private final long oneMeg = 1024 * 1024;
+
+    private final String TOO_SHORT_EID = "123456789012345678";
+    private final String TOO_LONG_EID = "12345678901324567890";
+    private final String VALID_EID = "1234567890123465788";
 
 
     public MiscellaneousTest() {
@@ -28,6 +30,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         getActivity();
     }
 
+
     @Override
     public void tearDown() throws Exception {
         finishActivitySync(getActivity());
@@ -35,16 +38,16 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         super.tearDown();
     }
 
-    public void testOverrideEverID()
-    {
-        everIDtest("123456789012345678", false);
-        everIDtest("12345678901324567890", false);
-        everIDtest("1234567890123465789", true);
+
+    public void testOverrideEverID() {
+        everIDtest(TOO_SHORT_EID, false);
+        everIDtest(TOO_LONG_EID, false);
+        everIDtest(VALID_EID, true);
         everIDtest(HelperFunctions.generateEverid(), true);
     }
 
-    private void everIDtest(String everID, boolean isShouldSet)
-    {
+
+    private void everIDtest(String everID, boolean eidIsValid) {
         String oldEverID = mWebtrekk.getEverId();
 
         mWebtrekk.setEverId(everID);
@@ -58,7 +61,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         String URL = waitForTrackedURL();
 
-        if (isShouldSet) {
+        if (eidIsValid) {
             assertTrue(URL.contains(everID));
             assertFalse(URL.contains(oldEverID));
         }else {
@@ -77,7 +80,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         URL = waitForTrackedURL();
 
-        if (isShouldSet) {
+        if (eidIsValid) {
             assertTrue(URL.contains(everID));
             assertFalse(URL.contains(oldEverID));
         }else {
@@ -86,8 +89,8 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         }
     }
 
-    public void testUserAgent()
-    {
+
+    public void testUserAgent() {
         initWaitingForTrack(new Runnable() {
             @Override
             public void run() {
@@ -103,12 +106,10 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         assertEquals("Tracking Library 9.9.9(Linux; Android 5.0.2; unknown Android SDK built for x86; en_US)",
                 HelperFunctions.urlDecode(parcel.getValue("X-WT-UA")));
-
-
     }
 
-    public void testMediaCodeSet()
-    {
+
+    public void testMediaCodeSet() {
         final String mediaCode = "mediaCode";
 
         // just ordinary track. no media code
@@ -148,6 +149,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         assertFalse(URL.contains("&"+TrackingParameter.Parameter.ADVERTISEMENT+"="));
     }
+
 
     public void testCustomPageOverride()
     {

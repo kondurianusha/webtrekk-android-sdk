@@ -58,17 +58,17 @@
     <autoTrackAdvertisementOptOut>true</autoTrackAdvertisementOptOut>
     <!--sends the size of the current locally stored urls in a custom parameter -->
     <autoTrackRequestUrlStoreSize>true</autoTrackRequestUrlStoreSize>
-
+    <!--track the AdClear id -->
+    <autoTrackAdClearId>true</autoTrackAdClearId>
     <!--enables the remote xml configuration -->
     <enableRemoteConfiguration>false</enableRemoteConfiguration>
     <!--url of the remote configuration -->
     <trackingConfigurationUrl>https://d1r27qvpjiaqj3.cloudfront.net/238713152098253/34629.xml</trackingConfigurationUrl>
     <!--resend onStart time, this is the timeout for auto tracked sessions in case an activity was paused -->
     <resendOnStartEventTime>30</resendOnStartEventTime>
-
     <!--enable or disable exception logging. By default is disabled -->
     <errorLogEnable>true</errorLogEnable>
-    <!--set log level to do loging 1- only fatals 2 - fatal and catched, 3- all logs. By default = 3 -->
+    <!--set log level to do logging 1- only fatal 2 - fatal and caught, 3- all logs. By default = 3 -->
     <errorLogLevel>3</errorLogLevel>
 
     <customParameter>

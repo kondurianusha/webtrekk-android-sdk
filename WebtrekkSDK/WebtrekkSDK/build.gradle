@@ -61,9 +61,20 @@ publishing {
                 def scmNode = parsedProjectXml.scm
                 def licenceNode = parsedProjectXml.licenses
                 def developersNode = parsedProjectXml.developers
-                def dependencyNode = parsedProjectXml.dependencies
+                def dependenciesNode = parsedProjectXml.dependencies
                 def nameNode = parsedProjectXml.name
                 def urlNode = parsedProjectXml.url
+
+                dependenciesNode.dependency.findAll { xmlDep ->
+                    if ( xmlDep.groupId.text() == "com.google.android.gms"
+                         &&  xmlDep.artifactId.text() == "play-services-ads") {
+                            def xmlOptional = xmlDep.optional[ 0 ];
+                            if ( !xmlOptional ) {
+                                xmlOptional = xmlDep.appendNode( 'optional' )
+                            }
+                            xmlOptional.value = 'true';
+                    }
+                }
 
                 //assert scmNode instanceof groovy.util.Node
                 pom.withXml {
@@ -72,7 +83,7 @@ publishing {
                     asNode().append(licenceNode)
                     asNode().append(developersNode)
                     asNode().append(scmNode)
-                    asNode().append(dependencyNode)
+                    asNode().append(dependenciesNode)
                 }
             }
             artifacts {

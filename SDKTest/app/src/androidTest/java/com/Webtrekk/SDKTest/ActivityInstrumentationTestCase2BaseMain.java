@@ -28,7 +28,7 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extends ActivityInstrumentationTestCase2<T> {
     protected Application mApplication;
-    private Thread.UncaughtExceptionHandler mOldHandler;
+    private SDKInstanceManager mSDKManager = new SDKInstanceManager();
     protected boolean mIsErrorHandlerTest;
     protected boolean mIsExternalCall;
     static private String IS_EXTERNAL = "external";
@@ -45,8 +45,7 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
 
         super.setUp();
         //refresh webtrekk instance
-        refreshWTInstance();
-        mOldHandler = Thread.getDefaultUncaughtExceptionHandler();
+        mSDKManager.setup();
         mApplication = (Application)getInstrumentation().getTargetContext().getApplicationContext();
         if (!mIsErrorHandlerTest)
             deleteErrorHandlerFile(mApplication);
@@ -61,14 +60,7 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
 
     @Override
     public void tearDown() throws Exception {
-        Webtrekk webtrekk = Webtrekk.getInstance();
-        if (webtrekk.isInitialized())
-            webtrekk.stopTracking();
-        Thread.setDefaultUncaughtExceptionHandler(mOldHandler);
-        unregisterCallback();
-        getInstrumentation().waitForIdleSync();
-        stopSendThread();
-        unregisterActivityEventCallback();
+        mSDKManager.release(mApplication);
         super.tearDown();
     }
 
@@ -76,59 +68,6 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
     {
         File loadFile = new File(context.getFilesDir().getPath() + File.separator+"exception.txt");
         loadFile.delete();
-    }
-
-    protected void refreshWTInstance() {
-        Class<Webtrekk> wtClass = Webtrekk.class;
-        try {
-            for (Class<?> classObj : wtClass.getDeclaredClasses()) {
-                if (classObj.getName().contains("SingletonHolder")) {
-                    Field field = null;
-                    field = classObj.getDeclaredField("webtrekk");
-                    field.setAccessible(true);
-                    Constructor<Webtrekk> wtConstr = wtClass.getDeclaredConstructor();
-                    wtConstr.setAccessible(true);
-                    field.set(null, wtConstr.newInstance());
-                }
-            }
-        } catch (NoSuchFieldException e) {
-            WebtrekkLogging.log("Can't refresh Webtrekk instance");
-        } catch (NoSuchMethodException e) {
-            WebtrekkLogging.log("Can't refresh Webtrekk instance");
-        } catch (InstantiationException e) {
-            WebtrekkLogging.log("Can't refresh Webtrekk instance");
-        } catch (IllegalAccessException e) {
-            WebtrekkLogging.log("Can't refresh Webtrekk instance");
-        } catch (InvocationTargetException e) {
-            WebtrekkLogging.log("Can't refresh Webtrekk instance");
-        }
-    }
-
-    protected void unregisterCallback()
-    {
-        if (mApplication == null)
-        {
-            WebtrekkLogging.log("Error unregister callback. Application reference is null");
-            return;
-        }
-
-        if (!Webtrekk.getInstance().isInitialized())
-        {
-            WebtrekkLogging.log("Error unregister callback. Webtrekk isn't initialized");
-            return;
-        }
-        Webtrekk webtrekk = Webtrekk.getInstance();
-
-        try {
-            Field callbackField = Webtrekk.class.getDeclaredField("mCallbacks");
-            callbackField.setAccessible(true);
-            Application.ActivityLifecycleCallbacks callback = (Application.ActivityLifecycleCallbacks) callbackField.get(webtrekk);
-            mApplication.unregisterActivityLifecycleCallbacks(callback);
-        } catch (NoSuchFieldException e) {
-            WebtrekkLogging.log("Can't remove activity callback");
-        } catch (IllegalAccessException e) {
-            WebtrekkLogging.log("Can't remove activity callback");
-        }
     }
 
     protected void finishActivitySync(Activity activity)
@@ -167,65 +106,5 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         if (preferences.contains("LAST_CBD_REQUEST_DATE"))
             preferences.edit().remove("LAST_CBD_REQUEST_DATE").apply();
     }
-
-    private void stopSendThread()
-    {
-        if (mApplication == null)
-        {
-            WebtrekkLogging.log("Error unregister callback. Application reference is null");
-            return;
-        }
-
-        if (!Webtrekk.getInstance().isInitialized())
-        {
-            WebtrekkLogging.log("Error unregister callback. Webtrekk isn't initialized");
-            return;
-        }
-        Webtrekk webtrekk = Webtrekk.getInstance();
-
-        RequestFactory requestFactory = (RequestFactory)returnHiddenField(webtrekk, "mRequestFactory");
-        ScheduledExecutorService threadService1 = (ScheduledExecutorService)returnHiddenField(requestFactory, "mURLSendTimerService");
-        ScheduledExecutorService threadService2 = (ScheduledExecutorService)returnHiddenField(requestFactory, "mFlashTimerService");
-        threadService1.shutdownNow();
-        threadService2.shutdownNow();
-    }
-
-    static private boolean isActivityStopped(Activity activity)
-    {
-        return (Boolean)returnHiddenField(activity, "mStopped");
-    }
-
-    static private boolean isActivityResumed(Activity activity)
-    {
-        return (Boolean)returnHiddenField(activity, "mResumed");
-    }
-
-    private void unregisterActivityEventCallback()
-    {
-        Webtrekk webtrekk = Webtrekk.getInstance();
-
-        Application.ActivityLifecycleCallbacks callbacks = (Application.ActivityLifecycleCallbacks)returnHiddenField(webtrekk, "mCallbacks");
-        if (callbacks != null)
-        {
-            mApplication.unregisterActivityLifecycleCallbacks(callbacks);
-        }
-    }
-
-    static private Object returnHiddenField(Object object, String fieldName)
-    {
-        Object result = null;
-        try {
-            Field callbackField = object.getClass().getDeclaredField(fieldName);
-            callbackField.setAccessible(true);
-            result = callbackField.get(object);
-        } catch (NoSuchFieldException e) {
-            WebtrekkLogging.log("Can't remove activity callback");
-        } catch (IllegalAccessException e) {
-            WebtrekkLogging.log("Can't remove activity callback");
-        }
-
-        return result;
-    }
-
 
 }

@@ -70,7 +70,6 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
 
         super.setUp();
         //refresh webtrekk instance
-        //URLReceiverRegister(mURLReceiver);
         if (mHttpServer == null) {
             mHttpServer = new HttpServer();
             mHttpServer.setContext(mApplication);

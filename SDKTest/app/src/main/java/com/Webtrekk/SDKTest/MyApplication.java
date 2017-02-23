@@ -7,5 +7,16 @@ import com.webtrekk.webtrekksdk.WebtrekkApplication;
  */
 
 public class MyApplication extends WebtrekkApplication {
+    private static  SDKInstanceManager mSDKManager = new SDKInstanceManager();
 
+    public SDKInstanceManager getSDKManager(){
+        return  mSDKManager;
+    }
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mSDKManager.setup();
+    }
 }

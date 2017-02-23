@@ -63,6 +63,14 @@
             android:layout_gravity="center_horizontal"
             android:onClick="recommendationTest" />
 
+        <Button
+            android:id="@+id/adclear_button_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AdClear test"
+            android:layout_gravity="center_horizontal"
+            android:onClick="adClearTest" />
+
         <WebView
             android:id="@+id/main_web_view"
             android:layout_width="match_parent"

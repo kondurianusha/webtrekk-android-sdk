@@ -2,6 +2,7 @@ package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
@@ -25,6 +27,8 @@ import java.io.IOException;
 public class MainActivity extends Activity {
     private Webtrekk webtrekk;
     private HttpServer mHttpServer;
+    private boolean mAdClearOn;
+    private String ADCLEAR_SIGN = "ADCLEAR_SIGN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,21 +45,42 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
 
+        if (savedInstanceState != null){
+            mAdClearOn = savedInstanceState.getBoolean(ADCLEAR_SIGN);
+        }
+
+
         mediaCodeReceiverRegister();
 
-        webtrekk = Webtrekk.getInstance();
-        webtrekk.initWebtrekk(getApplication(), R.raw.webtrekk_config_normal_track);
+        webtrekk =initWishNormalParameter();
 
         webtrekk.getCustomParameter().put("own_para", "my-value");
 
         ((TextView)findViewById(R.id.main_version)).setText(getString(R.string.hello_world) + "\nLibrary Version:" + Webtrekk.mTrackingLibraryVersionUI);
         MixpanelAPI mixpanel = MixpanelAPI.getInstance(this, "9e956a2e5169ddb44eb87b6acb0eee95");
+        updateAdClearCaption();
+    }
+
+    private Webtrekk initWishNormalParameter(){
+        Webtrekk.getInstance().initWebtrekk(getApplication(), R.raw.webtrekk_config_normal_track);
+        return Webtrekk.getInstance();
+    }
+
+    private void updateAdClearCaption(){
+        Button button = (Button)findViewById(R.id.adclear_button_id);
+        button.setText("AdClear test " + (mAdClearOn ? "on" : "off"));
     }
 
     @Override
     public void onStart()
     {
         super.onStart();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(ADCLEAR_SIGN, mAdClearOn);
     }
 
     @Override
@@ -168,6 +193,24 @@ public class MainActivity extends Activity {
         intent.putExtra(RecommendationActivity.RECOMMENDATION_NAME, "complexReco");
         intent.putExtra(RecommendationActivity.RECOMMENDATION_PRODUCT_ID, "085cc2g007");
         startActivity(intent);
+    }
+
+    public void adClearTest(View view)
+    {
+        SDKInstanceManager sdkManager = ((MyApplication)getApplication()).getSDKManager();
+        webtrekk = null;
+        sdkManager.release(getApplication());
+        sdkManager.setup();
+
+        if (mAdClearOn){
+            webtrekk = initWishNormalParameter();
+            mAdClearOn = false;
+        } else {
+            webtrekk = Webtrekk.getInstance();
+            webtrekk.initWebtrekk(getApplication(), R.raw.webtrekk_config_adclear_integration_test);
+            mAdClearOn = true;
+        }
+        updateAdClearCaption();
     }
 
     public Webtrekk getWebtrekk() {

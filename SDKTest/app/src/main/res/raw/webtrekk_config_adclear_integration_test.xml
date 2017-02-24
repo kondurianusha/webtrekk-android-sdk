@@ -45,7 +45,7 @@
     <autoTrackAppUpdate>true</autoTrackAppUpdate>
     <!--track the adClear id -->
     <autoTrackAdClearId>true</autoTrackAdClearId>
-    <!--track the advertiser id -->
+    <!--track the advertiser id -->ф
     <autoTrackAdvertiserId>true</autoTrackAdvertiserId>
     <!--track the app versions name -->
     <autoTrackAppVersionName>true</autoTrackAppVersionName>
@@ -89,7 +89,7 @@
         <!--define global tracking parameter which are send with every request, the key has to match a valid parameter name!
         entries made here are available as default parameters in the trackingparameter instance -->
         <parameter id="PRODUCT">test_product</parameter>
-
+        <parameter id="ADVERTISEMENT">wt_mc=de.inapp.webtrekkAndroidTest</parameter>
 
         <!--define the global page parameter, the key is the index,  -->
         <pageParameter>

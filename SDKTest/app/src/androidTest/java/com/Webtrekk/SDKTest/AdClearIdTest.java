@@ -22,6 +22,7 @@ package com.Webtrekk.SDKTest;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.AdClearIdUtil;
 import com.webtrekk.webtrekksdk.Webtrekk;
+import static com.webtrekk.webtrekksdk.Utils.AdClearIdUtil.MILLISECONDS_UNTIL_01012011;
 
 
 public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
@@ -233,6 +234,91 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
         for (int i = 14; i<64; i++) {
             assertEquals(0, getBit(adClearId, i));
         }
+    }
+
+
+
+    public void testLimitToBits() {
+        AdClearIdUtil a = new AdClearIdUtil();
+        assertEquals(6, a.limitToBits(6, 3));
+        assertEquals(7, a.limitToBits(7, 3));
+        assertEquals(0, a.limitToBits(8, 3));
+        assertEquals(1, a.limitToBits(9, 3));
+    }
+
+
+    /**
+     * making sure that a generated adclear id contains a plausible part which encodes the
+     * time passed since 01.01.2011
+     */
+    public void testGenerateAdClearId_millisecondsPart() {
+        long adClearId = new AdClearIdUtil().generateAdClearId();
+
+        // Getting the 39 bits containing the elapsed milliseconds since 01.01.2011
+        // Counting from the right side, these are the 39 bits starting at bit 24
+        long millisecSince_01_01_2011 = getBitRange(adClearId, 24, 39);
+
+        // 1st: Do a very rough plausibility check:
+        // assert that the encoded time since 01.01.2011 is between 6 years and 20 years:
+        long yearsSince_01_01_2011 = millisecSince_01_01_2011 / 1000 / 60 / 60 / 24 / 365;
+        assertTrue(yearsSince_01_01_2011 >= 6);
+        assertTrue(yearsSince_01_01_2011 <= 20);
+
+        // 2nd: Do a more precise check:
+        // assert that the encoded time does not differ by more than 5 minutes from the real value:
+        // (actually 1 millisecond would be enough, but 5 minutes allow for more stopping at
+        // breakpoints during debugging)
+        long nowUTC = System.currentTimeMillis();
+        long realMilliSecSince_01_01_2011 = nowUTC - MILLISECONDS_UNTIL_01012011;
+        long difference = Math.abs(realMilliSecSince_01_01_2011 - millisecSince_01_01_2011);
+        assertTrue(difference <= 5*60*1000);
+    }
+
+
+
+    /**
+     * making sure that a generated adclear id contains the correctly encoded application id (713)
+     */
+    public void testGenerateAdClearId_ApplicationId_part() {
+        long adClearId = new AdClearIdUtil().generateAdClearId();
+
+        // Getting the 10 bits containing the application id
+        // Counting from the right side, these are the 10 bits starting at bit 4
+        long appId = getBitRange(adClearId, 4, 10);
+
+        // assert that the application id is 713:
+        assertTrue(appId == 713);
+    }
+
+
+    /**
+     * Extracts a range of bits from a long, and converts it to a decimal number. E.g.:
+     *
+     * l = 114
+     * start = 2
+     * bits = 3
+     *
+     * The binary representation of 114 is 1110010.
+     * The 3 bits starting at 2, are 100 (counting from the right side).
+     * The decimal representation of 100 is 4, thus:
+     *
+     * => return 4;
+     *
+     * @param l a long whose bit range should be extracted
+     * @param start the first bit to extract
+     * @param noOfBits the last bit to extract
+     * @return the bit range represented as a decimal
+     */
+    private long getBitRange(long l, int start, int noOfBits) {
+        long result = 0;
+        int bit = 0;
+        for (int i = start; i<start+noOfBits; i++) {
+            if (getBit(l, i) == 1) {
+                result += (long) Math.pow(2, bit);
+            }
+            bit++;
+        }
+        return result;
     }
 
 

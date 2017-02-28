@@ -40,9 +40,9 @@ public final class AdClearIdUtil {
     private static final int BIT_SHIFT_FOR_APPLICATION    = BITS_OF_PROCESS;
     private static final int BIT_SHIFT_FOR_RAND           = BIT_SHIFT_FOR_APPLICATION + BITS_OF_APPLICATION;
     private static final int BIT_SHIFT_FOR_TIMESTAMP      = BIT_SHIFT_FOR_RAND + BITS_OF_RAND;
-    private static final long MILLISECONDS_UNTIL_01012011 = 1293840000000L;
+    public  static final long MILLISECONDS_UNTIL_01012011 = 1293840000000L;
     private static final int APPLICATION_ID               = 713;
-    public static final String PREFERENCE_KEY_ADCLEAR_ID = "adClearId";
+    public  static final String PREFERENCE_KEY_ADCLEAR_ID = "adClearId";
 
 
     /**
@@ -75,10 +75,10 @@ public final class AdClearIdUtil {
      */
     public final long combineAdClearId(long diffInMilliseconds, long rand, long applicationId, long processId) {
 
-        diffInMilliseconds = limitToBits(diffInMilliseconds, BITS_OF_MILLISECONDS);
-        rand               = limitToBits(rand,               BITS_OF_RAND);
-        applicationId      = limitToBits(applicationId,      BITS_OF_APPLICATION);
-        processId          = limitToBits(processId,          BITS_OF_PROCESS);
+        diffInMilliseconds = sanitize(diffInMilliseconds, BITS_OF_MILLISECONDS);
+        rand               = sanitize(rand,               BITS_OF_RAND);
+        applicationId      = sanitize(applicationId,      BITS_OF_APPLICATION);
+        processId          = sanitize(processId,          BITS_OF_PROCESS);
 
         return ((diffInMilliseconds << BIT_SHIFT_FOR_TIMESTAMP) + (rand << BIT_SHIFT_FOR_RAND)
                 + (applicationId << BIT_SHIFT_FOR_APPLICATION) + processId);
@@ -86,22 +86,29 @@ public final class AdClearIdUtil {
 
 
     /**
-     * Limits a given value v to using a maximum of maxBits.
+     * Guarantees l to be a positive number and limits its bits to maxBits
      *
-     * e.g. maxBits = 4
-     * This means that the maximum number possible using only this 4 bits is binary 1111, which is decimal 15 (=(2^4)-1).
-     * To guarantee that a given number v does not exceed 15, a modulo by 16 (2^4) can be applied: v%16, e.g.:
-     * 14%16 = 14
-     * 15%16 = 15
-     * 16%16 = 0
-     * 17%16 = 1
+     * @param l a long value
+     * @param maxBits the max number of bits allowed
+     * @return the sanitized long value
+     */
+    public long sanitize(long l, int maxBits) {
+        if (l<0) {
+            l = -l;
+        }
+        return limitToBits(l, maxBits);
+    }
+
+
+    /**
+     * Limits a given value v to using a maximum of maxBits.
      *
      * @param v
      * @param maxBits
      * @return v%maxBits
      */
-    private long limitToBits(long v, int maxBits) {
-        long maxlong = (1 << maxBits) - 1;
+    public long limitToBits(long v, int maxBits) {
+        long maxlong = (1L << maxBits) - 1L;
         return v & maxlong;
     }
 }

@@ -22,13 +22,12 @@ package com.Webtrekk.SDKTest;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.AdClearIdUtil;
 import com.webtrekk.webtrekksdk.Webtrekk;
-import static com.webtrekk.webtrekksdk.Utils.AdClearIdUtil.MILLISECONDS_UNTIL_01012011;
 
 
 public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
 
     private Webtrekk mWebtrekk;
-
+    private static final long MILLISECONDS_UNTIL_01012011 = 1293840000000L;
 
     public AdClearIdTest() {
         super(EmptyActivity.class);

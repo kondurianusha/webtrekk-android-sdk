@@ -40,7 +40,7 @@ public final class AdClearIdUtil {
     private static final int BIT_SHIFT_FOR_APPLICATION    = BITS_OF_PROCESS;
     private static final int BIT_SHIFT_FOR_RAND           = BIT_SHIFT_FOR_APPLICATION + BITS_OF_APPLICATION;
     private static final int BIT_SHIFT_FOR_TIMESTAMP      = BIT_SHIFT_FOR_RAND + BITS_OF_RAND;
-    public  static final long MILLISECONDS_UNTIL_01012011 = 1293840000000L;
+    private static final long MILLISECONDS_UNTIL_01012011 = 1293840000000L;
     private static final int APPLICATION_ID               = 713;
     public  static final String PREFERENCE_KEY_ADCLEAR_ID = "adClearId";
 

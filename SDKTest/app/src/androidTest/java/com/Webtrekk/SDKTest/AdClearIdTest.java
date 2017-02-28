@@ -50,7 +50,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
     }
 
 
-    public void testAdclearIDinRequestURL() {
+    public void testAdclearIdInRequestURL() {
 
         initWaitingForTrack(new Runnable() {
             @Override
@@ -81,6 +81,8 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
 
         String adClearID = parcel.getValue("cs808");
         assertTrue(adClearID != null && !adClearID.isEmpty());
+        assertionsGenerateAdClearId_millisecondsPart(Long.parseLong(adClearID));
+        assertionsGenerateAdClearId_ApplicationId_part(Long.parseLong(adClearID));
 
         try {
             long adClearIDNum = Long.valueOf(adClearID);
@@ -182,7 +184,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
         assertEquals(0, getBit(adClearId, 2));
         assertEquals(0, getBit(adClearId, 3));
         // the following 10 bits (1011001001):
-        assertEquals(1, getBit(adClearId, 4));
+       assertEquals(1, getBit(adClearId, 4));
         assertEquals(0, getBit(adClearId, 5));
         assertEquals(0, getBit(adClearId, 6));
         assertEquals(1, getBit(adClearId, 7));
@@ -246,12 +248,17 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
     }
 
 
+    public void testGenerateAdClearId_millisecondsPart() {
+        long adClearId = new AdClearIdUtil().generateAdClearId();
+        assertionsGenerateAdClearId_millisecondsPart(adClearId);
+    }
+
+
     /**
      * making sure that a generated adclear id contains a plausible part which encodes the
      * time passed since 01.01.2011
      */
-    public void testGenerateAdClearId_millisecondsPart() {
-        long adClearId = new AdClearIdUtil().generateAdClearId();
+    private void assertionsGenerateAdClearId_millisecondsPart(long adClearId) {
 
         // Getting the 39 bits containing the elapsed milliseconds since 01.01.2011
         // Counting from the right side, these are the 39 bits starting at bit 24
@@ -265,12 +272,17 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
 
         // 2nd: Do a more precise check:
         // assert that the encoded time does not differ by more than 5 minutes from the real value:
-        // (actually 1 millisecond would be enough, but 5 minutes allow for more stopping at
-        // breakpoints during debugging)
         long nowUTC = System.currentTimeMillis();
         long realMilliSecSince_01_01_2011 = nowUTC - MILLISECONDS_UNTIL_01012011;
         long difference = Math.abs(realMilliSecSince_01_01_2011 - millisecSince_01_01_2011);
-        assertTrue(difference <= 5*60*1000);
+        assertTrue(difference <= 30*60*60*1000);
+    }
+
+
+
+    public void testGenerateAdClearId_ApplicationId_part() {
+        long adClearId = new AdClearIdUtil().generateAdClearId();
+        assertionsGenerateAdClearId_ApplicationId_part(adClearId);
     }
 
 
@@ -278,9 +290,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
     /**
      * making sure that a generated adclear id contains the correctly encoded application id (713)
      */
-    public void testGenerateAdClearId_ApplicationId_part() {
-        long adClearId = new AdClearIdUtil().generateAdClearId();
-
+    private void assertionsGenerateAdClearId_ApplicationId_part(long adClearId) {
         // Getting the 10 bits containing the application id
         // Counting from the right side, these are the 10 bits starting at bit 4
         long appId = getBitRange(adClearId, 4, 10);

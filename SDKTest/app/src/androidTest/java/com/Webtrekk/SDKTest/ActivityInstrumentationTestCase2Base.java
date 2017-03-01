@@ -93,7 +93,7 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
     protected void initWaitingForTrack(Runnable process, long UrlCount)
     {
         mStringNumbersToWait = UrlCount;
-        mSentURLArray.clear();;
+        mSentURLArray.clear();
         mStringReceived = false;
 
         if (process != null) {

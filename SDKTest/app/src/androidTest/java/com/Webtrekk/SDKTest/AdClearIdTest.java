@@ -19,6 +19,8 @@
 
 package com.Webtrekk.SDKTest;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.AdClearIdUtil;
 import com.webtrekk.webtrekksdk.Webtrekk;
@@ -39,6 +41,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
         mWebtrekk = Webtrekk.getInstance();
         mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
         getActivity();
+        clearAdClearId();
     }
 
 
@@ -275,7 +278,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
         long nowUTC = System.currentTimeMillis();
         long realMilliSecSince_01_01_2011 = nowUTC - MILLISECONDS_UNTIL_01012011;
         long difference = Math.abs(realMilliSecSince_01_01_2011 - millisecSince_01_01_2011);
-        assertTrue(difference <= 30*60*60*1000);
+        assertTrue(difference <= 5*60*1000);
     }
 
 
@@ -338,9 +341,18 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
      *
      * @param l a long value
      * @param position position in the long whose bit should be returned
-     * @return the bit at the given position (counting from the end!)
+     * @return the bit at the given position (counting from the right side!)
      */
     private int getBit(long l, int position) {
         return (int) ((l >> position) & 1);
+    }
+
+
+    /**
+     * Clears the adClearId stored locally on the testing device
+     */
+    private void clearAdClearId() {
+        SharedPreferences preferences = getInstrumentation().getTargetContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+        preferences.edit().remove(AdClearIdUtil.PREFERENCE_KEY_ADCLEAR_ID).commit();
     }
 }

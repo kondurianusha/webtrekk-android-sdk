@@ -1,12 +1,9 @@
 package com.Webtrekk.SDKTest;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.test.ActivityInstrumentationTestCase2;
-
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
-import com.webtrekk.webtrekksdk.Webtrekk;
 
 /**
  * Created by vartbaronov on 25.05.16.

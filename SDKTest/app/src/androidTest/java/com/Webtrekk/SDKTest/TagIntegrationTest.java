@@ -1,16 +1,7 @@
 package com.Webtrekk.SDKTest;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.nfc.Tag;
-import android.preference.PreferenceManager;
-import android.test.suitebuilder.annotation.Suppress;
-
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 
 /**
  * Created by vartbaronov on 11.05.16.

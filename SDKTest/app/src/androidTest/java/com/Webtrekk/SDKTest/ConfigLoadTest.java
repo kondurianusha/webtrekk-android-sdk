@@ -1,14 +1,6 @@
 package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.test.suitebuilder.annotation.Suppress;
-
-import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
-import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
-import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 /**

@@ -99,13 +99,11 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         });
 
         String URL = waitForTrackedURL();
-
         URLParsel parcel = new URLParsel();
-
         parcel.parseURL(URL);
 
-        assertEquals("Tracking Library 9.9.9(Linux; Android 5.0.2; unknown Android SDK built for x86; en_US)",
-                HelperFunctions.urlDecode(parcel.getValue("X-WT-UA")));
+        String url =  HelperFunctions.urlDecode(parcel.getValue("X-WT-UA"));
+        assertTrue(url.contains("Android"));
     }
 
 

@@ -44,12 +44,10 @@ public class TrackingConfiguration {
     private boolean autoTrackConnectionType = true;
     private boolean autoTrackAdvertismentOptOut= true;
 
-    // enabled plugins
-    private boolean enablePluginHelloWorld;
     private boolean enableRemoteConfiguration;
     private String trackingConfigurationUrl;
     private boolean autoTrackRequestUrlStoreSize = true;
-    //intervall when autotracked start activity is send again
+    // interval when autotracked start activity is send again
     private int resendOnStartEventTime = 30;
     private boolean mErrorLogEnable;
     private int mErrorLogLevel = 3;
@@ -374,14 +372,6 @@ public class TrackingConfiguration {
 
     public void setAutoTrackAdvertismentOptOut(boolean autoTrackAdvertismentOptOut) {
         this.autoTrackAdvertismentOptOut = autoTrackAdvertismentOptOut;
-    }
-
-    public boolean isEnablePluginHelloWorld() {
-        return enablePluginHelloWorld;
-    }
-
-    public void setEnablePluginHelloWorld(boolean enablePluginHelloWorld) {
-        this.enablePluginHelloWorld = enablePluginHelloWorld;
     }
 
     public boolean isEnableRemoteConfiguration() {

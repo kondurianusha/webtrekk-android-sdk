@@ -558,7 +558,7 @@ public class RequestFactory {
 
         processMediaCode(request);
 
-        // only track when not opted out, but always execute the plugins
+        // only track if not opted out
         if(!mIsOptout && !mIsSampling) {
             String urlString = request.getUrlString();
             WebtrekkLogging.log("adding url: " + urlString);

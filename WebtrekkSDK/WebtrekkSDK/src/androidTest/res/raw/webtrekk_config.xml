@@ -46,8 +46,6 @@
     <autoTrackAdvertisementOptOut>true</autoTrackAdvertisementOptOut>
 
 
-    <!--enable the hello world plugin functions -->
-    <enablePluginHelloWorld>false</enablePluginHelloWorld>
     <!--enables the remote xml configuration -->
     <enableRemoteConfiguration>false</enableRemoteConfiguration>
     <!--url of the remote configuration -->
@@ -58,7 +56,7 @@
     <resendOnStartEventTime>30</resendOnStartEventTime>
     <!--enable or disable exception logging. By default is disabled -->
     <errorLogEnable>true</errorLogEnable>
-    <!--set log level to do loging 1- only fatals 2 - fatal and catchd, 3- all logs. By default = 3 -->
+    <!--set log level: 1 only fatal, 2 fatal and caught, 3 everything (default = 3) -->
     <errorLogLevel>3</errorLogLevel>
 
     <!--custom parameter -->

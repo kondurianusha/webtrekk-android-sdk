@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Tracking Library Demo</string>
 
-    <string name="hello_world">Welcome to Tracking Library Demo!</string>
+    <string name="hello_world">Welcome to the Tracking Library Demo!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_page_example_acitivity">PageExampleAcitivity</string>
     <string name="title_activity_shop_example">ShopExampleActivity</string>

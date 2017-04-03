@@ -30,11 +30,6 @@ public class TrackingConfigurationXmlParserTest extends AndroidTestCase {
             "        <autotrack type=\"text\">true</autotrack>\n" +
             "    </screen>\n" +
             "\n" +
-            "    <plugin>\n" +
-            "        <name>HelloWorldPlugin</name>\n" +
-            "        <value>hello</value>\n" +
-            "    </plugin>\n" +
-            "\n" +
             "    <customvalues>\n" +
             "        <exampleval1>custom example val 1</exampleval1>\n" +
             "    </customvalues>\n" +

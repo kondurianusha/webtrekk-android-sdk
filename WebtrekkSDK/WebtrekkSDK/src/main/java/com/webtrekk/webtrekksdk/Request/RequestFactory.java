@@ -404,17 +404,18 @@ public class RequestFactory {
     public void onFirstStart()
     {
         restore();
-
         //restart referrer getting if applicaiton was paused and resumed back
-        if (Campaign.getFirstStartInitiated(mContext, false) && mCampaign == null)
+        if (Campaign.getFirstStartInitiated(mContext, false) && (mCampaign == null || (mCampaign != null && !mCampaign.isAlive()))) {
             startAdvertizingThread(true);
+        }
     }
 
     public void stop()
     {
         flush();
-        if (mCampaign != null)
+        if (mCampaign != null && mCampaign.isAlive() && !mCampaign.isInterrupted()) {
             mCampaign.interrupt();
+        }
     }
 
     public void restore()
@@ -579,13 +580,7 @@ public class RequestFactory {
     public void startAdvertizingThread(boolean isFirstStart)
     {
         if (!mIsOptout) {
-            mCampaign = Campaign.start(mContext, mTrackingConfiguration.getTrackId(), isFirstStart, mTrackingConfiguration.isAutoTrackAdvertiserId(),
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            mCampaign = null;
-                        }
-                    });
+            mCampaign = Campaign.start(mContext, mTrackingConfiguration.getTrackId(), isFirstStart, mTrackingConfiguration.isAutoTrackAdvertiserId());
         }
     }
 

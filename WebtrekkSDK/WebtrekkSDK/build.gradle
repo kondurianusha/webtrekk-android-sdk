@@ -11,7 +11,7 @@ group = "com.webtrekk.webtrekksdk"                                        // Mav
 
 def projectName = 'Webtrekk Android SDK Library'
 def licenceName = 'MIT License'
-def licenceURL = 'https://opensource.org/licenses/mit-license.php'
+def licenceURL = 'https://github.com/Webtrekk/open-source-guidelines/blob/master/LICENSE-MIT.md'
 def devName = 'Arsen Vartbaronov'
 def devEmail = 'arsen.vartbaronov@webtrekk.com'
 def devID = 'vartbaronov'

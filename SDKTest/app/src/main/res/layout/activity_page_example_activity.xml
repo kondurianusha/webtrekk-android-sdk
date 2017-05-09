@@ -36,6 +36,12 @@
             android:text="Param Action Button"
             android:id="@+id/button_action_param"
             android:onClick="onButtonActionParamsClicked" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next Page Activity"
+            android:id="@+id/button_next_page"
+            android:onClick="onButtonNextPage" />
     </LinearLayout>
 
 </RelativeLayout>

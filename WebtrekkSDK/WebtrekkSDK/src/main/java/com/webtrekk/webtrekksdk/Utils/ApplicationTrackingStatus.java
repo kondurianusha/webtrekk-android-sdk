@@ -5,6 +5,9 @@ import android.app.Application;
 import android.os.Bundle;
 
 import java.lang.ref.WeakReference;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Created by vartbaronov on 06.05.16.
@@ -28,7 +31,7 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
     private WeakReference<Activity> mCurrentActivityInstance;
 
     volatile private int mCurrentActivitiesCount;
-    private String mPreviousActivityName;
+    final private Deque<String> mPreviousActivitiesQueue = new LinkedList<String>();
     private String mFirstActivityName;
     private long mLastActivityVisibleTime;
     private long mReturnFromBackgroundTime;
@@ -62,12 +65,13 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        //TODO delete logging
         WebtrekkLogging.log("Tracking Activity Created: "+getActivityName(activity) + " instance hash:" + activity.hashCode() + (savedInstanceState != null ? " as recreation":""));
-        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
         mIsRecreationInProgress = savedInstanceState != null;
         if (!mIsRecreationInProgress) {
-            mPreviousActivityName = mCurrentActivityName;
+            if (mCurrentActivityName != null) {
+                mPreviousActivitiesQueue.offerFirst(mCurrentActivityName);
+            }
             mCurrentActivityName = getActivityName(activity);
         }
         mCurrentActivityInstance = new WeakReference<Activity>(activity);
@@ -75,13 +79,13 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
         if (!mIsRecreationInProgress)
             mCurrentActivitiesCount++;
 
-        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
         WebtrekkLogging.log("Tracking Activity started: " + getActivityName(activity) + " instance hash:" + activity.hashCode());
-        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
 
         //this is first start, but initialization was done in onCreate of MainActivity
         if (!mIsRecreationInProgress && mCurrentActivitiesCount == 0)
@@ -100,36 +104,35 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
             mReturnFromBackgroundTime = System.currentTimeMillis();
         }
 
-        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
     }
 
     @Override
     public void onActivityResumed(Activity activity) {
         WebtrekkLogging.log("Tracking Activity Resumed: " + getActivityName(activity) + " instance hash:" + activity.hashCode() + (mIsRecreationInProgress ? " as recreation":""));
-        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
         mIsRecreationInProgress = false;
         mCurrentStatus = STATUS.ACTIVITY_IS_SHOWN;
-        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
       WebtrekkLogging.log("Tracking Activity Paused: " + getActivityName(activity));
 
-        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " instance hash:" + activity.hashCode() + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " instance hash:" + activity.hashCode() + " Previous Activity:"+mPreviousActivitiesQueue.peek());
         if (activity.isFinishing() && mCurrentActivityName != null && mCurrentActivityName.equals(getActivityName(activity))) {
-            mCurrentActivityName = mPreviousActivityName;
+            mCurrentActivityName = mPreviousActivitiesQueue.pollFirst();
             mCurrentActivityInstance = null;
-            mPreviousActivityName = null;
         }
 
-        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
         WebtrekkLogging.log("Tracking Activity stopped: " + getActivityName(activity) + " instance hash:" + activity.hashCode() + (activity.isFinishing() ? " as finishing" : " as sleeping"));
-        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus+ " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus+ " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
         if (activity.isFinishing()) {
             //activity is finishing increase activity counter and determine applicaiton shut down
             mCurrentActivitiesCount--;
@@ -145,25 +148,25 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
                 mLastActivityVisibleTime = System.currentTimeMillis();
             }
         }
-        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
     }
 
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
         WebtrekkLogging.log("Tracking Activity SaveInstance: " + getActivityName(activity) + (outState != null ? " as recreation":""));
-        WebtrekkLogging.log("CurrentStatus:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
     }
 
     @Override
     public void onActivityDestroyed(Activity activity) {
         WebtrekkLogging.log("Tracking Activity Destroyed: " + getActivityName(activity) + " instance hash:" + activity.hashCode() + (activity.isFinishing() ? " as finishing" : " as sleeping"));
-        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
 
         if (activity.isFinishing() && mCurrentStatus != STATUS.SHUT_DOWNING &&
                     (mCurrentActivitiesCount == 0 || (mFirstActivityName != null && mFirstActivityName.equals(getActivityName(activity))))) {
                 mCurrentStatus = STATUS.SHUT_DOWNING;
         }
-        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivityName);
+        WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
     }
 
     private String getActivityName(Activity activity)

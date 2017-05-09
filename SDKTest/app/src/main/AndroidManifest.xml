@@ -99,6 +99,7 @@
         <activity
             android:name=".RecommendationActivity">
         </activity>
+        <activity android:name=".NextPageExampleActivity"/>
         <service android:name=".LoadOSService"/>
         <receiver
             android:name="com.webtrekk.webtrekksdk.WebtrekkGcmReceiver"

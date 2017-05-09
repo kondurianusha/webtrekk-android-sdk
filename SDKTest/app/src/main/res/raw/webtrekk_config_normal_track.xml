@@ -188,4 +188,8 @@
             <parameter id="PAGE_URL">http://www.yandex.ru</parameter>
         </screenTrackingParameter>
     </screen>
+    <screen>
+        <classname type="text">com.Webtrekk.SDKTest.NextPageExampleActivity</classname>
+        <mappingname type="text">NextPage</mappingname>
+    </screen>
 </webtrekkConfiguration>

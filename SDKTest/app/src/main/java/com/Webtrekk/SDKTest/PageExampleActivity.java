@@ -1,6 +1,7 @@
 package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -83,5 +84,10 @@ public class PageExampleActivity extends Activity {
                 .add(Parameter.PAGE, "2", "4")
                 .add(Parameter.PAGE, "3", "234");
         webtrekk.track(tp_pageparams);
+    }
+
+    public void onButtonNextPage(View view){
+        Intent intent = new Intent(this, NextPageExampleActivity.class);
+        startActivity(intent);
     }
 }

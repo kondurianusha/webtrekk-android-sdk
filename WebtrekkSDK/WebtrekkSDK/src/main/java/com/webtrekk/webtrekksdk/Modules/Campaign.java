@@ -6,9 +6,6 @@ import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.JsonReader;
 
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.webtrekk.webtrekksdk.ReferrerReceiver;
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.Request.RequestProcessor;
@@ -18,6 +15,8 @@ import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -154,7 +153,6 @@ public class Campaign extends Thread
     public void run() {
 
         WebtrekkLogging.log("starting campain thread. Getting advertising ID");
-        AdvertisingIdClient.Info adInfo = null;
         String advID = null;
         boolean isLimitAdEnabled = false;
 
@@ -165,32 +163,36 @@ public class Campaign extends Thread
 
         if (mIsAutoTrackAdvID || mFirstStart) {
             try {
-                adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
+                Object adInfo = null;
+                AdvertisingIdClientReflection client = new AdvertisingIdClientReflection();
+                adInfo = client.getAdvertisingIdInfo(mContext);
 
                 if (adInfo != null) {
-                    advID = adInfo.getId();
-                    isLimitAdEnabled = adInfo.isLimitAdTrackingEnabled();
+                    advID = client.getId(adInfo);
+                    isLimitAdEnabled = client.isLimitAdTrackingEnabled(adInfo);
+                }else {
+                    WebtrekkLogging.log("Can't get AdvertisingIdClientRef. Most probably Google Api isn't available.");
                 }
 
                 WebtrekkLogging.log("advertiserId: " + advID);
 
-            } catch (IOException e) {
-                // Unrecoverable error connecting to Google Play services (e.g.,
-                // the old version of the service doesn't support getting AdvertisingId).
-                WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
-                // the only way understand that process was interrupted.
-                if (e.getMessage().equals("Interrupted exception"))
-                    return;
-            } catch (GooglePlayServicesNotAvailableException e) {
-                // Google Play services is not available entirely.
-                WebtrekkLogging.log("GooglePlayServicesNotAvailableException", e);
-            } catch (GooglePlayServicesRepairableException e) {
-                // maybe will work with another try, recheck
-            } catch (NoClassDefFoundError e) {
-                WebtrekkLogging.log("Can't define AdvID as library com.google.android.gms:play-services-ads isn't imported to project");
+            }catch (Throwable e) {
+                String exceptionType = e.getClass().getSimpleName();
+                if (exceptionType.equals("IOException")){
+                    // Unrecoverable error connecting to Google Play services (e.g.,
+                    // the old version of the service doesn't support getting AdvertisingId).
+                    WebtrekkLogging.log("Unrecoverable error connecting to Google Play services", e);
+                    // the only way understand that process was interrupted.
+                    if (e.getMessage().equals("Interrupted exception"))
+                        return;
+                } else if (exceptionType.equals("GooglePlayServicesNotAvailableException")){
+                    // Google Play services is not available entirely.
+                    WebtrekkLogging.log("GooglePlayServicesNotAvailableException", e);
+                } else if (exceptionType.equals("GooglePlayServicesRepairableException")){
+                    // maybe will work with another try, recheck
+                }
             }
         }
-
 
         //if this is first start wait for referrer for 30 seconds.
         final long waitForReferrerDelay = 10000;
@@ -438,6 +440,36 @@ public class Campaign extends Thread
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
         }catch (NoClassDefFoundError e){
             WebtrekkLogging.log("Cann't broad cast campain message:"+e.getMessage());
+        }
+    }
+
+    private static class AdvertisingIdClientReflection {
+
+        Object getAdvertisingIdInfo(Context context) throws Throwable {
+            return callMethod("com.google.android.gms.ads.identifier.AdvertisingIdClient", null, "getAdvertisingIdInfo", new Class[]{Context.class}, context);
+        }
+
+        String getId(Object info) throws Throwable{
+                return callMethod(null, info, "getId", null, null);
+        }
+
+        boolean isLimitAdTrackingEnabled(Object info) throws Throwable{
+                Boolean result = callMethod(null, info, "isLimitAdTrackingEnabled", null, null);
+                return result == null ? false : result;
+        }
+
+        private <T extends Object> T callMethod(String className, Object classInstance, String methodName, Class[] argumentsTypes, Object... argumentsValues) throws Throwable {
+            try {
+                Class classObj = classInstance == null ? Class.forName(className) : classInstance.getClass();
+
+                Method method = classObj.getMethod(methodName, argumentsTypes);
+
+                return (T) method.invoke(classInstance, argumentsValues);
+            }catch (InvocationTargetException e) {
+                throw e.getCause();
+            } catch (Exception e){
+                return null;
+            }
         }
     }
 }

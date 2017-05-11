@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
-import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.Suppress;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
@@ -178,8 +176,27 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
         Log.d(getClass().getName(), "Create advID file:" + file.getAbsolutePath());
     }
 
-    class AdvIDReader implements Runnable
-    {
+    public void testNoCampaignMode(){
+
+        if (!mIsExternalCall)
+            return;
+
+        Webtrekk.getInstance().initWebtrekk(mApplication, R.raw.webtrekk_config_no_campaign_test);
+        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).registerReceiver(mSDKNoCampaignTestReceiver,
+                new IntentFilter("com.Webtrekk.CampainMediaMessage"));
+
+        synchronized (mWaiter) {
+            while (!mNotifierDone)
+                try {
+                    mWaiter.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+        }
+        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).unregisterReceiver(mSDKNoCampaignTestReceiver);
+    }
+
+    class AdvIDReader implements Runnable {
         private final Object mNotifier;
 
         public AdvIDReader(Object notifier)
@@ -220,7 +237,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
 
         Webtrekk.getInstance().initWebtrekk(mApplication);
 
-        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).registerReceiver(mSDKReceiver,
+        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).registerReceiver(mSDKCampaignTestReceiver,
                 new IntentFilter("com.Webtrekk.CampainMediaMessage"));
 
         synchronized (mWaiter) {
@@ -231,10 +248,10 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
                     e.printStackTrace();
                 }
         }
-        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).unregisterReceiver(mSDKReceiver);
+        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).unregisterReceiver(mSDKCampaignTestReceiver);
     }
 
-    private BroadcastReceiver mSDKReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mSDKCampaignTestReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
@@ -250,6 +267,25 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
             }
 
             assertEquals(mediaCode, MEDIA_CODE);
+
+            mNotifierDone = true;
+
+            synchronized (mWaiter)
+            {
+                mWaiter.notifyAll();
+            }
+        };
+    };
+
+    private BroadcastReceiver mSDKNoCampaignTestReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String mediaCode = intent.getStringExtra("INSTALL_SETTINGS_MEDIA_CODE");
+
+            assertNull(mediaCode);
+
+            Log.d(getClass().getName(), "Null campaign data is received.");
 
             mNotifierDone = true;
 

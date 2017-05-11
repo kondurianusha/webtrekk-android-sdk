@@ -446,6 +446,19 @@ public class TrackingConfigurationXmlParser {
                 Map<String, String> recConfig = readRecommendationConfig(parser);
                 config.setRecommendationConfiguration(recConfig);
                 parser.require(XmlPullParser.END_TAG, ns, "recommendations");
+            }else if (name.equals("enableCampaignTracking")) {
+                parser.require(XmlPullParser.START_TAG, ns, "enableCampaignTracking");
+
+                String value = readText(parser);
+                if (value.equals("true")) {
+                    config.setAutoTrackApiLevel(true);
+                } else if (value.equals("false")) {
+                    config.setAutoTrackApiLevel(false);
+                } else {
+                    WebtrekkLogging.log("invalid enableCampaignTracking value, using default");
+                }
+                parser.require(XmlPullParser.END_TAG, ns, "enableCampaignTracking");
+
             } else {
                 WebtrekkLogging.log("unknown xml tag: " + name);
                 skip(parser);

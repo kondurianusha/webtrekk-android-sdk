@@ -47,6 +47,7 @@ public class TrackingConfiguration {
     private boolean enableRemoteConfiguration;
     private String trackingConfigurationUrl;
     private boolean autoTrackRequestUrlStoreSize = true;
+    private boolean mEnableCampaignTracking = true;
     // interval when autotracked start activity is send again
     private int resendOnStartEventTime = 30;
     private boolean mErrorLogEnable;
@@ -388,6 +389,14 @@ public class TrackingConfiguration {
 
     public void setAutoTrackRequestUrlStoreSize(boolean autoTrackRequestUrlStoreSize) {
         this.autoTrackRequestUrlStoreSize = autoTrackRequestUrlStoreSize;
+    }
+
+    public void setEnableCampaignTracking(boolean enableCampaignTracking) {
+        mEnableCampaignTracking = enableCampaignTracking;
+    }
+
+    public boolean isEnableCampaignTracking() {
+        return mEnableCampaignTracking;
     }
 
     public Map<String, String> getCustomParameter() {

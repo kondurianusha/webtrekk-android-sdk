@@ -580,7 +580,8 @@ public class RequestFactory {
     public void startAdvertizingThread(boolean isFirstStart)
     {
         if (!mIsOptout) {
-            mCampaign = Campaign.start(mContext, mTrackingConfiguration.getTrackId(), isFirstStart, mTrackingConfiguration.isAutoTrackAdvertiserId());
+            mCampaign = Campaign.start(mContext, mTrackingConfiguration.getTrackId(), isFirstStart,
+                    mTrackingConfiguration.isAutoTrackAdvertiserId(), mTrackingConfiguration.isEnableCampaignTracking());
         }
     }
 

@@ -35,6 +35,7 @@ public class Campaign extends Thread
     private final boolean mFirstStart;
     private final boolean mIsAutoTrackAdvID;
     private final Context mContext;
+    private final boolean mEnableCampaign;
 
     private String mMediaCode;
 
@@ -45,7 +46,7 @@ public class Campaign extends Thread
     private static final String CAMPAIN_MEDIA_CODE_DEFINED_MESSAGE = "com.Webtrekk.CampainMediaMessage";
 
 
-    Campaign(Context context, String trackID, boolean isFirstStart, boolean isAutoTrackAdvID) {
+    Campaign(Context context, String trackID, boolean isFirstStart, boolean isAutoTrackAdvID, boolean enableCampaign) {
 
         mContext = context;
         //if it is not first start check if thread was interrupted on first start.
@@ -53,6 +54,7 @@ public class Campaign extends Thread
         mFirstStart = isFirstStart ? isFirstStart : getFirstStartInitiated(context, true);
         mTrackID = trackID;
         mIsAutoTrackAdvID = isAutoTrackAdvID;
+        mEnableCampaign = enableCampaign;
     }
 
     /**
@@ -63,7 +65,7 @@ public class Campaign extends Thread
      * @param isFirstStart if this is first start
      * @return instance of Campain class. you need it to interrupt process if application is closed.
      */
-    public static Campaign start(Context context, String trackID, boolean isFirstStart, boolean isAutoTrackAdvID)
+    public static Campaign start(Context context, String trackID, boolean isFirstStart, boolean isAutoTrackAdvID, boolean enableCampaign)
     {
         if (trackID == null || trackID.isEmpty())
         {
@@ -71,7 +73,7 @@ public class Campaign extends Thread
             return null;
         }
 
-        Campaign service = new Campaign(context, trackID, isFirstStart, isAutoTrackAdvID);
+        Campaign service = new Campaign(context, trackID, isFirstStart, isAutoTrackAdvID, enableCampaign);
         service.start();
         return service;
     }
@@ -194,65 +196,72 @@ public class Campaign extends Thread
             }
         }
 
-        //if this is first start wait for referrer for 30 seconds.
-        final long waitForReferrerDelay = 10000;
-        long timeToEndListener = System.currentTimeMillis() + waitForReferrerDelay;
-        String referrer = null;
+        if (mEnableCampaign){
+            //if this is first start wait for referrer for 30 seconds.
+            final long waitForReferrerDelay = 10000;
+            long timeToEndListener = System.currentTimeMillis() + waitForReferrerDelay;
+            String referrer = null;
 
-        if (mFirstStart) {
-            //Wait for referrer max 1 minute
-            WebtrekkLogging.log("Start waiting for referrer");
-            while (System.currentTimeMillis() < timeToEndListener) {
-                if ((referrer = getStoredReferrer(mContext)) != null)
-                    break;
-
-                try {
-                    //ask each 5 seconds for referer;
-                    sleep(5000);
-                } catch (InterruptedException e) {
-                    return;
-                }
-            }
-            WebtrekkLogging.log("Referrer is received and readed:"+referrer);
-        }
-        String clickID = null;
-        String googleMediaCode = null;
-
-        // for non first start referrer is always null
-        if (referrer != null)
-        {
-            // is it referrer from Webtrekk
-            clickID = getClickID(referrer);
-
-            if (clickID != null)
-            {
-                WebtrekkLogging.log("Click ID:" + clickID);
-            }else
-            {
-                googleMediaCode = getGoogleAnalyticMediaCode(referrer);
-                if (googleMediaCode != null) {
-                    SaveCodeAndAdID(googleMediaCode, advID, isLimitAdEnabled);
-                    campaignNotificationMessage(googleMediaCode, advID);
-                    //delete first start
-                    getFirstStartInitiated(mContext, true);
-                }
-            }
-        }
-
-        String webtrekkMediaCode = null;
-
-        // if this is webtrekk referrer get media code.
-        if (googleMediaCode == null) {
             if (mFirstStart) {
-                // if thread isn't interrupted. Request for media code
-                if (!isInterrupted())
-                    webtrekkMediaCode = requestMediaCode(advID, clickID, HelperFunctions.getUserAgent());
-                else
-                    return;
+                //Wait for referrer max 1 minute
+                WebtrekkLogging.log("Start waiting for referrer");
+                while (System.currentTimeMillis() < timeToEndListener) {
+                    if ((referrer = getStoredReferrer(mContext)) != null)
+                        break;
+
+                    try {
+                        //ask each 5 seconds for referer;
+                        sleep(5000);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+                WebtrekkLogging.log("Referrer is received and readed:"+referrer);
+            }
+            String clickID = null;
+            String googleMediaCode = null;
+
+            // for non first start referrer is always null
+            if (referrer != null)
+            {
+                // is it referrer from Webtrekk
+                clickID = getClickID(referrer);
+
+                if (clickID != null)
+                {
+                    WebtrekkLogging.log("Click ID:" + clickID);
+                }else
+                {
+                    googleMediaCode = getGoogleAnalyticMediaCode(referrer);
+                    if (googleMediaCode != null) {
+                        SaveCodeAndAdID(googleMediaCode, advID, isLimitAdEnabled);
+                        campaignNotificationMessage(googleMediaCode, advID);
+                        //delete first start
+                        getFirstStartInitiated(mContext, true);
+                    }
+                }
             }
 
-            SaveCodeAndAdID(webtrekkMediaCode, advID, isLimitAdEnabled);
-            campaignNotificationMessage(webtrekkMediaCode, advID);
+            String webtrekkMediaCode = null;
+
+            // if this is webtrekk referrer get media code.
+            if (googleMediaCode == null) {
+                if (mFirstStart) {
+                    // if thread isn't interrupted. Request for media code
+                    if (!isInterrupted())
+                        webtrekkMediaCode = requestMediaCode(advID, clickID, HelperFunctions.getUserAgent());
+                    else
+                        return;
+                }
+
+                SaveCodeAndAdID(webtrekkMediaCode, advID, isLimitAdEnabled);
+                campaignNotificationMessage(webtrekkMediaCode, advID);
+                //delete first start
+                getFirstStartInitiated(mContext, true);
+            }
+        }else{
+            SaveCodeAndAdID(null, advID, isLimitAdEnabled);
+            campaignNotificationMessage(null, advID);
             //delete first start
             getFirstStartInitiated(mContext, true);
         }

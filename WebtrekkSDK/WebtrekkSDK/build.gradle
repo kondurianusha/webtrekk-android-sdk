@@ -50,42 +50,46 @@ task sourcesJar(type: Jar) {
 }
 
 def releaseFile = file("$project.buildDir/outputs/aar/WebtrekkSDK-library-release.aar")
-def pomeFile = file("$project.buildDir/poms/pom-default.xml")
+
 publishing {
     publications {
         WebtrekkPublication(MavenPublication) {
+            //get pom from install tast
+            def installPom = install.repositories.mavenInstaller.pom;
+            def dependenciesNode, scmNode, nameNode,  urlNode, licenceNode, developersNode;
 
-            // get created xml from install task
-            if (pomeFile.exists()) {
-                def parsedProjectXml = new XmlParser().parse(pomeFile)
-                def scmNode = parsedProjectXml.scm
-                def licenceNode = parsedProjectXml.licenses
-                def developersNode = parsedProjectXml.developers
-                def dependenciesNode = parsedProjectXml.dependencies
-                def nameNode = parsedProjectXml.name
-                def urlNode = parsedProjectXml.url
+            //fill pom nodes from install xml
+            installPom.withXml{
+                nameNode = asNode().name
+                scmNode =  asNode().scm
+                licenceNode = asNode().licenses
+                developersNode = asNode().developers
+                dependenciesNode = asNode().dependencies
+                urlNode = asNode().url
 
+                //change dependency
                 dependenciesNode.dependency.findAll { xmlDep ->
                     if ( xmlDep.groupId.text() == "com.google.android.gms"
-                         &&  xmlDep.artifactId.text() == "play-services-ads") {
-                            def xmlOptional = xmlDep.optional[ 0 ];
-                            if ( !xmlOptional ) {
-                                xmlOptional = xmlDep.appendNode( 'optional' )
-                            }
-                            xmlOptional.value = 'true';
+                            &&  xmlDep.artifactId.text() == "play-services-ads") {
+                        def xmlOptional = xmlDep.optional[ 0 ];
+                        if ( !xmlOptional ) {
+                            xmlOptional = xmlDep.appendNode( 'optional' )
+                        }
+                        xmlOptional.value = 'true';
                     }
                 }
-
-                //assert scmNode instanceof groovy.util.Node
-                pom.withXml {
-                    asNode().append(nameNode)
-                    asNode().append(urlNode)
-                    asNode().append(licenceNode)
-                    asNode().append(developersNode)
-                    asNode().append(scmNode)
-                    asNode().append(dependenciesNode)
-                }
             }
+
+            //change publication pom
+            pom.withXml {
+                asNode().append(nameNode)
+                asNode().append(urlNode)
+                asNode().append(licenceNode)
+                asNode().append(developersNode)
+                asNode().append(scmNode)
+                asNode().append(dependenciesNode)
+            }
+
             artifacts {
                 artifact sourcesJar
                 artifact(releaseFile) {

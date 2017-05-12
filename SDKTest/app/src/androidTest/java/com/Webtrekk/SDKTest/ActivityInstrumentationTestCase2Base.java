@@ -153,6 +153,7 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
     {
         while((mHttpServer.getCurrentRequestNumber() - mStartMessageReceiveNumber) != messageCount)
         {
+            Thread.yield();
             getInstrumentation().waitForIdleSync();
         }
     }

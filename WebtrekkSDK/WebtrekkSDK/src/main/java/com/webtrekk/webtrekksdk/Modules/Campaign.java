@@ -173,7 +173,7 @@ public class Campaign extends Thread
                     advID = client.getId(adInfo);
                     isLimitAdEnabled = client.isLimitAdTrackingEnabled(adInfo);
                 }else {
-                    WebtrekkLogging.log("Can't get AdvertisingIdClientRef. Most probably Google Api isn't available.");
+                    WebtrekkLogging.log("Can't get AdvertisingIdClientRef. Might be Google Play Services or Play Store isn't available.");
                 }
 
                 WebtrekkLogging.log("advertiserId: " + advID);
@@ -261,7 +261,7 @@ public class Campaign extends Thread
             }
         }else{
             SaveCodeAndAdID(null, advID, isLimitAdEnabled);
-            campaignNotificationMessage(null, advID);
+            campaignNotificationMessage("NoCampaignMode", advID);
             //delete first start
             getFirstStartInitiated(mContext, true);
         }

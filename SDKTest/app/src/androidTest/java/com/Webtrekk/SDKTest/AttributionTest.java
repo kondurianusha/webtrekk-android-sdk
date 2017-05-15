@@ -181,9 +181,10 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
         if (!mIsExternalCall)
             return;
 
-        Webtrekk.getInstance().initWebtrekk(mApplication, R.raw.webtrekk_config_no_campaign_test);
         LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).registerReceiver(mSDKNoCampaignTestReceiver,
                 new IntentFilter("com.Webtrekk.CampainMediaMessage"));
+
+        Webtrekk.getInstance().initWebtrekk(mApplication, R.raw.webtrekk_config_no_campaign_test);
 
         synchronized (mWaiter) {
             while (!mNotifierDone)
@@ -283,9 +284,9 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
             // Get extra data included in the Intent
             String mediaCode = intent.getStringExtra("INSTALL_SETTINGS_MEDIA_CODE");
 
-            assertNull(mediaCode);
+            assertEquals("NoCampaignMode", mediaCode);
 
-            Log.d(getClass().getName(), "Null campaign data is received.");
+            Log.d(getClass().getName(), "No campaign mode is ON.");
 
             mNotifierDone = true;
 

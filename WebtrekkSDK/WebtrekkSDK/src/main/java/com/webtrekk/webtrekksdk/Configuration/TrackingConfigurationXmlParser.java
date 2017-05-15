@@ -451,9 +451,9 @@ public class TrackingConfigurationXmlParser {
 
                 String value = readText(parser);
                 if (value.equals("true")) {
-                    config.setAutoTrackApiLevel(true);
+                    config.setEnableCampaignTracking(true);
                 } else if (value.equals("false")) {
-                    config.setAutoTrackApiLevel(false);
+                    config.setEnableCampaignTracking(false);
                 } else {
                     WebtrekkLogging.log("invalid enableCampaignTracking value, using default");
                 }

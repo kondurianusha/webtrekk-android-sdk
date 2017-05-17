@@ -13,6 +13,7 @@ SDKTest is Android application project that include WebtrekkSDK project as well.
 
 All documentation about deployment you can find at Webtrekk Support Center in [Android Tracking](https://support.webtrekk.com/hc/en-us/articles/115001508189-Android-Tracking) section
 
+
 ## Unit tests
 
 For unit test you can start Instrumentation unit tests for SDKTest project.
@@ -24,6 +25,15 @@ The follow tests can help you understand in details how SDK works:
 1. ErrorHandlerTest - Exception tracking.
 1. RecommendationsTest - providing recommendations.
 
+
+## Library support
+
+Minimum Android SDK version support is 14.
+Webtrekk SDK has optional dependency from Google Play API that activate functionality connected with Advertised ID.
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. After each release tag with version number is created.
 
 ## License
 

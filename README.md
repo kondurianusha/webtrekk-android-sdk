@@ -1,0 +1,32 @@
+# Webtrekk Android SDK
+
+The Webtrekk SDK allows you to track user activities, screen flow and media usage for an App. All data is send to the Webtrekk tracking system for further analysis.
+
+## Getting Started
+
+1. Open project in Android Studio by specifying SDKTest as targed folder.
+1. Compile and run.
+
+SDKTest is Android application project that include WebtrekkSDK project as well.
+
+## Deployment
+
+All documentation about deployment you can find at Webtrekk Support Center in [Android Tracking](https://support.webtrekk.com/hc/en-us/articles/115001508189-Android-Tracking) section
+
+## Unit tests
+
+For unit test you can start Instrumentation unit tests for SDKTest project.
+
+The follow tests can help you understand in details how SDK works:
+
+1. AdClearidTest - functionality connected with AdClearID support
+1. CDBUnitTest - CDB tracking
+1. ErrorHandlerTest - Exception tracking.
+1. RecommendationsTest - providing recommendations.
+
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+

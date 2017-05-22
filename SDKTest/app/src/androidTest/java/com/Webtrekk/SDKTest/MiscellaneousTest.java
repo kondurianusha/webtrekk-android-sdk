@@ -19,7 +19,12 @@
 package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
+
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
@@ -117,8 +122,13 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         URLParsel parcel = new URLParsel();
         parcel.parseURL(URL);
 
-        assertEquals("Tracking Library 9.9.9(Linux; Android 5.0.2; unknown Android SDK built for x86; en_US)",
-                HelperFunctions.urlDecode(parcel.getValue("X-WT-UA")));
+        Context targetContext = getInstrumentation().getTargetContext();
+
+        String version = Build.VERSION.RELEASE;
+
+        assertEquals(HelperFunctions.urlDecode(parcel.getValue("X-WT-UA")),
+                "Tracking Library 9.9.9(Linux; Android "+version+"; unknown Android SDK built for x86; en_US)");
+
     }
 
 
@@ -289,6 +299,11 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
     }
 
     public void testAutoAdvertiserId() {
+
+        if (isRestrictedMode()){
+            return;
+        }
+
         //test URL page in configuration xml
         initWaitingForTrack(new Runnable() {
             @Override

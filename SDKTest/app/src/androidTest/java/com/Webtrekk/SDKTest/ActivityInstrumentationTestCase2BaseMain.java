@@ -39,6 +39,7 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extends ActivityInstrumentationTestCase2<T> {
@@ -53,8 +54,6 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         super(activityClass);
     }
 
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void setUp() throws Exception {
 
@@ -67,7 +66,13 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         if (!mIsCDBTestRequest)
             deleteCDBRepeatRequestInfo();
 
-        Bundle arguments = ((InstrumentationTestRunner)getInstrumentation()).getArguments();
+        Bundle arguments = null;
+        InstrumentationTestRunner instrumentation = (InstrumentationTestRunner)getInstrumentation();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            arguments = instrumentation.getArguments();
+        }else {
+            arguments = (Bundle)getFieldValue(instrumentation, "mArguments");
+        }
         if (arguments.size() > 0)
             WebtrekkLogging.log("Receive arguments for test:"+arguments);
         mIsExternalCall = arguments.getString(IS_EXTERNAL) != null;
@@ -104,9 +109,17 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         long currentTime = System.currentTimeMillis();
         boolean finishTimeout = false;
         int activityHash = activity.hashCode();
-        while (!activity.isDestroyed() && !finishTimeout) {
+        boolean isDestroyed = false;
+
+        while (!isDestroyed && !finishTimeout) {
             instrumentation.waitForIdleSync();
             finishTimeout = (System.currentTimeMillis() - currentTime) > 140000;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                isDestroyed = activity.isDestroyed();
+            }else {
+                isDestroyed = (Boolean)callMethod(null, activity.getWindow(), "isDestroyed", null);
+            }
         }
 
         if (finishTimeout) {
@@ -122,4 +135,36 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
             preferences.edit().remove("LAST_CBD_REQUEST_DATE").apply();
     }
 
+    static private Object getFieldValue(Object instance, String valueName) {
+        Field field = null;
+        try {
+            field = instance.getClass().getDeclaredField(valueName);
+        field.setAccessible(true);
+        return field.get(instance);
+        } catch (NoSuchFieldException e) {
+            return null;
+        } catch (IllegalAccessException e) {
+            return null;
+        }
+    }
+
+    static private <T extends Object> T callMethod(String className, Object classInstance, String methodName, Class[] argumentsTypes, Object... argumentsValues){
+        try {
+            Class classObj = classInstance == null ? Class.forName(className) : classInstance.getClass();
+
+            Method method = classObj.getMethod(methodName, argumentsTypes);
+
+            return (T) method.invoke(classInstance, argumentsValues);
+        }catch (InvocationTargetException e) {
+            return null;
+        } catch (Exception e){
+            return null;
+        }
+    }
+
+    protected boolean isRestrictedMode(){
+        Context context = getInstrumentation().getTargetContext();
+
+        return context.getResources().getBoolean(R.bool.is_restricted_mode);
+    }
 }

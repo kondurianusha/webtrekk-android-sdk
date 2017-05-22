@@ -60,6 +60,10 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
     //works in reality only on real HW
     public void testTimePerformance()
     {
+        if (isRestrictedMode()){
+            return;
+        }
+
         final int numberOfTest = 1000;
         long timeDifSum = 0;
 
@@ -85,6 +89,11 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
     }
 
     public void testMessageNumberPerformance() {
+
+        if (isRestrictedMode()){
+            return;
+        }
+
         final int numberOfTest = 20000;
 
         setStartMessageNumber();

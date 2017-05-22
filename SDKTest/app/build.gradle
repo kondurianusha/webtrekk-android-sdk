@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 18
+    compileSdkVersion 23
     buildToolsVersion "21.1.2"
 
     defaultConfig {
@@ -12,10 +12,16 @@ android {
         versionName "1.3"
     }
     buildTypes {
+        println("has restrict mode property:"+parent.hasProperty("restrictedMode"))
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue "bool", "is_restricted_mode", Boolean.toString(parent.hasProperty("restrictedMode"))
         }
+        debug {
+            resValue "bool", "is_restricted_mode", Boolean.toString(parent.hasProperty("restrictedMode"))
+        }
+
     }
 }
 

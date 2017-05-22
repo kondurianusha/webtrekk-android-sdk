@@ -53,6 +53,10 @@ public class AutoTrackingParametersTest extends ActivityInstrumentationTestCase2
 // 811 and 812 isn't supported on emulator
     public void testSimpleAutoTest()
     {
+        if (isRestrictedMode()){
+            return;
+        }
+
         initWaitingForTrack(new Runnable() {
             @Override
             public void run() {
@@ -83,6 +87,10 @@ public class AutoTrackingParametersTest extends ActivityInstrumentationTestCase2
     // test how overwriten works
     public void testComplexAutoTest()
     {
+        if (isRestrictedMode()){
+            return;
+        }
+
         final String difValue = "differentValue";
         final String difPageValue = "newcp783";
         initWaitingForTrack(new Runnable() {

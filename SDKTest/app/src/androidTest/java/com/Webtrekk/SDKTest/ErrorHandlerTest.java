@@ -82,7 +82,9 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2Base<Empty
         assertEquals(parcel.getValue("ct"), "webtrekk_ignore");
         assertEquals(parcel.getValue("ck910"), "2");
         assertEquals(parcel.getValue("ck911"), "java.lang.NullPointerException");
-        assertEquals(parcel.getValue("ck912"), "Attempt+to+invoke+virtual+method+%27int+java.lang.String.length%28%29%27+on+a+null+object+reference");
+        if (!isRestrictedMode()) {
+            assertEquals(parcel.getValue("ck912"), "Attempt+to+invoke+virtual+method+%27int+java.lang.String.length%28%29%27+on+a+null+object+reference");
+        }
         assertEquals(getNormString(parcel.getValue("ck914")), "com.Webtrekk.SDKTest.ErrorHandlerTest%241.run%28ErrorHandlerTest.java%3A%29%7Cjava.lang.Thread.run%28Thread.java%29");
     }
 

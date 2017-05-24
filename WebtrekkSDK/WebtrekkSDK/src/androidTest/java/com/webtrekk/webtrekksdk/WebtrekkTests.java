@@ -22,6 +22,7 @@ package com.webtrekk.webtrekksdk;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.test.AndroidTestCase;
 
 import static org.mockito.Mockito.*;
@@ -349,11 +350,13 @@ public class WebtrekkTests extends AndroidTestCase {
      */
     public void testAutoTrackSettings() {
 
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+            return;
+        }
+
         TrackingConfiguration configuration = new TrackingConfiguration();
         // auto tracking globally enabled
         configuration.setAutoTracked(true);
-
-
 
         // auto tracking true
         ActivityConfiguration act1 = new ActivityConfiguration("act1", "mapping.act1", true, new TrackingParameter(), new TrackingParameter());
@@ -380,9 +383,6 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekkSpy.autoTrackActivity();
 
         verify(webtrekkSpy, times(1)).track();
-
-
-
 
     }
 

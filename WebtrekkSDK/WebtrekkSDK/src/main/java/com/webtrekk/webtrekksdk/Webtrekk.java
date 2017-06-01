@@ -698,6 +698,19 @@ public class Webtrekk {
     }
 
     /**
+     *Returns current Tracking ID, defined in configuration xml
+     * @return current Tracking ID
+     */
+    public String getTrackId() {
+        if (trackingConfiguration == null){
+            WebtrekkLogging.log("webtrekk has not been initialized");
+            return null;
+        }else {
+            return trackingConfiguration.getTrackId();
+        }
+    }
+
+    /**
      * set EverId. This ever ID will be used for all tracking request until application reinstall.
      * @param everId - 19 digits string value
      */
@@ -780,7 +793,6 @@ public class Webtrekk {
      */
     public int getVersion() { return trackingConfiguration.getVersion(); }
     public String getTrackDomain() { return trackingConfiguration.getTrackDomain(); }
-    public String getTrackId() { return trackingConfiguration.getTrackId(); }
     public int getSampling() { return trackingConfiguration.getSampling(); }
     public void setIsSampling(boolean isSampling ) { mRequestFactory.setIsSampling(isSampling); }
     public int getSendDelay() { return trackingConfiguration.getSendDelay(); }

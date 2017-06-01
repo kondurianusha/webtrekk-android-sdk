@@ -66,6 +66,10 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         everIDtest(HelperFunctions.generateEverid(), true);
     }
 
+    public void testTrackingID() {
+        assertEquals(mWebtrekk.getTrackId(), "123451234512345");
+    }
+
 
     private void everIDtest(String everID, boolean eidIsValid) {
         String oldEverID = mWebtrekk.getEverId();

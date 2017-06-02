@@ -67,7 +67,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2BaseMain<M
 
         assertTrue(wt.getTrackDomain().contains("://q3.webtrekk.net"));
         assertEquals(wt.getVersion(), 1);
-        assertEquals(wt.getTrackId(), "123451234512345");
+        assertEquals(wt.getTrackingIDs().get(0), "123451234512345");
         assertEquals(wt.getSampling(), 0);
         assertEquals(wt.getSendDelay(), 1);
         //assertEquals(wt.getResendOnStartEventTime(), 303);

@@ -86,7 +86,7 @@ public class TrackingConfigurationXmlParser {
                 parser.require(XmlPullParser.START_TAG, ns, "trackId");
 
                 String trackId = readText(parser);
-                config.setTrackId(trackId);
+                config.setTrackId(trackId.replace(" ", ""));
 
                 parser.require(XmlPullParser.END_TAG, ns, "trackId");
 

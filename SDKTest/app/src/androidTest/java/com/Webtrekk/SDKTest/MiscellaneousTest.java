@@ -47,7 +47,11 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
     }
 
     public void testTrackingID() {
-        assertEquals(mWebtrekk.getTrackId(), "123451234512345");
+        assertEquals(mWebtrekk.getTrackingIDs().get(0), "123451234512345");
+        assertEquals(mWebtrekk.getTrackingIDs().get(1), "123451234512346");
+        assertEquals(mWebtrekk.getTrackingIDs().get(2), "123451234512347");
+        assertEquals(mWebtrekk.getTrackingIDs().get(3), "123451234512348");
+        assertEquals(mWebtrekk.getTrackingIDs().get(4), "123451234512349");
     }
 
 

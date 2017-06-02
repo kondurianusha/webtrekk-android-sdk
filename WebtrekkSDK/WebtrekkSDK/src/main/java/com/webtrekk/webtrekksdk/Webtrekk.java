@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.webtrekk.webtrekksdk.Modules.ExceptionHandler;
@@ -101,7 +103,7 @@ public class Webtrekk {
     }
 
     /**
-     * @Deprecated use (@link #initWebtrekk(final Application app, int configResourceID)) instead
+     * @deprecated use {@link #initWebtrekk(Application, int)} instead
      * this initializes the webtrekk tracking configuration, it has to be called only once when the
      * application starts, for example in the Application Class or the Main Activitys onCreate.
      * Use R.raw.webtrekk_config as default configID
@@ -680,15 +682,16 @@ public class Webtrekk {
     }
 
     /**
-     *Returns current Tracking ID, defined in configuration xml
+     * Returns Tracking ID list defined in configuration xml. In most cased it is one item,
+     * but theoretically it can be list divided by commas. null if Webtrekk is not initialized.
      * @return current Tracking ID
      */
-    public String getTrackId() {
+    public List<String> getTrackingIDs() {
         if (trackingConfiguration == null){
             WebtrekkLogging.log("webtrekk has not been initialized");
             return null;
         }else {
-            return trackingConfiguration.getTrackId();
+            return Arrays.asList(trackingConfiguration.getTrackId().split(","));
         }
     }
 
@@ -784,4 +787,12 @@ public class Webtrekk {
     public boolean isAutoTracked() { return trackingConfiguration.isAutoTracked(); }
     public boolean isAutoTrackApiLevel() { return trackingConfiguration.isAutoTrackApiLevel(); }
     public boolean isEnableRemoteConfiguration() { return trackingConfiguration.isEnableRemoteConfiguration(); }
+
+    /**
+     * @deprecated use {@link #getTrackingIDs()} instead
+     * @return
+     */
+    public String getTrackId(){
+        return getTrackingIDs().get(0);
+    }
 }

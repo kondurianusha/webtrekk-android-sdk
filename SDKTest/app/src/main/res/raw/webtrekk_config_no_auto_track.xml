@@ -14,8 +14,8 @@
     <!--the webtrekk trackDomain where the requests are send -->
     <trackDomain type="text">http://localhost:8080</trackDomain>
 
-    <!--customers trackid-->
-    <trackId type="text">123451234512345</trackId>
+    <!--customers trackid complex case-->
+    <trackId type="text">123451234512345,  123451234512346  ,123451234512347,123451234512348   ,   123451234512349</trackId>
 
     <!--customers trackid  for CDB-->
 <!--

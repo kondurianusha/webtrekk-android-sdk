@@ -89,7 +89,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
             return;
 
         getActivity();
-        String trackID = Webtrekk.getInstance().getTrackId();
+        String trackID = Webtrekk.getInstance().getTrackingIDs().get(0);
         url = url.replace("&trackid=", "&trackid="+trackID);
 
         if (useAdvID) {

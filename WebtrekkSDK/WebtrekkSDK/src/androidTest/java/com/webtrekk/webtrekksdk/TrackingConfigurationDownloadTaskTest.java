@@ -26,6 +26,9 @@ import android.util.Log;
 import com.webtrekk.webtrekksdk.Utils.AsyncTest;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfigurationDownloadTask;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.Mockito.*;
 
 public class TrackingConfigurationDownloadTaskTest extends InstrumentationTestCase implements AsyncTest {
@@ -116,7 +119,7 @@ public class TrackingConfigurationDownloadTaskTest extends InstrumentationTestCa
 
         // make sure that no new tracking configuration is set
         //verify(webtrekk, times(0)).setTrackingConfiguration((TrackingConfiguration)any());
-        assertEquals("1111111111112", webtrekk.getTrackId());
+        assertEquals("1111111111112", webtrekk.getTrackingIDs().get(0));
         assertEquals("http://trackingtest.nglab.org", webtrekk.getTrackDomain());
     }
 

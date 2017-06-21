@@ -405,29 +405,25 @@ public class Webtrekk {
             return;
         }
 
-        //check if CDB request need repeat
-        if (WebtrekkUserParameters.needUpdateCDBRequest(mContext))
-        {
+        boolean addCDBRequestType = false;
+
+        if (WebtrekkUserParameters.needUpdateCDBRequest(mContext)){
+
             WebtrekkUserParameters userPar = new WebtrekkUserParameters();
 
-            if (userPar.restoreFromSettings(mContext))
-            {
-                track(userPar);
+            if (userPar.restoreFromSettings(mContext)){
+                tp.add(userPar.getParameters());
+                tp.setCustomUserParameters(userPar.getCustomParameters());
+                addCDBRequestType = true;
             }
         }
 
-        // use the automatic name in case no activity name is given
-        // for calls from class methods this must be overwritten
-        //if(!tp.getDefaultParameter().containsKey(TrackingParams.Params.ACTIVITY_NAME)) {
-        // hack for now, reflection not possible, Thread.currentThread().getStackTrace()[2].getClassName() is slower, custom security maanger to much
-        // automatically adds the name of the calling activity or class to the trackingparams
-        //String activity_name = new Throwable().getStackTrace()[2].getClassName();
-        //tp.add(TrackingParams.Params.ACTIVITY_NAME, activity_name);
-        //}
-        // other way was cooler, but requirements where to allow setting it always manually
-
-
         TrackingRequest request = mRequestFactory.createTrackingRequest(tp);
+
+        if (addCDBRequestType){
+            request.setMergedRequest(TrackingRequest.RequestType.CDB);
+        }
+
         mRequestFactory.addRequest(request);
         mRequestFactory.setLasTrackTime(System.currentTimeMillis());
     }
@@ -534,7 +530,7 @@ public class Webtrekk {
                 stop();
                 break;
             case GOING_TO_BACKGROUND:
-                flash();
+                flush();
                 break;
         }
     }
@@ -564,7 +560,7 @@ public class Webtrekk {
      * this method gets called when application is going to background
      * it stores all requests to file.
      */
-    private void flash() {
+    private void flush() {
         mRequestFactory.flush();
     }
 

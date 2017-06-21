@@ -579,7 +579,7 @@ public class RequestFactory {
         if(!mIsOptout && !mIsSampling) {
             String urlString = request.getUrlString();
             WebtrekkLogging.log("adding url: " + urlString);
-            mRequestUrlStore.addURL(request.getUrlString());
+            mRequestUrlStore.addURL(urlString);
         }
 
         // after the url is created reset the internal parameters to zero

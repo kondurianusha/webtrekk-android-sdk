@@ -18,15 +18,11 @@
 
 package com.Webtrekk.SDKTest;
 
-import android.test.suitebuilder.annotation.Suppress;
-
 import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -110,7 +106,7 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
     {
         RequestUrlStore urlStore = new RequestUrlStore(getInstrumentation().getTargetContext());
 
-        File file = urlStore.getRequestStoreFile();
+        File file = urlStore.getmRequestStoreFile();
         long length = file.length();
         mHttpServer.stop();
         mWebtrekk.track();
@@ -135,7 +131,7 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
     public void testFileCorruption()
     {
         RequestUrlStore urlStore = new RequestUrlStore(getInstrumentation().getTargetContext());
-        final File file = urlStore.getRequestStoreFile();
+        final File file = urlStore.getmRequestStoreFile();
 
         initWaitingForTrack(new Runnable() {
             @Override

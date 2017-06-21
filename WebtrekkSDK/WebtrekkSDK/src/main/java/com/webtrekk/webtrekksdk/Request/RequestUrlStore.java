@@ -49,7 +49,9 @@ import java.util.TreeMap;
  */
 
 public class RequestUrlStore {
-    final private File requestStoreFile;
+
+    final static private String FILE_NAME = "wt-tracking-requests";
+    final private File mRequestStoreFile;
     final private LruCache<Integer, String> mURLCache;
     //keys for current queu. Key can be point to not loaded URL
     final private SortedMap<Integer, Long> mIDs = Collections.synchronizedSortedMap(new TreeMap<Integer, Long>());
@@ -70,14 +72,20 @@ public class RequestUrlStore {
      * @param context the application/activity context to find the cache dir
      */
     public RequestUrlStore(Context context) {
+
         if(context == null) {
             throw new IllegalArgumentException("no valid context");
         }
 
         mContext = context;
+        mRequestStoreFile = new File(context.getFilesDir(), FILE_NAME);
 
-        // if the system is running low on storage, this file might be removed and the requests are lost
-        requestStoreFile = new File(context.getCacheDir(), "wt-tracking-requests");
+        File fileInCash = new File(context.getCacheDir(), FILE_NAME);
+
+        if (fileInCash.exists() && !mRequestStoreFile.exists()){
+            fileInCash.renameTo(mRequestStoreFile);
+        }
+
         initFileAttributes();
 
         final int maxSize = 20;
@@ -137,7 +145,7 @@ public class RequestUrlStore {
     private void saveURLsToFile(SaveURLAction action)
     {
         try {
-            PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(requestStoreFile, true), "UTF-8")));
+            PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mRequestStoreFile, true), "UTF-8")));
             try {
                 action.onSave(writer);
             }
@@ -231,7 +239,7 @@ public class RequestUrlStore {
 
     private boolean isURLFileExists()
     {
-        return requestStoreFile.exists();
+        return mRequestStoreFile.exists();
     }
 
 
@@ -265,7 +273,7 @@ public class RequestUrlStore {
     {
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(requestStoreFile), "UTF-8"));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(mRequestStoreFile), "UTF-8"));
 
             WebtrekkLogging.log("Dump flushed file start ------------------------------------------------");
             String line;
@@ -294,7 +302,7 @@ public class RequestUrlStore {
         long offset = startOffset < 0 ? 0 : startOffset;
 
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(requestStoreFile), "UTF-8"));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mRequestStoreFile), "UTF-8"));
             reader.skip(offset);
             try {
                 String line;
@@ -316,7 +324,7 @@ public class RequestUrlStore {
             }
 
         } catch (Exception e) {
-            WebtrekkLogging.log("cannot load backup file '" + requestStoreFile.getAbsolutePath() + "'", e);
+            WebtrekkLogging.log("cannot load backup file '" + mRequestStoreFile.getAbsolutePath() + "'", e);
             return false;
         }
 
@@ -352,7 +360,7 @@ public class RequestUrlStore {
             return;
         }
 
-        boolean success = requestStoreFile.delete();
+        boolean success = mRequestStoreFile.delete();
         if(success) {
             WebtrekkLogging.log("old backup file deleted");
         } else {
@@ -366,7 +374,7 @@ public class RequestUrlStore {
      * for unit testing only
      * @return
      */
-    public File getRequestStoreFile() {
-        return requestStoreFile;
+    public File getmRequestStoreFile() {
+        return mRequestStoreFile;
     }
 }

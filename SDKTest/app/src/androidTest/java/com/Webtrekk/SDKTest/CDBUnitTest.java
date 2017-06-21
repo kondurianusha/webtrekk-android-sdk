@@ -18,8 +18,10 @@
 
 package com.Webtrekk.SDKTest;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 import com.webtrekk.webtrekksdk.WebtrekkUserParameters;
 
@@ -48,6 +50,71 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2Base<EmptyActiv
             String url = waitForTrackedURL();
             processResult(url);
         }
+    }
+
+    public void testCDBRepeatTest(){
+
+        final String LAST_CBD_REQUEST_DATE = "LAST_CBD_REQUEST_DATE";
+        final long DATE_DELIMETER = 1000*60*60*24;
+
+        final Webtrekk webtrekk = Webtrekk.getInstance();
+        webtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
+
+        // do CDB test
+
+        Runnable runnalble = new Runnable() {
+            @Override
+            public void run() {
+                webtrekk.track(new WebtrekkUserParameters().
+                        setEmail(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
+                        setPhone(mParametersValue[mCycleTestArr[mTestCycleID][1]]).
+                        setAddress(mParametersValue[mCycleTestArr[mTestCycleID][2]]).
+                        setAndroidId(mParametersValue[mCycleTestArr[mTestCycleID][3]]).
+                        setiOSId(mParametersValue[mCycleTestArr[mTestCycleID][4]]).
+                        setWindowsId(mParametersValue[mCycleTestArr[mTestCycleID][5]]).
+                        setFacebookID(mParametersValue[mCycleTestArr[mTestCycleID][6]]).
+                        setTwitterID(mParametersValue[mCycleTestArr[mTestCycleID][7]]).
+                        setGooglePlusID(mParametersValue[mCycleTestArr[mTestCycleID][8]]).
+                        setLinkedInID(mParametersValue[mCycleTestArr[mTestCycleID][9]]).
+                        setCustom(1, mParametersValue[mCycleTestArr[mTestCycleID][10]]));
+            }
+        };
+
+        initWaitingForTrack(runnalble);
+        waitForTrackedURL();
+
+        // check preffered settings is correct
+        // value expected
+        long expected = (long)System.currentTimeMillis()/DATE_DELIMETER;
+
+        // value actual
+        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(mApplication.getApplicationContext());
+
+        long dates = preferences.getLong(LAST_CBD_REQUEST_DATE, 0);
+
+        // check
+        assertEquals(dates, expected);
+
+        // change settings
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putLong(LAST_CBD_REQUEST_DATE, expected - 1);
+        editor.apply();
+
+        getActivity();
+        // do some page request
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                webtrekk.track();
+            }
+        });
+
+        // check repeated CDB parameter
+        String url = waitForTrackedURL();
+        mTestCycleID = 0;
+        processResult(url);
+        finishActivitySync(getActivity());
+        setActivity(null);
     }
 
     private void addTextToConsole(String text)

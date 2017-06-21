@@ -40,6 +40,7 @@ public class TrackingRequest {
     public final TrackingParameter mTrackingParameter;
     final private TrackingConfiguration mTrackingConfiguration;
     final private RequestType mRequestType;
+    private RequestType mMergedRequestType;
 
     public enum RequestType
     {
@@ -100,8 +101,9 @@ public class TrackingRequest {
             if(trackingParameter.containsKey(key) && tp.get(key) != null && !tp.get(key).isEmpty()) {
                 url.append((isAmp ? "&" : "") + key.toString() + "=" + HelperFunctions.urlEncode(tp.get(key)));
 
-                if (!isAmp)
+                if (!isAmp) {
                     isAmp = true;
+                }
             }
         }
     }
@@ -144,15 +146,28 @@ public class TrackingRequest {
         boolean isEORAppend();
     }
 
+    /**
+     * this is intefrace for mergeable factory that should be realized if Factory can be merged to another one
+     */
 
-    private class CDBRequest implements URLFactory
+    private interface URLMergeableFactory
+    {
+        void getMergedTrackingPart(TrackingParameter trackingParameter, StringBuffer url);
+    }
+
+    public void setMergedRequest( RequestType type){
+        mMergedRequestType = type;
+    }
+
+    private class CDBRequest implements URLFactory, URLMergeableFactory
     {
         // arrays of all keys for CDB request
-        final Parameter KEYZ[] = {Parameter.EVERID, Parameter.CDB_EMAIL_MD5, Parameter.CDB_EMAIL_SHA,
+        private final Parameter KEYZ_MERGEABLE[] = {Parameter.CDB_EMAIL_MD5, Parameter.CDB_EMAIL_SHA,
                 Parameter.CDB_PHONE_MD5, Parameter.CDB_PHONE_SHA, Parameter.CDB_ADDRESS_MD5, Parameter.CDB_ADDRESS_SHA,
                 Parameter.CDB_ANDROID_ID, Parameter.CDB_IOS_ADD_ID, Parameter.CDB_WIN_AD_ID, Parameter.CDB_FACEBOOK_ID,
                 Parameter.CDB_TWITTER_ID, Parameter.CDB_GOOGLE_PLUS_ID, Parameter.CDB_LINKEDIN_ID};
 
+        private final Parameter KEYZ_COMMON[] = {Parameter.EVERID};
         /**
          * this method is generated p parameter for URL for specific implementation
          * @param trackingParameter
@@ -172,8 +187,8 @@ public class TrackingRequest {
          */
         @Override
         public void getTrackingPart(TrackingParameter trackingParameter, StringBuffer url) {
-            addParametersArray(trackingParameter, url, KEYZ);
-            addKeyMap(trackingParameter.getCustomUserParameters(), "&cdb", url);
+            addParametersArray(trackingParameter, url, KEYZ_COMMON);
+            getMergedTrackingPart(trackingParameter, url);
         }
 
         @Override
@@ -185,13 +200,19 @@ public class TrackingRequest {
         public boolean isEORAppend() {
             return true;
         }
+
+        @Override
+        public void getMergedTrackingPart(TrackingParameter trackingParameter, StringBuffer url) {
+            addParametersArray(trackingParameter, url, KEYZ_MERGEABLE);
+            addKeyMap(trackingParameter.getCustomUserParameters(), "&cdb", url);
+        }
     }
 
 
     private class GeneralRequest implements URLFactory
     {
         // arrays of all keys for General request
-        final Parameter KEYZ[] = {Parameter.EVERID, Parameter.ADVERTISER_ID, Parameter.FORCE_NEW_SESSION,
+        private final Parameter KEYZ[] = {Parameter.EVERID, Parameter.ADVERTISER_ID, Parameter.FORCE_NEW_SESSION,
         Parameter.APP_FIRST_START, Parameter.CURRENT_TIME, Parameter.TIMEZONE, Parameter.DEV_LANG, Parameter.CUSTOMER_ID,
         Parameter.ACTION_NAME, Parameter.ORDER_TOTAL, Parameter.ORDER_NUMBER, Parameter.PRODUCT, Parameter.PRODUCT_COST,
         Parameter.CURRENCY, Parameter.PRODUCT_COUNT, Parameter.PRODUCT_STATUS, Parameter.VOUCHER_VALUE, Parameter.ADVERTISEMENT,
@@ -339,21 +360,7 @@ public class TrackingRequest {
         StringBuffer url = new StringBuffer();
         URLFactory urlFactory = null;
 
-        switch (mRequestType)
-        {
-            case GENERAL:
-                urlFactory = new GeneralRequest();
-                break;
-            case CDB:
-                urlFactory = new CDBRequest();
-                break;
-            case INSTALL:
-                urlFactory = new InstallRequest();
-                break;
-            case ECXEPTION:
-                urlFactory = new ExceptionRequest();
-                break;
-        }
+        urlFactory = createFactory(mRequestType);
 
         if (urlFactory == null)
         {
@@ -365,9 +372,33 @@ public class TrackingRequest {
         url.append(urlFactory.getPValue(mTrackingParameter));
         urlFactory.getTrackingPart(mTrackingParameter, url);
 
+        if (mMergedRequestType != null){
+            URLFactory mergedFactory = createFactory(mMergedRequestType);
+            if (mergedFactory instanceof URLMergeableFactory){
+                ((URLMergeableFactory) mergedFactory).getMergedTrackingPart(mTrackingParameter, url);
+            }
+        }
+
         if (urlFactory.isEORAppend())
            url.append("&eor=1");
         return url.toString();
+    }
+
+
+    private URLFactory createFactory(RequestType type){
+        switch (type)
+        {
+            case GENERAL:
+                return new GeneralRequest();
+            case CDB:
+                return new CDBRequest();
+            case INSTALL:
+                return new InstallRequest();
+            case ECXEPTION:
+                return new ExceptionRequest();
+            default:
+                return null;
+        }
     }
 
     public TrackingParameter getTrackingParameter() {

@@ -66,22 +66,24 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2Base<EmptyActiv
             @Override
             public void run() {
                 webtrekk.track(new WebtrekkUserParameters().
-                        setEmail(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
-                        setPhone(mParametersValue[mCycleTestArr[mTestCycleID][1]]).
-                        setAddress(mParametersValue[mCycleTestArr[mTestCycleID][2]]).
-                        setAndroidId(mParametersValue[mCycleTestArr[mTestCycleID][3]]).
-                        setiOSId(mParametersValue[mCycleTestArr[mTestCycleID][4]]).
                         setWindowsId(mParametersValue[mCycleTestArr[mTestCycleID][5]]).
                         setFacebookID(mParametersValue[mCycleTestArr[mTestCycleID][6]]).
                         setTwitterID(mParametersValue[mCycleTestArr[mTestCycleID][7]]).
                         setGooglePlusID(mParametersValue[mCycleTestArr[mTestCycleID][8]]).
                         setLinkedInID(mParametersValue[mCycleTestArr[mTestCycleID][9]]).
                         setCustom(1, mParametersValue[mCycleTestArr[mTestCycleID][10]]));
+
+                webtrekk.track(new WebtrekkUserParameters().
+                        setEmail(mParametersValue[mCycleTestArr[mTestCycleID][0]]).
+                        setPhone(mParametersValue[mCycleTestArr[mTestCycleID][1]]).
+                        setAddress(mParametersValue[mCycleTestArr[mTestCycleID][2]]).
+                        setAndroidId(mParametersValue[mCycleTestArr[mTestCycleID][3]]).
+                        setiOSId(mParametersValue[mCycleTestArr[mTestCycleID][4]]));
             }
         };
 
-        initWaitingForTrack(runnalble);
-        waitForTrackedURL();
+        initWaitingForTrack(runnalble, 2);
+        waitForTrackedURLs();
 
         // check preffered settings is correct
         // value expected

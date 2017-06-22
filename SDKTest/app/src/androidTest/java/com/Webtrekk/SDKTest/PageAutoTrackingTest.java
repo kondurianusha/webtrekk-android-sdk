@@ -19,7 +19,9 @@
 package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Instrumentation;
+import android.os.Bundle;
 import android.test.TouchUtils;
 import android.util.Log;
 import android.widget.Button;
@@ -47,6 +49,9 @@ public class PageAutoTrackingTest extends ActivityInstrumentationTestCase2Base<M
         setActivityInitialTouchMode(true);
 
         Instrumentation instrumentation = getInstrumentation();
+
+        TrackActivityIsStopped callback = new TrackActivityIsStopped("PageExampleActivity");
+        mApplication.registerActivityLifecycleCallbacks(callback);
 
         Instrumentation.ActivityMonitor pageActivityMonitor = instrumentation.addMonitor(PageExampleActivity.class.getName(), null, false);
         Instrumentation.ActivityMonitor nextPageActivityMonitor = instrumentation.addMonitor(NextPageExampleActivity.class.getName(), null, false);
@@ -93,6 +98,12 @@ public class PageAutoTrackingTest extends ActivityInstrumentationTestCase2Base<M
         //track first page activity
         initWaitingForTrack(null);
 
+        //wait while PageExampleActivity is stopped
+
+        while (!callback.isStoped()){
+            instrumentation.waitForIdleSync();
+        }
+
         finishActivitySync(nextPageActivity);
 
         URL = waitForTrackedURL();
@@ -109,5 +120,58 @@ public class PageAutoTrackingTest extends ActivityInstrumentationTestCase2Base<M
         assertTrue(parcel.getValue("p").contains("Startseite"));
 
         finishActivitySync(mainActivity);
+
+        mApplication.unregisterActivityLifecycleCallbacks(callback);
+    }
+
+    static class TrackActivityIsStopped implements Application.ActivityLifecycleCallbacks{
+        private final String mActivityName;
+        private boolean mIsStoped;
+
+        TrackActivityIsStopped(String activityName){
+            mActivityName = activityName;
+        }
+
+        boolean isStoped(){
+            return mIsStoped;
+        }
+
+        @Override
+        public void onActivityCreated(Activity activity, Bundle bundle) {
+        }
+
+        @Override
+        public void onActivityStarted(Activity activity) {
+            if (activity.getLocalClassName().equals(mActivityName)){
+                mIsStoped = false;
+            }
+        }
+
+        @Override
+        public void onActivityResumed(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityPaused(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityStopped(Activity activity) {
+            if (activity.getLocalClassName().equals(mActivityName)){
+                mIsStoped = true;
+            }
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onActivityDestroyed(Activity activity) {
+
+        }
     }
 }

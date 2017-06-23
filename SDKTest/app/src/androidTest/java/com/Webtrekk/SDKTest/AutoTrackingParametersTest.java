@@ -18,39 +18,50 @@
 
 package com.Webtrekk.SDKTest;
 
+import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-public class AutoTrackingParametersTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+@RunWith(TestClassRunner.class)
+@LargeTest
+public class AutoTrackingParametersTest extends BaseTest {
     private Webtrekk mWebtrekk;
     private final String cs807New = "newcs807";
 
-    public AutoTrackingParametersTest() {
-        super(EmptyActivity.class);
-    }
+    @Rule
+    public final CustomTestRule<EmptyActivity> mActivityRule =
+            new CustomTestRule<>(EmptyActivity.class, this);
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    public void before() throws Exception {
+        super.before();
         mWebtrekk = Webtrekk.getInstance();
-        if (getName().equals("testSimpleAutoTest"))
+        if (BaseTest.mTestName.equals("testSimpleAutoTest"))
         {
             mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_parameters_auto_track_test);
         } else
         {
             mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_parameters_auto_track_test_complex);
         }
-        getActivity();
     }
 
+    @After
     @Override
-    public void tearDown() throws Exception {
-        finishActivitySync(getActivity());
-        setActivity(null);
-        super.tearDown();
+    public void after() throws Exception {
+        super.after();
     }
 
 // 811 and 812 isn't supported on emulator
+    @Test
     public void testSimpleAutoTest()
     {
         if (isRestrictedMode()){
@@ -85,6 +96,7 @@ public class AutoTrackingParametersTest extends ActivityInstrumentationTestCase2
     }
 
     // test how overwriten works
+    @Test
     public void testComplexAutoTest()
     {
         if (isRestrictedMode()){

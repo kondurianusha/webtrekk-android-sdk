@@ -19,30 +19,42 @@
 package com.Webtrekk.SDKTest;
 
 import android.content.SharedPreferences;
+import android.support.test.filters.LargeTest;
 import android.util.Log;
 
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 import com.webtrekk.webtrekksdk.WebtrekkUserParameters;
 
-public class CDBUnitTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class CDBUnitTest extends WebtrekkBaseMainTest {
 
     private int mTestCycleID;
 
-    public CDBUnitTest() {
-        super(EmptyActivity.class);
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, null, false);
+
+    @Before
+    @Override
+    public void before() throws Exception {
+         super.before();
     }
 
     @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    @After
+    public void after() throws Exception {
+        super.after();
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testCDB()
     {
         for (mTestCycleID = 0; mTestCycleID < 9; mTestCycleID++) {
@@ -52,6 +64,7 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2Base<EmptyActiv
         }
     }
 
+    @Test
     public void testCDBRepeatTest(){
 
         final String LAST_CBD_REQUEST_DATE = "LAST_CBD_REQUEST_DATE";
@@ -102,7 +115,7 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2Base<EmptyActiv
         editor.putLong(LAST_CBD_REQUEST_DATE, expected - 1);
         editor.apply();
 
-        getActivity();
+        mActivityRule.launchActivity(null);
         // do some page request
         initWaitingForTrack(new Runnable() {
             @Override
@@ -115,8 +128,6 @@ public class CDBUnitTest extends ActivityInstrumentationTestCase2Base<EmptyActiv
         String url = waitForTrackedURL();
         mTestCycleID = 0;
         processResult(url);
-        finishActivitySync(getActivity());
-        setActivity(null);
     }
 
     private void addTextToConsole(String text)

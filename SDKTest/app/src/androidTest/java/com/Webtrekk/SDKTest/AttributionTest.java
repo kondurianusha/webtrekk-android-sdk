@@ -253,7 +253,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
 
         Webtrekk.getInstance().initWebtrekk(mApplication);
 
-        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).registerReceiver(mSDKCampaignTestReceiver,
+        LocalBroadcastManager.getInstance(mApplication).registerReceiver(mSDKCampaignTestReceiver,
                 new IntentFilter("com.Webtrekk.CampainMediaMessage"));
 
         synchronized (mWaiter) {
@@ -264,7 +264,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
                     e.printStackTrace();
                 }
         }
-        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).unregisterReceiver(mSDKCampaignTestReceiver);
+        LocalBroadcastManager.getInstance(mApplication).unregisterReceiver(mSDKCampaignTestReceiver);
     }
 
     private BroadcastReceiver mSDKCampaignTestReceiver = new BroadcastReceiver() {

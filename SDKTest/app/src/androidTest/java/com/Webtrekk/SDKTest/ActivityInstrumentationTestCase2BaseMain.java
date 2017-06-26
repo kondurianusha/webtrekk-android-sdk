@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.InstrumentationTestRunner;
 
@@ -67,9 +68,9 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
             deleteCDBRepeatRequestInfo();
 
         Bundle arguments = null;
-        InstrumentationTestRunner instrumentation = (InstrumentationTestRunner)getInstrumentation();
+        Instrumentation instrumentation = (Instrumentation)getInstrumentation();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            arguments = instrumentation.getArguments();
+            arguments = InstrumentationRegistry.getArguments();
         }else {
             arguments = (Bundle)getFieldValue(instrumentation, "mArguments");
         }

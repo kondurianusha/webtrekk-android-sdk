@@ -19,33 +19,28 @@
 package com.Webtrekk.SDKTest;
 
 import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Webtrekk;
-
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(TestClassRunner.class)
+@RunWith(WebtrekkClassRunner.class)
 @LargeTest
-public class AutoTrackingParametersTest extends BaseTest {
+public class AutoTrackingParametersTest extends WebtrekkBaseMainTest {
     private Webtrekk mWebtrekk;
     private final String cs807New = "newcs807";
 
     @Rule
-    public final CustomTestRule<EmptyActivity> mActivityRule =
-            new CustomTestRule<>(EmptyActivity.class, this);
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, this);
 
     @Override
     public void before() throws Exception {
         super.before();
         mWebtrekk = Webtrekk.getInstance();
-        if (BaseTest.mTestName.equals("testSimpleAutoTest"))
+        if (WebtrekkBaseMainTest.mTestName.equals("testSimpleAutoTest"))
         {
             mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_parameters_auto_track_test);
         } else

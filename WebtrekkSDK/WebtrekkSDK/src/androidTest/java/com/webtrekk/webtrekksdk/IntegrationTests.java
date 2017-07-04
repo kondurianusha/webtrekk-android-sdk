@@ -30,6 +30,9 @@ import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfigurationXmlParser;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class IntegrationTests extends AndroidTestCase {
     private TrackingConfigurationXmlParser trackingConfigurationXmlParser;
     private Webtrekk webtrekk;
@@ -77,7 +80,9 @@ public class IntegrationTests extends AndroidTestCase {
         assertTrue(url, url.contains("ba=test_product"));
         // now call track method
         TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
-        Activity activity = new Activity();
+        Activity activity = mock(Activity.class);
+
+        when(activity.getResources()).thenReturn(mContext.getResources());
 
         lifecycleCallbacks.onActivityCreated(activity, null);
         lifecycleCallbacks.onActivityStarted(activity);
@@ -122,7 +127,9 @@ public class IntegrationTests extends AndroidTestCase {
 
         // now call track method
         TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
-        Activity activity = new Activity();
+        Activity activity = mock(Activity.class);
+
+        when(activity.getResources()).thenReturn(mContext.getResources());
 
         lifecycleCallbacks.onActivityCreated(activity, null);
         lifecycleCallbacks.onActivityStarted(activity);
@@ -132,6 +139,5 @@ public class IntegrationTests extends AndroidTestCase {
         // assert that the constant param is also set
         assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("ba=test_product"));
         webtrekk.stopTracking();
-
     }
 }

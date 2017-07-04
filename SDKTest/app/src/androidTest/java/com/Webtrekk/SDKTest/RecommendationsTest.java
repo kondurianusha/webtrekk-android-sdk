@@ -25,33 +25,48 @@ import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 import com.webtrekk.webtrekksdk.WebtrekkRecommendations;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
 import java.util.List;
 
-public class RecommendationsTest extends ActivityInstrumentationTestCase2Base<RecommendationActivity> {
+public class RecommendationsTest extends WebtrekkBaseMainTest {
 
     Webtrekk mWebtrekk;
 
-    public RecommendationsTest(){
-        super(RecommendationActivity.class);
-        }
+    @Rule
+    public final WebtrekkTestRule<RecommendationActivity> mActivityRule =
+            new WebtrekkTestRule<>(RecommendationActivity.class, null, false, false);
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void before() throws Exception{
+        super.before();
         mWebtrekk = Webtrekk.getInstance();
         mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_recomendations);
     }
 
+    @Override
+    @After
+    public void after() throws Exception {
+        super.after();
+    }
+
+    @Test
     public void testComplexRecommendations()
     {
         recommendTest("complexReco", "085cc2g007", null);
     }
 
+    @Test
     public void testSimpleRecommendations()
     {
         recommendTest("simpleReco", null, null);
     }
 
+    @Test
     public void testEmptyRecommendationList()
     {
         recommendTest("emptyTest", null, null, 0);
@@ -69,25 +84,23 @@ public class RecommendationsTest extends ActivityInstrumentationTestCase2Base<Re
         intent.putExtra(RecommendationActivity.RECOMMENDATION_NAME, recName);
         intent.putExtra(RecommendationActivity.RECOMMENDATION_PRODUCT_ID, productID);
         intent.putExtra(RecommendationActivity.RECOMMENDATION_PRODUCT_CAT, productCat);
-        setActivityIntent(intent);
-        RecommendationActivity activity = getActivity();
+        mActivityRule.launchActivity(intent);
         //Wait for recommendation request done
-        while (!activity.isRequestFinished()) {
+        while (!mActivityRule.getActivity().isRequestFinished()) {
             getInstrumentation().waitForIdleSync();
         }
 
         //Check results
-        assertEquals(WebtrekkRecommendations.QueryRecommendationResult.RECEIVED_OK, getActivity().getLastResult());
+        assertEquals(WebtrekkRecommendations.QueryRecommendationResult.RECEIVED_OK, mActivityRule.getActivity().getLastResult());
 
         if (countCheck > 0)
-          assertTrue(getActivity().getRecommendationCount() >= countCheck);
+          assertTrue(mActivityRule.getActivity().getRecommendationCount() >= countCheck);
         else
-          assertEquals(0, getActivity().getRecommendationCount());
-        assertTrue(getActivity().isUsedUIThread());
-
-        finishActivitySync(activity);
+          assertEquals(0, mActivityRule.getActivity().getRecommendationCount());
+        assertTrue(mActivityRule.getActivity().isUsedUIThread());
     }
 
+    @Test
     public void testRecoRequest()
     {
         Webtrekk webtrekk = Webtrekk.getInstance();

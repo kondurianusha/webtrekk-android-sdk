@@ -18,53 +18,66 @@
 
 package com.Webtrekk.SDKTest;
 
+import android.support.test.filters.LargeTest;
+
 import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-public class MainActivityTest extends ActivityInstrumentationTestCase2BaseMain<MainActivity> {
-    private MainActivity mMainActivity;
-    private Webtrekk wt;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-    public MainActivityTest() {
-        super(MainActivity.class);
+import static java.lang.Thread.sleep;
+
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class MainActivityTest extends WebtrekkBaseSDKTest{
+
+    @Rule
+    public final WebtrekkTestRule<MainActivity> mActivityRule =
+            new WebtrekkTestRule<>(MainActivity.class, this);
+
+    @Override
+    public void before() throws Exception {
+        super.before();
     }
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        mMainActivity = getActivity();
-        wt = mMainActivity.getWebtrekk();
+    @After
+    public void after() throws Exception {
+        //add sleep to wait until all messages are sent.
+        try {
+            sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        super.after();
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        finishActivitySync(getActivity());
-        setActivity(null);
-        RequestUrlStore request = new RequestUrlStore(getInstrumentation().getTargetContext());
-        request.deleteRequestsFile();
-        super.tearDown();
-    }
-
+    @Test
     public void testPreconditions() {
         //Try to add a message to add context to your assertions. These messages will be shown if
         //a tests fails and make it easy to understand why a test failed
-        assertNotNull("mFirstTestActivity is null", mMainActivity);
+        assertNotNull("mFirstTestActivity is null", mActivityRule.getActivity());
     }
 
     /**
      * make sure webtrekk was initialized
      */
+    @Test
     public void testInitWebtrekk() {
-        assertNotNull(mMainActivity.getWebtrekk());
+        assertNotNull(mActivityRule.getActivity().getWebtrekk());
     }
 
 
     /**
      * test that all default sdk values are overriden by the local ones form the local config
      */
+    @Test
     public void testAllValuesOverrideWithApplicationConfig() {
 
+        Webtrekk wt = Webtrekk.getInstance();
         assertTrue(wt.getTrackDomain().contains("://q3.webtrekk.net"));
         assertEquals(wt.getVersion(), 1);
         assertEquals(wt.getTrackingIDs().get(0), "123451234512345");
@@ -75,21 +88,23 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2BaseMain<M
         assertEquals(wt.getTrackingConfigurationUrl(), "https://d1r27qvpjiaqj3.cloudfront.net/238713152098253/34629.xml");
         assertEquals(wt.isAutoTracked(), true);
         assertEquals(wt.isAutoTrackApiLevel(), true);
-
     }
 
     /**
      * test that when a config value is invalid it chooses the default from the sdk
      */
+    @Test
     public void testInvalidValuesInApplicationConfig() {
+        Webtrekk wt = Webtrekk.getInstance();
         assertEquals(wt.isEnableRemoteConfiguration(), false);
     }
 
     /**
      * test that when an empty value is provided it also uses the default from the sdk
      */
-
+    @Test
     public void testEmptyValuesInApplicationConfig() {
+        Webtrekk wt = Webtrekk.getInstance();
         assertEquals(wt.getResendOnStartEventTime(), 30);
     }
 

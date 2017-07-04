@@ -54,11 +54,11 @@ public class WebtrekkTestRule<T extends Activity> extends ActivityTestRule<T> {
 
 
     public WebtrekkTestRule(Class<T> activityClass, TestAdapter adapter) {
-        this(activityClass, adapter, true);
+        this(activityClass, adapter, true, false);
     }
 
-    public WebtrekkTestRule(Class<T> activityClass, @Nullable TestAdapter adapter, boolean launchActivity) {
-        super(activityClass, false, launchActivity);
+    public WebtrekkTestRule(Class<T> activityClass, @Nullable TestAdapter adapter, boolean launchActivity, boolean initialInTouchMode) {
+        super(activityClass, initialInTouchMode, launchActivity);
         mTestAdapter = adapter;
     }
 }

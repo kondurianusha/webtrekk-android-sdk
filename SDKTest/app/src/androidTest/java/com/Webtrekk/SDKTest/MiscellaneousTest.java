@@ -24,12 +24,26 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.test.filters.LargeTest;
 
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.pressBack;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class MiscellaneousTest  extends WebtrekkBaseMainTest {
 
     private Webtrekk mWebtrekk;
 
@@ -38,27 +52,26 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
     private final String VALID_EID = "1234567890123465788";
 
 
-    public MiscellaneousTest() {
-        super(EmptyActivity.class);
-    }
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, this);
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    public void before() throws Exception{
+        super.before();
         mWebtrekk = Webtrekk.getInstance();
         mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
-        getActivity();
     }
 
 
     @Override
-    public void tearDown() throws Exception {
-        finishActivitySync(getActivity());
-        setActivity(null);
-        super.tearDown();
+    @After
+    public void after() throws Exception {
+        super.after();
     }
 
 
+    @Test
     public void testOverrideEverID() {
         everIDtest(TOO_SHORT_EID, false);
         everIDtest(TOO_LONG_EID, false);
@@ -66,6 +79,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         everIDtest(HelperFunctions.generateEverid(), true);
     }
 
+    @Test
     public void testTrackingID() {
         assertEquals(mWebtrekk.getTrackingIDs().get(0), "123451234512345");
         assertEquals(mWebtrekk.getTrackingIDs().get(1), "123451234512346");
@@ -118,6 +132,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
     }
 
 
+    @Test
     public void testUserAgent() {
         initWaitingForTrack(new Runnable() {
             @Override
@@ -136,10 +151,10 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         assertEquals(HelperFunctions.urlDecode(parcel.getValue("X-WT-UA")),
                 "Tracking Library 9.9.9(Linux; Android "+version+"; unknown Android SDK built for x86; en_US)");
-
     }
 
 
+    @Test
     public void testMediaCodeSet() {
         final String mediaCode = "mediaCode";
 
@@ -182,6 +197,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
     }
 
 
+    @Test
     public void testCustomPageOverride()
     {
         final String customPageName = "customPageName";
@@ -213,9 +229,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         assertFalse(URL.contains("Seite"));
         assertTrue(URL.contains(customPageName));
 
-        Intent newActivityIntent = new Intent(getActivity(), EmptyActivity.class);
-        newActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Activity newActivity = getInstrumentation().startActivitySync(newActivityIntent);
+        onView(withId(R.id.page_example_activity_start)).perform(click());
 
         //next track - no media code
         initWaitingForTrack(new Runnable() {
@@ -229,9 +243,10 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         assertTrue(URL.contains("Seite"));
         assertFalse(URL.contains(customPageName));
-        finishActivitySync(newActivity);
+        pressBack();
     }
 
+    @Test
     public void testDifferentParameterTrack()
     {
         final String s1 = "logged.in1";
@@ -269,6 +284,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         assertEquals(parcel.getValue("uc2"), cat2);
     }
 
+    @Test
     public void testPageURL()
     {
         internalTestPU(HelperFunctions.urlEncode("http://www.yandex.ru"));
@@ -279,13 +295,11 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
 
         internalTestPU(google);
 
-        Intent newActivityIntent = new Intent(getInstrumentation().getTargetContext(), PageExampleActivity.class);
-        newActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Activity newActivity = getInstrumentation().startActivitySync(newActivityIntent);
+        onView(withId(R.id.page_example_activity_start)).perform(click());
 
         internalTestPU(null);
 
-        finishActivitySync(newActivity);
+        pressBack();
     }
 
     private void internalTestPU(String valueToTest)
@@ -306,6 +320,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         assertEquals(valueToTest, parcel.getValue("pu"));
     }
 
+    @Test
     public void testAutoAdvertiserId() {
 
         if (isRestrictedMode()){
@@ -329,18 +344,17 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
         assertEquals("false", parcel.getValue("cb200"));
     }
 
+    @Test
     public void testCustomValueIsSaved()
     {
         customValueIsSavedTestInternal();
 
-        Intent newActivityIntent = new Intent(getInstrumentation().getTargetContext(), PageExampleActivity.class);
-        newActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Activity newActivity = getInstrumentation().startActivitySync(newActivityIntent);
+        onView(withId(R.id.page_example_activity_start)).perform(click());
 
         //no any new activity start is influence on custom parameters
         customValueIsSavedTestInternal();
 
-        finishActivitySync(newActivity);
+        pressBack();
     }
 
     private void customValueIsSavedTestInternal()
@@ -385,6 +399,7 @@ public class MiscellaneousTest  extends ActivityInstrumentationTestCase2Base<Emp
     }
 */
 
+    @Test
     public void testActionPageNamePriority()
     {
         initWaitingForTrack(new Runnable() {

@@ -19,6 +19,10 @@
 package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.View;
 
 public class EmptyActivity extends Activity {
 
@@ -35,6 +39,12 @@ public class EmptyActivity extends Activity {
 
 
     @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_empty);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         mIsStopped = false;
@@ -46,5 +56,13 @@ public class EmptyActivity extends Activity {
         mIsStartedToStopping = true;
         super.onStop();
         mIsStopped = true;
+    }
+
+    public void onTransparentActivity(View view){
+        startActivity(new Intent(this, TransparentActivity.class));
+    }
+
+    public void onPageExampleActivity(View view){
+        startActivity(new Intent(this, PageExampleActivity.class));
     }
 }

@@ -20,7 +20,6 @@ package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -44,21 +43,12 @@ import java.io.IOException;
 
 public class MainActivity extends Activity {
     private Webtrekk webtrekk;
-    private HttpServer mHttpServer;
     private boolean mAdClearOn;
     private String ADCLEAR_SIGN = "ADCLEAR_SIGN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        try {
-            mHttpServer = new HttpServer();
-            mHttpServer.setContext(getApplicationContext());
-            mHttpServer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         setContentView(R.layout.activity_main);
 
@@ -67,10 +57,9 @@ public class MainActivity extends Activity {
             mAdClearOn = savedInstanceState.getBoolean(ADCLEAR_SIGN);
         }
 
-
         mediaCodeReceiverRegister();
 
-        webtrekk =initWishNormalParameter();
+        webtrekk = initWithNormalParameter();
 
         webtrekk.getCustomParameter().put("own_para", "my-value");
 
@@ -79,7 +68,7 @@ public class MainActivity extends Activity {
         updateAdClearCaption();
     }
 
-    private Webtrekk initWishNormalParameter(){
+    private Webtrekk initWithNormalParameter(){
         Webtrekk.getInstance().initWebtrekk(getApplication(), R.raw.webtrekk_config_normal_track);
         return Webtrekk.getInstance();
     }
@@ -104,7 +93,6 @@ public class MainActivity extends Activity {
     @Override
     public void onPause() {
         super.onPause();
-        mHttpServer.stop();
     }
 
 
@@ -221,7 +209,7 @@ public class MainActivity extends Activity {
         sdkManager.setup();
 
         if (mAdClearOn){
-            webtrekk = initWishNormalParameter();
+            webtrekk = initWithNormalParameter();
             mAdClearOn = false;
         } else {
             webtrekk = Webtrekk.getInstance();

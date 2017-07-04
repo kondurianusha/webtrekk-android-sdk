@@ -21,10 +21,17 @@ package com.Webtrekk.SDKTest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
+import android.support.test.filters.LargeTest;
 
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,23 +39,36 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class MessageSendTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
-    private Webtrekk mWebtrekk;
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class MessageSendTest extends WebtrekkBaseMainTest {
 
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, null, false, false);
 
-    public MessageSendTest() {
-        super(EmptyActivity.class);
+    @Override
+    @Before
+    public void before() throws Exception{
+        super.before();
     }
 
+    @Override
+    @After
+    public void after() throws Exception {
+        super.after();
+    }
+
+    @Test
     public void testManualFlash()
     {
-        mWebtrekk = Webtrekk.getInstance();
-        mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_manual_flush);
-        getActivity();
+        final Webtrekk webtrekk = Webtrekk.getInstance();
+        webtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_manual_flush);
+        mActivityRule.launchActivity(null);
         initWaitingForTrack(new Runnable() {
             @Override
             public void run() {
-                mWebtrekk.track();
+                webtrekk.track();
             }
         });
 
@@ -57,13 +77,12 @@ public class MessageSendTest extends ActivityInstrumentationTestCase2Base<EmptyA
 
         initWaitingForTrack(null);
 
-        mWebtrekk.send();
+        webtrekk.send();
 
         waitForTrackedURL();
-        finishActivitySync(getActivity());
-        setActivity(null);
     }
 
+    @Test
     public void testURLCashFileMigration(){
         final String FILE_NAME = "wt-tracking-requests";
         final String URL_STORE_CURRENT_SIZE = "URL_STORE_CURRENT_SIZE";
@@ -100,19 +119,17 @@ public class MessageSendTest extends ActivityInstrumentationTestCase2Base<EmptyA
         prefEdit.putLong(URL_STORE_SENDED_URL_OFSSET, 0);
         prefEdit.putInt(URL_STORE_CURRENT_SIZE, 1000).apply();
 
-        mWebtrekk = Webtrekk.getInstance();
-        mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_manual_flush);
+        Webtrekk webtrekk = Webtrekk.getInstance();
+        webtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_manual_flush);
 
         initWaitingForTrack(null, 1000);
-        mWebtrekk.send();
+        webtrekk.send();
 
 
         mWaitMilliseconds = 70000;
         waitForTrackedURLs();
 
     }
-
-
 
     private void copyFile(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[1024];

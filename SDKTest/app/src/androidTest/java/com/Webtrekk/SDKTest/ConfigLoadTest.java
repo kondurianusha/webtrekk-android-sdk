@@ -36,7 +36,7 @@ public class ConfigLoadTest extends WebtrekkBaseMainTest {
 
     @Rule
     public final WebtrekkTestRule<EmptyActivity> mActivityRule =
-            new WebtrekkTestRule<>(EmptyActivity.class, null, false);
+            new WebtrekkTestRule<>(EmptyActivity.class, null, false, false);
 
 
     @Override

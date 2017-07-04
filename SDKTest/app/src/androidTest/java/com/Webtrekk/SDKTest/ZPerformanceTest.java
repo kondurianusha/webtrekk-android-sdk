@@ -22,6 +22,10 @@ import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -29,30 +33,29 @@ import java.io.IOException;
  * Name it with Z to call it at last.
  */
 
-public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+public class ZPerformanceTest extends WebtrekkBaseMainTest {
     private Webtrekk mWebtrekk;
 
-    public ZPerformanceTest() {
-        super(EmptyActivity.class);
-    }
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, this);
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    public void before() throws Exception{
+        super.before();
         mWebtrekk = Webtrekk.getInstance();
         mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_performance_test);
         mHttpServer.resetRequestNumber();
-        getActivity();
     }
 
     @Override
-    public void tearDown() throws Exception {
-        finishActivitySync(getActivity());
-        setActivity(null);
-        super.tearDown();
+    @After
+    public void after() throws Exception {
+        super.after();
     }
 
 
+    @Test
     //works in reality only on real HW
     public void testTimePerformance()
     {
@@ -84,6 +87,7 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
         assertTrue("Performance test is shown:"+result + " milliseconds per call", result < 10);
     }
 
+    @Test
     public void testMessageNumberPerformance() {
 
         if (isRestrictedMode()){
@@ -102,6 +106,7 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
         waitForMessages(numberOfTest);
     }
 
+    @Test
     public void testSavingToFlashByTimeout()
     {
         RequestUrlStore urlStore = new RequestUrlStore(getInstrumentation().getTargetContext());
@@ -128,6 +133,7 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
         waitForTrackedURLs();
     }
 
+    @Test
     public void testFileCorruption()
     {
         RequestUrlStore urlStore = new RequestUrlStore(getInstrumentation().getTargetContext());

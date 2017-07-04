@@ -22,23 +22,35 @@ import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-public class SuspendTest extends ActivityInstrumentationTestCase2Base<SuspendActivity> {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+public class SuspendTest extends WebtrekkBaseMainTest {
     private Webtrekk mWebtrekk;
     final static long DELAY_FOR_SEND = 30000;
     final static int MESSAGES_NUMBER = 500;
     final static String SUSPEND_TEST_RECEIVED_MESSAGE = "SUSPEND_TEST_RECEIVED_MESSAGE";
 
-
-    public SuspendTest() {
-        super(SuspendActivity.class);
-    }
+    @Rule
+    public final WebtrekkTestRule<SuspendActivity> mActivityRule =
+            new WebtrekkTestRule<>(SuspendActivity.class, null, false, false);
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void before() throws Exception {
+        super.before();
         mWebtrekk = Webtrekk.getInstance();
     }
 
+    @Override
+    @After
+    public void after() throws Exception {
+        super.after();
+    }
+
+    @Test
     public void testBeforeGoBackgroundHome()
     {
         if (!mIsExternalCall)
@@ -48,7 +60,7 @@ public class SuspendTest extends ActivityInstrumentationTestCase2Base<SuspendAct
         store.deleteRequestsFile();
         long currentMessageNumber = mHttpServer.getCurrentRequestNumber();
 
-        getActivity();
+        mActivityRule.launchActivity(null);
         mHttpServer.setDelay(100);
 
         mStringNumbersToWait = MESSAGES_NUMBER;

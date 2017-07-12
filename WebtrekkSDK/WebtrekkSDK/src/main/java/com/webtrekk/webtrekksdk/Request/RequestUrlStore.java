@@ -113,6 +113,7 @@ public class RequestUrlStore {
         SharedPreferences pref = HelperFunctions.getWebTrekkSharedPreference(mContext);
         mIndex = pref.getInt(URL_STORE_CURRENT_SIZE, 0);
         long sentURLFileOffset = pref.getLong(URL_STORE_SENDED_URL_OFSSET, -1);
+        WebtrekkLogging.log("read store size:"+mIndex);
 
         for (int i = 0; i < mIndex; i++) {
             mIDs.put(i, -1l);
@@ -124,6 +125,7 @@ public class RequestUrlStore {
 
     private void writeFileAttributes()
     {
+        WebtrekkLogging.log("save store size:"+mIDs.size());
         SharedPreferences.Editor prefEdit = HelperFunctions.getWebTrekkSharedPreference(mContext).edit();
         prefEdit.putLong(URL_STORE_SENDED_URL_OFSSET, mIDs.size() == 0 ? -1:mIDs.get(mIDs.firstKey()));
         prefEdit.putInt(URL_STORE_CURRENT_SIZE, mIDs.size()).apply();
@@ -374,7 +376,7 @@ public class RequestUrlStore {
      * for unit testing only
      * @return
      */
-    public File getmRequestStoreFile() {
+    public File getRequestStoreFile() {
         return mRequestStoreFile;
     }
 }

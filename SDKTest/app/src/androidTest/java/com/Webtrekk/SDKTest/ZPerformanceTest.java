@@ -111,7 +111,7 @@ public class ZPerformanceTest extends WebtrekkBaseMainTest {
     {
         RequestUrlStore urlStore = new RequestUrlStore(getInstrumentation().getTargetContext());
 
-        File file = urlStore.getmRequestStoreFile();
+        File file = urlStore.getRequestStoreFile();
         long length = file.length();
         mHttpServer.stop();
         mWebtrekk.track();
@@ -137,7 +137,7 @@ public class ZPerformanceTest extends WebtrekkBaseMainTest {
     public void testFileCorruption()
     {
         RequestUrlStore urlStore = new RequestUrlStore(getInstrumentation().getTargetContext());
-        final File file = urlStore.getmRequestStoreFile();
+        final File file = urlStore.getRequestStoreFile();
 
         initWaitingForTrack(new Runnable() {
             @Override

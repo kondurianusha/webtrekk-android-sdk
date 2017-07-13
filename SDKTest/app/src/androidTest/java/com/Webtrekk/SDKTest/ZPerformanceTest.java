@@ -106,7 +106,7 @@ public class ZPerformanceTest extends WebtrekkBaseMainTest {
         waitForMessages(numberOfTest);
     }
 
-    @Test
+    //@Test
     public void testSavingToFlashByTimeout()
     {
         RequestUrlStore urlStore = new RequestUrlStore(getInstrumentation().getTargetContext());

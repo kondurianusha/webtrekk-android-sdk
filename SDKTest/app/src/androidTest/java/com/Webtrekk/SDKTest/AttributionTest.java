@@ -33,11 +33,18 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
-public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<MainActivity> {
+import static java.lang.Thread.sleep;
+
+public class AttributionTest extends WebtrekkBaseSDKTest {
 
     volatile String mAdvID;
     private Context mContext;
@@ -46,22 +53,31 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
     final String MEDIA_CODE = "MEDIA_CODE";
 
 
-    public AttributionTest(){
-        super(MainActivity.class);
-        }
-
+    @Rule
+    public final WebtrekkTestRule<MainActivity> mActivityRule =
+            new WebtrekkTestRule<>(MainActivity.class, null, false, false);
 
     @Override
-    protected void setUp()throws Exception{
-        super.setUp();
+    @Before
+    public void before() throws Exception {
+        super.before();
     }
 
+    @Override
+    @After
+    public void after() throws Exception {
+        //add sleep to wait until all messages are sent.
+        super.after();
+    }
+
+
+    @Test
     public void testAttributionRunLinkWithAdID()
     {
         launchClickID("http://appinstall.webtrekk.net/appinstall/v1/redirect?mc="+MEDIA_CODE+"&trackid=&as1=market%3A//details%3Fid%3Dcom.Webtrekk.SDKTest&aid=", true);
     }
 
-
+    @Test
     public void testAttributionRunLinkWithoutAdID()
     {
         launchClickID("http://appinstall.webtrekk.net/appinstall/v1/redirect?mc="+MEDIA_CODE+"&trackid=&as1=market%3A//details%3Fid%3Dcom.Webtrekk.SDKTest", false);
@@ -88,7 +104,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
         if (!mIsExternalCall)
             return;
 
-        getActivity();
+        mActivityRule.launchActivity(null);
         String trackID = Webtrekk.getInstance().getTrackingIDs().get(0);
         url = url.replace("&trackid=", "&trackid="+trackID);
 
@@ -107,11 +123,11 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
         final String URLFinal = url;
 
 
-        getActivity().runOnUiThread(new Runnable() {
+        mActivityRule.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
-                WebView webView = (WebView) getActivity().findViewById(R.id.main_web_view);
+                WebView webView = (WebView) mActivityRule.getActivity().findViewById(R.id.main_web_view);
                 webView.setVisibility(View.VISIBLE);
 
 
@@ -123,7 +139,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
 
                                                  parcel.parseURL(url);
                                                  String clickID = parcel.getValue("referrer").split("%3D")[1];
-                                                 File file = new File(getActivity().getFilesDir(), clickID + ".clk");
+                                                 File file = new File(mActivityRule.getActivity().getFilesDir(), clickID + ".clk");
 
                                                  try {
                                                      file.createNewFile();
@@ -153,11 +169,9 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        finishActivitySync(getActivity());
-        setActivity(null);
     }
 
+    @Test
     public void testAdID()
     {
         if (!mIsExternalCall)
@@ -191,6 +205,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
         Log.d(getClass().getName(), "Create advID file:" + file.getAbsolutePath());
     }
 
+    @Test
     public void testNoCampaignMode(){
 
         if (!mIsExternalCall)
@@ -246,6 +261,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
         }
     }
 
+    @Test
     public void testFirstStart()
     {
         if (!mIsExternalCall)
@@ -253,7 +269,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
 
         Webtrekk.getInstance().initWebtrekk(mApplication);
 
-        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).registerReceiver(mSDKCampaignTestReceiver,
+        LocalBroadcastManager.getInstance(mApplication).registerReceiver(mSDKCampaignTestReceiver,
                 new IntentFilter("com.Webtrekk.CampainMediaMessage"));
 
         synchronized (mWaiter) {
@@ -264,7 +280,7 @@ public class AttributionTest extends ActivityInstrumentationTestCase2BaseMain<Ma
                     e.printStackTrace();
                 }
         }
-        LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).unregisterReceiver(mSDKCampaignTestReceiver);
+        LocalBroadcastManager.getInstance(mApplication).unregisterReceiver(mSDKCampaignTestReceiver);
     }
 
     private BroadcastReceiver mSDKCampaignTestReceiver = new BroadcastReceiver() {

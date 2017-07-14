@@ -13,56 +13,52 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * Created by Arsen Vartbaronov on 14.04.16.
+ * Created by Arsen Vartbaronov on 23.06.17.
  */
-
 package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.View;
+import android.support.test.rule.ActivityTestRule;
 
-public class EmptyActivity extends Activity {
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
-    public boolean isStopped() {
-        return mIsStopped;
+/**
+ * Created by vartbaronov on 23.06.17.
+ */
+
+public class WebtrekkTestRule<T extends Activity> extends ActivityTestRule<T> {
+    public interface TestAdapter{
+        public void before() throws Exception;
     }
 
-    public boolean isStartedToStopping() {
-        return mIsStartedToStopping;
-    }
-
-    volatile boolean mIsStopped;
-    volatile boolean mIsStartedToStopping;
-
+    private final TestAdapter mTestAdapter;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_empty);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mIsStopped = false;
-        mIsStartedToStopping = false;
+    protected void beforeActivityLaunched() {
+        super.beforeActivityLaunched();
+        try {
+            if (mTestAdapter != null) {
+                mTestAdapter.before();
+            }
+        } catch (Exception e) {
+            WebtrekkLogging.log("Exception during test:" + e.toString());
+        }
     }
 
     @Override
-    protected void onStop() {
-        mIsStartedToStopping = true;
-        super.onStop();
-        mIsStopped = true;
+    protected void afterActivityFinished() {
+        super.afterActivityFinished();
+        WebtrekkBaseSDKTest.finishActivitySync(getActivity(), false);
     }
 
-    public void onTransparentActivity(View view){
-        startActivity(new Intent(this, TransparentActivity.class));
+
+    public WebtrekkTestRule(Class<T> activityClass, TestAdapter adapter) {
+        this(activityClass, adapter, true, false);
     }
 
-    public void onPageExampleActivity(View view){
-        startActivity(new Intent(this, PageExampleActivity.class));
+    public WebtrekkTestRule(Class<T> activityClass, @Nullable TestAdapter adapter, boolean launchActivity, boolean initialInTouchMode) {
+        super(activityClass, initialInTouchMode, launchActivity);
+        mTestAdapter = adapter;
     }
 }

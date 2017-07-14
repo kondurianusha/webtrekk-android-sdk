@@ -20,36 +20,44 @@ package com.Webtrekk.SDKTest;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.test.ActivityInstrumentationTestCase2;
+import android.support.test.filters.LargeTest;
+
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 
-public class AaOldLibraryRunTest extends ActivityInstrumentationTestCase2<OldWebtrekkActivity> {
-    public AaOldLibraryRunTest(){
-        super(OldWebtrekkActivity.class);
-    }
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class AaOldLibraryRunTest extends WebtrekkBaseSDKTest {
+
+    @Rule
+    public final WebtrekkTestRule<OldWebtrekkActivity> mActivityRule =
+            new WebtrekkTestRule<>(OldWebtrekkActivity.class, this);
+
+    public void before() throws Exception {
+        super.before();
 
         //clear all settings.
-        SharedPreferences pref = HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext());
+        SharedPreferences pref = HelperFunctions.getWebTrekkSharedPreference(mApplication);
         pref.edit().clear().apply();
 
-        Application app = getInstrumentation().newApplication(OldWebtrekkApplication.class, getInstrumentation().getTargetContext());
+        Application app = getInstrumentation().newApplication(OldWebtrekkApplication.class, mApplication);
         getInstrumentation().callApplicationOnCreate(app);
     }
 
+    @After
     @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
+    public void after() throws Exception {
+        super.after();
     }
 
-    //test OldSDK for testing new SDK installation
+    //test OldSDK for testing new SDK installation test is just need to start and stop activity.
+    @Test
     public void testOldSDK()
     {
-        getActivity();
-        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(getActivity(), getInstrumentation(), true);
     }
 
 }

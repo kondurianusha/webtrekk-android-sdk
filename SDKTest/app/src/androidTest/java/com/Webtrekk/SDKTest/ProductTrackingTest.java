@@ -18,32 +18,40 @@
 
 package com.Webtrekk.SDKTest;
 
+import android.support.test.filters.LargeTest;
+
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-public class ProductTrackingTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class ProductTrackingTest extends WebtrekkBaseMainTest {
     private Webtrekk mWebtrekk;
 
-    public ProductTrackingTest() {
-        super(EmptyActivity.class);
-    }
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, this);
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    public void before() throws Exception{
+        super.before();
         mWebtrekk = Webtrekk.getInstance();
         mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
-        getActivity();
     }
 
     @Override
-    public void tearDown() throws Exception {
-        finishActivitySync(getActivity());
-        setActivity(null);
-        super.tearDown();
+    @After
+    public void after() throws Exception {
+        super.after();
     }
 
+    @Test
     public void testProductTracking()
     {
         final String productsName = "product1;product2";

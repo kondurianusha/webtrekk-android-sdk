@@ -19,68 +19,89 @@
 package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
+import android.support.test.filters.LargeTest;
+
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class ConfigLoadTest extends WebtrekkBaseMainTest {
     Webtrekk mWebtrekk;
 
-    public ConfigLoadTest(){
-        super(EmptyActivity.class);
-    }
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, null, false, false);
 
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void before() throws Exception {
+        super.before();
         mWebtrekk = Webtrekk.getInstance();
     }
 
     @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void after() throws Exception {
+        super.after();
     }
+
     //create to emulate fail for Jenkin test
+    @Test
     public void testFail()
     {
         if (mIsExternalCall)
             assertFalse(true);
     }
 
+    @Test
     public void testConfigOK()
     {
         configTest(R.raw.webtrekk_config_remote_test_exists, "ThisIsLocalConfig", false);
     }
 
+    @Test
     public void testLoadDefaultOK()
     {
         configTest(R.raw.webtrekk_config_remote_test_not_exists, "ThisIsLocalConfig", true);
     }
 
+    @Test
     public void testBrokenConfigLoad()
     {
         configTest(R.raw.webtrekk_config_remote_test_broken_scheme, "ThisIsLocalConfig", true);
     }
 
+    @Test
     public void testEmptyConfigLoad()
     {
         configTest(R.raw.webtrekk_config_remote_test_empty_file, "ThisIsLocalConfig", true);
     }
 
+    @Test
     public void testLocked()
     {
         configTest(R.raw.webtrekk_config_remote_test_locked, "ThisIsLocalConfig", true);
     }
 
+    @Test
     public void testLargeSize()
     {
         configTest(R.raw.webtrekk_config_remote_test_large_size, "ThisIsLocalConfig", true);
     }
 
+    @Test
     public void testTagIntegration()
     {
         configTest(R.raw.webtrekk_config_remote_test_tag_integration, "ThisIsLocalConfig", false);
-
     }
+
     private void configTest(int config, String textToCheck, boolean isForExistence)
     {
         assertFalse(mWebtrekk.isInitialized());
@@ -88,7 +109,7 @@ public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
         cleanConfigPreference();
 
         mWebtrekk.initWebtrekk(mApplication, config);
-        Activity activity = getActivity();
+        Activity activity = mActivityRule.launchActivity(null);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -107,8 +128,5 @@ public class ConfigLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
           assertTrue(URL.contains(textToCheck));
         else
           assertFalse(URL.contains(textToCheck));
-
-        finishActivitySync(getActivity());
-        setActivity(null);
     }
 }

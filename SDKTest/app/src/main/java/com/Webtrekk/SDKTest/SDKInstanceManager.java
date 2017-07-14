@@ -34,7 +34,6 @@ public class SDKInstanceManager {
     private Thread.UncaughtExceptionHandler mOldHandler;
 
     public void setup(){
-        refreshWTInstance();
         mOldHandler = Thread.getDefaultUncaughtExceptionHandler();
     }
 
@@ -46,6 +45,7 @@ public class SDKInstanceManager {
         unregisterCallback(application);
         stopSendThread(application);
         unregisterActivityEventCallback(application);
+        refreshWTInstance();
     }
 
     private void refreshWTInstance() {

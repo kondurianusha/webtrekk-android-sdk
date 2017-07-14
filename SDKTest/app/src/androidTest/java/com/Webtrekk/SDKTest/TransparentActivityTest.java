@@ -20,48 +20,70 @@ package com.Webtrekk.SDKTest;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.support.test.espresso.action.EspressoKey;
+import android.support.test.espresso.action.KeyEventAction;
+import android.support.test.espresso.action.ViewActions;
+import android.support.test.espresso.matcher.ViewMatchers;
+import android.support.test.filters.LargeTest;
+import android.view.View;
 
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-public class TransparentActivityTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-    Webtrekk mWebtrekk;
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.pressBack;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
+import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
-    public TransparentActivityTest() {
-        super(EmptyActivity.class);
-    }
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class TransparentActivityTest extends WebtrekkBaseMainTest {
+
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, null, false, false);
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mWebtrekk = Webtrekk.getInstance();
-        mWebtrekk.initWebtrekk(mApplication);
+    @Before
+    public void before() throws Exception {
+        super.before();
+        Webtrekk.getInstance().initWebtrekk(mApplication);
     }
 
+    @After
     @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
+    public void after() throws Exception {
+        super.after();
     }
 
+    @Test
     public void testTransparentActivity()
     {
         initWaitingForTrack(null);
-        getActivity();
+        mActivityRule.launchActivity(null);
 
         waitForTrackedURL();
 
         initWaitingForTrack(null);
-        Intent newActivityIntent = new Intent(getActivity(), TransparentActivity.class);
-        newActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Activity newActivity = getInstrumentation().startActivitySync(newActivityIntent);
+        onView(withId(R.id.trasparent_activity_start)).perform(click());
 
         waitForTrackedURL();
 
         initWaitingForTrack(null);
-        finishActivitySync(newActivity);
+
+        pressBack();
 
         waitForTrackedURL(true);
-
-        finishActivitySync(getActivity());
     }
 }

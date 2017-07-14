@@ -20,12 +20,12 @@ package com.webtrekk.webtrekksdk.Utils;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import java.lang.ref.WeakReference;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Queue;
 
 /**
  * Need to calculate status of application
@@ -46,6 +46,7 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
     private STATUS mCurrentStatus = STATUS.NO_ACTIVITY_IS_RUNNING;
     private String mCurrentActivityName;
     private WeakReference<Activity> mCurrentActivityInstance;
+    private Configuration mLatestConfiguration;
 
     volatile private int mCurrentActivitiesCount;
     final private Deque<String> mPreviousActivitiesQueue = new LinkedList<String>();
@@ -53,7 +54,8 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
     private long mLastActivityVisibleTime;
     private long mReturnFromBackgroundTime;
 
-    private boolean mIsRecreationInProgress;
+    private boolean mIsActivityRestored;
+    private boolean mIsConfigurationChanged;
 
     public STATUS getCurrentStatus() {
         return mCurrentStatus;
@@ -68,7 +70,7 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
     }
 
     public boolean isRecreationInProgress() {
-        return mIsRecreationInProgress;
+        return mIsConfigurationChanged;
     }
 
     /**
@@ -84,18 +86,31 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         WebtrekkLogging.log("Tracking Activity Created: "+getActivityName(activity) + " instance hash:" + activity.hashCode() + (savedInstanceState != null ? " as recreation":""));
         WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
-        mIsRecreationInProgress = savedInstanceState != null;
-        if (!mIsRecreationInProgress) {
+
+        Configuration currentConfiguration = getCurrentConfiguration(activity);
+        mIsConfigurationChanged = mLatestConfiguration != null && !currentConfiguration.equals(mLatestConfiguration);
+
+        if (mIsConfigurationChanged) {
+            mLatestConfiguration = new Configuration(currentConfiguration);
+        }
+
+        mIsActivityRestored = savedInstanceState != null;
+        if (!mIsActivityRestored) {
             if (mCurrentActivityName != null) {
                 mPreviousActivitiesQueue.offerFirst(mCurrentActivityName);
             }
+        }
+
+        if (!mIsConfigurationChanged){
             mCurrentActivityName = getActivityName(activity);
         }
+
         mCurrentActivityInstance = new WeakReference<Activity>(activity);
 
-        if (!mIsRecreationInProgress)
+        if (!mIsActivityRestored)
             mCurrentActivitiesCount++;
 
+        WebtrekkLogging.log("Configuration is changed:"+mIsConfigurationChanged);
         WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
     }
 
@@ -105,7 +120,7 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
         WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
 
         //this is first start, but initialization was done in onCreate of MainActivity
-        if (!mIsRecreationInProgress && mCurrentActivitiesCount == 0)
+        if (!mIsActivityRestored && mCurrentActivitiesCount == 0)
             mCurrentActivitiesCount = 1;
 
         if (mCurrentActivitiesCount == 1 && mCurrentStatus == STATUS.NO_ACTIVITY_IS_RUNNING) {
@@ -115,6 +130,9 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
                 mCurrentActivityInstance = new WeakReference<Activity>(activity);
             }
             mFirstActivityName = mCurrentActivityName;
+            if (mLatestConfiguration == null) {
+                mLatestConfiguration = new Configuration(getCurrentConfiguration(activity));
+            }
         }else if (mCurrentStatus == STATUS.GOING_TO_BACKGROUND && getActivityName(activity).equals(mCurrentActivityName))
         {
             mCurrentStatus = STATUS.RETURNINIG_FROM_BACKGROUND;
@@ -126,9 +144,10 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
 
     @Override
     public void onActivityResumed(Activity activity) {
-        WebtrekkLogging.log("Tracking Activity Resumed: " + getActivityName(activity) + " instance hash:" + activity.hashCode() + (mIsRecreationInProgress ? " as recreation":""));
+        WebtrekkLogging.log("Tracking Activity Resumed: " + getActivityName(activity) + " instance hash:" + activity.hashCode() + (mIsActivityRestored ? " as recreation":""));
         WebtrekkLogging.log("CurrentStatus before:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
-        mIsRecreationInProgress = false;
+        mIsActivityRestored = false;
+        mIsConfigurationChanged = false;
         mCurrentStatus = STATUS.ACTIVITY_IS_SHOWN;
         WebtrekkLogging.log("CurrentStatus after:"+mCurrentStatus + " Current Activity:"+mCurrentActivityName + " Previous Activity:"+mPreviousActivitiesQueue.peek());
     }
@@ -189,5 +208,9 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
     private String getActivityName(Activity activity)
     {
         return activity.getClass().getName();
+    }
+
+    private Configuration getCurrentConfiguration(Activity activity){
+        return activity.getResources().getConfiguration();
     }
 }

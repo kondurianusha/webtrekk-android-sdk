@@ -13,40 +13,25 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * Created by vartbaronov on 22.04.16.
+ * Created by Arsen Vartbaronov on 23.06.17.
  */
 
 package com.Webtrekk.SDKTest;
 
-import android.app.Activity;
-import android.app.Application;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
-import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.test.ActivityInstrumentationTestCase2;
+import android.support.test.InstrumentationRegistry;
 
 import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
-import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
-import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> extends ActivityInstrumentationTestCase2BaseMain<T> {
+import static junit.framework.Assert.assertTrue;
+
+/**
+ * Created by vartbaronov on 22.06.17.
+ */
+public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
 
     private List<String> mSentURLArray = new Vector<String>();
     protected volatile boolean mStringReceived;
@@ -56,10 +41,6 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
     volatile long mStringNumbersToWait = 1;
     volatile private boolean mWaitWhileTimoutFinished;
     private long mStartMessageReceiveNumber;
-
-    public ActivityInstrumentationTestCase2Base(Class<T> activityClass) {
-        super(activityClass);
-    }
 
     private HttpServer.UrlNotifier mURLReceiver = new HttpServer.UrlNotifier() {
         @Override
@@ -81,9 +62,8 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
     protected void onReceiveURLProcess(String url){};
 
     @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
+    public void before() throws Exception {
+        super.before();
         //refresh webtrekk instance
         if (mHttpServer == null) {
             mHttpServer = new HttpServer();
@@ -94,10 +74,9 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
     }
 
     @Override
-    public void tearDown() throws Exception {
-        //URLReceiverUnRegister(mURLReceiver);
+    public void after() throws Exception {
         mHttpServer.stop();
-        super.tearDown();
+        super.after();
     }
 
     protected void initWaitingForTrack(Runnable process)
@@ -150,12 +129,12 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
                     assertTrue(false);
                 }
             }
-                if (!isNoTrackCheck) {
-                    assertTrue(mStringReceived);
-                    assertEquals(mStringNumbersToWait, mSentURLArray.size());
-                }else {
-                    assertFalse(mStringReceived);
-                }
+            if (!isNoTrackCheck) {
+                assertTrue(mStringReceived);
+                assertEquals(mStringNumbersToWait, mSentURLArray.size());
+            }else {
+                assertFalse(mStringReceived);
+            }
         }
     }
 
@@ -169,14 +148,7 @@ public abstract class ActivityInstrumentationTestCase2Base<T extends Activity> e
         while((mHttpServer.getCurrentRequestNumber() - mStartMessageReceiveNumber) != messageCount)
         {
             Thread.yield();
-            getInstrumentation().waitForIdleSync();
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         }
     }
-
-    protected void cleanConfigPreference()
-    {
-        SharedPreferences sharedPrefs = HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext());
-        sharedPrefs.edit().remove(Webtrekk.PREFERENCE_KEY_CONFIGURATION).apply();
-    }
-
 }

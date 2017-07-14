@@ -18,32 +18,39 @@
 
 package com.Webtrekk.SDKTest;
 
+import android.support.test.filters.LargeTest;
+
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-public class ContentGroupTest  extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
-    private Webtrekk mWebtrekk;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-    public ContentGroupTest() {
-        super(EmptyActivity.class);
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class ContentGroupTest  extends WebtrekkBaseMainTest {
+
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, this);
+
+    @Override
+    public void before() throws Exception {
+        super.before();
+        Webtrekk.getInstance().initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
     }
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mWebtrekk = Webtrekk.getInstance();
-        mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
-        getActivity();
+    @After
+    public void after() throws Exception {
+        super.after();
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        finishActivitySync(getActivity());
-        setActivity(null);
-        super.tearDown();
-    }
-
+    @Test
     public void testContentGroup() {
         final String pageCat1 = "Cat1";
         final String pageCatLong = "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456";
@@ -59,7 +66,7 @@ public class ContentGroupTest  extends ActivityInstrumentationTestCase2Base<Empt
                 TrackingParameter par = new TrackingParameter();
                 par.add(TrackingParameter.Parameter.PAGE_CAT, "1", pageCat1);
                 par.add(TrackingParameter.Parameter.PAGE_CAT, "2", pageCatLong);
-                mWebtrekk.track(par);
+                Webtrekk.getInstance().track(par);
             }
         });
 

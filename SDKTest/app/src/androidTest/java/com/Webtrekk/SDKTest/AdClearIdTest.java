@@ -20,38 +20,44 @@ package com.Webtrekk.SDKTest;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.test.filters.LargeTest;
+
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.AdClearIdUtil;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class AdClearIdTest extends WebtrekkBaseMainTest {
 
     private Webtrekk mWebtrekk;
     private static final long MILLISECONDS_UNTIL_01012011 = 1293840000000L;
 
-    public AdClearIdTest() {
-        super(EmptyActivity.class);
-    }
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, this);
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    public void before() throws Exception {
+        super.before();
         mWebtrekk = Webtrekk.getInstance();
         mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
-        getActivity();
         clearAdClearId();
     }
 
 
+    @After
     @Override
-    public void tearDown() throws Exception {
-        finishActivitySync(getActivity());
-        setActivity(null);
-        super.tearDown();
+    public void after() throws Exception {
+        super.after();
     }
 
-
+    @Test
     public void testAdclearIdInRequestURL() {
 
         initWaitingForTrack(new Runnable() {
@@ -98,6 +104,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
     /**
      * using the application ID 713 and setting everything else to 0
      */
+    @Test
     public void testCombineAdClearId1() {
 
         // using the application ID 713 (binary: 1011001001) and setting everything else to 0:
@@ -133,6 +140,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
     /**
      * Using application ID 713 and setting process ID to 15
      */
+    @Test
     public void testCombineAdClearId2() {
 
         // using the application ID 713 (binary: 1011001001) and setting process ID to 15 (binary: 1111):
@@ -171,6 +179,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
      * the available number of bits for this position. 16 decimal is 10000 in binary. Since only 4
      * bits are available 16 should be altered to 16%16 = 0 (binary 0000)
      */
+    @Test
     public void testCombineAdClearId3() {
 
         // using the application ID 713 (binary: 1011001001) and setting process ID to 16 (binary: 10000):
@@ -208,6 +217,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
      * the available number of bits for this position. 1025 decimal is 10000000001 in binary. Since
      * only 10 bits are available 1025 should be altered to 1025%1024 = 1 (binary 0000000001)
      */
+    @Test
     public void testCombineAdClearId4() {
 
         // using the application ID 1025 (binary: 10000000001) and setting everything else to 0:
@@ -241,6 +251,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
 
 
 
+    @Test
     public void testLimitToBits() {
         AdClearIdUtil a = new AdClearIdUtil();
         assertEquals(6, a.limitToBits(6, 3));
@@ -250,6 +261,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
     }
 
 
+    @Test
     public void testGenerateAdClearId_millisecondsPart() {
         long adClearId = new AdClearIdUtil().generateAdClearId();
         assertionsGenerateAdClearId_millisecondsPart(adClearId);
@@ -282,6 +294,7 @@ public class AdClearIdTest extends ActivityInstrumentationTestCase2Base<EmptyAct
 
 
 
+    @Test
     public void testGenerateAdClearId_ApplicationId_part() {
         long adClearId = new AdClearIdUtil().generateAdClearId();
         assertionsGenerateAdClearId_ApplicationId_part(adClearId);

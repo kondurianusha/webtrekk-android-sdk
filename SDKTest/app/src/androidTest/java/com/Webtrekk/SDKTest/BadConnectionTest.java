@@ -18,36 +18,44 @@
 
 package com.Webtrekk.SDKTest;
 
+import android.support.test.filters.LargeTest;
+
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import java.io.IOException;
 
-public class BadConnectionTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class BadConnectionTest extends WebtrekkBaseMainTest {
 
     private Webtrekk mWebtrekk;
     private static final int TRACKING_CALLS_STACK = 1000;
 
 
-    public BadConnectionTest() {
-        super(EmptyActivity.class);
-    }
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, this);
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    public void before() throws Exception {
+        super.before();
         mWebtrekk = Webtrekk.getInstance();
         mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_connection_broken_request);
-        getActivity();
     }
 
+    @After
     @Override
-    public void tearDown() throws Exception {
-        finishActivitySync(getActivity());
-        setActivity(null);
-        super.tearDown();
+    public void after() throws Exception {
+        super.after();
     }
 
+    @Test
     public void testLostConnection()
     {
         long messageReeivedCounter = mHttpServer.getCurrentRequestNumber();
@@ -99,6 +107,7 @@ public class BadConnectionTest extends ActivityInstrumentationTestCase2Base<Empt
         waitForTrackedURLs();
     }
 
+    @Test
     public void testSlowConnection(){
         final int delay = 30*1000;
 
@@ -125,7 +134,7 @@ public class BadConnectionTest extends ActivityInstrumentationTestCase2Base<Empt
 
             //make sure you can close activity in less then 5 sec (stop is called)
 
-            EmptyActivity activity = (EmptyActivity) getActivity();
+            EmptyActivity activity = (EmptyActivity) mActivityRule.getActivity();
 
             activity.finish();
 
@@ -153,8 +162,7 @@ public class BadConnectionTest extends ActivityInstrumentationTestCase2Base<Empt
             assertTrue(activity.isStopped());
 
             // wait for finishing activity
-            ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, getInstrumentation(), false);
-            setActivity(null);
+            mActivityRule.afterActivityFinished();
         }finally {
             //change delay to zero and cancel current delay
             WebtrekkLogging.log("Cancel HTTP request delay.");
@@ -163,7 +171,7 @@ public class BadConnectionTest extends ActivityInstrumentationTestCase2Base<Empt
         }
 
         //start activity again
-        getActivity();
+        mActivityRule.launchActivity(null);
 
         // receive tracks
         waitForTrackedURLs();

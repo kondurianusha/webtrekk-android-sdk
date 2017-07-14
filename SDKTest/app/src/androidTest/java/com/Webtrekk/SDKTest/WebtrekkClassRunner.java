@@ -13,20 +13,28 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * Created by Arsen Vartbaronov on 08.03.16.
+ * Created by Arsen Vartbaronov on 23.06.17.
  */
-
 package com.Webtrekk.SDKTest;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
-import android.test.suitebuilder.annotation.Suppress;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
 
 /**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
+ * Created by vartbaronov on 23.06.17.
  */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
+
+public class WebtrekkClassRunner extends BlockJUnit4ClassRunner {
+    public WebtrekkClassRunner(Class<?> aClass) throws InitializationError {
+        super(aClass);
     }
+
+    @Override
+    protected Statement methodBlock(FrameworkMethod frameworkMethod) {
+        WebtrekkBaseMainTest.mTestName = frameworkMethod.getName();
+        return super.methodBlock(frameworkMethod);
+    }
+
 }

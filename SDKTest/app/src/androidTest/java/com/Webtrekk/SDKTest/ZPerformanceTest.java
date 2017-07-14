@@ -18,9 +18,17 @@
 
 package com.Webtrekk.SDKTest;
 
+import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.LargeTest;
+
 import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
+
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,31 +36,33 @@ import java.io.IOException;
 /**
  * Name it with Z to call it at last.
  */
-
-public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class ZPerformanceTest extends WebtrekkBaseMainTest {
     private Webtrekk mWebtrekk;
 
-    public ZPerformanceTest() {
-        super(EmptyActivity.class);
-    }
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, this);
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    public void before() throws Exception{
+        super.before();
         mWebtrekk = Webtrekk.getInstance();
-        mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_performance_test);
+        boolean useManual = WebtrekkBaseMainTest.mTestName.equals("testFileCorruption") || WebtrekkBaseMainTest.mTestName.equals("testTimePerformance");
+        int configurationXMLID = useManual ? R.raw.webtrekk_config_manual_flush : R.raw.webtrekk_config_performance_test;
+        mWebtrekk.initWebtrekk(mApplication, configurationXMLID);
         mHttpServer.resetRequestNumber();
-        getActivity();
     }
 
     @Override
-    public void tearDown() throws Exception {
-        finishActivitySync(getActivity());
-        setActivity(null);
-        super.tearDown();
+    @After
+    public void after() throws Exception {
+        super.after();
     }
 
 
+    @Test
     //works in reality only on real HW
     public void testTimePerformance()
     {
@@ -79,11 +89,13 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
 
         WebtrekkLogging.log("Performance test is shown:"+result + " milliseconds per call");
 
+        mWebtrekk.send();
         waitForMessages(numberOfTest);
 
         assertTrue("Performance test is shown:"+result + " milliseconds per call", result < 10);
     }
 
+    @Test
     public void testMessageNumberPerformance() {
 
         if (isRestrictedMode()){
@@ -102,23 +114,31 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
         waitForMessages(numberOfTest);
     }
 
+    @Test
     public void testSavingToFlashByTimeout()
     {
         RequestUrlStore urlStore = new RequestUrlStore(getInstrumentation().getTargetContext());
 
-        File file = urlStore.getmRequestStoreFile();
+        File file = urlStore.getRequestStoreFile();
         long length = file.length();
         mHttpServer.stop();
         mWebtrekk.track();
 
         // sleep for a while to make saving happends
+
         try {
-            Thread.sleep(95000);
+            for(int i = 0; i< 100 && file.length() <= length; i++)
+            {
+                Thread.sleep(950);
+                Thread.yield();
+                InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         assertTrue(file.length() > length);
+
         try {
             mHttpServer.start();
         } catch (IOException e) {
@@ -128,10 +148,11 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
         waitForTrackedURLs();
     }
 
+    @Test
     public void testFileCorruption()
     {
         RequestUrlStore urlStore = new RequestUrlStore(getInstrumentation().getTargetContext());
-        final File file = urlStore.getmRequestStoreFile();
+        final File file = urlStore.getRequestStoreFile();
 
         initWaitingForTrack(new Runnable() {
             @Override
@@ -142,6 +163,14 @@ public class ZPerformanceTest extends ActivityInstrumentationTestCase2Base<Empty
                 file.setReadable(false, false);
             }
         }, 20);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        mWebtrekk.send();
         waitForTrackedURLs();
         file.setReadable(true, false);
     }

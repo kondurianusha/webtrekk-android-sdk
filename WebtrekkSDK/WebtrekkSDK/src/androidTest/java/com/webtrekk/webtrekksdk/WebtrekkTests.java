@@ -167,12 +167,13 @@ public class WebtrekkTests extends AndroidTestCase {
 //        }
         TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
 
-        class TestActivity extends Activity{};
-        TestActivity activity = new TestActivity();
+        SecondActivity activity = mock(SecondActivity.class);
+
+        when(activity.getResources()).thenReturn(mContext.getResources());
         lifecycleCallbacks.onActivityCreated(activity, null);
         lifecycleCallbacks.onActivityStarted(activity);
         assertEquals(1, webtrekk.getRequestFactory().getRequestUrlStore().size());
-        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("TestActivity,"));
+        assertTrue(webtrekk.getRequestFactory().getRequestUrlStore().peek().contains("SecondActivity_Proxy,"));
     }
 
 
@@ -184,13 +185,15 @@ public class WebtrekkTests extends AndroidTestCase {
         TrackedActivityLifecycleCallbacks callbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
         webtrekk.initWebtrekk(getContext());
 
-        Activity activity = new Activity();
-
+        Activity activity = mock(Activity.class);
         SecondActivity secondActivity = mock(SecondActivity.class);
+
+        when(activity.getResources()).thenReturn(mContext.getResources());
+        when(secondActivity.getResources()).thenReturn(mContext.getResources());
 
         callbacks.onActivityStarted(activity);
 
-        assertEquals("android.app.Activity", webtrekk.getCurrentActivityName());
+        assertEquals("Activity_Proxy", webtrekk.getCurrentActivityName());
         assertEquals(1, webtrekk.getActivityCount());
 
         // second call
@@ -259,10 +262,9 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.initWebtrekk(getContext());
         SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
         TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        Activity activity = mock(Activity.class);
 
-        class SecondActivity extends Activity {};
-        Activity activity = new Activity();
-        SecondActivity secondActivity = new SecondActivity();
+        when(activity.getResources()).thenReturn(mContext.getResources());
 
         lifecycleCallbacks.onActivityCreated(activity, null);
         lifecycleCallbacks.onActivityStarted(activity);
@@ -280,7 +282,11 @@ public class WebtrekkTests extends AndroidTestCase {
         preferences.edit().remove(Webtrekk.PREFERENCE_KEY_EVER_ID).commit();
         webtrekk.initWebtrekk(getContext());
         TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
-        Activity activity = new Activity();
+
+        Activity activity = mock(Activity.class);
+
+        when(activity.getResources()).thenReturn(mContext.getResources());
+
 
         lifecycleCallbacks.onActivityCreated(activity, null);
         lifecycleCallbacks.onActivityStarted(activity);
@@ -301,8 +307,9 @@ public class WebtrekkTests extends AndroidTestCase {
         preferences.edit().remove(Webtrekk.PREFERENCE_APP_VERSIONCODE).commit();
         assertEquals(preferences.getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, -1), -1);
         TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
-        Activity activity = new Activity();
+        Activity activity = mock(Activity.class);
 
+        when(activity.getResources()).thenReturn(mContext.getResources());
         lifecycleCallbacks.onActivityCreated(activity, null);
         lifecycleCallbacks.onActivityStarted(activity);
         webtrekk.track();
@@ -321,8 +328,10 @@ public class WebtrekkTests extends AndroidTestCase {
         webtrekk.setGlobalTrackingParameter(globalTp);
         TrackingRequest tr = webtrekk.getRequestFactory().createTrackingRequest(tp);
         TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
-        Activity activity = new Activity();
 
+        Activity activity = mock(Activity.class);
+
+        when(activity.getResources()).thenReturn(mContext.getResources());
         lifecycleCallbacks.onActivityCreated(activity, null);
         lifecycleCallbacks.onActivityStarted(activity);
         //verify override

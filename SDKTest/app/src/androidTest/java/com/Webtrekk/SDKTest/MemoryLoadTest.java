@@ -19,49 +19,37 @@
 package com.Webtrekk.SDKTest;
 
 import android.content.Intent;
+import android.support.test.filters.LargeTest;
 import android.test.suitebuilder.annotation.Suppress;
 
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<EmptyActivity>  {
-    private Webtrekk mWebtrekk;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class MemoryLoadTest extends WebtrekkBaseMainTest  {
     private final long oneMeg = 1024*1024;
 
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, this);
 
-    public MemoryLoadTest() {
-        super(EmptyActivity.class);
+    @Override
+    public void before() throws Exception {
+        super.before();
+        Webtrekk.getInstance().initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
     }
 
     @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
-
-        mWebtrekk = Webtrekk.getInstance();
-        mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
-        getActivity();
-/*
-        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-        ActivityManager activityManager = (ActivityManager)getActivity().getSystemService(getActivity().ACTIVITY_SERVICE);
-        activityManager.getMemoryInfo(mi);
-        Runtime info = Runtime.getRuntime();
-
-        Log.d(getClass().getName(),"current free memory runtime is:"+info.freeMemory()/oneMeg);
-        Log.d(getClass().getName(),"current total memory runtime is:"+info.totalMemory()/oneMeg);
-        Log.d(getClass().getName(),"current available memory is:"+mi.availMem/oneMeg);
-        Log.d(getClass().getName(),"current is lowMemory value:"+mi.lowMemory);
-        Log.d(getClass().getName(),"current threshold value:"+mi.threshold/oneMeg);
-*/
+    @After
+    public void after() throws Exception {
+        super.after();
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        finishActivitySync(getActivity());
-        setActivity(null);
-        super.tearDown();
-    }
-
-    @Suppress
     public void testLoadMemory()
     {
         Runnable runnableTrackOnly = new Runnable(){
@@ -73,7 +61,7 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                mWebtrekk.track();
+                Webtrekk.getInstance().track();
             }
         };
 
@@ -83,6 +71,7 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
         waitForTrackedURL();
     }
 
+    @Test
     public void testLoadCPU()
     {
         Intent intent = new Intent(getInstrumentation().getTargetContext(), LoadOSService.class);
@@ -94,7 +83,7 @@ public class MemoryLoadTest extends ActivityInstrumentationTestCase2Base<EmptyAc
 
             @Override
             public void run() {
-                mWebtrekk.track();
+                Webtrekk.getInstance().track();
             }
         };
 

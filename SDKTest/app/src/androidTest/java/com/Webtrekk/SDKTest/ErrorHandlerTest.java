@@ -32,30 +32,42 @@ import com.webtrekk.webtrekksdk.Modules.ExceptionHandler;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ErrorHandlerTest extends ActivityInstrumentationTestCase2Base<EmptyActivity> {
+public class ErrorHandlerTest extends WebtrekkBaseMainTest {
 
     Webtrekk mWebtrekk;
 
     public ErrorHandlerTest(){
-        super(EmptyActivity.class);
+        super();
         mIsErrorHandlerTest = true;
     }
 
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mActivityRule =
+            new WebtrekkTestRule<>(EmptyActivity.class, null, false, false);
+
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void before() throws Exception {
+        super.before();
         mWebtrekk = Webtrekk.getInstance();
     }
 
     @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void after() throws Exception {
+        super.after();
     }
 
+    @Test
     public void testCatchedError()
     {
         deleteErrorHandlerFile(mApplication);
@@ -88,6 +100,7 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2Base<Empty
         assertEquals(getNormString(parcel.getValue("ck914")), "com.Webtrekk.SDKTest.ErrorHandlerTest%241.run%28ErrorHandlerTest.java%3A%29%7Cjava.lang.Thread.run%28Thread.java%29");
     }
 
+    @Test
     public void testInfoError()
     {
         deleteErrorHandlerFile(mApplication);
@@ -109,6 +122,7 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2Base<Empty
     /**
      * do unit taste for message more than 255 characters. As logic is the same and case happens rarely we can test only simple case only
      */
+    @Test
     public void testStringNormalization(){
         deleteErrorHandlerFile(mApplication);
         mWebtrekk.initWebtrekk(mApplication);
@@ -134,11 +148,13 @@ public class ErrorHandlerTest extends ActivityInstrumentationTestCase2Base<Empty
         assertEquals(255, parcel.getValue("ck912").length());
     }
 
+    @Test
     public void testFatalCompeteSimple()
     {
         internalTestFatalComplete(1);
     }
 
+    @Test
     public void testFatalCompeteComplex()
     {
         internalTestFatalComplete(2);

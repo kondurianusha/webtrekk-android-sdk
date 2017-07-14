@@ -22,43 +22,56 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.os.Bundle;
+import android.support.test.filters.LargeTest;
 import android.test.TouchUtils;
 import android.util.Log;
 import android.widget.Button;
 
 import com.webtrekk.webtrekksdk.Webtrekk;
 
-public class PageAutoTrackingTest extends ActivityInstrumentationTestCase2Base<MainActivity> {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-    Webtrekk mWebtrekk;
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.pressBack;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
-    public PageAutoTrackingTest() {
-        super(MainActivity.class);
+@RunWith(WebtrekkClassRunner.class)
+@LargeTest
+public class PageAutoTrackingTest extends WebtrekkBaseMainTest {
+
+    @Rule
+    public final WebtrekkTestRule<MainActivity> mActivityRule =
+            new WebtrekkTestRule<>(MainActivity.class, null, false, true);
+
+    @Override
+    @Before
+    public void before() throws Exception {
+        super.before();
+        Webtrekk.getInstance().initWebtrekk(mApplication);
     }
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mWebtrekk = Webtrekk.getInstance();
-        mWebtrekk.initWebtrekk(mApplication);
+    @After
+    public void after() throws Exception {
+        super.after();
     }
 
-
+    @Test
     public void testActivityChanging() {
-
-        setActivityInitialTouchMode(true);
 
         Instrumentation instrumentation = getInstrumentation();
 
         TrackActivityIsStopped callback = new TrackActivityIsStopped("PageExampleActivity");
         mApplication.registerActivityLifecycleCallbacks(callback);
 
-        Instrumentation.ActivityMonitor pageActivityMonitor = instrumentation.addMonitor(PageExampleActivity.class.getName(), null, false);
-        Instrumentation.ActivityMonitor nextPageActivityMonitor = instrumentation.addMonitor(NextPageExampleActivity.class.getName(), null, false);
-
         //track main activity
         initWaitingForTrack(null);
-        Activity mainActivity = getActivity();
+        Activity mainActivity = mActivityRule.launchActivity(null);
 
         String URL = waitForTrackedURL();
 
@@ -70,12 +83,7 @@ public class PageAutoTrackingTest extends ActivityInstrumentationTestCase2Base<M
         //track first page activity
         initWaitingForTrack(null);
 
-        Button pageExampleButton = (Button) mainActivity.findViewById(R.id.button_page);
-        TouchUtils.clickView(this, pageExampleButton);
-
-        Activity pageActivity = getInstrumentation().waitForMonitorWithTimeout(pageActivityMonitor, 5);
-        assertNotNull(pageActivity);
-        instrumentation.removeMonitor(pageActivityMonitor);
+        onView(withId(R.id.button_page)).perform(click());
 
         URL = waitForTrackedURL();
         parcel.parseURL(URL);
@@ -84,27 +92,21 @@ public class PageAutoTrackingTest extends ActivityInstrumentationTestCase2Base<M
         //track next page activity
         initWaitingForTrack(null);
 
-        Button nextPageButton = (Button) pageActivity.findViewById(R.id.button_next_page);
-        TouchUtils.clickView(this, nextPageButton);
+        onView(withId(R.id.button_next_page)).perform(click());
 
         URL = waitForTrackedURL();
         parcel.parseURL(URL);
         assertTrue(parcel.getValue("p").contains("NextPage"));
 
-        Activity nextPageActivity = getInstrumentation().waitForMonitorWithTimeout(nextPageActivityMonitor, 5);
-        assertNotNull(nextPageActivity);
-        instrumentation.removeMonitor(nextPageActivityMonitor);
-
         //track first page activity
         initWaitingForTrack(null);
 
         //wait while PageExampleActivity is stopped
-
         while (!callback.isStoped()){
             instrumentation.waitForIdleSync();
         }
 
-        finishActivitySync(nextPageActivity);
+        pressBack();
 
         URL = waitForTrackedURL();
         parcel.parseURL(URL);
@@ -113,13 +115,11 @@ public class PageAutoTrackingTest extends ActivityInstrumentationTestCase2Base<M
         //track main activity
         initWaitingForTrack(null);
 
-        finishActivitySync(pageActivity);
+        pressBack();
 
         URL = waitForTrackedURL();
         parcel.parseURL(URL);
         assertTrue(parcel.getValue("p").contains("Startseite"));
-
-        finishActivitySync(mainActivity);
 
         mApplication.unregisterActivityLifecycleCallbacks(callback);
     }

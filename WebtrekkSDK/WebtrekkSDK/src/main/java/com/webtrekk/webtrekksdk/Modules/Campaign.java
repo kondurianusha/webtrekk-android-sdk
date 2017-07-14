@@ -386,7 +386,7 @@ public class Campaign extends Thread
         if (advertizingID != null)
             editor.putString(ADV_ID, advertizingID);
         editor.putBoolean(OPT_OUT, isOptOut);
-        editor.apply();
+        editor.commit();
     }
 
     /**

@@ -13,7 +13,7 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * Created by Arsen Vartbaronov on 17.05.16.
+ * Created by Arsen Vartbaronov on 23.06.17.
  */
 
 package com.Webtrekk.SDKTest;
@@ -26,50 +26,47 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.test.ActivityInstrumentationTestCase2;
-import android.test.InstrumentationTestRunner;
+import android.support.test.InstrumentationRegistry;
 
-import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
-import com.webtrekk.webtrekksdk.Request.RequestFactory;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
+import junit.framework.Assert;
+
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.concurrent.ScheduledExecutorService;
 
-public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extends ActivityInstrumentationTestCase2<T> {
+/**
+ * Created by vartbaronov on 22.06.17.
+ */
+
+public class WebtrekkBaseSDKTest extends Assert implements WebtrekkTestRule.TestAdapter {
     protected Application mApplication;
     private SDKInstanceManager mSDKManager = new SDKInstanceManager();
     protected boolean mIsErrorHandlerTest;
     protected boolean mIsExternalCall;
     static private String IS_EXTERNAL = "external";
     protected boolean mIsCDBTestRequest;
+    public static String mTestName;
 
-    public ActivityInstrumentationTestCase2BaseMain(Class<T> activityClass) {
-        super(activityClass);
-    }
+    public void before() throws Exception {
 
-    @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
+        //super.setUp();
         //refresh webtrekk instance
         mSDKManager.setup();
-        mApplication = (Application)getInstrumentation().getTargetContext().getApplicationContext();
+        mApplication = getApplication();
         if (!mIsErrorHandlerTest)
             deleteErrorHandlerFile(mApplication);
         if (!mIsCDBTestRequest)
             deleteCDBRepeatRequestInfo();
 
         Bundle arguments = null;
-        InstrumentationTestRunner instrumentation = (InstrumentationTestRunner)getInstrumentation();
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            arguments = instrumentation.getArguments();
+            arguments = InstrumentationRegistry.getArguments();
         }else {
             arguments = (Bundle)getFieldValue(instrumentation, "mArguments");
         }
@@ -78,10 +75,8 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         mIsExternalCall = arguments.getString(IS_EXTERNAL) != null;
     }
 
-    @Override
-    public void tearDown() throws Exception {
+    public void after() throws Exception {
         mSDKManager.release(mApplication);
-        super.tearDown();
     }
 
     protected void deleteErrorHandlerFile(Context context)
@@ -90,14 +85,9 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         loadFile.delete();
     }
 
-    protected void finishActivitySync(Activity activity)
+    static public void finishActivitySync(Activity activity, boolean doFinish)
     {
-        finishActivitySync(activity, getInstrumentation());
-    }
-
-    static public void finishActivitySync(Activity activity, Instrumentation instrumentation)
-    {
-        ActivityInstrumentationTestCase2BaseMain.finishActivitySync(activity, instrumentation, true);
+        finishActivitySync(activity, InstrumentationRegistry.getInstrumentation(), doFinish);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -129,7 +119,7 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
 
     private void deleteCDBRepeatRequestInfo()
     {
-        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(getInstrumentation().getTargetContext());
+        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(mApplication);
 
         if (preferences.contains("LAST_CBD_REQUEST_DATE"))
             preferences.edit().remove("LAST_CBD_REQUEST_DATE").apply();
@@ -139,8 +129,8 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
         Field field = null;
         try {
             field = instance.getClass().getDeclaredField(valueName);
-        field.setAccessible(true);
-        return field.get(instance);
+            field.setAccessible(true);
+            return field.get(instance);
         } catch (NoSuchFieldException e) {
             return null;
         } catch (IllegalAccessException e) {
@@ -163,8 +153,24 @@ public class ActivityInstrumentationTestCase2BaseMain<T extends Activity> extend
     }
 
     protected boolean isRestrictedMode(){
-        Context context = getInstrumentation().getTargetContext();
+        Context context = mApplication;
 
         return context.getResources().getBoolean(R.bool.is_restricted_mode);
     }
+
+
+    protected void cleanConfigPreference()
+    {
+        SharedPreferences sharedPrefs = HelperFunctions.getWebTrekkSharedPreference(mApplication);
+        sharedPrefs.edit().remove(Webtrekk.PREFERENCE_KEY_CONFIGURATION).apply();
+    }
+
+    protected Instrumentation getInstrumentation(){
+        return InstrumentationRegistry.getInstrumentation();
+    }
+
+    protected Application getApplication(){
+        return (Application)InstrumentationRegistry.getTargetContext().getApplicationContext();
+    }
+
 }

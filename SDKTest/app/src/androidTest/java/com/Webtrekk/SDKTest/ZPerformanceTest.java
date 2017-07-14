@@ -49,7 +49,8 @@ public class ZPerformanceTest extends WebtrekkBaseMainTest {
     public void before() throws Exception{
         super.before();
         mWebtrekk = Webtrekk.getInstance();
-        int configurationXMLID = WebtrekkBaseMainTest.mTestName.equals("testFileCorruption") ? R.raw.webtrekk_config_manual_flush : R.raw.webtrekk_config_performance_test;
+        boolean useManual = WebtrekkBaseMainTest.mTestName.equals("testFileCorruption") || WebtrekkBaseMainTest.mTestName.equals("testTimePerformance");
+        int configurationXMLID = useManual ? R.raw.webtrekk_config_manual_flush : R.raw.webtrekk_config_performance_test;
         mWebtrekk.initWebtrekk(mApplication, configurationXMLID);
         mHttpServer.resetRequestNumber();
     }
@@ -88,6 +89,7 @@ public class ZPerformanceTest extends WebtrekkBaseMainTest {
 
         WebtrekkLogging.log("Performance test is shown:"+result + " milliseconds per call");
 
+        mWebtrekk.send();
         waitForMessages(numberOfTest);
 
         assertTrue("Performance test is shown:"+result + " milliseconds per call", result < 10);

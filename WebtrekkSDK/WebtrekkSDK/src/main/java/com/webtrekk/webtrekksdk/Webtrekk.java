@@ -21,6 +21,8 @@ package com.webtrekk.webtrekksdk;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Looper;
+import android.webkit.WebView;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -746,10 +748,41 @@ public class Webtrekk {
         HelperFunctions.setDeepLinkMediaCode(mContext, mediaCode);
     }
 
+    /**
+     * Use this function to establish user connection between App and Web tracking. In that case
+     * Webtrekk use everId from App to track website that is opened by WebView. Please note that website
+     * should have Webtrekk integrated as well with PIXEL minimum version 4.4.0.
+     * This function should be called before first main WebView page loading and in UI thread.
+     *
+     * @param webView - webView instance can't be null
+     */
+    public void setupWebView(WebView webView){
+        if (mContext == null){
+            WebtrekkLogging.log("Can't setup WebView. Please initialize SDK first.");
+            return;
+        }
+
+        if (webView == null){
+            WebtrekkLogging.log("Can't setup WebView. WebView parameter is null.");
+            return;
+        }
+
+        if (Looper.getMainLooper().getThread() != Thread.currentThread()){
+            WebtrekkLogging.log("Can't setup WebView. Function should be called from UI thread.");
+            return;
+        }
+
+        final String everId = HelperFunctions.getEverId(mContext);;
+
+        webView.loadUrl("javascript: var webtrekkApplicationEverId = \"" + everId + "\";");
+    }
+
+
     void setApplicationStatus(ApplicationTrackingStatus applicationStatus) {
         mApplicationStatus = applicationStatus;
         mRequestFactory.setApplicationStatus(applicationStatus);
     }
+
 
     /**
      * for unit testing only

@@ -31,20 +31,25 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
-
-import java.io.IOException;
 
 
 public class MainActivity extends Activity {
     private Webtrekk webtrekk;
     private boolean mAdClearOn;
     private String ADCLEAR_SIGN = "ADCLEAR_SIGN";
+    volatile private LoadWebViewResource mLoadResourceCallback;
+
+    interface LoadWebViewResource {
+        void load(String url);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,6 +222,31 @@ public class MainActivity extends Activity {
             mAdClearOn = true;
         }
         updateAdClearCaption();
+    }
+
+    public void appToWebConnection(View view){
+
+        final WebView webView = (WebView)findViewById(R.id.main_web_view);
+        webView.setVisibility(View.VISIBLE);
+
+        webView.getSettings().setJavaScriptEnabled(true);
+
+        Webtrekk.getInstance().setupWebView(webView);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onLoadResource(WebView view, String url) {
+                if (mLoadResourceCallback != null){
+                    mLoadResourceCallback.load(url);
+                }
+                super.onLoadResource(view, url);
+            }
+        });
+
+        webView.loadUrl("http://jenkins-yat-dev-01.webtrekk.com/web/hello.html");
+    }
+
+    public void setLoadResourceCallback(LoadWebViewResource mLoadResourceCallback) {
+        this.mLoadResourceCallback = mLoadResourceCallback;
     }
 
     public Webtrekk getWebtrekk() {

@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.test.InstrumentationRegistry;
 
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
@@ -51,6 +52,7 @@ public class WebtrekkBaseSDKTest extends Assert implements WebtrekkTestRule.Test
     static private String IS_EXTERNAL = "external";
     protected boolean mIsCDBTestRequest;
     public static String mTestName;
+    private PowerManager.WakeLock mWakeLock;
 
     public void before() throws Exception {
 
@@ -73,10 +75,27 @@ public class WebtrekkBaseSDKTest extends Assert implements WebtrekkTestRule.Test
         if (arguments.size() > 0)
             WebtrekkLogging.log("Receive arguments for test:"+arguments);
         mIsExternalCall = arguments.getString(IS_EXTERNAL) != null;
+
+        setupWakeUp();
     }
 
     public void after() throws Exception {
         mSDKManager.release(mApplication);
+        releaseWakeUp();
+    }
+
+    private void setupWakeUp(){
+        PowerManager powerManager = (PowerManager)mApplication.getSystemService(Context.POWER_SERVICE);
+        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                "MyWakelockTag");
+        mWakeLock.acquire();
+    }
+
+    private void releaseWakeUp(){
+        if (mWakeLock != null){
+            mWakeLock.release();
+            mWakeLock = null;
+        }
     }
 
     protected void deleteErrorHandlerFile(Context context)

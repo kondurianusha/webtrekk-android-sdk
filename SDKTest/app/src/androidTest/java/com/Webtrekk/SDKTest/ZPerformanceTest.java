@@ -49,7 +49,9 @@ public class ZPerformanceTest extends WebtrekkBaseMainTest {
     public void before() throws Exception{
         super.before();
         mWebtrekk = Webtrekk.getInstance();
-        boolean useManual = WebtrekkBaseMainTest.mTestName.equals("testFileCorruption") || WebtrekkBaseMainTest.mTestName.equals("testTimePerformance");
+        boolean useManual = WebtrekkBaseMainTest.mTestName.equals("testFileCorruption")
+                || WebtrekkBaseMainTest.mTestName.equals("testTimePerformance")
+                || WebtrekkBaseMainTest.mTestName.equals("testSavingToFlashByTimeout");
         int configurationXMLID = useManual ? R.raw.webtrekk_config_manual_flush : R.raw.webtrekk_config_performance_test;
         mWebtrekk.initWebtrekk(mApplication, configurationXMLID);
         mHttpServer.resetRequestNumber();
@@ -121,7 +123,6 @@ public class ZPerformanceTest extends WebtrekkBaseMainTest {
 
         File file = urlStore.getRequestStoreFile();
         long length = file.length();
-        mHttpServer.stop();
         mWebtrekk.track();
 
         // sleep for a while to make saving happends
@@ -145,6 +146,7 @@ public class ZPerformanceTest extends WebtrekkBaseMainTest {
             e.printStackTrace();
         }
 
+        mWebtrekk.send();
         waitForTrackedURLs();
     }
 

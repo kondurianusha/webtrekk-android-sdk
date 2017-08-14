@@ -667,7 +667,7 @@ public class RequestFactory {
     {
         if (mFlashTimerFuture == null)
             return;
-        if ((System.currentTimeMillis() - mLastTrackTime) > 60000 && mRequestProcessorFuture.isDone())
+        if ((System.currentTimeMillis() - mLastTrackTime) > 60000 && (mRequestProcessorFuture == null || mRequestProcessorFuture.isDone()))
             flush();
     }
 

@@ -140,12 +140,6 @@ public class ZPerformanceTest extends WebtrekkBaseMainTest {
 
         assertTrue(file.length() > length);
 
-        try {
-            mHttpServer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         mWebtrekk.send();
         waitForTrackedURLs();
     }

@@ -18,6 +18,7 @@
 
 package com.webtrekk.webtrekksdk.Configuration;
 
+import android.support.annotation.Nullable;
 import android.util.Xml;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
@@ -37,6 +39,341 @@ import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
  * parses the xml for the tracking configuration
  */
 public class TrackingConfigurationXmlParser {
+
+    interface ParameterAction{
+        <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException ;
+    }
+
+    enum ParType{
+        VERSION(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage)  throws XmlPullParserException, IOException  {
+                Integer version = (Integer) value;
+
+                if (version > 0) {
+                    config.setVersion(version);
+
+                }
+            }
+        }, Integer.class),
+
+        TRACK_DOMAIN(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException {
+                String trackDomain = (String) value;
+
+                if (trackDomain.endsWith("/")) {
+                    trackDomain = trackDomain.substring(0, trackDomain.length() - 1);
+                }
+                config.setTrackDomain(trackDomain);
+            }
+        }, String.class),
+
+        TRACK_ID(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                String trackId = (String) value;
+
+                config.setTrackId(trackId.replace(" ", ""));
+            }
+        }, String.class),
+
+        SAMPLING(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Integer sampling = (Integer) value;
+
+                if (sampling != 1 && sampling >= 0) {
+                    config.setSampling(sampling);
+                }
+            }
+        }, Integer.class),
+
+        MAX_REQUEST(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Integer maxRequests = (Integer) value;
+
+                if (maxRequests > 99) {
+                    config.setMaxRequests(maxRequests);
+                } else {
+                    WebtrekkLogging.log(errorMessage);
+                }
+            }
+        }, Integer.class),
+
+        SEND_DELAY(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Integer sendDelay = (Integer) value;
+
+                if (sendDelay >= 0) {
+                    config.setSendDelay(sendDelay);
+                } else {
+                    WebtrekkLogging.log(errorMessage);
+                }
+            }
+        }, Integer.class),
+
+        AUTO_TRACKED(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean autoTracked = (Boolean) value;
+
+                config.setAutoTracked(autoTracked);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_UPDATE(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean autoTrackUpdate = (Boolean) value;
+
+                config.setAutoTrackAppUpdate(autoTrackUpdate);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_ADD_CLEAR_ID(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean addClearId = (Boolean) value;
+
+                config.setAutoTrackAdClearId(addClearId);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_ADDVERTISER_ID(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean addVerId = (Boolean) value;
+
+                config.setAutoTrackAdvertiserId(addVerId);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_APP_VERSION_NAME(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackAppVersionName(boolValue);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_APP_VERSION_CODE(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackAppVersionCode(boolValue);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_APP_PRE_INSTALLED(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackAppPreInstalled(boolValue);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_APP_PLAY_STORE_USER_NAME(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackPlaystoreUsername(boolValue);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_APP_PLAY_STORE_MAIL(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackPlaystoreMail(boolValue);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_APP_PLAY_STORE_GIVEN_NAME(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackPlaystoreGivenName(boolValue);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_APP_PLAY_STORE_FAMILY_NAME(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackPlaystoreFamilyName(boolValue);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_API_LEVEL(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackApiLevel(boolValue);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_SCREEN_ORIENTATION(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackScreenorientation(boolValue);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_CONNECTION_TYPE(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackConnectionType(boolValue);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_ADDVERISEMENT_OPT_OUT(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackAdvertismentOptOut(boolValue);
+            }
+        }, Boolean.class),
+
+        AUTO_TRACK_REQUEST_URL_STORE_SIZE(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setAutoTrackRequestUrlStoreSize(boolValue);
+            }
+        }, Boolean.class),
+
+        ENABLE_REMOTE_CONFIGURATION(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setEnableRemoteConfiguration(boolValue);
+            }
+        }, Boolean.class),
+
+        TRACKING_CONFIGURATION_URL(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException {
+                String url = (String) value;
+
+                config.setTrackingConfigurationUrl(url);            }
+        }, String.class),
+
+        RESEND_ON_START_EVENT_TIME(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Integer resendOnStartEventTime = (Integer) value;
+
+                config.setResendOnStartEventTime(resendOnStartEventTime);            }
+        }, Integer.class),
+
+        ERROR_LOG_ENABLED(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean boolValue = (Boolean) value;
+
+                config.setErrorLogEnable(boolValue);
+            }
+        }, Boolean.class),
+
+        ERROR_LOG_LEVEL(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException {
+                Integer level = (Integer) value;
+
+                if (level >= 1 && level <= 3) {
+                    config.setErrorLogLevel(level);
+                }
+            }
+        }, Integer.class),
+
+        ENABLE_CAMPAIGN_TRACKING(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Boolean tracking = (Boolean) value;
+
+                config.setEnableCampaignTracking(tracking);
+            }
+        }, Boolean.class),
+
+        CUSTOM_PARAMETER(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Map<String, String> customParameter = new HashMap<String, String>();
+                confParser.setCustomParameterConfigurationFromXml(parser, customParameter);
+                config.setCustomParameter(customParameter);
+                WebtrekkLogging.log("customParameter read from xml");
+            }
+        }),
+
+        GLOBAL_TRACKING_PARAMETER(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                TrackingParameter tp = new TrackingParameter();
+                TrackingParameter constTp = new TrackingParameter();
+                confParser.setTrackingParameterFromXml(parser, tp, constTp);
+                config.setGlobalTrackingParameter(tp);
+                config.setConstGlobalTrackingParameter(constTp);
+                WebtrekkLogging.log("globalTrackingParameter read from xml");
+            }
+        }),
+
+        RECOMMENDATIONS(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                Map<String, String> recConfig = confParser.readRecommendationConfig(parser);
+                config.setRecommendationConfiguration(recConfig);
+            }
+        }),
+
+        ACTIVITY_SCREEN(new ParameterAction(){
+            @Override
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+                ActivityConfiguration act = confParser.readActivityConfiguration(parser, config.isAutoTracked());
+                config.getActivityConfigurations().put(act.getClassName(), act);
+                WebtrekkLogging.log("activity read from xml: "+ act.getClassName());
+            }
+        });
+
+        @Nullable
+        private final Class<?> mType;
+        private final ParameterAction mAction;
+
+        ParType(ParameterAction action, @Nullable Class<?> type){
+            mType = type;
+            mAction = action;
+        }
+
+        ParType(ParameterAction action){
+            this(action, null);
+        }
+
+        ParameterAction getAction(){
+            return mAction;
+        }
+
+        Class<?> getType(){
+            return mType;
+        }
+    }
+
     private static final String ns = null;
 
     /**
@@ -66,423 +403,104 @@ public class TrackingConfigurationXmlParser {
     private TrackingConfiguration readConfig(XmlPullParser parser) throws XmlPullParserException, IOException {
         TrackingConfiguration config = new TrackingConfiguration();
         parser.require(XmlPullParser.START_TAG, ns, "webtrekkConfiguration");
+
+        final Map<String,ParType> actionMap = new HashMap<>();
+
+        actionMap.put("version", ParType.VERSION);
+        actionMap.put("trackDomain", ParType.TRACK_DOMAIN);
+        actionMap.put("trackId", ParType.TRACK_ID);
+        actionMap.put("sampling", ParType.SAMPLING);
+        actionMap.put("maxRequests", ParType.MAX_REQUEST);
+        actionMap.put("sendDelay", ParType.SEND_DELAY);
+        actionMap.put("autoTracked", ParType.AUTO_TRACKED);
+        actionMap.put("autoTrackAppUpdate", ParType.AUTO_TRACK_UPDATE);
+        actionMap.put("autoTrackAdClearId", ParType.AUTO_TRACK_ADD_CLEAR_ID);
+        actionMap.put("autoTrackAdvertiserId", ParType.AUTO_TRACK_ADDVERTISER_ID);
+        actionMap.put("autoTrackAppVersionName", ParType.AUTO_TRACK_APP_VERSION_NAME);
+        actionMap.put("autoTrackAppVersionCode", ParType.AUTO_TRACK_APP_VERSION_CODE);
+        actionMap.put("autoTrackAppPreInstalled", ParType.AUTO_TRACK_APP_PRE_INSTALLED);
+        actionMap.put("autoTrackPlaystoreUsername", ParType.AUTO_TRACK_APP_PLAY_STORE_USER_NAME);
+        actionMap.put("autoTrackPlaystoreMail", ParType.AUTO_TRACK_APP_PLAY_STORE_MAIL);
+        actionMap.put("autoTrackPlaystoreGivenName", ParType.AUTO_TRACK_APP_PLAY_STORE_GIVEN_NAME);
+        actionMap.put("autoTrackPlaystoreFamilyName", ParType.AUTO_TRACK_APP_PLAY_STORE_FAMILY_NAME);
+        actionMap.put("autoTrackApiLevel", ParType.AUTO_TRACK_API_LEVEL);
+        actionMap.put("autoTrackScreenOrientation", ParType.AUTO_TRACK_SCREEN_ORIENTATION);
+        actionMap.put("autoTrackConnectionType", ParType.AUTO_TRACK_CONNECTION_TYPE);
+        actionMap.put("autoTrackAdvertisementOptOut", ParType.AUTO_TRACK_ADDVERISEMENT_OPT_OUT);
+        actionMap.put("autoTrackRequestUrlStoreSize", ParType.AUTO_TRACK_REQUEST_URL_STORE_SIZE);
+        actionMap.put("enableRemoteConfiguration", ParType.ENABLE_REMOTE_CONFIGURATION);
+        actionMap.put("trackingConfigurationUrl", ParType.TRACKING_CONFIGURATION_URL);
+        actionMap.put("resendOnStartEventTime", ParType.RESEND_ON_START_EVENT_TIME);
+        actionMap.put("errorLogEnable", ParType.ERROR_LOG_ENABLED);
+        actionMap.put("errorLogLevel", ParType.ERROR_LOG_LEVEL);
+        actionMap.put("enableCampaignTracking", ParType.ENABLE_CAMPAIGN_TRACKING);
+        actionMap.put("customParameter", ParType.CUSTOM_PARAMETER);
+        actionMap.put("globalTrackingParameter", ParType.GLOBAL_TRACKING_PARAMETER);
+        actionMap.put("recommendations", ParType.RECOMMENDATIONS);
+        actionMap.put("activity", ParType.ACTIVITY_SCREEN);
+        actionMap.put("screen", ParType.ACTIVITY_SCREEN);
+
+
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
 
             }
-            String name = parser.getName();
-            // Starts by looking for the entry tag
+            final String name = parser.getName();
+            final String errorMessage = "invalid "+name+" value, using default";
+
             if (name.equals("webtrekkConfiguration")) {
                 WebtrekkLogging.log("premature end of configuration");
                 break;
-            } else if (name.equals("version")) {
-                parser.require(XmlPullParser.START_TAG, ns, "version");
-                String versionValue = readText(parser);
-                try {
-                    int version = Integer.parseInt(versionValue);
-                    if (version > 0) {
-                        config.setVersion(version);
-                    }
-                } catch (Exception ex) {
-                    WebtrekkLogging.log("invalid version value, using default: ", ex);
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "version");
-
-
-            } else if (name.equals("trackDomain")) {
-                parser.require(XmlPullParser.START_TAG, ns, "trackDomain");
-                String trackDomain = readText(parser);
-                if (trackDomain.endsWith("/")) {
-                    trackDomain = trackDomain.substring(0, trackDomain.length() - 1);
-                }
-                config.setTrackDomain(trackDomain);
-                parser.require(XmlPullParser.END_TAG, ns, "trackDomain");
-
-
-            } else if (name.equals("trackId")) {
-                parser.require(XmlPullParser.START_TAG, ns, "trackId");
-
-                String trackId = readText(parser);
-                config.setTrackId(trackId.replace(" ", ""));
-
-                parser.require(XmlPullParser.END_TAG, ns, "trackId");
-
-
-            } else if (name.equals("sampling")) {
-                parser.require(XmlPullParser.START_TAG, ns, "sampling");
-                String samplingValue = readText(parser);
-                try {
-                    int sampling = Integer.parseInt(samplingValue);
-                    if (sampling != 1 && sampling >= 0) {
-                        config.setSampling(sampling);
-                    }
-                } catch (Exception ex) {
-                    WebtrekkLogging.log("invalid sampling value, using default", ex);
-                }
-
-                parser.require(XmlPullParser.END_TAG, ns, "sampling");
-
-
-            } else if (name.equals("maxRequests")) {
-                parser.require(XmlPullParser.START_TAG, ns, "maxRequests");
-
-                String maxRequestsValue = readText(parser);
-
-                try {
-                    int maxRequests = Integer.parseInt(maxRequestsValue);
-                    if (maxRequests > 99) {
-                        config.setMaxRequests(maxRequests);
-                    } else {
-                        WebtrekkLogging.log("invalid maxRequests value, using default");
-                    }
-
-                } catch (Exception ex) {
-                    WebtrekkLogging.log("invalid maxRequests value, using default: ", ex);
-                }
-
-                parser.require(XmlPullParser.END_TAG, ns, "maxRequests");
-
-
-            } else if (name.equals("sendDelay")) {
-                parser.require(XmlPullParser.START_TAG, ns, "sendDelay");
-                String sendDelayValue = readText(parser);
-                try {
-                    int sendDelay = Integer.parseInt(sendDelayValue);
-                    if (sendDelay >= 0) {
-                        config.setSendDelay(sendDelay);
-                    } else {
-                        WebtrekkLogging.log("invalid sendDelay value, using default");
-                    }
-
-                } catch (Exception ex) {
-                    WebtrekkLogging.log("invalid sendDelay value, using default", ex);
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "sendDelay");
-
-
-            } else if (name.equals("autoTracked")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTracked");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTracked(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTracked(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTracked value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTracked");
-
-
-            } else if (name.equals("autoTrackAppUpdate")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackAppUpdate");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackAppUpdate(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackAppUpdate(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackAppUpdate value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackAppUpdate");
-
-            } else if (name.equals("autoTrackAdClearId")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackAdClearId");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackAdClearId(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackAdClearId(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackAdClearId value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackAdClearId");
-
-            } else if (name.equals("autoTrackAdvertiserId")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackAdvertiserId");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackAdvertiserId(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackAdvertiserId(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackAdvertiserId value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackAdvertiserId");
-
-            } else if (name.equals("autoTrackAppVersionName")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackAppVersionName");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackAppVersionName(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackAppVersionName(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackAppVersionName value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackAppVersionName");
-
-            } else if (name.equals("autoTrackAppVersionCode")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackAppVersionCode");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackAppVersionCode(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackAppVersionCode(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackAppVersionCode value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackAppVersionCode");
-
-            } else if (name.equals("autoTrackAppPreInstalled")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackAppPreInstalled");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackAppPreInstalled(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackAppPreInstalled(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackAppPreInstalled value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackAppPreInstalled");
-
-            } else if (name.equals("autoTrackPlaystoreUsername")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackPlaystoreUsername");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackPlaystoreUsername(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackPlaystoreUsername(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackPlaystoreUsername value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackPlaystoreUsername");
-
-            } else if (name.equals("autoTrackPlaystoreMail")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackPlaystoreMail");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackPlaystoreMail(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackPlaystoreMail(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackPlaystoreMail value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackPlaystoreMail");
-
-            } else if (name.equals("autoTrackPlaystoreGivenName")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackPlaystoreGivenName");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackPlaystoreGivenName(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackPlaystoreGivenName(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackPlaystoreGivenName value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackPlaystoreGivenName");
-
-            } else if (name.equals("autoTrackPlaystoreFamilyName")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackPlaystoreFamilyName");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackPlaystoreFamilyName(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackPlaystoreFamilyName(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackPlaystoreFamilyName value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackPlaystoreFamilyName");
-
-            } else if (name.equals("autoTrackApiLevel")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackApiLevel");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackApiLevel(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackApiLevel(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackApiLevel value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackApiLevel");
-
-            } else if (name.equals("autoTrackScreenOrientation")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackScreenOrientation");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackScreenorientation(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackScreenorientation(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackScreenOrientation value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackScreenOrientation");
-
-            } else if (name.equals("autoTrackConnectionType")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackConnectionType");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackConnectionType(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackConnectionType(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackConnectionType value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackConnectionType");
-
-            } else if (name.equals("autoTrackAdvertisementOptOut")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackAdvertisementOptOut");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackAdvertismentOptOut(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackAdvertismentOptOut(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackAdvertisementOptOut value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackAdvertisementOptOut");
-
-            } else if (name.equals("trackingConfigurationUrl")) {
-                parser.require(XmlPullParser.START_TAG, ns, "trackingConfigurationUrl");
-
-                String value = readText(parser);
-                config.setTrackingConfigurationUrl(value);
-                parser.require(XmlPullParser.END_TAG, ns, "trackingConfigurationUrl");
-
-            } else if (name.equals("enableRemoteConfiguration")) {
-                parser.require(XmlPullParser.START_TAG, ns, "enableRemoteConfiguration");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setEnableRemoteConfiguration(true);
-                } else if (value.equals("false")) {
-                    config.setEnableRemoteConfiguration(false);
-                } else {
-                    WebtrekkLogging.log("invalid enableRemoteConfiguration value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "enableRemoteConfiguration");
-
-            } else if (name.equals("autoTrackRequestUrlStoreSize")) {
-                parser.require(XmlPullParser.START_TAG, ns, "autoTrackRequestUrlStoreSize");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setAutoTrackRequestUrlStoreSize(true);
-                } else if (value.equals("false")) {
-                    config.setAutoTrackRequestUrlStoreSize(false);
-                } else {
-                    WebtrekkLogging.log("invalid autoTrackRequestUrlStoreSize value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "autoTrackRequestUrlStoreSize");
-
-            } else if (name.equals("resendOnStartEventTime")) {
-                parser.require(XmlPullParser.START_TAG, ns, "resendOnStartEventTime");
-
-                String sendDelayValue = readText(parser);
-
-                try {
-                    int resendOnStartEventTime = Integer.parseInt(sendDelayValue);
-                    config.setResendOnStartEventTime(resendOnStartEventTime);
-                } catch (Exception ex) {
-                    WebtrekkLogging.log("invalid resendOnStartEventTime value, using default: ", ex);
-                }
-
-                parser.require(XmlPullParser.END_TAG, ns, "resendOnStartEventTime");
-
-
-            } else if (name.equals("errorLogEnable")) {
-                parser.require(XmlPullParser.START_TAG, ns, "errorLogEnable");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setErrorLogEnable(true);
-                } else if (value.equals("false")) {
-                    config.setErrorLogEnable(false);
-                } else {
-                    WebtrekkLogging.log("invalid errorLogEnable value, using default");
-                }
-
-               parser.require(XmlPullParser.END_TAG, ns, "errorLogEnable");
-
-            } else if (name.equals("errorLogLevel")) {
-                parser.require(XmlPullParser.START_TAG, ns, "errorLogLevel");
-                String samplingValue = readText(parser);
-                try {
-                    int level = Integer.parseInt(samplingValue);
-                    if (level >= 1 && level <= 3) {
-                        config.setErrorLogLevel(level);
-                    }
-                } catch (Exception ex) {
-                    WebtrekkLogging.log("invalid errorLogLevel value, using default", ex);
-                }
-
-                parser.require(XmlPullParser.END_TAG, ns, "errorLogLevel");
-
-            } else if (name.equals("customParameter")) {
-                parser.require(XmlPullParser.START_TAG, ns, "customParameter");
-                //TODO: make sure custom parameters via xml configuration are still neccesary
-                Map<String, String> customParameter = new HashMap<String, String>();
-                setCustomParameterConfigurationFromXml(parser, customParameter);
-                //config.setCustomParameter(setParameterConfigurationFromXml(parser));
-                config.setCustomParameter(customParameter);
-                parser.require(XmlPullParser.END_TAG, ns, "customParameter");
-                WebtrekkLogging.log("customParameter read from xml");
-            } else if (name.equals("globalTrackingParameter")) {
-                parser.require(XmlPullParser.START_TAG, ns, "globalTrackingParameter");
-                TrackingParameter tp = new TrackingParameter();
-                TrackingParameter constTp = new TrackingParameter();
-                setTrackingParameterFromXml(parser, tp, constTp);
-                config.setGlobalTrackingParameter(tp);
-                config.setConstGlobalTrackingParameter(constTp);
-                parser.require(XmlPullParser.END_TAG, ns, "globalTrackingParameter");
-                WebtrekkLogging.log("globalTrackingParameter read from xml");
-
-            } else if (name.equals("activity") || name.equals("screen")) {
-                parser.require(XmlPullParser.START_TAG, ns, name);
-                ActivityConfiguration act = readActivityConfiguration(parser, config.isAutoTracked());
-                config.getActivityConfigurations().put(act.getClassName(), act);
-                parser.require(XmlPullParser.END_TAG, ns, name);
-                WebtrekkLogging.log("activity read from xml: "+ act.getClassName());
-
-            } else if (name.equals("recommendations")) {
-                parser.require(XmlPullParser.START_TAG, ns, "recommendations");
-                Map<String, String> recConfig = readRecommendationConfig(parser);
-                config.setRecommendationConfiguration(recConfig);
-                parser.require(XmlPullParser.END_TAG, ns, "recommendations");
-            }else if (name.equals("enableCampaignTracking")) {
-                parser.require(XmlPullParser.START_TAG, ns, "enableCampaignTracking");
-
-                String value = readText(parser);
-                if (value.equals("true")) {
-                    config.setEnableCampaignTracking(true);
-                } else if (value.equals("false")) {
-                    config.setEnableCampaignTracking(false);
-                } else {
-                    WebtrekkLogging.log("invalid enableCampaignTracking value, using default");
-                }
-                parser.require(XmlPullParser.END_TAG, ns, "enableCampaignTracking");
-
             } else {
-                WebtrekkLogging.log("unknown xml tag: " + name);
-                skip(parser);
+                ParType parType = actionMap.get(name);
+
+                if (parType != null){
+                    parser.require(XmlPullParser.START_TAG, ns, name);
+
+                    Object objValue = null;
+
+                    if (parType.getType() != null) {
+
+                        final String strValue = readText(parser);
+
+                        try {
+                            if (parType.getType() == Integer.class) {
+                                objValue = Integer.parseInt(strValue);
+                            } else if (parType.getType() == String.class) {
+                                objValue = strValue;
+                            } else if (parType.getType() == Boolean.class) {
+                                if (strValue.equals("true")) {
+                                    objValue = Boolean.valueOf(true);
+                                } else if (strValue.equals("false")) {
+                                    objValue = Boolean.valueOf(false);
+                                } else {
+                                    WebtrekkLogging.log(errorMessage);
+                                }
+                            }
+                        } catch (Exception ex) {
+                            WebtrekkLogging.log(errorMessage + ": ", ex);
+                        }
+                    }
+
+                    // don't call process if objValue == null, but shouldn't
+                    if (parType.getType() == null || (parType.getType() != null && objValue != null)) {
+                        ParameterAction action = parType.getAction();
+
+                        action.process(config, parser, objValue, this, errorMessage);
+                    }
+
+                    parser.require(XmlPullParser.END_TAG, ns, name);
+
+                }else{
+                    WebtrekkLogging.log("unknown xml tag: " + name);
+                    skip(parser);
+                }
             }
         }
+
         WebtrekkLogging.log("configuration read from xml");
+
         return config;
     }
 
@@ -656,7 +674,7 @@ public class TrackingConfigurationXmlParser {
         }
     }
 
-    private void setCustomParameterConfigurationFromXml(XmlPullParser parser, Map<String, String> values) throws XmlPullParserException, IOException {
+    void setCustomParameterConfigurationFromXml(XmlPullParser parser, Map<String, String> values) throws XmlPullParserException, IOException {
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {

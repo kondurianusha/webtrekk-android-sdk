@@ -39,6 +39,7 @@ import org.junit.runner.RunWith;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 @RunWith(WebtrekkClassRunner.class)
@@ -295,7 +296,7 @@ public class MiscellaneousTest  extends WebtrekkBaseMainTest {
 
         internalTestPU(google);
 
-        onView(withId(R.id.page_example_activity_start)).perform(click());
+        onView(withId(R.id.page_example_activity_start)).perform(click(longClick()));
 
         internalTestPU(null);
 

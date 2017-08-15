@@ -132,7 +132,6 @@ public class ZPerformanceTest extends WebtrekkBaseMainTest {
             {
                 Thread.sleep(950);
                 Thread.yield();
-                InstrumentationRegistry.getInstrumentation().waitForIdleSync();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

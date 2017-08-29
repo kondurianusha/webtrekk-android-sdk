@@ -367,7 +367,7 @@ final public class HelperFunctions {
      * @return
      */
     public static String getUserAgent() {
-        return "Tracking Library " + Webtrekk.mTrackingLibraryVersionUI + "(" + "Linux; " + HelperFunctions.getOSName() + " " + HelperFunctions.getOSVersion() + "; " + HelperFunctions.getDevice() + "; " + Locale.getDefault() + ")";
+        return "Tracking Library " + Webtrekk.mTrackingLibraryVersionUI + " ("+HelperFunctions.getOSName() + " " + HelperFunctions.getOSVersion() + "; " + HelperFunctions.getDevice() + "; " + Locale.getDefault() + ")";
     }
 
     /**

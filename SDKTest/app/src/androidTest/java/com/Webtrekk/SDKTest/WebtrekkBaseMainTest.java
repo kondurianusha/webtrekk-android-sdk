@@ -88,11 +88,14 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
             mHttpServer = new HttpServer();
             mHttpServer.setContext(mApplication);
             mHttpServer.start();
+            mSubject = mHttpServer.getSubject();
+            mSubject.subscribe(mObserver);
         }
     }
 
     @Override
     public void after() throws Exception {
+        mSubject.onComplete();
         mHttpServer.stop();
         super.after();
     }
@@ -104,8 +107,6 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
 
     protected void initWaitingForTrack(Runnable process, long UrlCount)
     {
-        mSubject = mHttpServer.getSubject();
-        mSubject.subscribe(mObserver);
         mStringNumbersToWait = UrlCount;
         mSentURLArray.clear();
         mStringsReceived = false;
@@ -155,7 +156,6 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
             }else {
                 assertFalse(mStringsReceived);
             }
-            mSubject.onComplete();
         }
     }
 

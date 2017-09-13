@@ -26,20 +26,18 @@ import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 import java.io.IOException;
 
+import io.reactivex.subjects.ReplaySubject;
+import io.reactivex.subjects.Subject;
+
 public class HttpServer extends NanoHTTPD {
     private final static int PORT = 8080;
     private Context mContext;
     static private String REQUEST_COUNT_VALUE = "com.webtrekk.webtrekksdk.Test.RequestCount";
     volatile private long mDelayAfterReceive;
     volatile private long mDelayBeforeReceive;
-    private UrlNotifier mNotifier;
     final private Object mDelayMonitor = new Object();
     private boolean mIsDelay;
-
-
-    public interface UrlNotifier{
-        void received (String url);
-    }
+    private Subject<String> mSubject;
 
     public HttpServer() throws IOException {
         super(PORT);
@@ -60,9 +58,9 @@ public class HttpServer extends NanoHTTPD {
         mDelayBeforeReceive = delay;
     }
 
-    public void setNotifier(UrlNotifier notifier)
-    {
-        mNotifier = notifier;
+    public Subject<String> getSubject(){
+        mSubject = ReplaySubject.create();
+        return mSubject;
     }
 
     @Override
@@ -84,7 +82,7 @@ public class HttpServer extends NanoHTTPD {
 
         String requestURL = "http://"+session.getRemoteHostName()+session.getUri()+"?"+session.getQueryParameterString();
         WebtrekkLogging.log("receive request("+getCurrentRequestNumber()+"):" + requestURL);
-        mNotifier.received(requestURL);
+        mSubject.onNext(requestURL);
         Response response = new Response(Response.Status.OK, "image/gif;charset=UTF-8", null, 0);
         response.closeConnection(true);
 

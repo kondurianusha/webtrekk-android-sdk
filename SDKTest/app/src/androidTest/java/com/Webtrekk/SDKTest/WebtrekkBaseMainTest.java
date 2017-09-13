@@ -26,6 +26,11 @@ import com.webtrekk.webtrekksdk.Webtrekk;
 import java.util.List;
 import java.util.Vector;
 
+import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.Subject;
+
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -34,32 +39,46 @@ import static junit.framework.Assert.assertTrue;
 public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
 
     private List<String> mSentURLArray = new Vector<String>();
-    protected volatile boolean mStringReceived;
+    protected volatile boolean mStringsReceived;
     protected final Object mSynchronize = new Object();
     protected long mWaitMilliseconds = 12000;
     protected HttpServer mHttpServer;
     volatile long mStringNumbersToWait = 1;
     volatile private boolean mWaitWhileTimoutFinished;
     private long mStartMessageReceiveNumber;
+    private Subject<String> mSubject;
 
-    private HttpServer.UrlNotifier mURLReceiver = new HttpServer.UrlNotifier() {
+    private Observer<String> mObserver = new Observer<String>() {
         @Override
-        public void received(String url) {
+        public void onSubscribe(@NonNull Disposable disposable) {
+
+        }
+
+        @Override
+        public void onNext(@NonNull String url) {
             mSentURLArray.add(url);
-            onReceiveURLProcess(url);
 
             if (mStringNumbersToWait >= mSentURLArray.size()) {
-                mStringReceived = true;
+                mStringsReceived = true;
                 if (!mWaitWhileTimoutFinished) {
                     synchronized (mSynchronize) {
                         mSynchronize.notifyAll();
                     }
                 }
             }
+
+        }
+
+        @Override
+        public void onError(@NonNull Throwable throwable) {
+
+        }
+
+        @Override
+        public void onComplete() {
+
         }
     };
-
-    protected void onReceiveURLProcess(String url){};
 
     @Override
     public void before() throws Exception {
@@ -68,7 +87,6 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
         if (mHttpServer == null) {
             mHttpServer = new HttpServer();
             mHttpServer.setContext(mApplication);
-            mHttpServer.setNotifier(mURLReceiver);
             mHttpServer.start();
         }
     }
@@ -86,9 +104,11 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
 
     protected void initWaitingForTrack(Runnable process, long UrlCount)
     {
+        mSubject = mHttpServer.getSubject();
+        mSubject.subscribe(mObserver);
         mStringNumbersToWait = UrlCount;
         mSentURLArray.clear();
-        mStringReceived = false;
+        mStringsReceived = false;
 
         if (process != null) {
             synchronized (Webtrekk.getInstance()) {
@@ -120,7 +140,7 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
     private void processWaitForURL(boolean isNoTrackCheck)
     {
         synchronized (mSynchronize) {
-            while (!mStringReceived) {
+            while (!mStringsReceived) {
                 try {
                     mSynchronize.wait(mWaitMilliseconds);
                     if (isNoTrackCheck)
@@ -130,11 +150,12 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
                 }
             }
             if (!isNoTrackCheck) {
-                assertTrue(mStringReceived);
+                assertTrue(mStringsReceived);
                 assertEquals(mStringNumbersToWait, mSentURLArray.size());
             }else {
-                assertFalse(mStringReceived);
+                assertFalse(mStringsReceived);
             }
+            mSubject.onComplete();
         }
     }
 

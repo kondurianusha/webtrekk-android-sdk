@@ -18,6 +18,7 @@
 
 package com.Webtrekk.SDKTest;
 
+import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
@@ -89,6 +90,25 @@ public class TagIntegrationTest extends WebtrekkBaseMainTest {
         assertEquals(parcel.getValue("uc7"), "AT1Value");
         assertEquals(parcel.getValue("co"), "AT1Value");
         assertEquals(parcel.getValue("is"), "seachString");
+    }
+
+    @Test
+    public void testGlobalParameter(){
+        initWaitingForTrack(new Runnable() {
+            @Override
+            public void run() {
+                mWebtrekk.getCustomParameter().put("key", "KeyValue");
+                mWebtrekk.getGlobalTrackingParameter().add(TrackingParameter.Parameter.PAGE, "103", "key");
+                mWebtrekk.track();
+            }
+        });
+        String URL = waitForTrackedURL();
+
+        URLParsel parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertEquals("KeyValue", parcel.getValue("cp103"));
     }
 }
 

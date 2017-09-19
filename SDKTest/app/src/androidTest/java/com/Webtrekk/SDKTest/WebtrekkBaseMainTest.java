@@ -23,15 +23,16 @@ import android.support.test.InstrumentationRegistry;
 import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import io.reactivex.Observer;
+import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.subjects.Subject;
-
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Created by vartbaronov on 22.06.17.
@@ -39,46 +40,13 @@ import static junit.framework.Assert.assertTrue;
 public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
 
     private List<String> mSentURLArray = new Vector<String>();
-    protected volatile boolean mStringsReceived;
-    protected final Object mSynchronize = new Object();
     protected long mWaitMilliseconds = 12000;
     protected HttpServer mHttpServer;
     volatile long mStringNumbersToWait = 1;
-    volatile private boolean mWaitWhileTimoutFinished;
     private long mStartMessageReceiveNumber;
     private Subject<String> mSubject;
-
-    private Observer<String> mObserver = new Observer<String>() {
-        @Override
-        public void onSubscribe(@NonNull Disposable disposable) {
-
-        }
-
-        @Override
-        public void onNext(@NonNull String url) {
-            mSentURLArray.add(url);
-
-            if (mStringNumbersToWait >= mSentURLArray.size()) {
-                mStringsReceived = true;
-                if (!mWaitWhileTimoutFinished) {
-                    synchronized (mSynchronize) {
-                        mSynchronize.notifyAll();
-                    }
-                }
-            }
-
-        }
-
-        @Override
-        public void onError(@NonNull Throwable throwable) {
-
-        }
-
-        @Override
-        public void onComplete() {
-
-        }
-    };
+    private Iterator<String> mIterator;
+    private boolean mIsNoTrackCheck;
 
     @Override
     public void before() throws Exception {
@@ -89,7 +57,6 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
             mHttpServer.setContext(mApplication);
             mHttpServer.start();
             mSubject = mHttpServer.getSubject();
-            mSubject.subscribe(mObserver);
         }
     }
 
@@ -102,14 +69,25 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
 
     protected void initWaitingForTrack(Runnable process)
     {
-        initWaitingForTrack(process, 1);
+        initWaitingForTrack(process, 1, false);
     }
 
-    protected void initWaitingForTrack(Runnable process, long UrlCount)
+    protected void initWaitingForTrack(Runnable process, boolean isNoTrackCheck)
+    {
+        initWaitingForTrack(process, 1, isNoTrackCheck);
+    }
+
+    protected void initWaitingForTrack(Runnable process, long UrlCount){
+        initWaitingForTrack(process, UrlCount, false);
+    }
+
+    protected void initWaitingForTrack(Runnable process, long UrlCount, final boolean isNoTrackCheck)
     {
         mStringNumbersToWait = UrlCount;
         mSentURLArray.clear();
-        mStringsReceived = false;
+        mIsNoTrackCheck = isNoTrackCheck;
+
+        updateIterator();
 
         if (process != null) {
             synchronized (Webtrekk.getInstance()) {
@@ -119,44 +97,44 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
         }
     }
 
-    protected String waitForTrackedURL()
+    final protected String waitForTrackedURL()
     {
-        return waitForTrackedURL(false);
+        processWaitForURL();
+        return mIsNoTrackCheck ? null : mSentURLArray.get(0);
     }
 
-    protected String waitForTrackedURL(boolean isNoTrackCheck)
+    final protected List<String> waitForTrackedURLs()
     {
-        mWaitWhileTimoutFinished = false;
-        processWaitForURL(isNoTrackCheck);
-        return isNoTrackCheck ? null : mSentURLArray.get(0);
-    }
-
-    protected List<String> waitForTrackedURLs()
-    {
-        mWaitWhileTimoutFinished = true;
-        processWaitForURL(false);
+        processWaitForURL();
         return mSentURLArray;
     }
 
-    private void processWaitForURL(boolean isNoTrackCheck)
+    private void processWaitForURL()
     {
-        synchronized (mSynchronize) {
-            while (!mStringsReceived) {
-                try {
-                    mSynchronize.wait(mWaitMilliseconds);
-                    if (isNoTrackCheck)
-                        break;
-                } catch (InterruptedException e) {
-                    assertTrue(false);
-                }
+        if (mIterator == null){
+            updateIterator();
+        }
+
+        while (mIterator.hasNext()){
+            final String url = mIterator.next();
+            if (!url.isEmpty()) {
+                mSentURLArray.add(url);
             }
-            if (!isNoTrackCheck) {
-                assertTrue(mStringsReceived);
-                assertEquals(mStringNumbersToWait, mSentURLArray.size());
-            }else {
-                assertFalse(mStringsReceived);
+            if (mStringNumbersToWait == mSentURLArray.size()){
+                break;
             }
         }
+    }
+
+    private void updateIterator(){
+        mIterator = mSubject.timeout(mWaitMilliseconds, TimeUnit.MILLISECONDS)
+                .onErrorReturn(new Function<Throwable, String>() {
+                    @Override
+                    public String apply(@NonNull Throwable throwable) throws Exception {
+                        assertEquals(mIsNoTrackCheck ? 0 : mStringNumbersToWait, mSentURLArray.size());
+                        return "";
+                    }
+                }).blockingIterable().iterator();
     }
 
     protected void setStartMessageNumber()

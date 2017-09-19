@@ -80,10 +80,10 @@ public class TransparentActivityTest extends WebtrekkBaseMainTest {
 
         waitForTrackedURL();
 
-        initWaitingForTrack(null);
+        initWaitingForTrack(null, true);
 
         pressBack();
 
-        waitForTrackedURL(true);
+        waitForTrackedURL();
     }
 }

@@ -26,6 +26,7 @@ import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
 import java.io.IOException;
 
+import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.ReplaySubject;
 import io.reactivex.subjects.Subject;
 
@@ -59,7 +60,7 @@ public class HttpServer extends NanoHTTPD {
     }
 
     public Subject<String> getSubject(){
-        mSubject = ReplaySubject.create();
+        mSubject =  PublishSubject.create();
         return mSubject;
     }
 

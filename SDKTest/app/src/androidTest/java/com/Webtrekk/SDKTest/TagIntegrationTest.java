@@ -63,14 +63,13 @@ public class TagIntegrationTest extends WebtrekkBaseMainTest {
             getInstrumentation().waitForIdleSync();
         }
 
+        mWaitMilliseconds = 20000;
         initWaitingForTrack(new Runnable() {
             @Override
             public void run() {
                 mWebtrekk.track();
             }
         });
-
-        mWaitMilliseconds = 20000;
 
         String URL = waitForTrackedURL();
 

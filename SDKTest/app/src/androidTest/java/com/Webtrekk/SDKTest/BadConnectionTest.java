@@ -88,6 +88,7 @@ public class BadConnectionTest extends WebtrekkBaseMainTest {
             WebtrekkLogging.log("Sleep interruction");
         }
 
+        mWaitMilliseconds = 70000;
         initWaitingForTrack(new Runnable() {
             @Override
             public void run() {
@@ -103,7 +104,6 @@ public class BadConnectionTest extends WebtrekkBaseMainTest {
         }, TRACKING_CALLS_STACK - (mHttpServer.getCurrentRequestNumber() - messageReeivedCounter));
 
 
-        mWaitMilliseconds = 70000;
         waitForTrackedURLs();
     }
 

@@ -170,9 +170,6 @@ public class BadConnectionTest extends WebtrekkBaseMainTest {
             mHttpServer.stopBeforeDelay();
         }
 
-        //start activity again
-        mActivityRule.launchActivity(null);
-
         // receive tracks
         waitForTrackedURLs();
 

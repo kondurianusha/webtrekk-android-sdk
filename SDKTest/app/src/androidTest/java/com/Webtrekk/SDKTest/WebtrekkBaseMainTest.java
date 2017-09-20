@@ -138,6 +138,7 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
                 .onErrorReturn(new Function<Throwable, String>() {
                     @Override
                     public String apply(@NonNull Throwable throwable) throws Exception {
+                        WebtrekkLogging.log("throwable:"+throwable.getLocalizedMessage()+" cause:"+throwable.getCause());
                         assertEquals(mIsNoTrackCheck ? 0 : mStringNumbersToWait, mSentURLArray.size());
                         return "";
                     }

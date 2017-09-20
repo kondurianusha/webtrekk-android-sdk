@@ -62,6 +62,7 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
 
     @Override
     public void after() throws Exception {
+        mIterator = null;
         mSubject.onComplete();
         mHttpServer.stop();
         super.after();

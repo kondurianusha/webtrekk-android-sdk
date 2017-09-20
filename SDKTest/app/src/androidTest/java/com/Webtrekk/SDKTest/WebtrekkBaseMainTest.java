@@ -21,6 +21,7 @@ package com.Webtrekk.SDKTest;
 import android.support.test.InstrumentationRegistry;
 
 import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.util.Iterator;
@@ -56,6 +57,7 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
             mHttpServer = new HttpServer();
             mHttpServer.setContext(mApplication);
             mHttpServer.start();
+            WebtrekkLogging.log("subject created");
             mSubject = mHttpServer.getSubject();
         }
     }
@@ -116,8 +118,11 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
             updateIterator();
         }
 
+        WebtrekkLogging.log("get messages from observer");
         while (mIterator.hasNext()){
+            WebtrekkLogging.log("start to wait next message from observer");
             final String url = mIterator.next();
+            WebtrekkLogging.log("get next message from observer");
             if (!url.isEmpty()) {
                 mSentURLArray.add(url);
             }
@@ -128,6 +133,7 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
     }
 
     private void updateIterator(){
+        WebtrekkLogging.log("iterator created");
         mIterator = mSubject.timeout(mWaitMilliseconds, TimeUnit.MILLISECONDS)
                 .onErrorReturn(new Function<Throwable, String>() {
                     @Override

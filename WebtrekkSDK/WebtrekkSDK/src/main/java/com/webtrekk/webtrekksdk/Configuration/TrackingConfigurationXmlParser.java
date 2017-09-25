@@ -18,6 +18,7 @@
 
 package com.webtrekk.webtrekksdk.Configuration;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Xml;
 
@@ -41,13 +42,13 @@ import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 public class TrackingConfigurationXmlParser {
 
     interface ParameterAction{
-        <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException ;
+        <T> void process(TrackingConfiguration config, XmlPullParser parser, T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException ;
     }
 
     enum ParType{
         VERSION(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage)  throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage)  throws XmlPullParserException, IOException  {
                 Integer version = (Integer) value;
 
                 if (version > 0) {
@@ -59,7 +60,7 @@ public class TrackingConfigurationXmlParser {
 
         TRACK_DOMAIN(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException {
                 String trackDomain = (String) value;
 
                 if (trackDomain.endsWith("/")) {
@@ -71,7 +72,7 @@ public class TrackingConfigurationXmlParser {
 
         TRACK_ID(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 String trackId = (String) value;
 
                 config.setTrackId(trackId.replace(" ", ""));
@@ -80,7 +81,7 @@ public class TrackingConfigurationXmlParser {
 
         SAMPLING(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Integer sampling = (Integer) value;
 
                 if (sampling != 1 && sampling >= 0) {
@@ -91,7 +92,7 @@ public class TrackingConfigurationXmlParser {
 
         MAX_REQUEST(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Integer maxRequests = (Integer) value;
 
                 if (maxRequests > 99) {
@@ -104,7 +105,7 @@ public class TrackingConfigurationXmlParser {
 
         SEND_DELAY(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Integer sendDelay = (Integer) value;
 
                 if (sendDelay >= 0) {
@@ -117,7 +118,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACKED(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean autoTracked = (Boolean) value;
 
                 config.setAutoTracked(autoTracked);
@@ -126,7 +127,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_UPDATE(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean autoTrackUpdate = (Boolean) value;
 
                 config.setAutoTrackAppUpdate(autoTrackUpdate);
@@ -135,7 +136,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_ADD_CLEAR_ID(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean addClearId = (Boolean) value;
 
                 config.setAutoTrackAdClearId(addClearId);
@@ -144,7 +145,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_ADDVERTISER_ID(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean addVerId = (Boolean) value;
 
                 config.setAutoTrackAdvertiserId(addVerId);
@@ -153,7 +154,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_APP_VERSION_NAME(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackAppVersionName(boolValue);
@@ -162,7 +163,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_APP_VERSION_CODE(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackAppVersionCode(boolValue);
@@ -171,7 +172,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_APP_PRE_INSTALLED(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackAppPreInstalled(boolValue);
@@ -180,7 +181,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_APP_PLAY_STORE_USER_NAME(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackPlaystoreUsername(boolValue);
@@ -189,7 +190,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_APP_PLAY_STORE_MAIL(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackPlaystoreMail(boolValue);
@@ -198,7 +199,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_APP_PLAY_STORE_GIVEN_NAME(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackPlaystoreGivenName(boolValue);
@@ -207,7 +208,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_APP_PLAY_STORE_FAMILY_NAME(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackPlaystoreFamilyName(boolValue);
@@ -216,7 +217,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_API_LEVEL(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackApiLevel(boolValue);
@@ -225,7 +226,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_SCREEN_ORIENTATION(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackScreenorientation(boolValue);
@@ -234,7 +235,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_CONNECTION_TYPE(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackConnectionType(boolValue);
@@ -243,7 +244,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_ADDVERISEMENT_OPT_OUT(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackAdvertismentOptOut(boolValue);
@@ -252,7 +253,7 @@ public class TrackingConfigurationXmlParser {
 
         AUTO_TRACK_REQUEST_URL_STORE_SIZE(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setAutoTrackRequestUrlStoreSize(boolValue);
@@ -261,7 +262,7 @@ public class TrackingConfigurationXmlParser {
 
         ENABLE_REMOTE_CONFIGURATION(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setEnableRemoteConfiguration(boolValue);
@@ -270,23 +271,25 @@ public class TrackingConfigurationXmlParser {
 
         TRACKING_CONFIGURATION_URL(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException {
                 String url = (String) value;
 
-                config.setTrackingConfigurationUrl(url);            }
+                config.setTrackingConfigurationUrl(url);
+            }
         }, String.class),
 
         RESEND_ON_START_EVENT_TIME(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Integer resendOnStartEventTime = (Integer) value;
 
-                config.setResendOnStartEventTime(resendOnStartEventTime);            }
+                config.setResendOnStartEventTime(resendOnStartEventTime);
+            }
         }, Integer.class),
 
         ERROR_LOG_ENABLED(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean boolValue = (Boolean) value;
 
                 config.setErrorLogEnable(boolValue);
@@ -295,7 +298,7 @@ public class TrackingConfigurationXmlParser {
 
         ERROR_LOG_LEVEL(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException {
                 Integer level = (Integer) value;
 
                 if (level >= 1 && level <= 3) {
@@ -306,7 +309,7 @@ public class TrackingConfigurationXmlParser {
 
         ENABLE_CAMPAIGN_TRACKING(new ParameterAction(){
             @Override
-            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
+            public <T> void process(TrackingConfiguration config, XmlPullParser parser, @NonNull T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
                 Boolean tracking = (Boolean) value;
 
                 config.setEnableCampaignTracking(tracking);
@@ -316,7 +319,7 @@ public class TrackingConfigurationXmlParser {
         CUSTOM_PARAMETER(new ParameterAction(){
             @Override
             public <T> void process(TrackingConfiguration config, XmlPullParser parser, @Nullable T value, TrackingConfigurationXmlParser confParser, String errorMessage) throws XmlPullParserException, IOException  {
-                Map<String, String> customParameter = new HashMap<String, String>();
+                Map<String, String> customParameter = new HashMap<>();
                 confParser.setCustomParameterConfigurationFromXml(parser, customParameter);
                 config.setCustomParameter(customParameter);
                 WebtrekkLogging.log("customParameter read from xml");
@@ -514,8 +517,8 @@ public class TrackingConfigurationXmlParser {
      */
     private ActivityConfiguration readActivityConfiguration(XmlPullParser parser, boolean globalAutoTracked) throws XmlPullParserException, IOException {
 
-        String className = null;
-        String mappingName = null;
+        String className;
+        String mappingName;
         boolean isAutoTrack = globalAutoTracked;
 
         ActivityConfiguration activityConfiguration = new ActivityConfiguration();
@@ -746,7 +749,7 @@ public class TrackingConfigurationXmlParser {
 
     private Map<String, String> readRecommendationConfig(XmlPullParser parser) throws XmlPullParserException, IOException {
 
-        Map<String, String> retValue = new HashMap<String, String>();
+        Map<String, String> retValue = new HashMap<>();
         while (parser.next() != XmlPullParser.END_TAG) {
 
             if (parser.getEventType() != XmlPullParser.START_TAG) {

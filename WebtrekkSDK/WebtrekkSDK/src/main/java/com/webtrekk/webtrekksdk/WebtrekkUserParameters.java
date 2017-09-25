@@ -37,7 +37,7 @@ import java.util.TreeMap;
  */
 public class WebtrekkUserParameters {
 
-    private final Map<Parameter, String> mParameters = new HashMap<Parameter, String>();
+    private final Map<Parameter, String> mParameters = new HashMap<>();
     private final SortedMap<String, String> mCustomParameters  = new TreeMap<String, String>();
     static final Parameter ALL_CDB_PAR[] = {Parameter.CDB_EMAIL_MD5, Parameter.CDB_EMAIL_SHA,
             Parameter.CDB_PHONE_MD5, Parameter.CDB_PHONE_SHA, Parameter.CDB_ADDRESS_MD5, Parameter.CDB_ADDRESS_SHA,

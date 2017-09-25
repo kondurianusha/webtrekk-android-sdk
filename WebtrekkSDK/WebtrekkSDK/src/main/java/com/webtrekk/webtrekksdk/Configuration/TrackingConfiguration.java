@@ -124,7 +124,7 @@ public class TrackingConfiguration {
 
     public TrackingConfiguration() {
         activityConfigurations = new HashMap<String, ActivityConfiguration>();
-        customParameter = new HashMap<String, String>();
+        customParameter = new HashMap<>();
     }
 
     /**

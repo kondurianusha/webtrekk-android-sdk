@@ -34,7 +34,7 @@ public class LoadOSService extends Service {
 
     public static String MODE = "MODE";
     public enum Mode {LOAD_MEMORY, LOAD_CPU};
-    public static Set<ArrayHolder> mMemory= new HashSet<ArrayHolder>();
+    public static Set<ArrayHolder> mMemory= new HashSet<>();
     private final long oneMeg = 1024*1024;
 
 

@@ -113,11 +113,12 @@ public class BadConnectionTest extends WebtrekkBaseMainTest {
 
         // make significant delay in response
         WebtrekkLogging.log("Setup HTTP request delay");
-        //mHttpServer.setBeforeDelay(delay);
+        mHttpServer.setBeforeDelay(delay);
 
         try {
 
             // do some track
+            mWaitMilliseconds = delay;
             initWaitingForTrack(new Runnable() {
                 @Override
                 public void run() {
@@ -166,8 +167,8 @@ public class BadConnectionTest extends WebtrekkBaseMainTest {
         }finally {
             //change delay to zero and cancel current delay
             WebtrekkLogging.log("Cancel HTTP request delay.");
-            //mHttpServer.setBeforeDelay(0);
-            //mHttpServer.stopBeforeDelay();
+            mHttpServer.setBeforeDelay(0);
+            mHttpServer.stopBeforeDelay();
         }
 
         // receive tracks

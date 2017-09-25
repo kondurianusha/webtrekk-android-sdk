@@ -148,7 +148,7 @@ public class WebtrekkRecommendations {
         void onReceiveRecommendations(List<RecommendationProduct> products, QueryRecommendationResult result);
     }
 
-    private Map<String, String> mRequestParameters = new HashMap<String, String>();
+    private Map<String, String> mRequestParameters = new HashMap<>();
     private RecommendationCallback mCallback;
     private String mRecomendationURL;
     private String mProductID;
@@ -291,7 +291,7 @@ public class WebtrekkRecommendations {
 
         final private RecommendationCallback mCallback;
         final private String mUrl;
-        private List<RecommendationProduct> mRequestResults = null;
+        private List<RecommendationProduct> mRequestResults;
         volatile private QueryRecommendationResult mQueryResult;
         final private Handler mHandler;
 
@@ -369,7 +369,7 @@ public class WebtrekkRecommendations {
 
         private boolean processResponseMain(JsonReader reader) {
             try {
-                mRequestResults = new ArrayList<RecommendationProduct>();
+                mRequestResults = new ArrayList<>();
                 reader.beginArray();
                 while (reader.hasNext())
                 {
@@ -394,7 +394,7 @@ public class WebtrekkRecommendations {
         private void processResponseRecoItem(JsonReader reader, List<RecommendationProduct> recommendations) throws IOException {
 
             String title = null, id = null;
-            Map<String, RecommendationProductValue> recommendationValues = new HashMap<String, RecommendationProductValue>();
+            Map<String, RecommendationProductValue> recommendationValues = new HashMap<>();
 
             reader.beginArray();//begin array of one recommendation
             while (reader.hasNext())

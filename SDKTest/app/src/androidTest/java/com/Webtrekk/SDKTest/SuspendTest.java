@@ -85,6 +85,7 @@ public class SuspendTest extends WebtrekkBaseMainTest {
 
         WebtrekkLogging.log("Backgroud test. Wait for message number:"+(MESSAGES_NUMBER - messageReceived));
         mHttpServer.setDelay(0);
+        mWaitMilliseconds = 20000;
         initWaitingForTrack(new Runnable() {
             @Override
             public void run() {
@@ -92,7 +93,6 @@ public class SuspendTest extends WebtrekkBaseMainTest {
             }
         }, MESSAGES_NUMBER - messageReceived);
 
-        mWaitMilliseconds = 20000;
         waitForTrackedURLs();
     }
 }

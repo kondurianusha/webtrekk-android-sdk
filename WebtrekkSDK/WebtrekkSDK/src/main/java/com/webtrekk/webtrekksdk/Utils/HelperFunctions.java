@@ -221,7 +221,7 @@ final public class HelperFunctions {
                 ContactsContract.Contacts.Data.IS_PRIMARY + " DESC"
         );
 
-        HashMap<String, String> result = new HashMap<String, String>();
+        HashMap<String, String> result = new HashMap<>();
         String mime_type;
         while (cursor.moveToNext()) {
             // get the typ, 4.column in the query result

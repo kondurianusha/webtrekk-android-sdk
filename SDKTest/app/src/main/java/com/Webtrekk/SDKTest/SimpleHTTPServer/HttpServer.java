@@ -60,7 +60,7 @@ public class HttpServer extends NanoHTTPD {
     }
 
     public Subject<String> getSubject(){
-        mSubject =  PublishSubject.create();
+        mSubject =  ReplaySubject.create();
         return mSubject;
     }
 

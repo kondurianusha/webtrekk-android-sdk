@@ -163,7 +163,7 @@ public class WebtrekkBaseSDKTest extends Assert implements WebtrekkTestRule.Test
 
             Method method = classObj.getMethod(methodName, argumentsTypes);
 
-            return (T) method.invoke(classInstance, null);
+            return (T) method.invoke(classInstance);
         }catch (InvocationTargetException e) {
             return null;
         } catch (Exception e){

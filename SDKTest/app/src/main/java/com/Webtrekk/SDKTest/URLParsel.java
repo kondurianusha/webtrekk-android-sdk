@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 
 public class URLParsel
 {
-    final private Map<String, String> mMap = new HashMap<String, String>();
+    final private Map<String, String> mMap = new HashMap<>();
     public static String URLKEY = "MAIN_URL_KEY";
 
     public boolean parseURL(String url)

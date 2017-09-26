@@ -21,6 +21,7 @@ package com.Webtrekk.SDKTest;
 import android.support.test.InstrumentationRegistry;
 
 import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
+import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.util.Iterator;
@@ -39,7 +40,7 @@ import io.reactivex.subjects.Subject;
  */
 public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
 
-    private List<String> mSentURLArray = new Vector<String>();
+    private List<String> mSentURLArray = new Vector<>();
     protected long mWaitMilliseconds = 12000;
     protected HttpServer mHttpServer;
     volatile long mStringNumbersToWait = 1;
@@ -47,6 +48,7 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
     private Subject<String> mSubject;
     private Iterator<String> mIterator;
     private boolean mIsNoTrackCheck;
+    static final private String TIMEOUT = "TIMEOUT";
 
     @Override
     public void before() throws Exception {
@@ -56,6 +58,7 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
             mHttpServer = new HttpServer();
             mHttpServer.setContext(mApplication);
             mHttpServer.start();
+            WebtrekkLogging.log("subject created");
             mSubject = mHttpServer.getSubject();
         }
     }
@@ -112,14 +115,12 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
 
     private void processWaitForURL()
     {
-        if (mIterator == null){
-            updateIterator();
-        }
-
-        while (mIterator.hasNext()){
+        while (mIterator != null && mIterator.hasNext()){
             final String url = mIterator.next();
-            if (!url.isEmpty()) {
+            if (!url.equals(TIMEOUT)) {
                 mSentURLArray.add(url);
+            } else { // timeout
+                mIterator = null;
             }
             if (mStringNumbersToWait == mSentURLArray.size()){
                 break;
@@ -128,12 +129,16 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
     }
 
     private void updateIterator(){
+        if (mIterator != null){
+            return;
+        }
+
         mIterator = mSubject.timeout(mWaitMilliseconds, TimeUnit.MILLISECONDS)
                 .onErrorReturn(new Function<Throwable, String>() {
                     @Override
                     public String apply(@NonNull Throwable throwable) throws Exception {
                         assertEquals(mIsNoTrackCheck ? 0 : mStringNumbersToWait, mSentURLArray.size());
-                        return "";
+                        return TIMEOUT;
                     }
                 }).blockingIterable().iterator();
     }

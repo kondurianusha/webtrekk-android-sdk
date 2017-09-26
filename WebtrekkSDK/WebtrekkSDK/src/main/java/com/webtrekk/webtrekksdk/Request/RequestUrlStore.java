@@ -56,7 +56,7 @@ public class RequestUrlStore {
     //keys for current queu. Key can be point to not loaded URL
     final private SortedMap<Integer, Long> mIDs = Collections.synchronizedSortedMap(new TreeMap<Integer, Long>());
     final int mReadGroupSize = 200;
-    final private Map<Integer, String> mLoaddedIDs = new HashMap<Integer, String>(mReadGroupSize);
+    final private Map<Integer, String> mLoaddedIDs = new HashMap<>(mReadGroupSize);
 
     //Next string index
     private int mIndex;
@@ -345,7 +345,6 @@ public class RequestUrlStore {
                     removeKey(id);
             }else
                 break;
-
         }
     }
 

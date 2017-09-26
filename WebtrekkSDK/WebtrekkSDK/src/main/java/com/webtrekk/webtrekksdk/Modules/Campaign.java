@@ -476,11 +476,11 @@ public class Campaign extends Thread
         }
 
         String getId(Object info) throws Throwable{
-                return callMethod(null, info, "getId", null, null);
+                return callMethod(null, info, "getId", null);
         }
 
         boolean isLimitAdTrackingEnabled(Object info) throws Throwable{
-                Boolean result = callMethod(null, info, "isLimitAdTrackingEnabled", null, null);
+                Boolean result = callMethod(null, info, "isLimitAdTrackingEnabled", null);
                 return result == null ? false : result;
         }
 

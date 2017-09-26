@@ -157,13 +157,13 @@ public class WebtrekkBaseSDKTest extends Assert implements WebtrekkTestRule.Test
         }
     }
 
-    static private <T extends Object> T callMethod(String className, Object classInstance, String methodName, Class[] argumentsTypes, Object... argumentsValues){
+    static private <T extends Object> T callMethod(String className, Object classInstance, String methodName, Class[] argumentsTypes){
         try {
             Class classObj = classInstance == null ? Class.forName(className) : classInstance.getClass();
 
             Method method = classObj.getMethod(methodName, argumentsTypes);
 
-            return (T) method.invoke(classInstance, argumentsValues);
+            return (T) method.invoke(classInstance);
         }catch (InvocationTargetException e) {
             return null;
         } catch (Exception e){

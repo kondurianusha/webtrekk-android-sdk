@@ -118,6 +118,7 @@ public class BadConnectionTest extends WebtrekkBaseMainTest {
         try {
 
             // do some track
+            mWaitMilliseconds = delay;
             initWaitingForTrack(new Runnable() {
                 @Override
                 public void run() {

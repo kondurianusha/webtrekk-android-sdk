@@ -40,7 +40,7 @@ public class OldWebtrekkActivity extends Activity{
 
 
         // Um das Update einer Applikation zu übermitteln
-        Map<String, String> parameter = new HashMap<String, String>();
+        Map<String, String> parameter = new HashMap<>();
 
         if(com.webtrekk.android.tracking.Webtrekk.isThisVersionAnUpdate()) {
             parameter.put("cs2", "1");

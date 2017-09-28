@@ -42,7 +42,6 @@ public class SDKInstanceManager {
         if (webtrekk.isInitialized())
             webtrekk.stopTracking();
         Thread.setDefaultUncaughtExceptionHandler(mOldHandler);
-        unregisterCallback(application);
         stopSendThread(application);
         unregisterActivityEventCallback(application);
         refreshWTInstance();
@@ -74,34 +73,6 @@ public class SDKInstanceManager {
         }
     }
 
-    private void unregisterCallback(Application application)
-    {
-        if (application == null)
-        {
-            WebtrekkLogging.log("Error unregister callback. Application reference is null");
-            return;
-        }
-
-        if (!Webtrekk.getInstance().isInitialized())
-        {
-            WebtrekkLogging.log("Error unregister callback. Webtrekk isn't initialized");
-            return;
-        }
-        Webtrekk webtrekk = Webtrekk.getInstance();
-
-        try {
-            Field callbackField = Webtrekk.class.getDeclaredField("mCallbacks");
-            callbackField.setAccessible(true);
-            Application.ActivityLifecycleCallbacks callback = (Application.ActivityLifecycleCallbacks) callbackField.get(webtrekk);
-            application.unregisterActivityLifecycleCallbacks(callback);
-        } catch (NoSuchFieldException e) {
-            WebtrekkLogging.log("Can't remove activity callback");
-        } catch (IllegalAccessException e) {
-            WebtrekkLogging.log("Can't remove activity callback");
-        }
-    }
-
-
     private void stopSendThread(Application application)
     {
         if (application == null)
@@ -128,7 +99,7 @@ public class SDKInstanceManager {
     {
         Webtrekk webtrekk = Webtrekk.getInstance();
 
-        Application.ActivityLifecycleCallbacks callbacks = (Application.ActivityLifecycleCallbacks)returnHiddenField(webtrekk, "mCallbacks");
+        Application.ActivityLifecycleCallbacks callbacks = (Application.ActivityLifecycleCallbacks)returnHiddenField(webtrekk, "mActivityStatus");
         if (callbacks != null)
         {
             application.unregisterActivityLifecycleCallbacks(callbacks);

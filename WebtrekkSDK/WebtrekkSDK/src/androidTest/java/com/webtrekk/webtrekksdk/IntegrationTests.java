@@ -29,6 +29,7 @@ import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfigurationXmlParser;
+import com.webtrekk.webtrekksdk.Utils.ActivityListener;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -79,7 +80,7 @@ public class IntegrationTests extends AndroidTestCase {
         String url = tr.getUrlString();
         assertTrue(url, url.contains("ba=test_product"));
         // now call track method
-        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        ActivityListener lifecycleCallbacks = new ActivityListener(webtrekk);
         Activity activity = mock(Activity.class);
 
         when(activity.getResources()).thenReturn(mContext.getResources());
@@ -126,7 +127,7 @@ public class IntegrationTests extends AndroidTestCase {
         assertTrue(url, url.contains("cb1=dynamic-value"));
 
         // now call track method
-        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        ActivityListener lifecycleCallbacks = new ActivityListener(webtrekk);
         Activity activity = mock(Activity.class);
 
         when(activity.getResources()).thenReturn(mContext.getResources());

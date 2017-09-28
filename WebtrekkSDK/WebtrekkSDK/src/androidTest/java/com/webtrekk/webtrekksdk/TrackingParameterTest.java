@@ -84,7 +84,7 @@ public class TrackingParameterTest extends AndroidTestCase {
     public void testApplyMapping() {
         TrackingParameter tp = new TrackingParameter();
 
-        HashMap<String, String> customParameter = new HashMap<String, String>();
+        HashMap<String, String> customParameter = new HashMap<>();
         // make sure all occurences of screen_resolution as value will be replaced with 123x456
         customParameter.put("screen_resolution", "123x456");
 

@@ -49,7 +49,7 @@ public class ActivityTrackingStatus implements Application.ActivityLifecycleCall
     private Configuration mLatestConfiguration;
 
     volatile private int mCurrentActivitiesCount;
-    final private Deque<String> mPreviousActivitiesQueue = new LinkedList<String>();
+    final private Deque<String> mPreviousActivitiesQueue = new LinkedList<>();
     private String mFirstActivityName;
     private long mLastActivityVisibleTime;
     private long mReturnFromBackgroundTime;

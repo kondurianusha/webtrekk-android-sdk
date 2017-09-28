@@ -104,7 +104,7 @@ public class RequestFactory {
         mTrackingConfiguration = trackingConfiguration;
 
         if(mCustomParameter == null) {
-            mCustomParameter = new HashMap<String, String>();
+            mCustomParameter = new HashMap<>();
         }
 
         boolean isFirstStart = HelperFunctions.firstStart(mContext);
@@ -279,7 +279,7 @@ public class RequestFactory {
     private void initWebtrekkParameter() {
         // collect all static device information which remain the same for all requests
         if(mWebtrekkParameter == null) {
-            mWebtrekkParameter = new HashMap<Parameter, String>();
+            mWebtrekkParameter = new HashMap<>();
         }
 
         mWebtrekkParameter.put(Parameter.SCREEN_DEPTH, HelperFunctions.getDepth(mContext));
@@ -307,11 +307,11 @@ public class RequestFactory {
      */
     public void initAutoCustomParameter() {
         if(mAutoCustomParameter == null) {
-            mAutoCustomParameter = new HashMap<String, String>();
+            mAutoCustomParameter = new HashMap<>();
         }
 
         if(mCustomParameter == null) {
-            mCustomParameter = new HashMap<String, String>();
+            mCustomParameter = new HashMap<>();
         }
 
         if(mTrackingConfiguration.isAutoTrackAppVersionName()) {

@@ -26,8 +26,7 @@ import com.webtrekk.webtrekksdk.Modules.Campaign;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
-import com.webtrekk.webtrekksdk.Utils.AdClearIdUtil;
-import com.webtrekk.webtrekksdk.Utils.ApplicationTrackingStatus;
+import com.webtrekk.webtrekksdk.Utils.ActivityTrackingStatus;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
@@ -93,7 +92,6 @@ public class RequestFactory {
     private ScheduledFuture<?> mURLSendTimerFuture;
     private ExecutorService mExecutorService;
     private Future<?> mRequestProcessorFuture;
-    private ApplicationTrackingStatus mApplicationStatus;
 
     volatile private long mLastTrackTime;
     private ScheduledExecutorService mFlashTimerService;
@@ -642,7 +640,7 @@ public class RequestFactory {
      * @return true if send is done and false if previous send is still in progress or there is no message to send
      */
     public boolean onSendIntervalOver() {
-        WebtrekkLogging.log("onSendIntervalOver: activity count: " + mApplicationStatus.getCurrentActivitiesCount() + " request urls: " + mRequestUrlStore.size()
+        WebtrekkLogging.log("onSendIntervalOver: request urls: " + mRequestUrlStore.size()
                 + " thread done:"+(mRequestProcessorFuture == null ? "null": mRequestProcessorFuture.isDone()));
         if(mRequestUrlStore.size() > 0  && (mRequestProcessorFuture == null || mRequestProcessorFuture.isDone())) {
             if (mExecutorService == null) {
@@ -687,13 +685,6 @@ public class RequestFactory {
             mExecutorService = null;
             WebtrekkLogging.log("Processing URL is canceled");
         }
-    }
-
-    /**
-     * @param applicationStatus
-     */
-    public void setApplicationStatus(ApplicationTrackingStatus applicationStatus) {
-        mApplicationStatus = applicationStatus;
     }
 
     public void setLasTrackTime(long lasTrackTime) {

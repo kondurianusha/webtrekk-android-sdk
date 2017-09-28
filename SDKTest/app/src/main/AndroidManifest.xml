@@ -76,10 +76,6 @@
             android:label="@string/title_activity_CDB" >
         </activity>
         <activity
-            android:name=".PushNotificationActivity"
-            android:label="@string/title_activity_push" >
-        </activity>
-        <activity
             android:name=".EmptyActivity">
         </activity>
         <activity
@@ -102,16 +98,6 @@
         </activity>
         <activity android:name=".NextPageExampleActivity"/>
         <service android:name=".LoadOSService"/>
-        <receiver
-            android:name="com.webtrekk.webtrekksdk.WebtrekkGcmReceiver"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <category android:name="com.Webtrekk.SDKTest" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

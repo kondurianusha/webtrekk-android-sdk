@@ -7,6 +7,5 @@
     <string name="title_activity_shop_example">ShopExampleActivity</string>
     <string name="title_activity_media">MediaActivity</string>
     <string name="title_activity_CDB">CDBActivity</string>
-    <string name="title_activity_push">PushActivity</string>
     <string name="loading_video">loading video</string>
 </resources>

@@ -192,12 +192,6 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
-    public void pushTest(View view)
-    {
-        Intent intent = new Intent(this, PushNotificationActivity.class);
-        startActivity(intent);
-    }
-
     public void recommendationTest(View view)
     {
         Intent intent = new Intent(this, RecommendationActivity.class);

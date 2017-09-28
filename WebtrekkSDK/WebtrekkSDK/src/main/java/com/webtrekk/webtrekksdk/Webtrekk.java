@@ -32,12 +32,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.webtrekk.webtrekksdk.Modules.ExceptionHandler;
-import com.webtrekk.webtrekksdk.Modules.WebtrekkPushNotification;
 import com.webtrekk.webtrekksdk.Request.RequestFactory;
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Configuration.ActivityConfiguration;
-import com.webtrekk.webtrekksdk.Utils.ApplicationTrackingStatus;
+import com.webtrekk.webtrekksdk.Utils.ActivityListener;
+import com.webtrekk.webtrekksdk.Utils.ActivityTrackingStatus;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfigurationDownloadTask;
@@ -47,7 +47,7 @@ import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 /**
  * The WebtrekkSDK main class, the developer/customer interacts with the SDK through this class.
  */
-public class Webtrekk {
+public class Webtrekk implements ActivityListener.Callback {
 
 
     //name of the preference strings
@@ -62,13 +62,10 @@ public class Webtrekk {
     final private RequestFactory mRequestFactory = new RequestFactory();
     private TrackingConfiguration trackingConfiguration;
 
-    //application status definishion
-    private ApplicationTrackingStatus mApplicationStatus;
-
     private Context mContext;
 
-    private TrackedActivityLifecycleCallbacks mCallbacks;
-    private WebtrekkPushNotification mPushNotification;
+    //Current status of activities
+    private ActivityListener mActivityStatus;
     final private ExceptionHandler mExceptionHandler = new ExceptionHandler();
     private boolean mIsInitialized;
 
@@ -268,22 +265,11 @@ public class Webtrekk {
      * this functions enables the automatic activity tracking in case its enabled in the configuration
      * @param app application object of the tracked app, can either be a custom one or required by getApplication()
      */
-    public void initAutoTracking(Application app){
-//        boolean autoTrack = false;
-//        // when global autotracking is enabled, autoTrack is true
-//        if(trackingConfiguration.isAutoTracked()) {
-//            autoTrack = true;
-//        }
-//        // enable autotracking when one of the activities has autoTracking enabled
-//        for(ActivityConfiguration activityConfiguration : trackingConfiguration.getActivityConfigurations().values()) {
-//            if(activityConfiguration.isAutoTrack()) {
-//                autoTrack = true;
-//            }
-//        }
-        if(mCallbacks == null) {
+    void initAutoTracking(Application app){
+        if(mActivityStatus == null) {
             WebtrekkLogging.log("enabling callbacks");
-            mCallbacks = new TrackedActivityLifecycleCallbacks(this);
-            app.registerActivityLifecycleCallbacks(mCallbacks);
+            mActivityStatus = new ActivityListener(this);
+            mActivityStatus.init(app);
         }
     }
 
@@ -352,19 +338,6 @@ public class Webtrekk {
     }
 
     /**
-     * this functionality is for future release only
-     * @return WebtrekkPushNotification object
-     */
-    WebtrekkPushNotification getPushNotification()
-    {
-        return null;
-/*
-        return mPushNotification == null ? new WebtrekkPushNotification(mContext, trackingConfiguration.isTestMode()):
-                                                  mPushNotification;
-*/
-    }
-
-    /**
      * this is the default tracking method which creates an empty tracking trackingParameter object
      * it only tracks the auto tracked values like lib version, resolution, page name
      */
@@ -398,10 +371,12 @@ public class Webtrekk {
             WebtrekkLogging.log("webtrekk has not been initialized");
             return;
         }
-        if (mApplicationStatus.getCurrentStatus() == ApplicationTrackingStatus.STATUS.NO_ACTIVITY_IS_RUNNING) {
+
+        if (mRequestFactory.getCurrentActivityName() == null) {
             WebtrekkLogging.log("no running activity, call startActivity first");
             return;
         }
+
         if(tp == null) {
             WebtrekkLogging.log("TrackingParams is null");
             return;
@@ -480,25 +455,27 @@ public class Webtrekk {
      * this function is be called automatically by activity flow listener
      * @hide
      * */
-    void startActivity() {
+    @Override
+    public void onStart(boolean isRecreationInProcess, ActivityTrackingStatus.STATUS status,
+                        long inactivityTime, String activityName) {
         if (mRequestFactory.getRequestUrlStore() == null || trackingConfiguration == null) {
             WebtrekkLogging.log("webtrekk has not been initialized");
             return;
         }
 
         //reset page URL if activity is changed
-        if (!mApplicationStatus.isRecreationInProgress()) {
+        if (!isRecreationInProcess) {
             resetPageURLTrack();
-            mRequestFactory.setCurrentActivityName(mApplicationStatus.getCurrentActivityName());
+            mRequestFactory.setCurrentActivityName(activityName);
         }
 
-        if(mApplicationStatus.getCurrentStatus() == ApplicationTrackingStatus.STATUS.FIRST_ACTIVITY_STARTED) {
+        if(status == ActivityTrackingStatus.STATUS.FIRST_ACTIVITY_STARTED) {
             onFirstActivityStart();
         }
 
         // track only if it isn't in background and session timeout isn't passed
-        if (mApplicationStatus.getCurrentStatus() == ApplicationTrackingStatus.STATUS.RETURNINIG_FROM_BACKGROUND){
-            if (mApplicationStatus.inactivityApplicaitonTime() > trackingConfiguration.getResendOnStartEventTime())
+        if (status == ActivityTrackingStatus.STATUS.RETURNINIG_FROM_BACKGROUND){
+            if (inactivityTime > trackingConfiguration.getResendOnStartEventTime())
                 mRequestFactory.forceNewSession();
              mRequestFactory.restore();
         }
@@ -521,12 +498,13 @@ public class Webtrekk {
      * open activities and knows when to exit
      * @hide
      */
-    void stopActivity() {
+    @Override
+    public void onStop(ActivityTrackingStatus.STATUS status) {
         if (mRequestFactory.getRequestUrlStore() == null || trackingConfiguration == null) {
             throw new IllegalStateException("webtrekk has not been initialized");
         }
 
-        switch (mApplicationStatus.getCurrentStatus())
+        switch (status)
         {
             case SHUT_DOWNING:
                 stop();
@@ -542,9 +520,10 @@ public class Webtrekk {
      * Is called when activity is destroyed to double check that queries are saved and threads are stopped
      * as in some cases stop isn't called during application showt down.
      */
-    void destroy()
+    @Override
+    public void onDestroy(ActivityTrackingStatus.STATUS status)
     {
-        if(mApplicationStatus.getCurrentStatus() == ApplicationTrackingStatus.STATUS.SHUT_DOWNING) {
+        if(status == ActivityTrackingStatus.STATUS.SHUT_DOWNING) {
             stop();
         }
     }
@@ -616,7 +595,7 @@ public class Webtrekk {
         }
     }
 
-    //reset overrided URLTrack
+    //reset overrated URLTrack
     private void resetPageURLTrack()
     {
         ActivityConfiguration acConf = trackingConfiguration.getActivityConfigurations().get(mRequestFactory.getCurrentActivityName());
@@ -775,22 +754,6 @@ public class Webtrekk {
         final String everId = HelperFunctions.getEverId(mContext);;
 
         webView.loadUrl("javascript: var webtrekkApplicationEverId = \"" + everId + "\";");
-    }
-
-
-    void setApplicationStatus(ApplicationTrackingStatus applicationStatus) {
-        mApplicationStatus = applicationStatus;
-        mRequestFactory.setApplicationStatus(applicationStatus);
-    }
-
-
-    /**
-     * for unit testing only
-     * @hide
-     * @return
-     */
-    int getActivityCount() {
-        return mApplicationStatus.getCurrentActivitiesCount();
     }
 
     /**

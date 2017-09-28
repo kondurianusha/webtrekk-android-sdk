@@ -31,7 +31,7 @@ import java.util.LinkedList;
  * Need to calculate status of application
  * @hide
  */
-public class ApplicationTrackingStatus implements Application.ActivityLifecycleCallbacks
+public class ActivityTrackingStatus implements Application.ActivityLifecycleCallbacks
 {
     public enum STATUS
     {
@@ -43,8 +43,8 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
         SHUT_DOWNING
     }
 
-    private STATUS mCurrentStatus = STATUS.NO_ACTIVITY_IS_RUNNING;
-    private String mCurrentActivityName;
+    STATUS mCurrentStatus = STATUS.NO_ACTIVITY_IS_RUNNING;
+    String mCurrentActivityName;
     private WeakReference<Activity> mCurrentActivityInstance;
     private Configuration mLatestConfiguration;
 
@@ -55,29 +55,22 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
     private long mReturnFromBackgroundTime;
 
     private boolean mIsActivityRestored;
-    private boolean mIsConfigurationChanged;
+    boolean mIsConfigurationChanged;
 
-    public STATUS getCurrentStatus() {
-        return mCurrentStatus;
-    }
-
+    /**
+     * @hide
+     * for unit test only
+     * @return number of showed activities.
+     */
     public int getCurrentActivitiesCount() {
         return mCurrentActivitiesCount;
-    }
-
-    public String getCurrentActivityName() {
-        return mCurrentActivityName;
-    }
-
-    public boolean isRecreationInProgress() {
-        return mIsConfigurationChanged;
     }
 
     /**
      *
      * @return time in seconds when application was in background. Should ba called when status is RETURNINIG_FROM_BACKGROUND
      */
-    public long inactivityApplicaitonTime()
+    protected long getInactivityApplicaitonTime()
     {
         return (mReturnFromBackgroundTime - mLastActivityVisibleTime)/1000;
     }
@@ -105,7 +98,7 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
             mCurrentActivityName = getActivityName(activity);
         }
 
-        mCurrentActivityInstance = new WeakReference<Activity>(activity);
+        mCurrentActivityInstance = new WeakReference<>(activity);
 
         if (!mIsActivityRestored)
             mCurrentActivitiesCount++;
@@ -127,7 +120,7 @@ public class ApplicationTrackingStatus implements Application.ActivityLifecycleC
             mCurrentStatus = STATUS.FIRST_ACTIVITY_STARTED;
             if (mCurrentActivityName == null) {
                 mCurrentActivityName = getActivityName(activity);
-                mCurrentActivityInstance = new WeakReference<Activity>(activity);
+                mCurrentActivityInstance = new WeakReference<>(activity);
             }
             mFirstActivityName = mCurrentActivityName;
             if (mLatestConfiguration == null) {

@@ -20,6 +20,7 @@
 package com.webtrekk.webtrekksdk;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -32,6 +33,7 @@ import com.webtrekk.webtrekksdk.Request.RequestUrlStore;
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
 import com.webtrekk.webtrekksdk.Configuration.ActivityConfiguration;
+import com.webtrekk.webtrekksdk.Utils.ActivityListener;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 
@@ -78,12 +80,12 @@ public class WebtrekkTests extends AndroidTestCase {
         }
 
         webtrekk.initWebtrekk(getContext());
-        TrackedActivityLifecycleCallbacks callbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        ActivityListener callbacks = new ActivityListener(webtrekk);
         assertNotNull(webtrekk.getTrackingConfiguration());
         assertNotNull(webtrekk.getContext());
         assertNotNull(webtrekk.getRequestFactory().getRequestUrlStore());
         assertNotNull(webtrekk.getRequestFactory().getWebtrekkParameter());
-        assertEquals(0, webtrekk.getActivityCount());
+        assertEquals(0, callbacks.getCurrentActivitiesCount());
         // make shure it fails when init is called twice
 //        try {
 //            webtrekk.initWebtrekk(getContext());
@@ -165,7 +167,7 @@ public class WebtrekkTests extends AndroidTestCase {
 //        } catch (IllegalStateException e) {
 //
 //        }
-        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        ActivityListener lifecycleCallbacks = new ActivityListener(webtrekk);
 
         SecondActivity activity = mock(SecondActivity.class);
 
@@ -182,7 +184,7 @@ public class WebtrekkTests extends AndroidTestCase {
 
     public void testStartStopActivity() {
 
-        TrackedActivityLifecycleCallbacks callbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        ActivityListener callbacks = new ActivityListener(webtrekk);
         webtrekk.initWebtrekk(getContext());
 
         Activity activity = mock(Activity.class);
@@ -194,23 +196,23 @@ public class WebtrekkTests extends AndroidTestCase {
         callbacks.onActivityStarted(activity);
 
         assertEquals("Activity_Proxy", webtrekk.getCurrentActivityName());
-        assertEquals(1, webtrekk.getActivityCount());
+        assertEquals(1, callbacks.getCurrentActivitiesCount());
 
         // second call
         callbacks.onActivityCreated(secondActivity, null);
         callbacks.onActivityStarted(secondActivity);
         callbacks.onActivityStopped(activity);
-        assertEquals(2, webtrekk.getActivityCount());
+        assertEquals(2, callbacks.getCurrentActivitiesCount());
         callbacks.onActivityStopped(secondActivity);
-        assertEquals(2, webtrekk.getActivityCount());
+        assertEquals(2, callbacks.getCurrentActivitiesCount());
         when(secondActivity.isFinishing()).thenReturn(true);
         callbacks.onActivityStopped(secondActivity);
-        assertEquals(1, webtrekk.getActivityCount());
+        assertEquals(1, callbacks.getCurrentActivitiesCount());
     }
 
     public void testOnSendIntervalOver() {
         webtrekk.initWebtrekk(getContext());
-        TrackedActivityLifecycleCallbacks callbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        ActivityListener callbacks = new ActivityListener(webtrekk);
         RequestUrlStore requestUrlStore = mock(RequestUrlStore.class);
         webtrekk.getRequestFactory().setRequestUrlStore(requestUrlStore);
         webtrekk.getRequestFactory().onSendIntervalOver();
@@ -261,7 +263,7 @@ public class WebtrekkTests extends AndroidTestCase {
         // make shure fns gets send once and only once when a new session starts
         webtrekk.initWebtrekk(getContext());
         SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        ActivityListener lifecycleCallbacks = new ActivityListener(webtrekk);
         Activity activity = mock(Activity.class);
 
         when(activity.getResources()).thenReturn(mContext.getResources());
@@ -281,7 +283,7 @@ public class WebtrekkTests extends AndroidTestCase {
         SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
         preferences.edit().remove(Webtrekk.PREFERENCE_KEY_EVER_ID).commit();
         webtrekk.initWebtrekk(getContext());
-        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        ActivityListener lifecycleCallbacks = new ActivityListener(webtrekk);
 
         Activity activity = mock(Activity.class);
 
@@ -306,7 +308,7 @@ public class WebtrekkTests extends AndroidTestCase {
         SharedPreferences preferences = getContext().getSharedPreferences(Webtrekk.PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
         preferences.edit().remove(Webtrekk.PREFERENCE_APP_VERSIONCODE).commit();
         assertEquals(preferences.getInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, -1), -1);
-        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        ActivityListener lifecycleCallbacks = new ActivityListener(webtrekk);
         Activity activity = mock(Activity.class);
 
         when(activity.getResources()).thenReturn(mContext.getResources());
@@ -327,7 +329,7 @@ public class WebtrekkTests extends AndroidTestCase {
         TrackingParameter tp = new TrackingParameter();
         webtrekk.setGlobalTrackingParameter(globalTp);
         TrackingRequest tr = webtrekk.getRequestFactory().createTrackingRequest(tp);
-        TrackedActivityLifecycleCallbacks lifecycleCallbacks = new TrackedActivityLifecycleCallbacks(webtrekk);
+        ActivityListener lifecycleCallbacks = new ActivityListener(webtrekk);
 
         Activity activity = mock(Activity.class);
 

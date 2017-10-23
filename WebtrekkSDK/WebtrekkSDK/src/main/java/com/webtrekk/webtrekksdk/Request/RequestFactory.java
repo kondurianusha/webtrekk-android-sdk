@@ -22,11 +22,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.webtrekk.webtrekksdk.Configuration.ActivityConfiguration;
+import com.webtrekk.webtrekksdk.Modules.AppinstallGoal;
 import com.webtrekk.webtrekksdk.Modules.Campaign;
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.TrackingParameter.Parameter;
-import com.webtrekk.webtrekksdk.Utils.ActivityTrackingStatus;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
@@ -56,6 +56,7 @@ public class RequestFactory {
     private Context mContext;
     private TrackingConfiguration mTrackingConfiguration;
     private volatile Campaign mCampaign;
+    private final AppinstallGoal mAppinstallGoal = new AppinstallGoal();
 
     //additional customer params, this is a globally available HashMap
     //before the requests are sent, the keys of this HashMap are matched with the keys in the xml configuration or the global/
@@ -110,6 +111,7 @@ public class RequestFactory {
         boolean isFirstStart = HelperFunctions.firstStart(mContext);
 
         initOptedOut();
+        mAppinstallGoal.initAppinstallGoal(mContext);
         startAdvertizingThread(isFirstStart);
         initSampling();
         initInternalParameter(isFirstStart);
@@ -398,20 +400,27 @@ public class RequestFactory {
     /*
     Process campaignData
      */
-    private void processMediaCode(TrackingRequest request)
+    private void processInstallGoals(TrackingRequest request)
     {
-        String mediaCode = Campaign.getMediaCode(mContext);
+        final boolean isCampaingProcessFinished = Campaign.isCampaignProcessingFinished(mContext);
 
-        if (mediaCode != null && !mediaCode.isEmpty()) {
-            request.mTrackingParameter.add(Parameter.ADVERTISEMENT, mediaCode);
-            request.mTrackingParameter.add(Parameter.ADVERTISEMENT_ACTION, "c");
-            request.mTrackingParameter.add(Parameter.ECOM, "900", "1");
-        }else
-        {
-            String deepLinkMediaCode = HelperFunctions.getDeepLinkMediaCode(mContext, true);
-            if (deepLinkMediaCode != null && !deepLinkMediaCode.isEmpty())
-            {
-                request.mTrackingParameter.add(Parameter.ADVERTISEMENT, deepLinkMediaCode);
+        if (isCampaingProcessFinished) {
+
+            if (mAppinstallGoal.isAppinstallGoal(mContext)){
+                request.mTrackingParameter.add(Parameter.ECOM, "900", "1");
+                mAppinstallGoal.finishAppinstallGoal(mContext);
+            }
+
+            final String mediaCode = Campaign.getMediaCode(mContext);
+
+            if (mediaCode != null && !mediaCode.isEmpty()) {
+                request.mTrackingParameter.add(Parameter.ADVERTISEMENT, mediaCode);
+                request.mTrackingParameter.add(Parameter.ADVERTISEMENT_ACTION, "c");
+            } else {
+                String deepLinkMediaCode = HelperFunctions.getDeepLinkMediaCode(mContext, true);
+                if (deepLinkMediaCode != null && !deepLinkMediaCode.isEmpty()) {
+                    request.mTrackingParameter.add(Parameter.ADVERTISEMENT, deepLinkMediaCode);
+                }
             }
         }
     }
@@ -571,7 +580,7 @@ public class RequestFactory {
      */
     public void addRequest(TrackingRequest request)  {
 
-        processMediaCode(request);
+        processInstallGoals(request);
 
         // only track if not opted out
         if(!mIsOptout && !mIsSampling) {

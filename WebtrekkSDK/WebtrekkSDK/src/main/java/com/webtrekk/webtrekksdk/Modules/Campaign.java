@@ -21,6 +21,7 @@ package com.webtrekk.webtrekksdk.Modules;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.JsonReader;
 
@@ -60,7 +61,8 @@ public class Campaign extends Thread
     private static final String MEDIA_CODE = "INSTALL_SETTINGS_MEDIA_CODE";
     private static final String OPT_OUT = "INSTALL_SETTINGS_OPT_OUT";
     private static final String FIRST_START_INITIATED = "FIRST_START_INITIATED";
-    private static final String CAMPAIN_MEDIA_CODE_DEFINED_MESSAGE = "com.Webtrekk.CampainMediaMessage";
+    private static final String CAMPAIGN_MEDIA_CODE_DEFINED_MESSAGE = "com.Webtrekk.CampainMediaMessage";
+    private static final String CAMPAIGN_PROCESS_FINISHED = "CAMPAIGN_PROCESS_FINISHED";
 
 
     Campaign(Context context, String trackID, boolean isFirstStart, boolean isAutoTrackAdvID, boolean enableCampaign) {
@@ -230,7 +232,7 @@ public class Campaign extends Thread
                         //ask each 5 seconds for referer;
                         sleep(5000);
                     } catch (InterruptedException e) {
-                        return;
+                        continue;
                     }
                 }
                 WebtrekkLogging.log("Referrer is received and readed:"+referrer);
@@ -254,7 +256,7 @@ public class Campaign extends Thread
                         SaveCodeAndAdID(googleMediaCode, advID, isLimitAdEnabled);
                         campaignNotificationMessage(googleMediaCode, advID);
                         //delete first start
-                        getFirstStartInitiated(mContext, true);
+                        finishProcessCampaign(mContext);
                     }
                 }
             }
@@ -273,14 +275,14 @@ public class Campaign extends Thread
 
                 SaveCodeAndAdID(webtrekkMediaCode, advID, isLimitAdEnabled);
                 campaignNotificationMessage(webtrekkMediaCode, advID);
-                //delete first start
-                getFirstStartInitiated(mContext, true);
+                //delete first start and set flag for finishing campaign processing
+                finishProcessCampaign(mContext);
             }
         }else{
             SaveCodeAndAdID(null, advID, isLimitAdEnabled);
             campaignNotificationMessage("NoCampaignMode", advID);
-            //delete first start
-            getFirstStartInitiated(mContext, true);
+            //delete first start and set flag for finishing campaign processing
+            finishProcessCampaign(mContext);
         }
     }
 
@@ -399,12 +401,29 @@ public class Campaign extends Thread
         editor.putBoolean(FIRST_START_INITIATED, true).apply();
     }
 
+    private void finishProcessCampaign(@NonNull Context context){
+        getFirstStartInitiated(context, true);
+        SharedPreferences.Editor editor = HelperFunctions.getWebTrekkSharedPreference(context).edit();
+        editor.putBoolean(Campaign.CAMPAIGN_PROCESS_FINISHED, true).commit();
+    }
+
+    /**
+     * Check if campaign is processed
+     * {@hide}
+     * @param context
+     * @return true if campaign processing is finished
+     */
+    static public boolean isCampaignProcessingFinished(@NonNull Context context){
+        SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
+        return preferences.getBoolean(Campaign.CAMPAIGN_PROCESS_FINISHED, false);
+    }
+
     /**
      * {@hide}
      * get if thread was interrupted see {@link #setFirstStartInitiated()} delete flag from settings
      * @return
      */
-    public static boolean getFirstStartInitiated(Context context, boolean deleteFlag)
+    public static boolean getFirstStartInitiated(@NonNull Context context, boolean deleteFlag)
     {
         SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
 
@@ -416,17 +435,17 @@ public class Campaign extends Thread
         return result;
     }
 
-    public static String getAdvId(Context context)
+    public static String getAdvId(@NonNull Context context)
     {
         return getAndRemoveInstallSpecificCode(context, ADV_ID, false);
     }
 
-    public static String getMediaCode(Context context)
+    public static String getMediaCode(@NonNull Context context)
     {
         return getAndRemoveInstallSpecificCode(context, MEDIA_CODE, true);
     }
 
-    public static boolean getOptOut(Context context)
+    public static boolean getOptOut(@NonNull Context context)
     {
         SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
         return preferences.getBoolean(OPT_OUT, false);
@@ -439,7 +458,7 @@ public class Campaign extends Thread
      * @param remove
      * @return
      */
-    static private String getAndRemoveInstallSpecificCode(Context context, String key, boolean remove)
+    static private String getAndRemoveInstallSpecificCode(@NonNull Context context, @NonNull String key, boolean remove)
     {
         String value;
         SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
@@ -459,7 +478,7 @@ public class Campaign extends Thread
         try{
             if (!mFirstStart)
                 return;
-            Intent intent = new Intent(CAMPAIN_MEDIA_CODE_DEFINED_MESSAGE);
+            Intent intent = new Intent(CAMPAIGN_MEDIA_CODE_DEFINED_MESSAGE);
 
             intent.putExtra(MEDIA_CODE, mediaCode);
             intent.putExtra(ADV_ID, advID);

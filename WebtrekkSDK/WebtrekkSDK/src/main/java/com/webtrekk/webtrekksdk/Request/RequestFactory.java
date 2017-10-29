@@ -137,7 +137,7 @@ public class RequestFactory {
         mIsOptout = isOptout;
 
         SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(mContext);
-        preferences.edit().putBoolean(PREFERENCE_KEY_OPTED_OUT, isOptout).commit();
+        preferences.edit().putBoolean(PREFERENCE_KEY_OPTED_OUT, isOptout).apply();
     }
 
     public boolean isSampling() {
@@ -268,7 +268,7 @@ public class RequestFactory {
         // store the preference keys if the device is sampling and the sampling value
         editor.putBoolean(PREFERENCE_KEY_IS_SAMPLING, mIsSampling);
         editor.putInt(PREFERENCE_KEY_SAMPLING, mTrackingConfiguration.getSampling());
-        editor.commit();
+        editor.apply();
         WebtrekkLogging.log("isSampling = " + mIsSampling + ", samplingRate = " + mTrackingConfiguration.getSampling());
     }
 

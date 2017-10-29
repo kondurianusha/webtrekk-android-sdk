@@ -388,7 +388,7 @@ public class Campaign extends Thread
         if (advertizingID != null)
             editor.putString(ADV_ID, advertizingID);
         editor.putBoolean(OPT_OUT, isOptOut);
-        editor.commit();
+        editor.apply();
     }
 
     /**
@@ -404,7 +404,7 @@ public class Campaign extends Thread
     private void finishProcessCampaign(@NonNull Context context){
         getFirstStartInitiated(context, true);
         SharedPreferences.Editor editor = HelperFunctions.getWebTrekkSharedPreference(context).edit();
-        editor.putBoolean(Campaign.CAMPAIGN_PROCESS_FINISHED, true).commit();
+        editor.putBoolean(Campaign.CAMPAIGN_PROCESS_FINISHED, true).apply();
     }
 
     /**

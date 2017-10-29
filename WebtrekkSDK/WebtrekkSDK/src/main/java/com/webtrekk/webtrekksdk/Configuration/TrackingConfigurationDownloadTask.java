@@ -114,7 +114,7 @@ public class TrackingConfigurationDownloadTask extends AsyncTask<String, Void, T
                     // either store it as xml on the internal storage or save it as xml string in the shared prefs
                     WebtrekkLogging.log("saving new trackingConfiguration to preferences");
                     SharedPreferences sharedPrefs = HelperFunctions.getWebTrekkSharedPreference(context);
-                    sharedPrefs.edit().putString(Webtrekk.PREFERENCE_KEY_CONFIGURATION, trackingConfigurationString).commit();
+                    sharedPrefs.edit().putString(Webtrekk.PREFERENCE_KEY_CONFIGURATION, trackingConfigurationString).apply();
 
                     //TODO: update the current configuration only if valid and newer
                     WebtrekkLogging.log("updating current trackingConfiguration");

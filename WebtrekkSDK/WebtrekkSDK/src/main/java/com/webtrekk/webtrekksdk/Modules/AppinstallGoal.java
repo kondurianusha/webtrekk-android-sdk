@@ -36,7 +36,7 @@ public class AppinstallGoal {
     public void initAppinstallGoal(@NonNull Context context){
         if (!isAppinstallGoalProcessed(context)){
             SharedPreferences.Editor editor = getPreferences(context).edit();
-            editor.putBoolean(AppinstallGoal.appinstallGoal, true).commit();
+            editor.putBoolean(AppinstallGoal.appinstallGoal, true).apply();
         }
     }
 
@@ -51,7 +51,7 @@ public class AppinstallGoal {
             SharedPreferences.Editor editor = getPreferences(context).edit();
             editor.remove(AppinstallGoal.appinstallGoal);
             editor.putBoolean(AppinstallGoal.appinstallGoalProcessed, true);
-            editor.commit();
+            editor.apply();
         }
     }
 

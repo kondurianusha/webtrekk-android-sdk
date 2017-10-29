@@ -273,7 +273,7 @@ final public class HelperFunctions {
     public static String getEverId(Context context) {
         SharedPreferences preferences = getWebTrekkSharedPreference(context);
         if (!preferences.contains(Webtrekk.PREFERENCE_KEY_EVER_ID)) {
-            preferences.edit().putString(Webtrekk.PREFERENCE_KEY_EVER_ID, HelperFunctions.generateEverid()).commit();
+            preferences.edit().putString(Webtrekk.PREFERENCE_KEY_EVER_ID, HelperFunctions.generateEverid()).apply();
             // for compatibility reasons put the key here for new installation
             //preferences.edit().putString(Webtrekk.PREFERENCE_KEY_INSTALLATION_FLAG, "1");
         }
@@ -282,14 +282,14 @@ final public class HelperFunctions {
 
     public static void setEverId(Context context, String value) {
         SharedPreferences preferences = getWebTrekkSharedPreference(context);
-        preferences.edit().putString(Webtrekk.PREFERENCE_KEY_EVER_ID, value).commit();
+        preferences.edit().putString(Webtrekk.PREFERENCE_KEY_EVER_ID, value).apply();
     }
 
 
     public static long getAdClearId(Context context) {
         SharedPreferences preferences = HelperFunctions.getWebTrekkSharedPreference(context);
         if (!preferences.contains(AdClearIdUtil.PREFERENCE_KEY_ADCLEAR_ID)) {
-            preferences.edit().putLong(AdClearIdUtil.PREFERENCE_KEY_ADCLEAR_ID, new AdClearIdUtil().generateAdClearId()).commit();
+            preferences.edit().putLong(AdClearIdUtil.PREFERENCE_KEY_ADCLEAR_ID, new AdClearIdUtil().generateAdClearId()).apply();
         }
         return preferences.getLong(AdClearIdUtil.PREFERENCE_KEY_ADCLEAR_ID, 0);
     }
@@ -332,8 +332,7 @@ final public class HelperFunctions {
 
     public static void setAppVersionCode(int versionCode, Context context) {
         SharedPreferences preferences = getWebTrekkSharedPreference(context);
-        ;
-        preferences.edit().putInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, versionCode).commit();
+        preferences.edit().putInt(Webtrekk.PREFERENCE_APP_VERSIONCODE, versionCode).apply();
     }
 
     /**

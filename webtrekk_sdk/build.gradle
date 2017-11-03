@@ -101,11 +101,11 @@ publishing {
     }
 }
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.0'
+    compileSdkVersion COMPILE_SDK_VERSION as int
+    buildToolsVersion BUILD_TOOLS_VERSION as String
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion MIN_SDK_VERSION as int
         targetSdkVersion 22
     }
     buildTypes {
@@ -122,10 +122,6 @@ android {
 
     defaultPublishConfig 'release'
     publishNonDefault true
-    productFlavors {
-        library {
-        }
-    }
 }
 
 
@@ -184,14 +180,14 @@ install {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile ('com.google.android.gms:play-services-ads:[8.1.0,)')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation ('com.google.android.gms:play-services-ads:[8.1.0,)')
     //compile 'com.google.android.gms:play-services-gcm:8.1.0'
     // dexmaker is fixed to this mockito version, 1.10.19 has bugs like missing abstract method error
     //https://code.google.com/p/dexmaker/issues/detail?id=43
-    androidTestCompile 'org.mockito:mockito-core:1.9.5'
-    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
-    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+    androidTestImplementation 'org.mockito:mockito-core:1.9.5'
+    androidTestImplementation 'com.google.dexmaker:dexmaker:1.2'
+    androidTestImplementation 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
 
 

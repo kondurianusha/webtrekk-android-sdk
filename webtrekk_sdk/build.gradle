@@ -178,7 +178,7 @@ install {
                     if ( !xmlOptional ) {
                         xmlOptional = xmlDep.appendNode( 'optional' )
                     }
-                    xmlOptional.value = 'false';
+                    xmlOptional.value = 'true';
                 }
             }
         }

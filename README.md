@@ -4,10 +4,10 @@ The Webtrekk SDK allows you to track user activities, screen flow and media usag
 
 ## Getting Started
 
-1. Open project in Android Studio by specifying SDKTest as targed folder.
+1. Clone source code and open project in Android Studio
 1. Compile and run.
 
-SDKTest is Android application project that include WebtrekkSDK project as well.
+sdk_test is test application, webtrekk_sdk is library.
 
 ## Deployment
 

@@ -151,7 +151,7 @@ public class MiscellaneousTest  extends WebtrekkBaseMainTest {
         String version = Build.VERSION.RELEASE;
 
         assertEquals(HelperFunctions.urlDecode(parcel.getValue("X-WT-UA")),
-                "Tracking Library 9.9.9 (Android "+version+"; unknown Android SDK built for x86; en_US)");
+                "Tracking Library " + Webtrekk.mTrackingLibraryVersionUI + " (Android "+version+"; unknown Android SDK built for x86; en_US)");
     }
 
 

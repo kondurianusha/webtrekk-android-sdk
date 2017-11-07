@@ -1,6 +1,6 @@
 local.properties
 .gradle
-/.idea/workspace.xml
-/.idea/libraries
+/.idea
 .DS_Store
 /build
+sdk_test-parent.iml

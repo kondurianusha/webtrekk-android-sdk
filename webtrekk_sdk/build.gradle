@@ -6,7 +6,7 @@ apply plugin: 'findbugs'
 
 
 def siteUrl = 'www.webtrekk.com'      // Homepage URL of the library
-def gitUrl = 'http://stash.webtrekk.com/scm/pixlib/sdk-android-v2.git'   // Git repository URL
+def gitUrl = 'git@github.com:Webtrekk/webtrekk-android-sdk.git'   // Github repository URL
 group = "com.webtrekk.webtrekksdk"                                        // Maven Group ID for the artifact
 
 def projectName = 'Webtrekk Android SDK Library'
@@ -15,23 +15,20 @@ def licenceURL = 'https://github.com/Webtrekk/open-source-guidelines/blob/master
 def devName = 'Arsen Vartbaronov'
 def devEmail = 'arsen.vartbaronov@webtrekk.com'
 def devID = 'vartbaronov'
+def webtrekkArtifactId = 'WebtrekkSDK'
+def webtrekkGitHubRepo = 'Webtrekk/webtrekk-android-sdk'
 
 task findbugs(type: FindBugs) {
     ignoreFailures = false
     effort = "default"
     reportLevel = "medium"
-    excludeFilter = new File("${project.rootDir}/findbugs/findbugs-filter.xml")
-    classes = files("${project.rootDir}/app/build/intermediates/classes")
+    classes = files("${project.buildDir}/intermediates/classes")
     source = fileTree('src/main/java/')
     classpath = files()
     reports {
         xml.enabled = true
-        html.enabled = true
         xml {
-            destination "$project.buildDir/findbugs/findbugs-output.xml"
-        }
-        html {
-            destination "$project.buildDir/findbugs/findbugs-output.html"
+            destination file("$project.buildDir/findbugs/findbugs-output.xml")
         }
     }
 }
@@ -41,7 +38,7 @@ task versionDef(){
     {
         version = versionExt
     } else
-        version = "9.9.9"
+        version = "1.1.1"
 }
 
 task sourcesJar(type: Jar) {
@@ -49,7 +46,7 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
 }
 
-def releaseFile = file("$project.buildDir/outputs/aar/WebtrekkSDK-library-release.aar")
+def releaseFile = file("$project.buildDir/outputs/aar/webtrekk_sdk-release.aar")
 
 publishing {
     publications {
@@ -57,6 +54,8 @@ publishing {
             //get pom from install tast
             def installPom = install.repositories.mavenInstaller.pom;
             def dependenciesNode, scmNode, nameNode,  urlNode, licenceNode, developersNode;
+
+            println("installPom:"+installPom)
 
             //fill pom nodes from install xml
             installPom.withXml{
@@ -66,19 +65,10 @@ publishing {
                 developersNode = asNode().developers
                 dependenciesNode = asNode().dependencies
                 urlNode = asNode().url
-
-                //change dependency
-                dependenciesNode.dependency.findAll { xmlDep ->
-                    if ( xmlDep.groupId.text() == "com.google.android.gms"
-                            &&  xmlDep.artifactId.text() == "play-services-ads") {
-                        def xmlOptional = xmlDep.optional[ 0 ];
-                        if ( !xmlOptional ) {
-                            xmlOptional = xmlDep.appendNode( 'optional' )
-                        }
-                        xmlOptional.value = 'true';
-                    }
-                }
             }
+
+            //need to call withXml
+            installPom.writeTo(new StringWriter())
 
             //change publication pom
             pom.withXml {
@@ -89,6 +79,8 @@ publishing {
                 asNode().append(scmNode)
                 asNode().append(dependenciesNode)
             }
+
+            artifactId webtrekkArtifactId
 
             artifacts {
                 artifact sourcesJar
@@ -101,11 +93,11 @@ publishing {
     }
 }
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.0'
+    compileSdkVersion COMPILE_SDK_VERSION as int
+    buildToolsVersion BUILD_TOOLS_VERSION as String
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion MIN_SDK_VERSION as int
         targetSdkVersion 22
     }
     buildTypes {
@@ -121,11 +113,6 @@ android {
     }
 
     defaultPublishConfig 'release'
-    publishNonDefault true
-    productFlavors {
-        library {
-        }
-    }
 }
 
 
@@ -158,6 +145,7 @@ install {
                 // Add your description here
                 name projectName
                 url siteUrl
+                artifactId webtrekkArtifactId
 
                 // Set your license
                 licenses {
@@ -180,18 +168,29 @@ install {
                 }
             }
         }
+
+        pom.withXml{
+            //change dependency
+            asNode().dependencies.dependency.findAll { xmlDep ->
+                if ( xmlDep.groupId.text() == "com.google.android.gms"
+                        &&  xmlDep.artifactId.text() == "play-services-ads") {
+                    def xmlOptional = xmlDep.optional[ 0 ];
+                    if ( !xmlOptional ) {
+                        xmlOptional = xmlDep.appendNode( 'optional' )
+                    }
+                    xmlOptional.value = 'true';
+                }
+            }
+        }
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile ('com.google.android.gms:play-services-ads:[8.1.0,)')
-    //compile 'com.google.android.gms:play-services-gcm:8.1.0'
-    // dexmaker is fixed to this mockito version, 1.10.19 has bugs like missing abstract method error
-    //https://code.google.com/p/dexmaker/issues/detail?id=43
-    androidTestCompile 'org.mockito:mockito-core:1.9.5'
-    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
-    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation ('com.google.android.gms:play-services-ads:[8.1.0,)')
+    androidTestImplementation 'org.mockito:mockito-core:1.9.5'
+    androidTestImplementation 'com.google.dexmaker:dexmaker:1.2'
+    androidTestImplementation 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
 
 
@@ -212,11 +211,11 @@ bintray {
             properties.setProperty("bintray.user", bintrayUserEx)
         }
         if (parent.hasProperty("bintrayApiKeyrEx")) {
-        properties.setProperty("bintray.apikey", bintrayApiKeyrEx)
+            properties.setProperty("bintray.apikey", bintrayApiKeyrEx)
         }
-            if (parent.hasProperty("bintrayGpgPasswordEx")) {
-        properties.setProperty("bintray.gpg.password", bintrayGpgPasswordEx)
-            }
+        if (parent.hasProperty("bintrayGpgPasswordEx")) {
+            properties.setProperty("bintray.gpg.password", bintrayGpgPasswordEx)
+        }
     }
 
     user = properties.getProperty("bintray.user")
@@ -225,7 +224,7 @@ bintray {
     }
     key = properties.getProperty("bintray.apikey")
     if (key == null && parent.hasProperty("bintrayApiKeyrEx")){
-      keay = bintrayApiKeyrEx
+        key = bintrayApiKeyrEx
     }
 
     publications = ['WebtrekkPublication']
@@ -235,6 +234,8 @@ bintray {
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["MIT"]
+        githubRepo = webtrekkGitHubRepo
+        githubReleaseNotesFile = 'README.md'
         publish = true
         publicDownloadNumbers = true
         version {

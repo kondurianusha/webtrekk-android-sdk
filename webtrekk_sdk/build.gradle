@@ -113,6 +113,7 @@ android {
     }
 
     defaultPublishConfig 'release'
+    buildToolsVersion '26.0.2'
 }
 
 
@@ -188,6 +189,7 @@ install {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation ('com.google.android.gms:play-services-ads:[8.1.0,)')
+    implementation ('com.android.support:recyclerview-v7:27.0.0')
     androidTestImplementation 'org.mockito:mockito-core:1.9.5'
     androidTestImplementation 'com.google.dexmaker:dexmaker:1.2'
     androidTestImplementation 'com.google.dexmaker:dexmaker-mockito:1.2'

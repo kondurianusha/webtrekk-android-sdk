@@ -17,8 +17,13 @@
  */
 package com.webtrekk.webtrekksdk;
 
+import android.support.annotation.NonNull;
+
+import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
+import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -31,6 +36,12 @@ import java.util.TreeMap;
  */
 
 public class TrackingParameter {
+
+    //Separator for product list merge
+    final private static String PRODUCT_LIST_SEPARATOR = ";";
+    final private static int MAX_PARAMETER_LENGTH = 255;
+    //~8 KB because some parameter don't exist during size validation add 200 symbols, just in case
+    final private static int MAX_QUERY_LENGTH = 8*1024 - 200;
     // general tracking trackingParameter
     private SortedMap<Parameter, String> defaultParameter;
     // customer trackingparams, defined by the app
@@ -105,10 +116,10 @@ public class TrackingParameter {
     public TrackingParameter add(Parameter key, String index, String value) {
 
         String valueToAdd = null;
-        if (value != null && value.length() > 255)
+        if (value != null && value.length() > TrackingParameter.MAX_PARAMETER_LENGTH)
         {
-            WebtrekkLogging.log("Parameter is more then 255 length. Truncate");
-            valueToAdd = value.substring(0, 255);
+            WebtrekkLogging.log("Parameter is more then "+TrackingParameter.MAX_PARAMETER_LENGTH+" length. Truncate");
+            valueToAdd = value.substring(0, TrackingParameter.MAX_PARAMETER_LENGTH);
         }else
             valueToAdd = value;
 
@@ -277,6 +288,7 @@ public class TrackingParameter {
         CURRENCY("cr"),
         PRODUCT_COUNT("qn"), // produkt anzahl
         PRODUCT_STATUS("st"), // produkt status ( ad, view, conf)
+        PRODUCT_POSITION("plp"),
         CUSTOMER_ID("cd"), // kundennnummer
         EMAIL("uc700"), // email
         EMAIL_RID("uc701"), // email rid
@@ -339,15 +351,15 @@ public class TrackingParameter {
          * multiple value trackingParameter and customer trackingParameter
          */
 
-        PAGE(""),
-        SESSION(""),
-        ECOM(""),
-        AD(""),
-        ACTION(""),
-        USER_CAT(""),
-        PAGE_CAT(""),
-        PRODUCT_CAT(""),
-        MEDIA_CAT(""),
+        PAGE("cp"),
+        SESSION("cs"),
+        ECOM("cb"),
+        AD("cc"),
+        ACTION("ck"),
+        USER_CAT("uc"),
+        PAGE_CAT("cg"),
+        PRODUCT_CAT("ca"),
+        MEDIA_CAT("mg"),
         ACTIVITY_CAT(""),
 
 
@@ -423,4 +435,95 @@ public class TrackingParameter {
         return mappedValues;
     }
 
+    /**merge products in two Tracking parameters with product.
+     *
+     * @param mergedFrom parameters that have additional product to merge
+     * @return TrackingParameter instance with merged results or null if size of any parameter more then {@link #MAX_PARAMETER_LENGTH}
+     */
+    public TrackingParameter mergeProducts(TrackingParameter mergedFrom, TrackingConfiguration configuration){
+
+        // merge default parameters
+        boolean more255 = false;
+
+        final TrackingParameter mergedResult = new TrackingParameter();
+        final SortedMap<Parameter, String> mergedDefaults =
+                mergeMaps(defaultParameter, mergedFrom.getDefaultParameter());
+
+        // can't merge this parameters query is too long
+        if (mergedDefaults == null){
+            return null;
+        }
+
+        mergedResult.setDefaultParameter(mergedDefaults);
+
+        final SortedMap<String, String> eComParameters = mergedFrom.getEcomParameter();
+
+        if (ecomParameter != null){
+            SortedMap<String, String> mergedEcomParameters =
+                    mergeMaps(ecomParameter, mergedFrom.getEcomParameter());
+
+            // can't merge this parameters query is too long
+            if (mergedEcomParameters == null){
+                return null;
+            }
+            mergedResult.setEcomParameter(mergedEcomParameters);
+        }
+
+        final SortedMap<String, String> eProductCategory = mergedFrom.getProductCategories();
+
+        if (productCategories != null){
+            SortedMap<String, String> mergedProductCategories =
+                    mergeMaps(productCategories, mergedFrom.getProductCategories());
+
+            // can't merge this parameters query is too long
+            if (mergedProductCategories == null){
+                return null;
+            }
+            mergedResult.setProductCategories(mergedProductCategories);
+        }
+
+        if (validateQuerySize(mergedResult, configuration)){
+            return mergedResult;
+        } else{
+            WebtrekkLogging.log("size more than 8 KB");
+            return null;
+        }
+    }
+
+    /**
+     * merge two maps and concatenate values with {@link #PRODUCT_LIST_SEPARATOR} character
+     * @param mergeTo base map
+     * @param mergeFrom map that have additional items to merge
+     * @param <T> type of key
+     * @return result
+     */
+    @NonNull
+    private <T> SortedMap<T, String> mergeMaps(SortedMap<T, String> mergeTo, SortedMap<T, String> mergeFrom){
+
+        final SortedMap<T, String> mergedResult = new TreeMap<>(mergeTo);
+        boolean more255 = false;
+
+        for (Map.Entry<T, String> entry: mergeFrom.entrySet()){
+            T parameter = entry.getKey();
+            String valueMergeFrom = entry.getValue();
+            String valueMergeTo = mergeTo.get(parameter);
+            valueMergeFrom = valueMergeFrom == null ? "" : valueMergeFrom;
+
+            valueMergeTo = (valueMergeTo == null) ? valueMergeFrom :
+                    valueMergeTo + PRODUCT_LIST_SEPARATOR + valueMergeFrom;
+            if (valueMergeTo.length() <=  TrackingParameter.MAX_PARAMETER_LENGTH){
+                mergedResult.put(parameter, valueMergeTo);
+            }else{
+                more255 = true;
+                break;
+            }
+        }
+
+        return more255 ? null : mergedResult;
+    }
+
+    private boolean validateQuerySize(TrackingParameter parameter, TrackingConfiguration configuration){
+        TrackingRequest request = new TrackingRequest(parameter, configuration);
+        return request.getRequestSize() <= TrackingParameter.MAX_QUERY_LENGTH;
+    }
 }

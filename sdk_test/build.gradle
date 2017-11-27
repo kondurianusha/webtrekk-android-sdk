@@ -27,12 +27,12 @@ android {
         }
 
     }
-    buildToolsVersion '26.0.2'
+    buildToolsVersion BUILD_TOOLS_VERSION as String
 }
 
 configurations.all {
     resolutionStrategy {
-        force 'com.android.support:support-annotations:27.0.0'
+        force 'com.android.support:support-annotations:27.0.1'
     }
 }
 
@@ -41,8 +41,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.mixpanel.android:mixpanel-android:4.8.0'
     implementation 'com.google.android.gms:play-services-ads:11.6.0'
-    implementation 'com.android.support:recyclerview-v7:27.0.0'
-    implementation 'com.android.support:appcompat-v7:27.0.0'
+    implementation 'com.android.support:recyclerview-v7:27.0.1'
+    implementation 'com.android.support:appcompat-v7:27.0.1'
     implementation "android.arch.lifecycle:extensions:1.0.0"
 
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

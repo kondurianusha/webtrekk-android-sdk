@@ -159,7 +159,7 @@ public class Webtrekk implements ActivityListener.Callback {
         //Application act = (Application) mContext.getApplicationContext();
         mExceptionHandler.init(mRequestFactory, mContext);
 
-        mProductListTracker = new ProductListTracker(trackingConfiguration);
+        mProductListTracker = new ProductListTracker(trackingConfiguration, mContext);
 
 
         WebtrekkLogging.log("requestUrlStore created: max requests - " + trackingConfiguration.getMaxRequests());

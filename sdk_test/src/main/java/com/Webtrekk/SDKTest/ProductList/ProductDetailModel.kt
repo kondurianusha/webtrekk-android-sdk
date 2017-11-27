@@ -22,6 +22,7 @@ import android.arch.lifecycle.ViewModel
  *
  * Created by vartbaronov on 20.11.17.
  */
+var testBasket = MutableLiveData<MutableList<ProductItem>>()
 class ProductDetailModel: ViewModel(){
     private var item: MutableLiveData<ProductItem> = MutableLiveData<ProductItem>()
 

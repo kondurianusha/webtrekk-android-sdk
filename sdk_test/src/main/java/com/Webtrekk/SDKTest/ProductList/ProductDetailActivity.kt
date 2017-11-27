@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.Webtrekk.SDKTest.R
+import com.webtrekk.webtrekksdk.ProductParameterBuilder
 import com.webtrekk.webtrekksdk.TrackingParameter
 import com.webtrekk.webtrekksdk.Webtrekk
 import kotlinx.android.synthetic.main.product_detail.*
@@ -52,36 +53,108 @@ class ProductDetailActivity : AppCompatActivity(){
                 text += "Product paymentMethod: "+ item?.paymentMethod + "\n"
                 text += "Product shippingService: "+ item?.shippingService + "\n"
                 text += "Product shippingSpeed: "+ item?.shippingSpeed + "\n"
-                text += "Product shippingCosts: "+ item?.shippingCosts + "\n"
+                text += "Product shippingCosts: "+ item?.shippingCost + "\n"
                 text += "Product grossMargin: "+ item?.grossMargin + "\n"
                 text += "Product productVariant: "+ item?.productVariant + "\n"
                 text += "Product productSoldOut: "+ item?.productSoldOut + "\n"
-                //TODO add more parameters
                 ProductDetails.text = text
             })
 
             model.getItem().value = ProductItem.getFromBundle(bundle)
+
+            testBasket.observe(this, Observer { items ->
+                var textProductList = ""
+
+                if (items == null){
+                    return@Observer
+                }
+
+                for (item in items.iterator()){
+                    textProductList += item.id + "; "
+                }
+
+                Basket.text = textProductList
+            })
         }
 
     }
 
     public fun onAdd(view: View){
-        trackProduct("add")
+        trackProduct(ProductParameterBuilder.ActionType.add)
+
+        val item = model.getItem().value!!
+        if (!testBasket.value!!.contains(item)) {
+            val newList = mutableListOf<ProductItem>()
+            newList.addAll(testBasket.value!!)
+            newList.add(item)
+            testBasket.value = newList
+        }
     }
 
     public fun onView(view: View){
-        trackProduct("view")
+        trackProduct(ProductParameterBuilder.ActionType.view)
     }
 
     public fun onConf(view: View){
-        trackProduct("conf")
+        val items = testBasket.value
+        if (items != null){
+
+            val productTracker = Webtrekk.getInstance().productListTracker
+            for (item in items){
+                val parameter = ProductParameterBuilder(item.id, ProductParameterBuilder.ActionType.conf).
+                        setCost(item.cost).
+                        setEcommerce(1, item.ecomParameters[0]).
+                        setEcommerce(2, item.ecomParameters[1]).
+                        setProductCategory(1, item.categories[0]).
+                        setProductCategory(2, item.categories[1]).
+                        setPaymentMethod(item.paymentMethod).
+                        setShippingService(item.shippingService).
+                        setShippingSpeed(item.shippingSpeed).
+                        setShippingCost(item.shippingCost).
+                        setGrossMargin(item.grossMargin).
+                        setProductVariant(item.productVariant).
+                        setIsProductSoldOut(item.productSoldOut).
+                        setCouponValue("CouponValue").
+                        setOrderStatus("orderStatus").
+                        setProductQuantity(2).
+                        result
+
+                if (parameter != null) {
+                    productTracker.trackProduct(parameter)
+                }
+
+            }
+            productTracker.send()
+
+            onBasketClear(view)
+        }
     }
 
-    private fun trackProduct(status: String){
-        val parameter = TrackingParameter()
+    public fun onBasketClear(view: View){
+        testBasket.value = mutableListOf<ProductItem>()
+    }
+
+    private fun trackProduct(status: ProductParameterBuilder.ActionType){
         val item = model.getItem().value
-        parameter.add(TrackingParameter.Parameter.PRODUCT, item?.id)
-        parameter.add(TrackingParameter.Parameter.PRODUCT_STATUS, status)
-        Webtrekk.getInstance().track(parameter)
+
+        if (item != null){
+            val productTracker = Webtrekk.getInstance().productListTracker
+            val parameter = ProductParameterBuilder(item.id, status).setCost(item.cost).
+                    setEcommerce(1, item.ecomParameters[0]).
+                    setEcommerce(2, item.ecomParameters[1]).
+                    setProductCategory(1, item.categories[0]).
+                    setProductCategory(2, item.categories[1]).
+                    setPaymentMethod(item.paymentMethod).
+                    setShippingService(item.shippingService).
+                    setShippingSpeed(item.shippingSpeed).
+                    setShippingCost(item.shippingCost).
+                    setGrossMargin(item.grossMargin).
+                    setProductVariant(item.productVariant).
+                    setIsProductSoldOut(item.productSoldOut).result
+
+            if (parameter != null) {
+                productTracker.trackProduct(parameter, true)
+            }
+        }
     }
 }

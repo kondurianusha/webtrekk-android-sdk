@@ -2,7 +2,6 @@ package com.Webtrekk.SDKTest.ProductList
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -11,7 +10,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.Webtrekk.SDKTest.R
-import com.webtrekk.webtrekksdk.ProductListTracker
+import com.webtrekk.webtrekksdk.ProductParameterBuilder
+import com.webtrekk.webtrekksdk.TrackingParameter
 import com.webtrekk.webtrekksdk.Webtrekk
 import kotlinx.android.synthetic.main.product_list_layout.*
 
@@ -59,13 +59,8 @@ class ProductListActivity : AppCompatActivity(){
         productListRecyclerView.adapter = adapter
         productListRecyclerView.addItemDecoration(DividerItemDecoration(this, (productListRecyclerView.layoutManager as LinearLayoutManager).orientation))
 
-        val webtrekk = Webtrekk.getInstance()
-
-        webtrekk.productListTracker.registerView(productListRecyclerView){ position ->
-            val item = model.getList().value?.get(position)
-            val builder = ProductListTracker.ParameterBuilder(position, item!!.id)
-            builder.setCost(item.cost).setEcommerce(1, item!!.ecomParameters[0]).
-                    setEcommerce(2, item!!.ecomParameters[1]).result
+        if (savedInstanceState == null) {
+            testBasket.value = mutableListOf<ProductItem>()
         }
     }
 
@@ -74,8 +69,35 @@ class ProductListActivity : AppCompatActivity(){
         unregisterTracking();
     }
 
+    override fun onStart() {
+        super.onStart()
+        val webtrekk = Webtrekk.getInstance()
+
+        webtrekk.productListTracker.registerView(productListRecyclerView){ position ->
+            val item = model.getList().value!!.get(position)
+            val builder = ProductParameterBuilder(item.id, ProductParameterBuilder.ActionType.list)
+
+            builder.setPosition(position).setCost(item.cost).
+                    setEcommerce(1, item.ecomParameters[0]).
+                    setEcommerce(2, item.ecomParameters[1]).
+                    setProductCategory(1, item.categories[0]).
+                    setProductCategory(2, item.categories[1]).
+                    setPaymentMethod(item.paymentMethod).
+                    setShippingService(item.shippingService).
+                    setShippingSpeed(item.shippingSpeed).
+                    setShippingCost(item.shippingCost).
+                    setGrossMargin(item.grossMargin).
+                    setProductVariant(item.productVariant).
+                    setIsProductSoldOut(item.productSoldOut).result!!
+        }
+    }
+
     fun unregisterTracking(){
-        Webtrekk.getInstance().productListTracker.unregisterView(productListRecyclerView)
+        val webtrekk = Webtrekk.getInstance()
+
+        if (webtrekk.isInitialized) {
+            webtrekk.productListTracker.unregisterView(productListRecyclerView)
+        }
     }
 
     fun getRecyclerView() : RecyclerView {

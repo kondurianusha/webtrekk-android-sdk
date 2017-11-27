@@ -7,6 +7,10 @@
         android:id="@+id/ProductDetails"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/Basket"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <Button
         android:onClick="onView"
         android:text="@string/product_view"
@@ -16,6 +20,12 @@
     <Button
         android:onClick="onAdd"
         android:text="@string/product_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:onClick="onBasketClear"
+        android:text="@string/product_clear_basket"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

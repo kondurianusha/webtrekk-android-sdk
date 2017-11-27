@@ -35,7 +35,7 @@ const val PRODUCT_PRODUCT_SOLD_OUT: String = "PRODUCT_PRODUCT_SOLD_OUT"
 public data class ProductItem(val ind: Int, val id: String, val categories: Array<String>, val cost: Float,
                        val ecomParameters: Array<String>, val paymentMethod: String,
                        val shippingService: String, val shippingSpeed: String,
-                       val shippingCosts: Float, val grossMargin: Float,
+                       val shippingCost: Float, val grossMargin: Float,
                        val productVariant: String, val productSoldOut: Boolean){
     companion object Handler{
         fun getProductItemByIndex(ind: Int): ProductItem{
@@ -83,7 +83,7 @@ public data class ProductItem(val ind: Int, val id: String, val categories: Arra
         bundle.putString(PRODUCT_PAYMENT_METHOD, paymentMethod)
         bundle.putString(PRODUCT_SHIPPING_SERVICE, shippingService)
         bundle.putString(PRODUCT_SHIPPING_SPEED, shippingSpeed)
-        bundle.putFloat(PRODUCT_SHIPPING_COST, shippingCosts)
+        bundle.putFloat(PRODUCT_SHIPPING_COST, shippingCost)
         bundle.putFloat(PRODUCT_GROSS_MARGIN, grossMargin)
         bundle.putString(PRODUCT_PRODUCT_VARIANT, productVariant)
         bundle.putBoolean(PRODUCT_PRODUCT_SOLD_OUT, productSoldOut)

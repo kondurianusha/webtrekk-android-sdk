@@ -23,8 +23,12 @@ import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
 import com.webtrekk.webtrekksdk.Request.TrackingRequest;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -38,7 +42,7 @@ import java.util.TreeMap;
 public class TrackingParameter {
 
     //Separator for product list merge
-    final private static String PRODUCT_LIST_SEPARATOR = ";";
+    final public static String PRODUCT_LIST_SEPARATOR = ";";
     final private static int MAX_PARAMETER_LENGTH = 255;
     //~8 KB because some parameter don't exist during size validation add 200 symbols, just in case
     final private static int MAX_QUERY_LENGTH = 8*1024 - 200;
@@ -287,8 +291,17 @@ public class TrackingParameter {
         PRODUCT_COST("co"), // produktkosten
         CURRENCY("cr"),
         PRODUCT_COUNT("qn"), // produkt anzahl
-        PRODUCT_STATUS("st"), // produkt status ( ad, view, conf)
+        PRODUCT_STATUS("st"), // produkt status ( ad, view, conf, list)
         PRODUCT_POSITION("plp"),
+        PRODUCT_PAYMENT_METHOD("cb761"),
+        PRODUCT_SHIPPING_SERVICE("cb762"),
+        PRODUCT_SHIPPING_SPEED("cb763"),
+        PRODUCT_SHIPPING_COST("cb764"),
+        PRODUCT_GROSS_MARGIN("cb765"),
+        PRODUCT_ORDER_STATUS("cb766"),
+        PRODUCT_VARIANT("cb767"),
+        PRODUCT_COUPON("cb563"),
+        PRODUCT_SOLD_OUT("cb760"),
         CUSTOMER_ID("cd"), // kundennnummer
         EMAIL("uc700"), // email
         EMAIL_RID("uc701"), // email rid
@@ -440,14 +453,17 @@ public class TrackingParameter {
      * @param mergedFrom parameters that have additional product to merge
      * @return TrackingParameter instance with merged results or null if size of any parameter more then {@link #MAX_PARAMETER_LENGTH}
      */
-    public TrackingParameter mergeProducts(TrackingParameter mergedFrom, TrackingConfiguration configuration){
+
+    public TrackingParameter mergeProducts(TrackingParameter mergedFrom, TrackingParameter baseParameter,
+                                           TrackingConfiguration configuration){
 
         // merge default parameters
         boolean more255 = false;
 
         final TrackingParameter mergedResult = new TrackingParameter();
         final SortedMap<Parameter, String> mergedDefaults =
-                mergeMaps(defaultParameter, mergedFrom.getDefaultParameter());
+                mergeMaps(defaultParameter, mergedFrom.getDefaultParameter(),
+                        baseParameter.getDefaultParameter().keySet());
 
         // can't merge this parameters query is too long
         if (mergedDefaults == null){
@@ -460,7 +476,8 @@ public class TrackingParameter {
 
         if (ecomParameter != null){
             SortedMap<String, String> mergedEcomParameters =
-                    mergeMaps(ecomParameter, mergedFrom.getEcomParameter());
+                    mergeMaps(ecomParameter, mergedFrom.getEcomParameter(),
+                            baseParameter.getEcomParameter().keySet());
 
             // can't merge this parameters query is too long
             if (mergedEcomParameters == null){
@@ -473,7 +490,8 @@ public class TrackingParameter {
 
         if (productCategories != null){
             SortedMap<String, String> mergedProductCategories =
-                    mergeMaps(productCategories, mergedFrom.getProductCategories());
+                    mergeMaps(productCategories, mergedFrom.getProductCategories(),
+                            baseParameter.getProductCategories().keySet());
 
             // can't merge this parameters query is too long
             if (mergedProductCategories == null){
@@ -498,21 +516,39 @@ public class TrackingParameter {
      * @return result
      */
     @NonNull
-    private <T> SortedMap<T, String> mergeMaps(SortedMap<T, String> mergeTo, SortedMap<T, String> mergeFrom){
+    private <T> SortedMap<T, String> mergeMaps(SortedMap<T, String> mergeTo,
+                                               SortedMap<T, String> mergeFrom,
+                                               Set<T> baseKey){
 
         final SortedMap<T, String> mergedResult = new TreeMap<>(mergeTo);
+        final Set<String> exceptionsKey =
+                new HashSet<>(Arrays.asList(new String[] {Parameter.PRODUCT_STATUS.toString(),
+                        Parameter.ACTION_NAME.toString()}));
         boolean more255 = false;
 
-        for (Map.Entry<T, String> entry: mergeFrom.entrySet()){
-            T parameter = entry.getKey();
-            String valueMergeFrom = entry.getValue();
-            String valueMergeTo = mergeTo.get(parameter);
+        for (T key: baseKey){
+            String valueMergeFrom = mergeFrom.get(key);;
+            String valueMergeTo = mergeTo.get(key);
             valueMergeFrom = valueMergeFrom == null ? "" : valueMergeFrom;
 
-            valueMergeTo = (valueMergeTo == null) ? valueMergeFrom :
-                    valueMergeTo + PRODUCT_LIST_SEPARATOR + valueMergeFrom;
+            final String keyAsString = key.toString();
+
+            if (valueMergeFrom == null && valueMergeTo == null){
+                WebtrekkLogging.log("incorrect baseKey list");
+                continue;
+            }
+            if (exceptionsKey.contains(keyAsString)){
+                    valueMergeTo = valueMergeFrom;
+            }else {
+                if (valueMergeTo == null){
+                    valueMergeTo = valueMergeFrom;
+                } else {
+                    valueMergeTo += PRODUCT_LIST_SEPARATOR + valueMergeFrom;
+                }
+            }
+
             if (valueMergeTo.length() <=  TrackingParameter.MAX_PARAMETER_LENGTH){
-                mergedResult.put(parameter, valueMergeTo);
+                mergedResult.put(key, valueMergeTo);
             }else{
                 more255 = true;
                 break;

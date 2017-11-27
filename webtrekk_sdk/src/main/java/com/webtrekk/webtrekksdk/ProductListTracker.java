@@ -22,47 +22,29 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
 import com.webtrekk.webtrekksdk.Configuration.TrackingConfiguration;
+import com.webtrekk.webtrekksdk.Modules.ProductListOrderSaver;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 
-import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class ProductListTracker {
-
-    public static class ParameterBuilder{
-        private final TrackingParameter mParameter = new TrackingParameter();
-
-        public ParameterBuilder(int position, @NonNull String productdId){
-            mParameter.add(TrackingParameter.Parameter.PRODUCT, productdId);
-            mParameter.add(TrackingParameter.Parameter.PRODUCT_POSITION, Integer.toString(position));
-        }
-
-        @NonNull
-        public ParameterBuilder setCost(float cost){
-            mParameter.add(TrackingParameter.Parameter.PRODUCT_COST, Float.toString(cost));
-            return this;
-        }
-
-        @NonNull
-        public ParameterBuilder setEcommerce(int index, String value){
-            mParameter.add(TrackingParameter.Parameter.ECOM, Integer.toString(index), value);
-            return this;
-        }
-
-        @NonNull
-        public TrackingParameter getResult(){
-            return mParameter;
-        }
-    }
 
     public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener{
 
@@ -99,81 +81,235 @@ public class ProductListTracker {
      * It is mandatory at lease provide productId
      */
     public interface ProductListItemCallback{
+        /**
+         * return parameters for product with certain list position
+         * @param position position of product in list
+         * @return
+         */
         @NonNull
         TrackingParameter getItem(int position);
     }
 
-    final private SortedMap<Integer, TrackingParameter> mProductItems = new TreeMap<>();
-    final private SortedMap<Integer, TrackingParameter> mPendingProductItems = new TreeMap<>();
+    final private SortedMap<Integer, TrackingParameter> mProductPositionItems = new TreeMap<>();
+    final private SortedMap<Integer, TrackingParameter> mPendingProductPositionItems = new TreeMap<>();
+    final private List<TrackingParameter> mProductItems = new ArrayList<>();
     private RecyclerView.OnScrollListener mScrollListener;
     private Handler mDelayHandler;
     final private Runnable mApplyPendingAction = new Runnable() {
         @Override
         public void run() {
-            if (!mPendingProductItems.isEmpty()) {
-                mProductItems.putAll(mPendingProductItems);
-                WebtrekkLogging.log(mPendingProductItems.size() + " products add to tracking");
-                WebtrekkLogging.log("Products positions: " + Arrays.toString(mPendingProductItems.keySet().toArray()));
-                mPendingProductItems.clear();
+            if (!mPendingProductPositionItems.isEmpty()) {
+                mProductPositionItems.putAll(mPendingProductPositionItems);
+                WebtrekkLogging.log(mPendingProductPositionItems.size() + " products add to tracking");
+                mPendingProductPositionItems.clear();
             }
         }
     };
 
     private RecyclerView.OnItemTouchListener mOnTouсhEventListener;
     private final TrackingConfiguration mTrackingConfiguration;
+    private final ProductListOrderSaver mOrderSaver;
 
 
-    ProductListTracker(TrackingConfiguration configuration){
+    ProductListTracker(TrackingConfiguration configuration, Context context){
         mTrackingConfiguration = configuration;
+        mOrderSaver = new ProductListOrderSaver(context);
+        mOrderSaver.load();
     }
-
 
     /**
      * sends all product tracking list requests to server.
      */
     public void send(){
+        send(null);
+    }
+
+    /**
+     * sends all product tracking list requests to server.
+     * @param commonParameters common parameters that is not merged with ";"
+     */
+    public void send(@Nullable TrackingParameter commonParameters){
+        sendProductPositionItems(commonParameters);
+        sendProducts(commonParameters);
+    }
+
+    /**
+     * clear all data about position in list and adding order
+     */
+    public void clearAddPositionData(){
+        mOrderSaver.clear();
+    }
+
+
+    private void sendProductPositionItems(@Nullable TrackingParameter commonParameters){
         //Check if there is anything to send
-        if (mProductItems.isEmpty()){
+        if (mProductPositionItems.isEmpty()){
             return;
         }
 
-        TrackingParameter mergedParameters = constructTrackingParameter();
-        Webtrekk webtrekk = Webtrekk.getInstance();
+        trackParameters(mProductPositionItems.values(), commonParameters, true);
+        mOrderSaver.saveProductPositions(mProductPositionItems);
 
-        for (TrackingParameter item: mProductItems.values()){
-            TrackingParameter parameters = mergedParameters.mergeProducts(item, mTrackingConfiguration);
+        mProductPositionItems.clear();
+    }
+
+    /**
+     * track parameters with minimum number of requests
+     * @param parametersToTrack
+     */
+    private void trackParameters(Collection<TrackingParameter> parametersToTrack, TrackingParameter commonParameters, boolean addIgnoreAction){
+
+        if (parametersToTrack.isEmpty()){
+            return;
+        }
+
+        Webtrekk webtrekk = Webtrekk.getInstance();
+        TrackingParameter mergedParameters = constructTrackingParameter(addIgnoreAction);
+        TrackingParameter mergedBaseParameters = constructTrackingParameter(false);
+
+        //create Base TrackingParameters
+
+        for (TrackingParameter itemToCollect: parametersToTrack){
+            mergedBaseParameters.getDefaultParameter().putAll(itemToCollect.getDefaultParameter());
+            mergedBaseParameters.getEcomParameter().putAll(itemToCollect.getEcomParameter());
+            mergedBaseParameters.getProductCategories().putAll(itemToCollect.getProductCategories());
+        }
+
+        for (TrackingParameter item: parametersToTrack){
+            TrackingParameter parameters = mergedParameters.mergeProducts(item,
+                    mergedBaseParameters, mTrackingConfiguration);
 
             // parameters value is more then 255
             if (parameters == null){
                 webtrekk.track(mergedParameters);
-                mergedParameters = constructTrackingParameter();
+                mergedParameters = constructTrackingParameter(addIgnoreAction);
                 // we assume that one product list won't have field with length more then 255
-                mergedParameters = mergedParameters.mergeProducts(item, mTrackingConfiguration);
+                mergedParameters = mergedParameters.mergeProducts(item,
+                        mergedBaseParameters, mTrackingConfiguration);
             } else{
                 mergedParameters = parameters;
             }
         }
 
+        //merge common parameters
+        if (commonParameters != null){
+            mergedParameters.getDefaultParameter().putAll(commonParameters.getDefaultParameter());
+            mergedParameters.getEcomParameter().putAll(commonParameters.getEcomParameter());
+            mergedParameters.getProductCategories().putAll(commonParameters.getProductCategories());
+        }
+
         webtrekk.track(mergedParameters);
+    }
+
+    private void sendProducts(@Nullable TrackingParameter commonParameters){
+        if (mProductItems.isEmpty()){
+            return;
+        }
+
+        //separate products to add view and conf
+        List<TrackingParameter> productView = new ArrayList<>();
+        List<TrackingParameter> productAdd = new ArrayList<>();
+        List<TrackingParameter> productConf = new ArrayList<>();
+
+        for (TrackingParameter parameter: mProductItems){
+            final String type = parameter.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT_STATUS);
+            if (type.equals(ProductParameterBuilder.ActionType.add.toString())){
+                productAdd.add(parameter);
+            }else if (type.equals(ProductParameterBuilder.ActionType.view.toString())){
+                productView.add(parameter);
+            }else if (type.equals(ProductParameterBuilder.ActionType.conf.toString())) {
+                productConf.add(parameter);
+            }
+        }
+
+        trackParametersWithType(productView, commonParameters, ProductParameterBuilder.ActionType.view);
+        trackParametersWithType(productAdd, commonParameters, ProductParameterBuilder.ActionType.add);
+        trackParametersWithType(productConf, commonParameters, ProductParameterBuilder.ActionType.conf);
+
+        if (!productConf.isEmpty()) {
+            clearAddPositionData();
+        }
 
         mProductItems.clear();
     }
 
-    @NonNull
-    private TrackingParameter constructTrackingParameter(){
-        TrackingParameter parameter = new TrackingParameter();
-        parameter.add(TrackingParameter.Parameter.ACTION_NAME, "webtrekk_ignore");
-        parameter.add(TrackingParameter.Parameter.PRODUCT_STATUS, "list");
-        return parameter;
+    private void trackParametersWithType(@NonNull List<TrackingParameter> parameters,
+                                         @Nullable TrackingParameter commonParameters,
+                                         ProductParameterBuilder.ActionType type){
+        if (parameters.isEmpty()){
+            return;
+        }
+
+        final Comparator<TrackingParameter> comparator = new Comparator<TrackingParameter>() {
+            @Override
+            public int compare(TrackingParameter parameter, TrackingParameter t1) {
+                final String product1 = parameter.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT);
+                final String product2 = t1.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT);
+
+                final Integer product1Order = mOrderSaver.getProductAddOrderPosition(product1);
+                final Integer product2Order = mOrderSaver.getProductAddOrderPosition(product2);
+
+                return product1Order.compareTo(product2Order);
+            }
+        };
+
+        Collections.sort(parameters, comparator);
+        final ListIterator<TrackingParameter> iterator = parameters.listIterator();
+
+        while (iterator.hasNext()){
+            TrackingParameter parameter = iterator.next();
+            final String productId = parameter.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT);
+
+            final int position = type == ProductParameterBuilder.ActionType.view ?
+                    mOrderSaver.getProductLastDefinedPosition(productId) :
+                    mOrderSaver.getProductFirstDefinedPosition(productId);
+
+            if (position != ProductListOrderSaver.NOT_DEFINED_ORDER){
+                parameter.getDefaultParameter().put(TrackingParameter.Parameter.PRODUCT_POSITION,
+                        String.valueOf(position));
+            }
+
+            if (type == ProductParameterBuilder.ActionType.add){
+                mOrderSaver.trackAddedProducts(parameter);
+            }
+        }
+
+        trackParameters(parameters, commonParameters, false);
     }
 
     @NonNull
-    public void track(@NonNull TrackingParameter parameters){
+    private TrackingParameter constructTrackingParameter(boolean addIgnoreAction){
+        TrackingParameter parameter = new TrackingParameter();
+        if (addIgnoreAction) {
+            parameter.add(TrackingParameter.Parameter.ACTION_NAME, "webtrekk_ignore");
+        }
+        return parameter;
+    }
 
-        String positionS = parameters.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT_POSITION);
+    /**
+     * Do position tracking. Due to acceptable performance function just remember position. Actual
+     * tracking is done in {@link #send()} function that should be called after.
+     * @param parameter
+     */
+    @NonNull
+    public void trackProductPositionInList(@NonNull TrackingParameter parameter){
+
+        String positionS = parameter.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT_POSITION);
+        String typeTracking = parameter.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT_STATUS);
+        String product = parameter.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT);
+
+        if (typeTracking == null || (typeTracking != null && !typeTracking.equals(ProductParameterBuilder.ActionType.list.toString()))){
+            WebtrekkLogging.log("Product isn't product list position tracking. Use another method for this");
+            return;
+        }
 
         if (positionS == null){
             WebtrekkLogging.log("Error: No position in parameters. Track won't be done");
+            return;
+        }
+
+        if (product == null){
+            WebtrekkLogging.log("Error: No product in parameters. Track won't be done");
             return;
         }
 
@@ -188,12 +324,59 @@ public class ProductListTracker {
             return;
         }
 
-        mProductItems.put(position, parameters);
+        mProductPositionItems.put(position, parameter);
     }
 
+    public void trackProduct(@NonNull TrackingParameter parameter) {
+        trackProduct(parameter, false);
+    }
+
+    public void trackProduct(@NonNull TrackingParameter parameter, boolean sendImmediately){
+        String product = parameter.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT);
+        String typeTracking = parameter.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT_STATUS);
+
+        String[] trackingTypes = {ProductParameterBuilder.ActionType.add.toString(),
+                ProductParameterBuilder.ActionType.view.toString(),
+                ProductParameterBuilder.ActionType.conf.toString()};
+        Set<String> trackingTypesCollection = new HashSet<>(Arrays.asList(trackingTypes));
+
+
+        if (typeTracking == null || (typeTracking != null
+                && !trackingTypesCollection.contains(typeTracking))){
+            WebtrekkLogging.log("Product isn't either add or view or conf product tracking. Track won't be done");
+            return;
+        }
+
+        if (product == null){
+            WebtrekkLogging.log("Error: No product in parameters. Track won't be done");
+            return;
+        }
+
+        mProductItems.add(parameter);
+
+        if (sendImmediately){
+            send(null);
+        }
+    }
+
+    /**
+     * Register RecyclerView for product list tracking with timeout == 2 sec. Please call {@link #unregisterView(RecyclerView)}
+     * after RecyclerView is hided
+     * @param view RecyclerView instance
+     * @param itemCallback callback that should be used to provide parameters for product
+     */
     public void registerView(@NonNull RecyclerView view, @NonNull final ProductListItemCallback itemCallback){
         registerView(view, 2000, itemCallback);
     }
+
+    /**
+     * Register Recycler view for product list tracking. Please call {@link #unregisterView(RecyclerView)}
+     * after RecyclerView is hided
+     * @param view RecyclerView instance
+     * @param timeoutMilliseconds timeout that is used when list is scrolled. Position of product
+     * is tracked if list has this delay after scrolling or first show-up
+     * @param itemCallback - callback to provide information about product
+     */
 
     public void registerView(@NonNull RecyclerView view, @IntRange(from=0) final long timeoutMilliseconds, @NonNull final ProductListItemCallback itemCallback){
 
@@ -230,8 +413,13 @@ public class ProductListTracker {
 
         mOnTouсhEventListener = new RecyclerItemClickListener(view.getContext(), view);
         view.addOnItemTouchListener(mOnTouсhEventListener);
+        initPendingList(view, timeoutMilliseconds, itemCallback);
     }
 
+    /**
+     * unregister RecyclerView suggested to call in onStop.
+     * @param view RecyclerView instance
+     */
     public void unregisterView(@NonNull RecyclerView view){
         if (mScrollListener != null){
             view.removeOnScrollListener(mScrollListener);
@@ -251,7 +439,7 @@ public class ProductListTracker {
     }
 
     private void clearPendingEvents(){
-        mPendingProductItems.clear();
+        mPendingProductPositionItems.clear();
         if (mDelayHandler != null) {
             mDelayHandler.removeCallbacks(mApplyPendingAction);
         }
@@ -264,8 +452,8 @@ public class ProductListTracker {
         final int lastCompletelyItem = linearLayoutManager.findLastCompletelyVisibleItemPosition();
 
         for (int position = firstCompletelyItem; position <= lastCompletelyItem; position++){
-            if (!mProductItems.containsKey(position)) {
-                mPendingProductItems.put(position, itemCallback.getItem(position));
+            if (!mProductPositionItems.containsKey(position) && position >= 0) {
+                mPendingProductPositionItems.put(position, itemCallback.getItem(position));
             }
         }
 

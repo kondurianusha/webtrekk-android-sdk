@@ -20,6 +20,7 @@ import android.arch.lifecycle.ViewModel
  *
  * Created by vartbaronov on 14.11.17.
  */
+
 class ProductListModel : ViewModel() {
     private var list = MutableLiveData<Array<ProductItem>>()
 

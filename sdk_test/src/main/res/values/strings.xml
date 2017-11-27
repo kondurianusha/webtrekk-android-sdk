@@ -11,4 +11,5 @@
     <string name="product_view">View</string>
     <string name="product_add">Add</string>
     <string name="product_conf">Conf</string>
+    <string name="product_clear_basket">Clear Basket</string>
 </resources>

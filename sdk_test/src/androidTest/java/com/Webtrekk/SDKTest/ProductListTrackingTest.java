@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 
 import com.Webtrekk.SDKTest.ProductList.ProductItem;
 import com.Webtrekk.SDKTest.ProductList.ProductListActivity;
+import com.webtrekk.webtrekksdk.ProductListTracker;
+import com.webtrekk.webtrekksdk.ProductParameterBuilder;
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
@@ -59,8 +61,7 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
     public void before() throws Exception {
         super.before();
         mWaitMilliseconds = 5000;
-        mWebtrekk = Webtrekk.getInstance();
-        mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
+        initWT();
     }
 
     @Override
@@ -69,9 +70,323 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
         super.after();
     }
 
+    private void initWT(){
+        mWebtrekk = Webtrekk.getInstance();
+        mWebtrekk.initWebtrekk(mApplication, R.raw.webtrekk_config_no_auto_track);
+    }
     @Test
     public void manualTrackingTest(){
 
+        mActivityRule.finishActivity();
+
+        final ProductListTracker productListTracker = Webtrekk.getInstance().getProductListTracker();
+
+        //Tracking position some items
+        ProductItem item1 = ProductItem.Handler.getProductItemByIndex(1);
+        TrackingParameter parameter = getFromProductItem(item1, ProductParameterBuilder.ActionType.list);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_COST);
+        productListTracker.trackProductPositionInList(parameter);
+
+        ProductItem item2 = ProductItem.Handler.getProductItemByIndex(2);
+        TrackingParameter parameter2 = getFromProductItem(item2, ProductParameterBuilder.ActionType.list);
+        productListTracker.trackProductPositionInList(parameter2);
+
+        TrackingParameter parameter3 = new ProductParameterBuilder("productId3",
+                ProductParameterBuilder.ActionType.list).setPosition(3).getResult();
+        productListTracker.trackProductPositionInList(parameter3);
+
+        ProductItem item4 = ProductItem.Handler.getProductItemByIndex(4);
+        parameter = getFromProductItem(item4, ProductParameterBuilder.ActionType.list);
+        productListTracker.trackProductPositionInList(parameter);
+
+        initWaitingForTrack(null);
+        productListTracker.send();
+
+        String URL = waitForTrackedURL();
+        URLParsel parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+
+        assertEquals("list", parcel.getDecodedValue("st") );
+        assertEquals("webtrekk_ignore", parcel.getDecodedValue("ct"));
+        assertEquals(item1.getEcomParameters()[0]+";"+item2.getEcomParameters()[0] + ";;" +
+                        item4.getEcomParameters()[0], parcel.getDecodedValue("cb1"));
+        assertEquals(
+                item1.getEcomParameters()[1]+";"+item2.getEcomParameters()[1] + ";;" +
+                        item4.getEcomParameters()[1], parcel.getDecodedValue("cb2"));
+        assertEquals(
+                item1.getCategories()[0]+";"+item2.getCategories()[0] + ";;" +
+                        item4.getCategories()[0], parcel.getDecodedValue("ca1"));
+        assertEquals(item1.getCategories()[1]+";"+item2.getCategories()[1] + ";;" +
+                        item4.getCategories()[1], parcel.getDecodedValue("ca2"));
+
+        assertEquals(item1.getId()+";"+item2.getId()+";productId3;"+ item4.getId(), parcel.getDecodedValue("ba"));
+        assertEquals(item1.getInd()+";"+item2.getInd()+";3;"+ item4.getInd(), parcel.getDecodedValue("plp"));
+        assertEquals(";"+item2.getCost()+";;"+ item4.getCost(), parcel.getDecodedValue("co"));
+        assertEquals(item1.getPaymentMethod()+";"+item2.getPaymentMethod()+";;"+ item4.getPaymentMethod(),
+                parcel.getDecodedValue("cb761"));
+        assertEquals(item1.getShippingService()+";"+item2.getShippingService()+";;"+ item4.getShippingService(),
+                parcel.getDecodedValue("cb762"));
+        assertEquals(item1.getShippingSpeed()+";"+item2.getShippingSpeed()+";;"+ item4.getShippingSpeed(),
+                parcel.getDecodedValue("cb763"));
+        assertEquals(item1.getShippingCost()+";"+item2.getShippingCost()+";;"+ item4.getShippingCost(),
+                parcel.getDecodedValue("cb764"));
+        assertEquals(item1.getGrossMargin()+";"+item2.getGrossMargin()+";;"+ item4.getGrossMargin(),
+                parcel.getDecodedValue("cb765"));
+        assertEquals(item1.getProductVariant()+";"+item2.getProductVariant()+";;"+ item4.getProductVariant(),
+                parcel.getDecodedValue("cb767"));
+        assertEquals(getSoldOutString(item1.getProductSoldOut())+";"+
+                getSoldOutString(item2.getProductSoldOut())+";;"+
+                getSoldOutString(item4.getProductSoldOut()),
+                parcel.getDecodedValue("cb760"));
+
+        // Add the same product with different position so product2 has 2 and 5 positions
+        parameter2.add(TrackingParameter.Parameter.PRODUCT_POSITION, "5");
+        productListTracker.trackProductPositionInList(parameter2);
+
+        initWaitingForTrack(null);
+        productListTracker.send();
+
+        //just wait no check is required.
+        waitForTrackedURL();
+
+        //View product1 test
+        parameter = getFromProductItem(item1, ProductParameterBuilder.ActionType.view);
+        productListTracker.trackProduct(parameter);
+
+        initWaitingForTrack(null);
+        productListTracker.send();
+        URL = waitForTrackedURL();
+
+        parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertEquals("view", parcel.getDecodedValue("st") );
+        assertEquals(item1.getEcomParameters()[0], parcel.getDecodedValue("cb1"));
+        assertEquals(item1.getEcomParameters()[1], parcel.getDecodedValue("cb2"));
+        assertEquals(item1.getCategories()[0], parcel.getDecodedValue("ca1"));
+        assertEquals(item1.getCategories()[1], parcel.getDecodedValue("ca2"));
+
+        assertEquals(item1.getId(), parcel.getDecodedValue("ba"));
+        assertEquals(String.valueOf(item1.getInd()), parcel.getDecodedValue("plp"));
+        assertEquals(String.valueOf(item1.getCost()), parcel.getDecodedValue("co"));
+        assertEquals(item1.getPaymentMethod(), parcel.getDecodedValue("cb761"));
+        assertEquals(item1.getShippingService(), parcel.getDecodedValue("cb762"));
+        assertEquals(item1.getShippingSpeed(), parcel.getDecodedValue("cb763"));
+        assertEquals(String.valueOf(item1.getShippingCost()), parcel.getDecodedValue("cb764"));
+        assertEquals(String.valueOf(item1.getGrossMargin()), parcel.getDecodedValue("cb765"));
+        assertEquals(item1.getProductVariant(), parcel.getDecodedValue("cb767"));
+        assertEquals(getSoldOutString(item1.getProductSoldOut()),
+                parcel.getDecodedValue("cb760"));
+
+        //View product2 test
+        parameter = getFromProductItem(item2, ProductParameterBuilder.ActionType.view);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_POSITION);
+        productListTracker.trackProduct(parameter);
+
+        initWaitingForTrack(null);
+        productListTracker.send();
+        URL = waitForTrackedURL();
+
+        parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertEquals("view", parcel.getDecodedValue("st") );
+        assertEquals(item2.getEcomParameters()[0], parcel.getDecodedValue("cb1"));
+        assertEquals(item2.getEcomParameters()[1], parcel.getDecodedValue("cb2"));
+        assertEquals(item2.getCategories()[0], parcel.getDecodedValue("ca1"));
+        assertEquals(item2.getCategories()[1], parcel.getDecodedValue("ca2"));
+
+        assertEquals(item2.getId(), parcel.getDecodedValue("ba"));
+        assertEquals("5", parcel.getDecodedValue("plp"));
+        assertEquals(String.valueOf(item2.getCost()), parcel.getDecodedValue("co"));
+        assertEquals(item2.getPaymentMethod(), parcel.getDecodedValue("cb761"));
+        assertEquals(item2.getShippingService(), parcel.getDecodedValue("cb762"));
+        assertEquals(item2.getShippingSpeed(), parcel.getDecodedValue("cb763"));
+        assertEquals(String.valueOf(item2.getShippingCost()), parcel.getDecodedValue("cb764"));
+        assertEquals(String.valueOf(item2.getGrossMargin()), parcel.getDecodedValue("cb765"));
+        assertEquals(item2.getProductVariant(), parcel.getDecodedValue("cb767"));
+        assertEquals(getSoldOutString(item2.getProductSoldOut()),
+                parcel.getDecodedValue("cb760"));
+
+        //Add product2 test
+        parameter = getFromProductItem(item2, ProductParameterBuilder.ActionType.add);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_POSITION);
+        productListTracker.trackProduct(parameter);
+
+        initWaitingForTrack(null);
+        productListTracker.send();
+        URL = waitForTrackedURL();
+
+        parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertEquals("add", parcel.getDecodedValue("st") );
+        assertEquals(item2.getEcomParameters()[0], parcel.getDecodedValue("cb1"));
+        assertEquals(item2.getEcomParameters()[1], parcel.getDecodedValue("cb2"));
+        assertEquals(item2.getCategories()[0], parcel.getDecodedValue("ca1"));
+        assertEquals(item2.getCategories()[1], parcel.getDecodedValue("ca2"));
+
+        assertEquals(item2.getId(), parcel.getDecodedValue("ba"));
+        assertEquals(String.valueOf(item2.getInd()), parcel.getDecodedValue("plp"));
+        assertEquals(String.valueOf(item2.getCost()), parcel.getDecodedValue("co"));
+        assertEquals(item2.getPaymentMethod(), parcel.getDecodedValue("cb761"));
+        assertEquals(item2.getShippingService(), parcel.getDecodedValue("cb762"));
+        assertEquals(item2.getShippingSpeed(), parcel.getDecodedValue("cb763"));
+        assertEquals(String.valueOf(item2.getShippingCost()), parcel.getDecodedValue("cb764"));
+        assertEquals(String.valueOf(item2.getGrossMargin()), parcel.getDecodedValue("cb765"));
+        assertEquals(item2.getProductVariant(), parcel.getDecodedValue("cb767"));
+        assertEquals(getSoldOutString(item2.getProductSoldOut()),
+                parcel.getDecodedValue("cb760"));
+
+        //Add product1 test
+        parameter = getFromProductItem(item1, ProductParameterBuilder.ActionType.add);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_POSITION);
+        productListTracker.trackProduct(parameter);
+
+        initWaitingForTrack(null);
+        productListTracker.send();
+        URL = waitForTrackedURL();
+
+        parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertEquals("add", parcel.getDecodedValue("st") );
+        assertEquals(item1.getEcomParameters()[0], parcel.getDecodedValue("cb1"));
+        assertEquals(item1.getEcomParameters()[1], parcel.getDecodedValue("cb2"));
+        assertEquals(item1.getCategories()[0], parcel.getDecodedValue("ca1"));
+        assertEquals(item1.getCategories()[1], parcel.getDecodedValue("ca2"));
+
+        assertEquals(item1.getId(), parcel.getDecodedValue("ba"));
+        assertEquals(String.valueOf(item1.getInd()), parcel.getDecodedValue("plp"));
+        assertEquals(String.valueOf(item1.getCost()), parcel.getDecodedValue("co"));
+        assertEquals(item1.getPaymentMethod(), parcel.getDecodedValue("cb761"));
+        assertEquals(item1.getShippingService(), parcel.getDecodedValue("cb762"));
+        assertEquals(item1.getShippingSpeed(), parcel.getDecodedValue("cb763"));
+        assertEquals(String.valueOf(item1.getShippingCost()), parcel.getDecodedValue("cb764"));
+        assertEquals(String.valueOf(item1.getGrossMargin()), parcel.getDecodedValue("cb765"));
+        assertEquals(item1.getProductVariant(), parcel.getDecodedValue("cb767"));
+        assertEquals(getSoldOutString(item1.getProductSoldOut()),
+                parcel.getDecodedValue("cb760"));
+
+        //Add product7 test (no position)
+        parameter = new ProductParameterBuilder("productId7",
+                ProductParameterBuilder.ActionType.add).getResult();
+        productListTracker.trackProduct(parameter);
+
+        initWaitingForTrack(null);
+        productListTracker.send();
+        URL = waitForTrackedURL();
+
+        parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertEquals("add", parcel.getDecodedValue("st") );
+        assertEquals("productId7", parcel.getDecodedValue("ba"));
+        assertEquals(null, parcel.getDecodedValue("co"));
+        assertEquals(null, parcel.getDecodedValue("cb761"));
+        assertEquals(null, parcel.getDecodedValue("plp"));
+
+        //Add product4 no test is required
+        parameter = getFromProductItem(item4, ProductParameterBuilder.ActionType.add);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_POSITION);
+        productListTracker.trackProduct(parameter);
+
+        initWaitingForTrack(null);
+        productListTracker.send();
+        waitForTrackedURL();
+
+        //call conf request
+        parameter = getFromProductItem(item1, ProductParameterBuilder.ActionType.conf);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_POSITION);
+        productListTracker.trackProduct(parameter);
+
+        parameter = getFromProductItem(item2, ProductParameterBuilder.ActionType.conf);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_POSITION);
+        productListTracker.trackProduct(parameter);
+
+        parameter = new ProductParameterBuilder("productId7",
+                ProductParameterBuilder.ActionType.conf).getResult();
+        productListTracker.trackProduct(parameter);
+
+        parameter = getFromProductItem(item4, ProductParameterBuilder.ActionType.conf);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_POSITION);
+        parameter.add(TrackingParameter.Parameter.PRODUCT_COUNT, "2");
+        productListTracker.trackProduct(parameter);
+
+        TrackingParameter commonParameter = new TrackingParameter();
+        commonParameter.add(TrackingParameter.Parameter.PRODUCT_COUPON, "Coupon");
+        commonParameter.add(TrackingParameter.Parameter.PRODUCT_ORDER_STATUS, "OrderStatus");
+
+        initWaitingForTrack(null);
+        productListTracker.send(commonParameter);
+
+        URL = waitForTrackedURL();
+        parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertEquals("conf", parcel.getDecodedValue("st") );
+        assertEquals(item2.getEcomParameters()[0]+";"+item1.getEcomParameters()[0] + ";;" +
+                item4.getEcomParameters()[0], parcel.getDecodedValue("cb1"));
+        assertEquals(
+                item2.getEcomParameters()[1]+";"+item1.getEcomParameters()[1] + ";;" +
+                        item4.getEcomParameters()[1], parcel.getDecodedValue("cb2"));
+        assertEquals(item2.getCategories()[0]+";"+item1.getCategories()[0] + ";;" +
+                        item4.getCategories()[0], parcel.getDecodedValue("ca1"));
+        assertEquals(item2.getCategories()[1]+";"+item1.getCategories()[1] + ";;" +
+                item4.getCategories()[1], parcel.getDecodedValue("ca2"));
+
+        assertEquals(item2.getId()+";"+item1.getId()+";productId7;"+ item4.getId(), parcel.getDecodedValue("ba"));
+        assertEquals(item2.getInd()+";"+item1.getInd()+";;"+ item4.getInd(), parcel.getDecodedValue("plp"));
+        assertEquals(item2.getCost()+";"+item1.getCost()+";;"+ item4.getCost(), parcel.getDecodedValue("co"));
+        assertEquals(item2.getPaymentMethod()+";"+item1.getPaymentMethod()+";;"+ item4.getPaymentMethod(),
+                parcel.getDecodedValue("cb761"));
+        assertEquals(item2.getShippingService()+";"+item1.getShippingService()+";;"+ item4.getShippingService(),
+                parcel.getDecodedValue("cb762"));
+        assertEquals(item2.getShippingSpeed()+";"+item1.getShippingSpeed()+";;"+ item4.getShippingSpeed(),
+                parcel.getDecodedValue("cb763"));
+        assertEquals(item2.getShippingCost()+";"+item1.getShippingCost()+";;"+ item4.getShippingCost(),
+                parcel.getDecodedValue("cb764"));
+        assertEquals(item2.getGrossMargin()+";"+item1.getGrossMargin()+";;"+ item4.getGrossMargin(),
+                parcel.getDecodedValue("cb765"));
+        assertEquals(item2.getProductVariant()+";"+item1.getProductVariant()+";;"+ item4.getProductVariant(),
+                parcel.getDecodedValue("cb767"));
+        assertEquals(getSoldOutString(item2.getProductSoldOut())+";"+
+                        getSoldOutString(item1.getProductSoldOut())+";;"+
+                        getSoldOutString(item4.getProductSoldOut()),
+                parcel.getDecodedValue("cb760"));
+        assertEquals(";;;2", parcel.getDecodedValue("qn"));
+        assertEquals("Coupon", parcel.getDecodedValue("cb563"));
+        assertEquals("OrderStatus", parcel.getDecodedValue("cb766"));
+    }
+
+    private TrackingParameter getFromProductItem(ProductItem item, ProductParameterBuilder.ActionType type){
+        return new ProductParameterBuilder(item.getId(), type).
+                setPosition(item.getInd()).
+                setEcommerce(1, item.getEcomParameters()[0]).
+                setEcommerce(2, item.getEcomParameters()[1]).
+                setProductCategory(1, item.getCategories()[0]).
+                setProductCategory(2, item.getCategories()[1]).
+                setCost(item.getCost()).
+                setPaymentMethod(item.getPaymentMethod()).
+                setShippingService(item.getShippingService()).
+                setShippingSpeed(item.getShippingSpeed()).
+                setShippingCost(item.getShippingCost()).
+                setGrossMargin(item.getGrossMargin()).
+                setProductVariant(item.getProductVariant()).
+                setIsProductSoldOut(item.getProductSoldOut()).getResult();
+
+    }
+
+    private String getSoldOutString(boolean value){
+        return value ? "1" : "0";
     }
 
     @Test
@@ -85,8 +400,12 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
 
             //check for nothing to send
             waitForTrackedURL();
+
+            mWebtrekk.getProductListTracker().clearAddPositionData();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            mWebtrekk.getProductListTracker().clearAddPositionData();
         }
     }
 
@@ -101,6 +420,8 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
             waitForTrackedURL();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            mWebtrekk.getProductListTracker().clearAddPositionData();
         }
     }
 
@@ -181,12 +502,78 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
             assertTrue(ecom1Result.containsAll(ecom1Tracked) && ecom1Tracked.containsAll(ecom1Result));
             assertTrue(ecom2Result.containsAll(ecom2Tracked) && ecom2Tracked.containsAll(ecom2Result));
 
-
-
-
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            mWebtrekk.getProductListTracker().clearAddPositionData();
         }
+    }
+
+    @Test
+    public void savingPositionToHardMemory(){
+        mActivityRule.finishActivity();
+
+        ProductListTracker productListTracker = Webtrekk.getInstance().getProductListTracker();
+
+        //Tracking position some items
+        ProductItem item6 = ProductItem.Handler.getProductItemByIndex(6);
+        TrackingParameter parameter = getFromProductItem(item6, ProductParameterBuilder.ActionType.list);
+        productListTracker.trackProductPositionInList(parameter);
+
+        ProductItem item5 = ProductItem.Handler.getProductItemByIndex(5);
+        TrackingParameter parameter2 = getFromProductItem(item5, ProductParameterBuilder.ActionType.list);
+        productListTracker.trackProductPositionInList(parameter2);
+
+        productListTracker.trackProductPositionInList(parameter);
+
+        initWaitingForTrack(null);
+        productListTracker.send();
+
+        waitForTrackedURL();
+
+        //Add product6 and  product5 no test is required
+        parameter = getFromProductItem(item6, ProductParameterBuilder.ActionType.add);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_POSITION);
+        productListTracker.trackProduct(parameter);
+
+        parameter = getFromProductItem(item5, ProductParameterBuilder.ActionType.add);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_POSITION);
+        productListTracker.trackProduct(parameter);
+
+        initWaitingForTrack(null);
+        productListTracker.send();
+        waitForTrackedURL();
+
+        //restart WT instance like application restart
+        releaseWTInstance();
+        setupWTInstance();
+        initWT();
+
+        mActivityRule.launchActivity(null);
+        mActivityRule.finishActivity();
+
+        productListTracker = Webtrekk.getInstance().getProductListTracker();
+
+        parameter = getFromProductItem(item5, ProductParameterBuilder.ActionType.conf);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_POSITION);
+        productListTracker.trackProduct(parameter);
+
+        parameter = getFromProductItem(item6, ProductParameterBuilder.ActionType.conf);
+        parameter.getDefaultParameter().remove(TrackingParameter.Parameter.PRODUCT_POSITION);
+        productListTracker.trackProduct(parameter);
+
+        initWaitingForTrack(null);
+        productListTracker.send();
+
+        String URL = waitForTrackedURL();
+        URLParsel parcel = new URLParsel();
+
+        parcel.parseURL(URL);
+
+        assertEquals("conf", parcel.getDecodedValue("st") );
+        assertEquals(item6.getId()+";"+item5.getId(), parcel.getDecodedValue("ba"));
+        assertEquals(item6.getInd()+";"+item5.getInd(), parcel.getDecodedValue("plp"));
+
     }
 
     private void addToHash(int min, int max, Set<Integer> set){

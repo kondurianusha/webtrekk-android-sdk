@@ -135,9 +135,11 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
             } else { // timeout
                 mIterator = null;
             }
-            if (callback != null && callback.stop(url))
+            if (callback != null)
             {
-                break;
+                if (callback.stop(url)) {
+                    break;
+                }
             }else  if (mStringNumbersToWait == mSentURLArray.size()){
                 break;
             }
@@ -153,7 +155,8 @@ public class WebtrekkBaseMainTest extends WebtrekkBaseSDKTest {
                 .onErrorReturn(new Function<Throwable, String>() {
                     @Override
                     public String apply(@NonNull Throwable throwable) throws Exception {
-                        assertEquals(mIsNoTrackCheck ? 0 : mStringNumbersToWait, mSentURLArray.size());
+                        assertEquals("track receive error",
+                                mIsNoTrackCheck ? 0 : mStringNumbersToWait, mSentURLArray.size());
                         return TIMEOUT;
                     }
                 }).blockingIterable().iterator();

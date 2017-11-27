@@ -21,13 +21,17 @@ import android.support.annotation.Nullable;
  * Created by vartbaronov on 21.11.17.
  */
 
+/**
+ * Class is used to generate TrackingParameter for product
+ */
 public class ProductParameterBuilder {
 
     public enum ActionType {
         list("list"),
         view("view"),
         add("add"),
-        conf("conf");
+        conf("conf"),
+        common(""); //used for common parameters
 
         private final String value;
 
@@ -52,6 +56,13 @@ public class ProductParameterBuilder {
     public ProductParameterBuilder(@NonNull String productId, ActionType type) {
         mParameter.add(TrackingParameter.Parameter.PRODUCT, productId);
         mParameter.add(TrackingParameter.Parameter.PRODUCT_STATUS, type.toString());
+        mType = type;
+    }
+
+    /**
+     * Constructor for custom type. Can be used for common parameters
+     */
+    public ProductParameterBuilder(ActionType type){
         mType = type;
     }
 
@@ -149,12 +160,15 @@ public class ProductParameterBuilder {
     }
 
     private boolean validate(){
+        final boolean isProduct = mParameter.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT) != null;
         switch (mType){
             case list:
-                return mParameter.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT_POSITION) != null;
+                return isProduct && mParameter.getDefaultParameter().get(TrackingParameter.Parameter.PRODUCT_POSITION) != null;
             case add:
             case view:
             case conf:
+                return isProduct;
+            case common:
                 return true;
         }
         return false;

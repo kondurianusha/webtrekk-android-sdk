@@ -320,9 +320,9 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
         parameter.add(TrackingParameter.Parameter.PRODUCT_COUNT, "2");
         productListTracker.trackProduct(parameter);
 
-        TrackingParameter commonParameter = new TrackingParameter();
-        commonParameter.add(TrackingParameter.Parameter.PRODUCT_COUPON, "Coupon");
-        commonParameter.add(TrackingParameter.Parameter.PRODUCT_ORDER_STATUS, "OrderStatus");
+        TrackingParameter commonParameter = new ProductParameterBuilder(ProductParameterBuilder.ActionType.common)
+                .setCouponValue("Coupon")
+                .setOrderStatus("OrderStatus").getResult();
 
         initWaitingForTrack(null);
         productListTracker.send(commonParameter);
@@ -392,9 +392,7 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
     @Test
     public void integrationWithRecyclingViewNothingSendTest(){
         try {
-            sleep(1000);
             onView(withId(R.id.productListRecyclerView)).perform(swipeUp());
-            sleep(1000);
             initWaitingForTrack(null, true);
             mActivityRule.getActivity().unregisterTracking();
 
@@ -402,8 +400,6 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
             waitForTrackedURL();
 
             mWebtrekk.getProductListTracker().clearAddPositionData();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } finally {
             mWebtrekk.getProductListTracker().clearAddPositionData();
         }

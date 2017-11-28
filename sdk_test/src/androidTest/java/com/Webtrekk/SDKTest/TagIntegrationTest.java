@@ -16,7 +16,7 @@
  * Created by Arsen Vartbaronov on 11.05.16.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import com.webtrekk.webtrekksdk.TrackingParameter;
 import com.webtrekk.webtrekksdk.Utils.HelperFunctions;

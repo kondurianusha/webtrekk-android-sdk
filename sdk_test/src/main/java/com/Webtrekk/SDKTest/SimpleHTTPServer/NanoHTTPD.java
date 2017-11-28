@@ -1,4 +1,4 @@
-package com.Webtrekk.SDKTest.SimpleHTTPServer;
+package com.webtrekk.SDKTest.SimpleHTTPServer;
 
 
 /*
@@ -95,8 +95,8 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
-import com.Webtrekk.SDKTest.SimpleHTTPServer.NanoHTTPD.Response.IStatus;
-import com.Webtrekk.SDKTest.SimpleHTTPServer.NanoHTTPD.Response.Status;
+import com.webtrekk.SDKTest.SimpleHTTPServer.NanoHTTPD.Response.IStatus;
+import com.webtrekk.SDKTest.SimpleHTTPServer.NanoHTTPD.Response.Status;
 
 /**
  * A simple, tiny, nicely embeddable HTTP server in Java

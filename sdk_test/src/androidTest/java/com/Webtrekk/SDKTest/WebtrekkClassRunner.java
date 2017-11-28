@@ -15,7 +15,7 @@
  *
  * Created by Arsen Vartbaronov on 23.06.17.
  */
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;

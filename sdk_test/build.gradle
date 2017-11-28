@@ -5,7 +5,7 @@ android {
     buildToolsVersion BUILD_TOOLS_VERSION as String
 
     defaultConfig {
-        applicationId "com.Webtrekk.SDKTest"
+        applicationId "com.webtrekk.SDKTest"
         minSdkVersion MIN_SDK_VERSION as int
         targetSdkVersion 18
         versionCode 13

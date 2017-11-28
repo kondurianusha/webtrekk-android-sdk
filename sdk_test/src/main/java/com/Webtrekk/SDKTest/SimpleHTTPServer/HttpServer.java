@@ -16,7 +16,7 @@
  * Created by Arsen Vartbaronov on 09.05.16.
  */
 
-package com.Webtrekk.SDKTest.SimpleHTTPServer;
+package com.webtrekk.SDKTest.SimpleHTTPServer;
 
 import android.content.Context;
 import android.content.SharedPreferences;

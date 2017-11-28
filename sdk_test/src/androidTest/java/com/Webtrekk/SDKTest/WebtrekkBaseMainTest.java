@@ -16,11 +16,11 @@
  * Created by Arsen Vartbaronov on 23.06.17.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import android.support.test.InstrumentationRegistry;
 
-import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
+import com.webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
 import com.webtrekk.webtrekksdk.Utils.WebtrekkLogging;
 import com.webtrekk.webtrekksdk.Webtrekk;
 

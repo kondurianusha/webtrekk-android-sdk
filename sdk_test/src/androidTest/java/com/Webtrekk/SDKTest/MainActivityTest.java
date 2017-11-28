@@ -16,7 +16,7 @@
  * Created by Thomas Dahlmann on 09.11.15.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import android.support.test.filters.LargeTest;
 

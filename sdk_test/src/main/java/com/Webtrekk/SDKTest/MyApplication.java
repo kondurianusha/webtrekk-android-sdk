@@ -16,7 +16,7 @@
  * Created by Thomas Dahlmann on 16.03.15.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import com.webtrekk.webtrekksdk.WebtrekkApplication;
 

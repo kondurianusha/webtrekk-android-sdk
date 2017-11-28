@@ -1,4 +1,4 @@
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import android.media.MediaPlayer;
 import android.view.SurfaceView;

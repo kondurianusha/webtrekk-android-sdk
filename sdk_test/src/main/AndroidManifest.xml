@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.Webtrekk.SDKTest" >
+    package="com.webtrekk.SDKTest" >
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -48,7 +48,7 @@
             android:name=".ShopExampleActivity"
             android:label="@string/title_activity_shop_example" >
 <!--
-            <a href="intent://webtrekk.com/#Intent;scheme=http;package=com.Webtrekk.SDKTest;S.everID=0123456789123456789;S.mediaCode=MediaCode;end">
+            <a href="intent://webtrekk.com/#Intent;scheme=http;package=com.webtrekk.SDKTest;S.everID=0123456789123456789;S.mediaCode=MediaCode;end">
 -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

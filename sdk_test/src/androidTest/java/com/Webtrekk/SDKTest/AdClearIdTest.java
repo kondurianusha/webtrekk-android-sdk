@@ -16,7 +16,7 @@
  * Created by Niko Pruessner.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import android.content.Context;
 import android.content.SharedPreferences;

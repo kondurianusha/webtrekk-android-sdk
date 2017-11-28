@@ -16,7 +16,7 @@
  * Created by Arsen Vartbaronov on 31.03.16.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import android.content.SharedPreferences;
 import android.support.test.filters.LargeTest;

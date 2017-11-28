@@ -16,7 +16,7 @@
  * Created by Arsen Vartbaronov on 17.11.16.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import android.support.test.filters.LargeTest;
 import com.webtrekk.webtrekksdk.TrackingParameter;

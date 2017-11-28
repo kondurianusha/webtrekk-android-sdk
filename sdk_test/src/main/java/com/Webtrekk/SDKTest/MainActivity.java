@@ -16,7 +16,7 @@
  * Created by Thomas Dahlmann 19.04.15.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -144,7 +144,7 @@ public class MainActivity extends Activity {
     private void mediaCodeReceiverRegister()
     {
         LocalBroadcastManager.getInstance(this).registerReceiver(mSDKReceiver,
-                new IntentFilter("com.Webtrekk.CampainMediaMessage"));
+                new IntentFilter("com.webtrekk.CampainMediaMessage"));
     }
 
     /**

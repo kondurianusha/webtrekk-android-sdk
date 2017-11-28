@@ -16,7 +16,7 @@
  * Created by Arsen Vartbaronov on 01.04.16.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -74,13 +74,13 @@ public class AttributionTest extends WebtrekkBaseSDKTest {
     @Test
     public void testAttributionRunLinkWithAdID()
     {
-        launchClickID("http://appinstall.webtrekk.net/appinstall/v1/redirect?mc="+MEDIA_CODE+"&trackid=&as1=market%3A//details%3Fid%3Dcom.Webtrekk.SDKTest&aid=", true);
+        launchClickID("http://appinstall.webtrekk.net/appinstall/v1/redirect?mc="+MEDIA_CODE+"&trackid=&as1=market%3A//details%3Fid%3Dcom.webtrekk.SDKTest&aid=", true);
     }
 
     @Test
     public void testAttributionRunLinkWithoutAdID()
     {
-        launchClickID("http://appinstall.webtrekk.net/appinstall/v1/redirect?mc="+MEDIA_CODE+"&trackid=&as1=market%3A//details%3Fid%3Dcom.Webtrekk.SDKTest", false);
+        launchClickID("http://appinstall.webtrekk.net/appinstall/v1/redirect?mc="+MEDIA_CODE+"&trackid=&as1=market%3A//details%3Fid%3Dcom.webtrekk.SDKTest", false);
     }
 
     private String[] getFileList(final String contains)
@@ -212,7 +212,7 @@ public class AttributionTest extends WebtrekkBaseSDKTest {
             return;
 
         LocalBroadcastManager.getInstance(getInstrumentation().getTargetContext()).registerReceiver(mSDKNoCampaignTestReceiver,
-                new IntentFilter("com.Webtrekk.CampainMediaMessage"));
+                new IntentFilter("com.webtrekk.CampainMediaMessage"));
 
         Webtrekk.getInstance().initWebtrekk(mApplication, R.raw.webtrekk_config_no_campaign_test);
 
@@ -270,7 +270,7 @@ public class AttributionTest extends WebtrekkBaseSDKTest {
         Webtrekk.getInstance().initWebtrekk(mApplication);
 
         LocalBroadcastManager.getInstance(mApplication).registerReceiver(mSDKCampaignTestReceiver,
-                new IntentFilter("com.Webtrekk.CampainMediaMessage"));
+                new IntentFilter("com.webtrekk.CampainMediaMessage"));
 
         synchronized (mWaiter) {
             while (!mNotifierDone)

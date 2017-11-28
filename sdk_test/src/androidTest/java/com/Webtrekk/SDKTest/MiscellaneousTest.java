@@ -16,7 +16,7 @@
  * Created by Arsen Vartbaronov on 26.04.16.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import android.app.Activity;
 import android.content.Context;

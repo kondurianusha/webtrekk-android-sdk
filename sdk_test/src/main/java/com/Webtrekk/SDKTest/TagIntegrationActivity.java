@@ -16,13 +16,13 @@
  * Created by Arsen Vartbaronov on 11.05.16.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.Webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
+import com.webtrekk.SDKTest.SimpleHTTPServer.HttpServer;
 import com.webtrekk.webtrekksdk.Webtrekk;
 
 import java.io.IOException;

@@ -61,7 +61,7 @@ public class Campaign extends Thread
     private static final String MEDIA_CODE = "INSTALL_SETTINGS_MEDIA_CODE";
     private static final String OPT_OUT = "INSTALL_SETTINGS_OPT_OUT";
     private static final String FIRST_START_INITIATED = "FIRST_START_INITIATED";
-    private static final String CAMPAIGN_MEDIA_CODE_DEFINED_MESSAGE = "com.Webtrekk.CampainMediaMessage";
+    private static final String CAMPAIGN_MEDIA_CODE_DEFINED_MESSAGE = "com.webtrekk.CampainMediaMessage";
     private static final String CAMPAIGN_PROCESS_FINISHED = "CAMPAIGN_PROCESS_FINISHED";
 
 

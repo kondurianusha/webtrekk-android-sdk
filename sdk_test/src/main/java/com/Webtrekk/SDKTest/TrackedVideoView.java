@@ -16,7 +16,7 @@
  * Created by Thomas Dahlmann on 24.04.15.
  */
 
-package com.Webtrekk.SDKTest;
+package com.webtrekk.SDKTest;
 
 import android.content.Context;
 import android.util.AttributeSet;

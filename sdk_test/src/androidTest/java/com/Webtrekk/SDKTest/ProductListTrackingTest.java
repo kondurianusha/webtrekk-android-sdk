@@ -55,9 +55,14 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
 
     @Rule
     public final WebtrekkTestRule<ProductListActivity> mActivityRule =
-            new WebtrekkTestRule<>(ProductListActivity.class, this);
+            new WebtrekkTestRule<>(ProductListActivity.class, null,false, true);
+
+    @Rule
+    public final WebtrekkTestRule<EmptyActivity> mEmptyActivity =
+            new WebtrekkTestRule<>(EmptyActivity.class, null,false, true);
 
     @Override
+    @Before
     public void before() throws Exception {
         super.before();
         mWaitMilliseconds = 5000;
@@ -76,9 +81,7 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
     }
     @Test
     public void manualTrackingTest(){
-
-        mActivityRule.finishActivity();
-
+        mEmptyActivity.launchActivity(null);
         final ProductListTracker productListTracker = Webtrekk.getInstance().getProductListTracker();
 
         //Tracking position some items
@@ -391,6 +394,7 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
 
     @Test
     public void integrationWithRecyclingViewNothingSendTest(){
+        mActivityRule.launchActivity(null);
         try {
             onView(withId(R.id.productListRecyclerView)).perform(swipeUp());
             initWaitingForTrack(null, true);
@@ -407,6 +411,7 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
 
     @Test
     public void integrationWithRecyclingViewSendOnFirstPageTest(){
+        mActivityRule.launchActivity(null);
         try {
             sleep(2100);
             initWaitingForTrack(null);
@@ -423,6 +428,7 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
 
     @Test
     public void validateCorrectDataToSend(){
+        mActivityRule.launchActivity(null);
         try {
             RecyclerView recyclerView = mActivityRule.getActivity().getRecyclerView();
             LinearLayoutManager linearLayoutManager = (LinearLayoutManager)recyclerView.getLayoutManager();
@@ -507,8 +513,7 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
 
     @Test
     public void savingPositionToHardMemory(){
-        mActivityRule.finishActivity();
-
+        mEmptyActivity.launchActivity(null);
         ProductListTracker productListTracker = Webtrekk.getInstance().getProductListTracker();
 
         //Tracking position some items
@@ -541,12 +546,12 @@ public class ProductListTrackingTest extends WebtrekkBaseMainTest {
         waitForTrackedURL();
 
         //restart WT instance like application restart
+        mEmptyActivity.finishActivity();
         releaseWTInstance();
         setupWTInstance();
         initWT();
 
-        mActivityRule.launchActivity(null);
-        mActivityRule.finishActivity();
+        mEmptyActivity.launchActivity(null);
 
         productListTracker = Webtrekk.getInstance().getProductListTracker();
 
